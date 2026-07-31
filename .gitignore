@@ -61,3 +61,6 @@ config/local_settings.py
 
 # API Keys
 config/secrets.py
+
+# SQLite database
+data/*.db
