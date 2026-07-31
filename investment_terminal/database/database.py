@@ -13,9 +13,10 @@ class Database:
 
     def __init__(self):
 
-        self.connection = sqlite3.connect(
-            Settings.DATABASE_PATH
-        )
+self.connection = sqlite3.connect(
+    Settings.DATABASE_PATH,
+    detect_types=sqlite3.PARSE_DECLTYPES,
+)
 
         self.connection.row_factory = sqlite3.Row
 
