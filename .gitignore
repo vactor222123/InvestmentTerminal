@@ -1,0 +1,61 @@
+# ============================================
+# Investment Terminal
+# Git Ignore
+# ============================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Environment Variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Output Files
+output/
+*.xlsx
+
+# Cache
+.cache/
+.pytest_cache/
+
+# Testing
+.coverage
+htmlcov/
+
+# Distribution
+build/
+dist/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Temporary Files
+*.tmp
+*.bak
+
+# Local Configuration
+config/local_settings.py
+
+# API Keys
+config/secrets.py
