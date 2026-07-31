@@ -35,5 +35,14 @@ db.close()
 
 print("Database: OK")
 
+from investment_terminal.models.quote import Quote
+
+quote = Quote(
+    symbol="TEST",
+    price=100.0
+)
+
+print("Quote Model: OK")
+
 if __name__ == "__main__":
     main()
