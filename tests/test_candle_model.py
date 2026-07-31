@@ -9,6 +9,7 @@ import pytest
 
 from investment_terminal.database.database import Database
 from investment_terminal.models.candle import Candle
+from investment_terminal.config.settings import Settings    
 
 
 def create_candle() -> Candle:
@@ -66,7 +67,16 @@ def test_database_creates_candles_table() -> None:
         database.close()
 
 
-def test_candles_table_rejects_duplicate_candle() -> None:
+def test_candles_table_rejects_duplicate_candle(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(
+        Settings,
+        "DATABASE_PATH",
+        tmp_path / "candles.db",
+    )
+
     database = Database()
     database.initialize()
 
