@@ -9,6 +9,8 @@ import requests
 
 from investment_terminal.config.settings import Settings
 from investment_terminal.utils.exceptions import APIError, ConfigurationError
+from datetime import datetime, timezone
+from investment_terminal.models.quote import Quote
 
 
 @dataclass(slots=True)
@@ -136,6 +138,88 @@ class FinnhubClient:
             )
 
         return payload
+        
+    def get_quote(
+        self,
+        symbol: str,
+        currency: str = "USD",
+    ) -> Quote:
+        """
+        Download and validate the latest quote for a symbol.
+
+        Finnhub's quote endpoint does not provide currency, so the
+        caller must supply the expected currency when it is not USD.
+        """
+        normalized_symbol = symbol.strip().upper()
+        normalized_currency = currency.strip().upper()
+
+        if not normalized_symbol:
+            raise ValueError("Quote symbol must not be empty.")
+
+        if not normalized_currency:
+            raise ValueError("Quote currency must not be empty.")
+
+        payload = self.get_json(
+            "/quote",
+            params={"symbol": normalized_symbol},
+        )
+
+        price = self._require_positive_number(
+            payload,
+            key="c",
+            field_name="current price",
+        )
+
+        timestamp_value = self._require_positive_number(
+            payload,
+            key="t",
+            field_name="timestamp",
+        )
+
+        timestamp = datetime.fromtimestamp(
+            timestamp_value,
+            tz=timezone.utc,
+        )
+
+        return Quote(
+            symbol=normalized_symbol,
+            price=price,
+            currency=normalized_currency,
+            timestamp=timestamp,
+        )
+
+    @staticmethod
+    def _require_positive_number(
+        payload: dict[str, Any],
+        key: str,
+        field_name: str,
+    ) -> float:
+        """
+        Read and validate a required positive numeric field.
+        """
+        if key not in payload:
+            raise APIError(
+                f"Finnhub response is missing {field_name}."
+            )
+
+        value = payload[key]
+
+        if isinstance(value, bool) or not isinstance(
+            value,
+            (int, float),
+        ):
+            raise APIError(
+                f"Finnhub {field_name} must be numeric."
+            )
+
+        numeric_value = float(value)
+
+        if numeric_value <= 0:
+            raise APIError(
+                f"Finnhub {field_name} must be greater than zero."
+            )
+
+        return numeric_value
 
     def close(self) -> None:
         """

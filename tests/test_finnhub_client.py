@@ -206,3 +206,98 @@ def test_context_manager_closes_session() -> None:
         assert client.api_key == "test-key"
 
     session.close.assert_called_once()
+
+def test_get_quote_returns_quote_model() -> None:
+    client, session = create_client_with_mock_session()
+
+    response = Mock()
+    response.raise_for_status.return_value = None
+    response.json.return_value = {
+        "c": 412.75,
+        "t": 1_700_000_000,
+    }
+
+    session.get.return_value = response
+
+    quote = client.get_quote(" msft ")
+
+    assert quote.symbol == "MSFT"
+    assert quote.price == 412.75
+    assert quote.currency == "USD"
+    assert quote.timestamp is not None
+    assert quote.timestamp.tzinfo is not None
+
+
+def test_get_quote_accepts_explicit_currency() -> None:
+    client, session = create_client_with_mock_session()
+
+    response = Mock()
+    response.raise_for_status.return_value = None
+    response.json.return_value = {
+        "c": 210.50,
+        "t": 1_700_000_000,
+    }
+
+    session.get.return_value = response
+
+    quote = client.get_quote(
+        symbol="SAP.DE",
+        currency="EUR",
+    )
+
+    assert quote.symbol == "SAP.DE"
+    assert quote.currency == "EUR"
+
+
+def test_get_quote_rejects_empty_symbol() -> None:
+    client, _ = create_client_with_mock_session()
+
+    with pytest.raises(ValueError, match="symbol"):
+        client.get_quote("   ")
+
+
+def test_get_quote_rejects_missing_price() -> None:
+    client, session = create_client_with_mock_session()
+
+    response = Mock()
+    response.raise_for_status.return_value = None
+    response.json.return_value = {
+        "t": 1_700_000_000,
+    }
+
+    session.get.return_value = response
+
+    with pytest.raises(APIError, match="current price"):
+        client.get_quote("MSFT")
+
+
+def test_get_quote_rejects_zero_price() -> None:
+    client, session = create_client_with_mock_session()
+
+    response = Mock()
+    response.raise_for_status.return_value = None
+    response.json.return_value = {
+        "c": 0,
+        "t": 1_700_000_000,
+    }
+
+    session.get.return_value = response
+
+    with pytest.raises(APIError, match="greater than zero"):
+        client.get_quote("MSFT")
+
+
+def test_get_quote_rejects_invalid_timestamp() -> None:
+    client, session = create_client_with_mock_session()
+
+    response = Mock()
+    response.raise_for_status.return_value = None
+    response.json.return_value = {
+        "c": 412.75,
+        "t": 0,
+    }
+
+    session.get.return_value = response
+
+    with pytest.raises(APIError, match="timestamp"):
+        client.get_quote("MSFT")
