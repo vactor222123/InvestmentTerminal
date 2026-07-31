@@ -9,7 +9,7 @@ import requests
 
 from investment_terminal.clients.finnhub_client import FinnhubClient
 from investment_terminal.utils.exceptions import APIError, ConfigurationError
-
+from datetime import datetime, timezone
 
 def create_client_with_mock_session() -> tuple[FinnhubClient, Mock]:
     """
@@ -301,3 +301,175 @@ def test_get_quote_rejects_invalid_timestamp() -> None:
 
     with pytest.raises(APIError, match="timestamp"):
         client.get_quote("MSFT")
+
+def test_get_candles_returns_candle_models() -> None:
+    client, session = create_client_with_mock_session()
+
+    response = Mock()
+    response.raise_for_status.return_value = None
+    response.json.return_value = {
+        "s": "ok",
+        "o": [100.0, 101.0],
+        "h": [105.0, 106.0],
+        "l": [98.0, 99.0],
+        "c": [103.0, 104.0],
+        "v": [1_000_000, 1_100_000],
+        "t": [1_700_000_000, 1_700_086_400],
+    }
+
+    session.get.return_value = response
+
+    start = datetime(
+        2023,
+        11,
+        14,
+        tzinfo=timezone.utc,
+    )
+    end = datetime(
+        2023,
+        11,
+        17,
+        tzinfo=timezone.utc,
+    )
+
+    candles = client.get_candles(
+        symbol="msft",
+        resolution="d",
+        start=start,
+        end=end,
+    )
+
+    assert len(candles) == 2
+    assert candles[0].symbol == "MSFT"
+    assert candles[0].resolution == "D"
+    assert candles[0].open_price == 100.0
+    assert candles[0].close_price == 103.0
+    assert candles[0].currency == "USD"
+
+
+def test_get_candles_returns_empty_list_for_no_data() -> None:
+    client, session = create_client_with_mock_session()
+
+    response = Mock()
+    response.raise_for_status.return_value = None
+    response.json.return_value = {
+        "s": "no_data",
+    }
+
+    session.get.return_value = response
+
+    start = datetime(
+        2023,
+        1,
+        1,
+        tzinfo=timezone.utc,
+    )
+    end = datetime(
+        2023,
+        1,
+        2,
+        tzinfo=timezone.utc,
+    )
+
+    assert client.get_candles(
+        symbol="MSFT",
+        resolution="D",
+        start=start,
+        end=end,
+    ) == []
+
+
+def test_get_candles_rejects_inconsistent_array_lengths() -> None:
+    client, session = create_client_with_mock_session()
+
+    response = Mock()
+    response.raise_for_status.return_value = None
+    response.json.return_value = {
+        "s": "ok",
+        "o": [100.0],
+        "h": [105.0],
+        "l": [98.0],
+        "c": [103.0, 104.0],
+        "v": [1_000_000],
+        "t": [1_700_000_000],
+    }
+
+    session.get.return_value = response
+
+    start = datetime(
+        2023,
+        1,
+        1,
+        tzinfo=timezone.utc,
+    )
+    end = datetime(
+        2023,
+        1,
+        2,
+        tzinfo=timezone.utc,
+    )
+
+    with pytest.raises(APIError, match="inconsistent lengths"):
+        client.get_candles(
+            symbol="MSFT",
+            resolution="D",
+            start=start,
+            end=end,
+        )
+
+
+def test_get_candles_rejects_missing_field() -> None:
+    client, session = create_client_with_mock_session()
+
+    response = Mock()
+    response.raise_for_status.return_value = None
+    response.json.return_value = {
+        "s": "ok",
+        "o": [100.0],
+        "h": [105.0],
+        "l": [98.0],
+        "c": [103.0],
+        "t": [1_700_000_000],
+    }
+
+    session.get.return_value = response
+
+    start = datetime(
+        2023,
+        1,
+        1,
+        tzinfo=timezone.utc,
+    )
+    end = datetime(
+        2023,
+        1,
+        2,
+        tzinfo=timezone.utc,
+    )
+
+    with pytest.raises(APIError, match="missing 'v'"):
+        client.get_candles(
+            symbol="MSFT",
+            resolution="D",
+            start=start,
+            end=end,
+        )
+
+
+def test_get_candles_rejects_invalid_date_range() -> None:
+    client, _ = create_client_with_mock_session()
+
+    moment = datetime(
+        2023,
+        1,
+        1,
+        tzinfo=timezone.utc,
+    )
+
+    with pytest.raises(ValueError, match="earlier"):
+        client.get_candles(
+            symbol="MSFT",
+            resolution="D",
+            start=moment,
+            end=moment,
+        )

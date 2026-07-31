@@ -11,6 +11,7 @@ from investment_terminal.config.settings import Settings
 from investment_terminal.utils.exceptions import APIError, ConfigurationError
 from datetime import datetime, timezone
 from investment_terminal.models.quote import Quote
+from investment_terminal.models.candle import Candle
 
 
 @dataclass(slots=True)
@@ -27,6 +28,192 @@ class FinnhubClient:
         repr=False,
     )
 
+    def get_candles(
+        self,
+        symbol: str,
+        resolution: str,
+        start: datetime,
+        end: datetime,
+        currency: str = "USD",
+    ) -> list[Candle]:
+        """
+        Download and validate historical OHLCV candles.
+        """
+        normalized_symbol = symbol.strip().upper()
+        normalized_resolution = resolution.strip().upper()
+        normalized_currency = currency.strip().upper()
+
+        if not normalized_symbol:
+            raise ValueError("Candle symbol must not be empty.")
+
+        if not normalized_resolution:
+            raise ValueError("Candle resolution must not be empty.")
+
+        if not normalized_currency:
+            raise ValueError("Candle currency must not be empty.")
+
+        if not isinstance(start, datetime):
+            raise TypeError("start must be a datetime")
+
+        if not isinstance(end, datetime):
+            raise TypeError("end must be a datetime")
+
+        if start >= end:
+            raise ValueError("start must be earlier than end")
+
+        payload = self.get_json(
+            "/stock/candle",
+            params={
+                "symbol": normalized_symbol,
+                "resolution": normalized_resolution,
+                "from": int(start.timestamp()),
+                "to": int(end.timestamp()),
+            },
+        )
+
+        status = payload.get("s")
+
+        if status == "no_data":
+            return []
+
+        if status != "ok":
+            raise APIError(
+                "Finnhub candle response has an invalid status."
+            )
+
+        required_keys = ("o", "h", "l", "c", "v", "t")
+
+        for key in required_keys:
+            if key not in payload:
+                raise APIError(
+                    f"Finnhub candle response is missing '{key}'."
+                )
+
+            if not isinstance(payload[key], list):
+                raise APIError(
+                    f"Finnhub candle field '{key}' must be a list."
+                )
+
+        lengths = {
+            len(payload[key])
+            for key in required_keys
+        }
+
+        if len(lengths) != 1:
+            raise APIError(
+                "Finnhub candle arrays have inconsistent lengths."
+            )
+
+        candles: list[Candle] = []
+
+        for index in range(len(payload["t"])):
+            candle = Candle(
+                symbol=normalized_symbol,
+                resolution=normalized_resolution,
+                timestamp=datetime.fromtimestamp(
+                    payload["t"][index],
+                    tz=timezone.utc,
+                ),
+                open_price=self._require_positive_list_number(
+                    payload["o"],
+                    index,
+                    "open price",
+                ),
+                high_price=self._require_positive_list_number(
+                    payload["h"],
+                    index,
+                    "high price",
+                ),
+                low_price=self._require_positive_list_number(
+                    payload["l"],
+                    index,
+                    "low price",
+                ),
+                close_price=self._require_positive_list_number(
+                    payload["c"],
+                    index,
+                    "close price",
+                ),
+                volume=self._require_non_negative_list_number(
+                    payload["v"],
+                    index,
+                    "volume",
+                ),
+                currency=normalized_currency,
+            )
+
+            if candle.high_price < max(
+                candle.open_price,
+                candle.close_price,
+                candle.low_price,
+            ):
+                raise APIError(
+                    "Finnhub candle high price is inconsistent."
+                )
+
+            if candle.low_price > min(
+                candle.open_price,
+                candle.close_price,
+                candle.high_price,
+            ):
+                raise APIError(
+                    "Finnhub candle low price is inconsistent."
+                )
+
+            candles.append(candle)
+
+        return candles
+
+    @staticmethod
+    def _require_positive_list_number(
+        values: list[Any],
+        index: int,
+        field_name: str,
+    ) -> float:
+        value = values[index]
+
+        if isinstance(value, bool) or not isinstance(
+            value,
+            (int, float),
+        ):
+            raise APIError(
+                f"Finnhub candle {field_name} must be numeric."
+            )
+
+        numeric_value = float(value)
+
+        if numeric_value <= 0:
+            raise APIError(
+                f"Finnhub candle {field_name} must be greater than zero."
+            )
+
+        return numeric_value
+
+    @staticmethod
+    def _require_non_negative_list_number(
+        values: list[Any],
+        index: int,
+        field_name: str,
+    ) -> float:
+        value = values[index]
+
+        if isinstance(value, bool) or not isinstance(
+            value,
+            (int, float),
+        ):
+            raise APIError(
+                f"Finnhub candle {field_name} must be numeric."
+            )
+
+        numeric_value = float(value)
+
+        if numeric_value < 0:
+            raise APIError(
+                f"Finnhub candle {field_name} must not be negative."
+            )
+
+        return numeric_value
+        
     def __post_init__(self) -> None:
         """
         Validate client configuration.
