@@ -1,16 +1,30 @@
 """
 Investment Terminal
-Main entry point.
 """
 
-from investment_terminal.config.settings import FINNHUB_API_KEY
+from investment_terminal.config.settings import Settings
+from investment_terminal.utils.logger import setup_logger
 
 
-def main() -> None:
-    print("=" * 50)
+def main():
+
+    Settings.validate()
+
+    logger = setup_logger(Settings.LOG_DIR)
+
+    logger.info("Investment Terminal started.")
+
+    print("=" * 60)
     print("Investment Terminal")
-    print("=" * 50)
-    print(f"Finnhub API: {'OK' if FINNHUB_API_KEY else 'Missing'}")
+    print("=" * 60)
+
+    print("Configuration: OK")
+
+    print("Finnhub API: OK")
+
+    print("Logger: OK")
+
+    logger.info("Initialization successful.")
 
 
 if __name__ == "__main__":
