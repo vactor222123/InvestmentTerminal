@@ -25,7 +25,15 @@ def main():
     print("Logger: OK")
 
     logger.info("Initialization successful.")
+from investment_terminal.database.database import Database
 
+db = Database()
+
+db.initialize()
+
+db.close()
+
+print("Database: OK")
 
 if __name__ == "__main__":
     main()
