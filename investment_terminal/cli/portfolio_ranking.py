@@ -1,5 +1,5 @@
 """
-Run a live portfolio ranking.
+Run a live portfolio ranking with contextual recommendations.
 """
 
 from investment_terminal.clients.yahoo_fundamental_client import (
@@ -14,6 +14,9 @@ from investment_terminal.database.database import (
 from investment_terminal.portfolio.ranking_engine import (
     RankingEngine,
 )
+from investment_terminal.portfolio.recommendation_engine import (
+    RecommendationEngine,
+)
 from investment_terminal.repositories.candle_repository import (
     CandleRepository,
 )
@@ -27,7 +30,7 @@ from investment_terminal.services.technical_analysis_service import (
 
 def main() -> None:
     """
-    Execute a live portfolio ranking.
+    Execute a live portfolio ranking and recommendation run.
     """
     database = Database()
     database.initialize()
@@ -53,6 +56,9 @@ def main() -> None:
         )
 
         ranking_engine = RankingEngine()
+        recommendation_engine = (
+            RecommendationEngine()
+        )
 
         decisions = [
             asset_analysis_service.analyze(
@@ -67,18 +73,28 @@ def main() -> None:
             decisions=decisions,
         )
 
+        recommendation_result = (
+            recommendation_engine.recommend(
+                ranking=ranking,
+            )
+        )
+
         print()
-        print("=" * 90)
-        print("Investment Terminal Portfolio Ranking")
-        print("=" * 90)
+        print("=" * 110)
         print(
-            f"Universe size : {ranking.universe_size}"
+            "Investment Terminal Portfolio "
+            "Ranking and Recommendations"
+        )
+        print("=" * 110)
+        print(
+            f"Universe size : "
+            f"{recommendation_result.universe_size}"
         )
         print(
             f"Generated     : "
-            f"{ranking.generated_at.isoformat()}"
+            f"{recommendation_result.generated_at.isoformat()}"
         )
-        print("-" * 90)
+        print("-" * 110)
 
         print(
             f"{'Rank':<5}"
@@ -87,36 +103,57 @@ def main() -> None:
             f"{'Tech':>10}"
             f"{'Fund':>10}"
             f"{'Conf':>10}"
-            f"{'Risk':>14}"
+            f"{'Risk':>12}"
+            f"{'Recommendation':>20}"
         )
 
-        print("-" * 90)
+        print("-" * 110)
 
-        for candidate in ranking.candidates:
+        for recommendation in (
+            recommendation_result.recommendations
+        ):
+            candidate = recommendation.candidate
+
             print(
-                f"{candidate.rank:<5}"
-                f"{candidate.symbol:<8}"
+                f"{recommendation.rank:<5}"
+                f"{recommendation.symbol:<8}"
                 f"{candidate.overall_score:>10.2f}"
                 f"{candidate.technical_score:>10.2f}"
                 f"{candidate.fundamental_score:>10.2f}"
                 f"{candidate.confidence_score:>10.2f}"
-                f"{candidate.risk_level:>14}"
+                f"{candidate.risk_level:>12}"
+                f"{recommendation.recommendation:>20}"
             )
 
-        top = ranking.top_candidate
+        top = (
+            recommendation_result
+            .top_recommendation
+        )
 
         print()
-        print("=" * 90)
-        print("Top Candidate")
-        print("=" * 90)
+        print("=" * 110)
+        print("Top Portfolio Candidate")
+        print("=" * 110)
         print(f"Symbol            : {top.symbol}")
+        print(
+            f"Rank              : "
+            f"#{top.rank}"
+        )
+        print(
+            f"Recommendation    : "
+            f"{top.recommendation}"
+        )
         print(
             f"Overall Score     : "
             f"{top.overall_score:.2f}"
         )
         print(
+            f"Confidence        : "
+            f"{top.confidence_score:.2f}"
+        )
+        print(
             f"Business Quality  : "
-            f"{top.business_quality}"
+            f"{top.candidate.business_quality}"
         )
         print(
             f"Risk Level        : "
@@ -124,13 +161,35 @@ def main() -> None:
         )
         print(
             f"Classification    : "
-            f"{top.classification}"
+            f"{top.candidate.classification}"
         )
 
         print()
-        print("Summary")
-        print("-" * 90)
-        print(top.decision.summary)
+        print("Why")
+        print("-" * 110)
+
+        for item in top.rationale:
+            print(f"+ {item}")
+
+        if top.cautions:
+            print()
+            print("Cautions")
+            print("-" * 110)
+
+            for item in top.cautions:
+                print(f"- {item}")
+
+        print()
+        print("Decision Summary")
+        print("-" * 110)
+        print(top.candidate.decision.summary)
+
+        print()
+        print(
+            "Note: Recommendations are analytical "
+            "screening labels and are not personalized "
+            "financial advice."
+        )
 
     finally:
         database.close()
