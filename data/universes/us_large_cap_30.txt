@@ -1,0 +1,40 @@
+# Diversified US Large Cap test universe
+# Technology
+AAPL
+MSFT
+GOOGL
+AMZN
+META
+NVDA
+AVGO
+ORCL
+CRM
+ADBE
+
+# Financials
+JPM
+BAC
+GS
+V
+MA
+
+# Healthcare
+LLY
+JNJ
+UNH
+ABBV
+MRK
+
+# Consumer
+WMT
+COST
+HD
+MCD
+NKE
+
+# Industrials and energy
+CAT
+GE
+HON
+XOM
+CVX
