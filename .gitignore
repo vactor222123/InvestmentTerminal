@@ -64,3 +64,6 @@ config/secrets.py
 
 # SQLite database
 data/*.db
+
+# Generated analysis output
+output/
