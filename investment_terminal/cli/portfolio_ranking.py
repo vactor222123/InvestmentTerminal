@@ -1,41 +1,29 @@
 """
-Run a fresh live portfolio analysis with ranking,
-recommendations, theses, and JSON export.
+Run a fresh live portfolio analysis with ranking, recommendations,
+theses, and compact JSON export.
 """
 
 from datetime import datetime, timezone
 from pathlib import Path
 
-from investment_terminal.clients.yahoo_finance_client import (
-    YahooFinanceClient,
-)
+from investment_terminal.clients.yahoo_finance_client import YahooFinanceClient
 from investment_terminal.clients.yahoo_fundamental_client import (
     YahooFundamentalClient,
 )
-from investment_terminal.config.universe import (
-    MEGA_CAP_TECH,
+from investment_terminal.config.universe import MEGA_CAP_TECH
+from investment_terminal.database.database import Database
+from investment_terminal.exporters.portfolio_exporter import PortfolioExporter
+from investment_terminal.portfolio.allocation_engine import (
+    PortfolioAllocationEngine,
 )
-from investment_terminal.database.database import (
-    Database,
+from investment_terminal.portfolio.allocation_models import (
+    PortfolioAllocationResult,
 )
-from investment_terminal.exporters.portfolio_exporter import (
-    PortfolioExporter,
-)
-from investment_terminal.portfolio.ranking_engine import (
-    RankingEngine,
-)
-from investment_terminal.portfolio.recommendation_engine import (
-    RecommendationEngine,
-)
-from investment_terminal.portfolio.thesis_generator import (
-    InvestmentThesisGenerator,
-)
-from investment_terminal.repositories.candle_repository import (
-    CandleRepository,
-)
-from investment_terminal.services.asset_analysis_service import (
-    AssetAnalysisService,
-)
+from investment_terminal.portfolio.ranking_engine import RankingEngine
+from investment_terminal.portfolio.recommendation_engine import RecommendationEngine
+from investment_terminal.portfolio.thesis_generator import InvestmentThesisGenerator
+from investment_terminal.repositories.candle_repository import CandleRepository
+from investment_terminal.services.asset_analysis_service import AssetAnalysisService
 from investment_terminal.services.historical_market_service import (
     HistoricalMarketService,
 )
@@ -54,70 +42,34 @@ from investment_terminal.services.technical_analysis_service import (
 UNIVERSE_NAME = "Mega Cap Tech"
 RESOLUTION = "D"
 CURRENCY = "USD"
+OUTPUT_PATH = Path("output") / "mega_cap_tech_portfolio.json"
 
-OUTPUT_PATH = (
-    Path("output")
-    / "mega_cap_tech_portfolio.json"
-)
+ALLOCATION_PROFILE = "BALANCED"
+ALLOCATION_CAPITAL = 100_000.0
 
 
 def main() -> None:
-    """
-    Refresh market data, run portfolio analysis, and export JSON.
-    """
     database = Database()
     database.initialize()
 
     try:
-        repository = CandleRepository(
-            database
-        )
-
-        checked_at = datetime.now(
-            timezone.utc
-        )
+        repository = CandleRepository(database)
+        checked_at = datetime.now(timezone.utc)
 
         refresh_result = refresh_market_data(
             repository=repository,
             checked_at=checked_at,
         )
+        print_refresh_result(refresh_result)
+        require_fresh_market_data(refresh_result)
 
-        print_refresh_result(
-            refresh_result
+        technical_analysis_service = TechnicalAnalysisService(
+            repository=repository,
         )
-
-        require_fresh_market_data(
-            refresh_result
-        )
-
-        technical_analysis_service = (
-            TechnicalAnalysisService(
-                repository=repository,
-            )
-        )
-
-        fundamental_client = (
-            YahooFundamentalClient()
-        )
-
-        asset_analysis_service = (
-            AssetAnalysisService(
-                technical_analysis_service=(
-                    technical_analysis_service
-                ),
-                fundamental_client=fundamental_client,
-            )
-        )
-
-        ranking_engine = RankingEngine()
-        recommendation_engine = (
-            RecommendationEngine()
-        )
-        thesis_generator = (
-            InvestmentThesisGenerator()
-        )
-        portfolio_exporter = (
-            PortfolioExporter()
+        fundamental_client = YahooFundamentalClient()
+        asset_analysis_service = AssetAnalysisService(
+            technical_analysis_service=technical_analysis_service,
+            fundamental_client=fundamental_client,
         )
 
         decisions = [
@@ -129,42 +81,40 @@ def main() -> None:
             for symbol in MEGA_CAP_TECH
         ]
 
-        generated_at = datetime.now(
-            timezone.utc
-        )
-
-        ranking = ranking_engine.rank(
+        generated_at = datetime.now(timezone.utc)
+        ranking = RankingEngine().rank(
             decisions=decisions,
             generated_at=generated_at,
         )
-
-        recommendation_result = (
-            recommendation_engine.recommend(
-                ranking=ranking,
-                generated_at=generated_at,
-            )
+        recommendation_result = RecommendationEngine().recommend(
+            ranking=ranking,
+            generated_at=generated_at,
         )
-
-        thesis_result = thesis_generator.generate(
-            recommendation_result=(
-                recommendation_result
-            ),
+        thesis_result = InvestmentThesisGenerator().generate(
+            recommendation_result=recommendation_result,
             generated_at=generated_at,
         )
 
-        export_package = (
-            portfolio_exporter.build_package(
-                universe_name=UNIVERSE_NAME,
-                ranking=ranking,
-                recommendations=(
-                    recommendation_result
-                ),
-                theses=thesis_result,
+        allocation_result = (
+            PortfolioAllocationEngine().allocate(
+                recommendations=recommendation_result,
+                total_capital=ALLOCATION_CAPITAL,
+                profile=ALLOCATION_PROFILE,
+                currency=CURRENCY,
                 generated_at=generated_at,
             )
         )
 
-        saved_path = portfolio_exporter.save_json(
+        exporter = PortfolioExporter()
+        export_package = exporter.build_package(
+            universe_name=UNIVERSE_NAME,
+            market_data=refresh_result,
+            ranking=ranking,
+            recommendations=recommendation_result,
+            theses=thesis_result,
+            generated_at=generated_at,
+        )
+        saved_path = exporter.save_json(
             package=export_package,
             output_path=OUTPUT_PATH,
         )
@@ -172,9 +122,9 @@ def main() -> None:
         print_portfolio_result(
             export_package=export_package,
             thesis_result=thesis_result,
+            allocation_result=allocation_result,
             saved_path=saved_path,
         )
-
     finally:
         database.close()
 
@@ -183,35 +133,17 @@ def refresh_market_data(
     repository: CandleRepository,
     checked_at: datetime,
 ) -> UniverseMarketDataRefreshResult:
-    """
-    Ensure all technical market data satisfies freshness policy.
-    """
-    historical_client = (
-        YahooFinanceClient()
+    historical_market_service = HistoricalMarketService(
+        client=YahooFinanceClient(),
+        repository=repository,
     )
-
-    historical_market_service = (
-        HistoricalMarketService(
-            client=historical_client,
-            repository=repository,
-        )
+    freshness_service = MarketDataFreshnessService(
+        repository=repository,
     )
-
-    freshness_service = (
-        MarketDataFreshnessService(
-            repository=repository,
-        )
+    refresh_service = MarketDataRefreshService(
+        freshness_service=freshness_service,
+        historical_market_service=historical_market_service,
     )
-
-    refresh_service = (
-        MarketDataRefreshService(
-            freshness_service=freshness_service,
-            historical_market_service=(
-                historical_market_service
-            ),
-        )
-    )
-
     return refresh_service.ensure_many(
         symbols=MEGA_CAP_TECH,
         resolution=RESOLUTION,
@@ -223,20 +155,13 @@ def refresh_market_data(
 def require_fresh_market_data(
     result: UniverseMarketDataRefreshResult,
 ) -> None:
-    """
-    Stop analysis unless every candle series is fresh.
-    """
     if result.all_ready:
         return
 
-    failed_symbols = ", ".join(
-        result.failed_symbols
-    )
-
+    failed_symbols = ", ".join(result.failed_symbols)
     raise RuntimeError(
-        "Portfolio analysis was stopped because "
-        "market data still exceeds the 24-hour "
-        "freshness limit after refresh. "
+        "Portfolio analysis was stopped because market data did not "
+        "satisfy the trading-session freshness policy after refresh. "
         f"Affected symbols: {failed_symbols}."
     )
 
@@ -244,111 +169,82 @@ def require_fresh_market_data(
 def print_refresh_result(
     result: UniverseMarketDataRefreshResult,
 ) -> None:
-    """
-    Print market-data freshness and refresh statistics.
-    """
     print()
-    print("=" * 110)
+    print("=" * 118)
     print("Market Data Freshness")
-    print("=" * 110)
+    print("=" * 118)
+    print(f"Checked at      : {result.checked_at.isoformat()}")
+    print(f"Universe size   : {result.universe_size}")
+    print(f"Ready           : {result.ready_count}")
+    print(f"Not ready       : {result.failed_count}")
+    print(f"Refresh attempts: {result.refreshed_count}")
+    print("-" * 118)
     print(
-        f"Checked at      : "
-        f"{result.checked_at.isoformat()}"
+        f"{'Symbol':<9}"
+        f"{'Policy':<18}"
+        f"{'Before':<10}"
+        f"{'After':<10}"
+        f"{'Session':<12}"
+        f"{'Expected':<12}"
+        f"{'Age h':>9}"
+        f"{'Downloaded':>12}"
+        f"{'Inserted':>10}"
+        f"{'Ready':>8}"
     )
-    print(
-        f"Universe size   : "
-        f"{result.universe_size}"
-    )
-    print(
-        f"Ready           : "
-        f"{result.ready_count}"
-    )
-    print(
-        f"Not ready       : "
-        f"{result.failed_count}"
-    )
-    print(
-        f"Refresh attempts: "
-        f"{result.refreshed_count}"
-    )
-    print("-" * 110)
-
-    print(
-        f"{'Symbol':<10}"
-        f"{'Before':<12}"
-        f"{'After':<12}"
-        f"{'Age hours':>12}"
-        f"{'Downloaded':>14}"
-        f"{'Inserted':>12}"
-        f"{'Ready':>10}"
-    )
-
-    print("-" * 110)
+    print("-" * 118)
 
     for item in result.results:
+        freshness = item.freshness_after
         age_hours = (
-            f"{item.freshness_after.age_hours:.2f}"
-            if item.freshness_after.age_hours
-            is not None
+            f"{freshness.age_hours:.2f}"
+            if freshness.age_hours is not None
             else "N/A"
         )
-
-        ready_text = (
-            "YES"
-            if item.is_ready
-            else "NO"
+        session = (
+            freshness.last_candle_session_date.isoformat()
+            if freshness.last_candle_session_date is not None
+            else "N/A"
         )
-
+        expected = (
+            freshness.expected_session_date.isoformat()
+            if freshness.expected_session_date is not None
+            else "N/A"
+        )
         print(
-            f"{item.symbol:<10}"
-            f"{item.freshness_before.status:<12}"
-            f"{item.freshness_after.status:<12}"
-            f"{age_hours:>12}"
-            f"{item.downloaded:>14}"
-            f"{item.inserted:>12}"
-            f"{ready_text:>10}"
+            f"{item.symbol:<9}"
+            f"{freshness.policy:<18}"
+            f"{item.freshness_before.status:<10}"
+            f"{freshness.status:<10}"
+            f"{session:<12}"
+            f"{expected:<12}"
+            f"{age_hours:>9}"
+            f"{item.downloaded:>12}"
+            f"{item.inserted:>10}"
+            f"{('YES' if item.is_ready else 'NO'):>8}"
         )
 
     if not result.all_ready:
         print()
-        print(
-            "Freshness policy failed for: "
-            + ", ".join(
-                result.failed_symbols
-            )
-        )
+        print("Freshness policy failed for: " + ", ".join(result.failed_symbols))
 
 
 def print_portfolio_result(
     *,
     export_package,
     thesis_result,
+    allocation_result: PortfolioAllocationResult,
     saved_path: Path,
 ) -> None:
-    """
-    Print portfolio ranking and the top investment thesis.
-    """
     print()
     print("=" * 110)
-    print(
-        "Investment Terminal Portfolio "
-        "Ranking and Recommendations"
-    )
+    print("Investment Terminal Portfolio Ranking and Recommendations")
     print("=" * 110)
-    print(
-        f"Universe      : "
-        f"{export_package.universe_name}"
-    )
-    print(
-        f"Universe size : "
-        f"{export_package.universe_size}"
-    )
-    print(
-        f"Generated     : "
-        f"{export_package.generated_at.isoformat()}"
-    )
+    print(f"Universe      : {export_package.universe_name}")
+    print(f"Universe size : {export_package.universe_size}")
+    print(f"Generated     : {export_package.generated_at.isoformat()}")
+    print(f"Market data   : {'READY' if export_package.market_data.all_ready else 'FAILED'}")
+    print(f"Data checked  : {export_package.market_data.checked_at.isoformat()}")
     print("-" * 110)
-
     print(
         f"{'Rank':<5}"
         f"{'Symbol':<8}"
@@ -359,13 +255,10 @@ def print_portfolio_result(
         f"{'Risk':>12}"
         f"{'Recommendation':>20}"
     )
-
     print("-" * 110)
 
     for thesis in thesis_result.theses:
-        recommendation = thesis.recommendation
-        candidate = recommendation.candidate
-
+        candidate = thesis.recommendation.candidate
         print(
             f"{thesis.rank:<5}"
             f"{thesis.symbol:<8}"
@@ -385,108 +278,132 @@ def print_portfolio_result(
     print("=" * 110)
     print("Top Investment Thesis")
     print("=" * 110)
-    print(
-        f"Symbol            : "
-        f"{top.symbol}"
-    )
-    print(
-        f"Rank              : "
-        f"#{top.rank}"
-    )
-    print(
-        f"Recommendation    : "
-        f"{top.recommendation_label}"
-    )
-    print(
-        f"Overall Score     : "
-        f"{top.overall_score:.2f}"
-    )
-    print(
-        f"Technical Score   : "
-        f"{candidate.technical_score:.2f}"
-    )
-    print(
-        f"Fundamental Score : "
-        f"{candidate.fundamental_score:.2f}"
-    )
-    print(
-        f"Confidence        : "
-        f"{top.confidence_score:.2f}"
-    )
-    print(
-        f"Business Quality  : "
-        f"{candidate.business_quality}"
-    )
-    print(
-        f"Financial Health  : "
-        f"{decision.quality.financial_health}"
-    )
-    print(
-        f"Growth            : "
-        f"{decision.quality.growth}"
-    )
-    print(
-        f"Valuation         : "
-        f"{decision.quality.valuation}"
-    )
-    print(
-        f"Technical State   : "
-        f"{decision.quality.technical_condition}"
-    )
-    print(
-        f"Risk Level        : "
-        f"{top.risk_level}"
-    )
+    print(f"Symbol            : {top.symbol}")
+    print(f"Rank              : #{top.rank}")
+    print(f"Recommendation    : {top.recommendation_label}")
+    print(f"Overall Score     : {top.overall_score:.2f}")
+    print(f"Technical Score   : {candidate.technical_score:.2f}")
+    print(f"Fundamental Score : {candidate.fundamental_score:.2f}")
+    print(f"Confidence        : {top.confidence_score:.2f}")
+    print(f"Business Quality  : {candidate.business_quality}")
+    print(f"Financial Health  : {decision.quality.financial_health}")
+    print(f"Growth            : {decision.quality.growth}")
+    print(f"Valuation         : {decision.quality.valuation}")
+    print(f"Technical State   : {decision.quality.technical_condition}")
+    print(f"Risk Level        : {top.risk_level}")
 
-    print()
-    print("Headline")
+    print("\nHeadline")
     print("-" * 110)
     print(top.headline)
-
-    print()
-    print("Investment Thesis")
+    print("\nInvestment Thesis")
     print("-" * 110)
     print(top.thesis)
-
-    print()
-    print("Strengths")
+    print("\nStrengths")
     print("-" * 110)
-
     for strength in top.strengths:
-        print(
-            f"+ {strength}"
-        )
+        print(f"+ {strength}")
 
     if top.risks:
-        print()
-        print("Risks")
+        print("\nRisks")
         print("-" * 110)
-
         for risk in top.risks:
-            print(
-                f"- {risk}"
-            )
+            print(f"- {risk}")
 
-    print()
-    print("Analytical Action")
+    print("\nAnalytical Action")
     print("-" * 110)
     print(top.action)
 
+    print_allocation_result(
+        allocation_result
+    )
+
+    print("\nExport")
+    print("-" * 110)
+    print(f"JSON saved to: {saved_path.resolve()}")
     print()
-    print("Export")
+    print(
+        "Note: Recommendations and actions are analytical screening "
+        "outputs. They are not personalized financial advice or "
+        "automatic trading instructions."
+    )
+
+
+def print_allocation_result(
+    result: PortfolioAllocationResult,
+) -> None:
+    """
+    Print the generated target portfolio allocation.
+    """
+    print()
+    print("=" * 110)
+    print("Target Portfolio Allocation")
+    print("=" * 110)
+    print(
+        f"Profile          : "
+        f"{result.constraints.profile}"
+    )
+    print(
+        f"Total capital    : "
+        f"{result.total_capital:,.2f} "
+        f"{result.currency}"
+    )
+    print(
+        f"Invested amount  : "
+        f"{result.invested_amount:,.2f} "
+        f"{result.currency}"
+    )
+    print(
+        f"Cash reserve     : "
+        f"{result.cash_amount:,.2f} "
+        f"{result.currency} "
+        f"({result.cash_weight * 100.0:.2f}%)"
+    )
+    print(
+        f"Maximum position : "
+        f"{result.constraints.maximum_position_weight * 100.0:.2f}%"
+    )
+    print("-" * 110)
+
+    print(
+        f"{'Rank':<6}"
+        f"{'Symbol':<10}"
+        f"{'Recommendation':<18}"
+        f"{'Risk':<12}"
+        f"{'Weight':>12}"
+        f"{'Amount':>18}"
+        f"{'Alloc. score':>16}"
+    )
+
+    print("-" * 110)
+
+    for position in result.positions:
+        print(
+            f"{position.rank:<6}"
+            f"{position.symbol:<10}"
+            f"{position.recommendation_label:<18}"
+            f"{position.risk_level:<12}"
+            f"{position.target_percent:>11.2f}%"
+            f"{position.target_amount:>16,.2f} "
+            f"{result.currency:<3}"
+            f"{position.allocation_score:>13.2f}"
+        )
+
     print("-" * 110)
     print(
-        f"JSON saved to: "
-        f"{saved_path.resolve()}"
+        f"{'CASH':<46}"
+        f"{result.cash_weight * 100.0:>11.2f}%"
+        f"{result.cash_amount:>16,.2f} "
+        f"{result.currency}"
     )
 
     print()
-    print(
-        "Note: Recommendations and actions are "
-        "analytical screening outputs. They are not "
-        "personalized financial advice or automatic "
-        "trading instructions."
-    )
+    print("Allocation Rationale")
+    print("-" * 110)
+
+    for position in result.positions:
+        print(
+            f"- {position.explanation}"
+        )
 
 
 if __name__ == "__main__":
