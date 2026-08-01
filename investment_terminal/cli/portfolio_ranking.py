@@ -1,6 +1,10 @@
 """
-Run a live portfolio ranking with recommendations and theses.
+Run a live portfolio ranking with recommendations, theses,
+and JSON export.
 """
+
+from datetime import datetime, timezone
+from pathlib import Path
 
 from investment_terminal.clients.yahoo_fundamental_client import (
     YahooFundamentalClient,
@@ -10,6 +14,9 @@ from investment_terminal.config.universe import (
 )
 from investment_terminal.database.database import (
     Database,
+)
+from investment_terminal.exporters.portfolio_exporter import (
+    PortfolioExporter,
 )
 from investment_terminal.portfolio.ranking_engine import (
     RankingEngine,
@@ -31,15 +38,25 @@ from investment_terminal.services.technical_analysis_service import (
 )
 
 
+UNIVERSE_NAME = "Mega Cap Tech"
+
+OUTPUT_PATH = (
+    Path("output")
+    / "mega_cap_tech_portfolio.json"
+)
+
+
 def main() -> None:
     """
-    Execute a live portfolio analysis, ranking, and thesis run.
+    Execute a live portfolio analysis and save the result as JSON.
     """
     database = Database()
     database.initialize()
 
     try:
-        repository = CandleRepository(database)
+        repository = CandleRepository(
+            database
+        )
 
         technical_analysis_service = (
             TechnicalAnalysisService(
@@ -53,14 +70,23 @@ def main() -> None:
 
         asset_analysis_service = (
             AssetAnalysisService(
-                technical_analysis_service=technical_analysis_service,
+                technical_analysis_service=(
+                    technical_analysis_service
+                ),
                 fundamental_client=fundamental_client,
             )
         )
 
         ranking_engine = RankingEngine()
-        recommendation_engine = RecommendationEngine()
-        thesis_generator = InvestmentThesisGenerator()
+        recommendation_engine = (
+            RecommendationEngine()
+        )
+        thesis_generator = (
+            InvestmentThesisGenerator()
+        )
+        portfolio_exporter = (
+            PortfolioExporter()
+        )
 
         decisions = [
             asset_analysis_service.analyze(
@@ -71,18 +97,44 @@ def main() -> None:
             for symbol in MEGA_CAP_TECH
         ]
 
+        generated_at = datetime.now(
+            timezone.utc
+        )
+
         ranking = ranking_engine.rank(
             decisions=decisions,
+            generated_at=generated_at,
         )
 
         recommendation_result = (
             recommendation_engine.recommend(
                 ranking=ranking,
+                generated_at=generated_at,
             )
         )
 
         thesis_result = thesis_generator.generate(
-            recommendation_result=recommendation_result,
+            recommendation_result=(
+                recommendation_result
+            ),
+            generated_at=generated_at,
+        )
+
+        export_package = (
+            portfolio_exporter.build_package(
+                universe_name=UNIVERSE_NAME,
+                ranking=ranking,
+                recommendations=(
+                    recommendation_result
+                ),
+                theses=thesis_result,
+                generated_at=generated_at,
+            )
+        )
+
+        saved_path = portfolio_exporter.save_json(
+            package=export_package,
+            output_path=OUTPUT_PATH,
         )
 
         print()
@@ -93,12 +145,16 @@ def main() -> None:
         )
         print("=" * 110)
         print(
+            f"Universe      : "
+            f"{export_package.universe_name}"
+        )
+        print(
             f"Universe size : "
-            f"{thesis_result.universe_size}"
+            f"{export_package.universe_size}"
         )
         print(
             f"Generated     : "
-            f"{thesis_result.generated_at.isoformat()}"
+            f"{export_package.generated_at.isoformat()}"
         )
         print("-" * 110)
 
@@ -138,8 +194,14 @@ def main() -> None:
         print("=" * 110)
         print("Top Investment Thesis")
         print("=" * 110)
-        print(f"Symbol            : {top.symbol}")
-        print(f"Rank              : #{top.rank}")
+        print(
+            f"Symbol            : "
+            f"{top.symbol}"
+        )
+        print(
+            f"Rank              : "
+            f"#{top.rank}"
+        )
         print(
             f"Recommendation    : "
             f"{top.recommendation_label}"
@@ -200,7 +262,9 @@ def main() -> None:
         print("-" * 110)
 
         for strength in top.strengths:
-            print(f"+ {strength}")
+            print(
+                f"+ {strength}"
+            )
 
         if top.risks:
             print()
@@ -208,12 +272,22 @@ def main() -> None:
             print("-" * 110)
 
             for risk in top.risks:
-                print(f"- {risk}")
+                print(
+                    f"- {risk}"
+                )
 
         print()
         print("Analytical Action")
         print("-" * 110)
         print(top.action)
+
+        print()
+        print("Export")
+        print("-" * 110)
+        print(
+            f"JSON saved to: "
+            f"{saved_path.resolve()}"
+        )
 
         print()
         print(
