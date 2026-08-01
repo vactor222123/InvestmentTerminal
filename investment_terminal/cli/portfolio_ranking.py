@@ -10,7 +10,6 @@ from investment_terminal.clients.yahoo_finance_client import YahooFinanceClient
 from investment_terminal.clients.yahoo_fundamental_client import (
     YahooFundamentalClient,
 )
-from investment_terminal.config.universe import MEGA_CAP_TECH
 from investment_terminal.database.database import Database
 from investment_terminal.exporters.portfolio_exporter import PortfolioExporter
 from investment_terminal.portfolio.allocation_engine import (
@@ -37,12 +36,18 @@ from investment_terminal.services.market_data_refresh_service import (
 from investment_terminal.services.technical_analysis_service import (
     TechnicalAnalysisService,
 )
+from investment_terminal.universe.universe_loader import (
+    UniverseLoader,
+)
+from investment_terminal.universe.universe_models import (
+    InvestmentUniverse,
+)
 
 
-UNIVERSE_NAME = "Mega Cap Tech"
+UNIVERSE_KEY = "mega_cap_tech"
 RESOLUTION = "D"
 CURRENCY = "USD"
-OUTPUT_PATH = Path("output") / "mega_cap_tech_portfolio.json"
+OUTPUT_DIRECTORY = Path("output")
 
 ALLOCATION_PROFILE = "BALANCED"
 ALLOCATION_CAPITAL = 100_000.0
@@ -54,10 +59,17 @@ def main() -> None:
 
     try:
         repository = CandleRepository(database)
+        universe = UniverseLoader().load(
+            UNIVERSE_KEY
+        )
+        output_path = build_output_path(
+            UNIVERSE_KEY
+        )
         checked_at = datetime.now(timezone.utc)
 
         refresh_result = refresh_market_data(
             repository=repository,
+            universe=universe,
             checked_at=checked_at,
         )
         print_refresh_result(refresh_result)
@@ -78,7 +90,7 @@ def main() -> None:
                 resolution=RESOLUTION,
                 currency=CURRENCY,
             )
-            for symbol in MEGA_CAP_TECH
+            for symbol in universe.symbols
         ]
 
         generated_at = datetime.now(timezone.utc)
@@ -107,7 +119,7 @@ def main() -> None:
 
         exporter = PortfolioExporter()
         export_package = exporter.build_package(
-            universe_name=UNIVERSE_NAME,
+            universe_name=universe.name,
             market_data=refresh_result,
             allocation=allocation_result,
             ranking=ranking,
@@ -117,7 +129,7 @@ def main() -> None:
         )
         saved_path = exporter.save_json(
             package=export_package,
-            output_path=OUTPUT_PATH,
+            output_path=output_path,
         )
 
         print_portfolio_result(
@@ -130,8 +142,28 @@ def main() -> None:
         database.close()
 
 
+def build_output_path(
+    universe_key: str,
+) -> Path:
+    """
+    Build a deterministic JSON output path for a universe.
+    """
+    normalized_key = (
+        UniverseLoader
+        ._normalize_universe_name(
+            universe_key
+        )
+    )
+
+    return (
+        OUTPUT_DIRECTORY
+        / f"{normalized_key}_portfolio.json"
+    )
+
+
 def refresh_market_data(
     repository: CandleRepository,
+    universe: InvestmentUniverse,
     checked_at: datetime,
 ) -> UniverseMarketDataRefreshResult:
     historical_market_service = HistoricalMarketService(
@@ -146,7 +178,7 @@ def refresh_market_data(
         historical_market_service=historical_market_service,
     )
     return refresh_service.ensure_many(
-        symbols=MEGA_CAP_TECH,
+        symbols=universe.symbols,
         resolution=RESOLUTION,
         currency=CURRENCY,
         checked_at=checked_at,
