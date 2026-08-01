@@ -9,6 +9,9 @@ from pathlib import Path
 from investment_terminal.clients.fundamental_data_client import (
     FundamentalDataClient,
 )
+from investment_terminal.decision_engine.decision_engine import (
+    DecisionEngine,
+)
 from investment_terminal.exporters.analysis_exporter import (
     AnalysisExportPackage,
     AnalysisExporter,
@@ -36,7 +39,8 @@ class AnalysisRunResult:
 
 class AnalysisOrchestrator:
     """
-    Run technical and fundamental analysis and export one JSON package.
+    Run technical, fundamental and decision analysis,
+    then export one JSON package.
     """
 
     def __init__(
@@ -45,6 +49,7 @@ class AnalysisOrchestrator:
         technical_score_service: TechnicalScoreService,
         fundamental_client: FundamentalDataClient,
         fundamental_score_service: FundamentalScoreService,
+        decision_engine: DecisionEngine,
         exporter: AnalysisExporter,
     ) -> None:
         self.technical_analysis_service = (
@@ -57,6 +62,7 @@ class AnalysisOrchestrator:
         self.fundamental_score_service = (
             fundamental_score_service
         )
+        self.decision_engine = decision_engine
         self.exporter = exporter
 
     def run(
@@ -112,11 +118,20 @@ class AnalysisOrchestrator:
             timezone.utc
         )
 
+        decision = self.decision_engine.evaluate(
+            technical_analysis=technical_analysis,
+            technical_score=technical_score,
+            fundamental_snapshot=fundamental_snapshot,
+            fundamental_score=fundamental_score,
+            generated_at=generated_at,
+        )
+
         package = self.exporter.build_package(
             technical_analysis=technical_analysis,
             technical_score=technical_score,
             fundamental_snapshot=fundamental_snapshot,
             fundamental_score=fundamental_score,
+            decision=decision,
             generated_at=generated_at,
         )
 

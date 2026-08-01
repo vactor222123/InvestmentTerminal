@@ -1,5 +1,5 @@
 """
-Combined technical and fundamental analysis exporter.
+Combined technical, fundamental and decision analysis exporter.
 """
 
 from dataclasses import asdict, dataclass, is_dataclass
@@ -8,6 +8,9 @@ import json
 from pathlib import Path
 from typing import Any
 
+from investment_terminal.decision_engine.decision_model import (
+    DecisionResult,
+)
 from investment_terminal.models.fundamental_snapshot import (
     FundamentalSnapshot,
 )
@@ -53,6 +56,8 @@ class AnalysisExportPackage:
     fundamental_snapshot: FundamentalSnapshot
     fundamental_score: FundamentalScoreResult
 
+    decision: DecisionResult
+
     data_quality: AnalysisDataQualitySummary
 
     def to_dict(self) -> dict[str, Any]:
@@ -80,6 +85,7 @@ class AnalysisExportPackage:
                     self.fundamental_score.to_dict()
                 ),
             },
+            "decision": self.decision.to_dict(),
             "data_quality": _to_json_ready(
                 self.data_quality
             ),
@@ -99,6 +105,7 @@ class AnalysisExporter:
         technical_score: TechnicalScoreResult,
         fundamental_snapshot: FundamentalSnapshot,
         fundamental_score: FundamentalScoreResult,
+        decision: DecisionResult,
         generated_at: datetime,
     ) -> AnalysisExportPackage:
         """
@@ -109,6 +116,7 @@ class AnalysisExporter:
             technical_score=technical_score,
             fundamental_snapshot=fundamental_snapshot,
             fundamental_score=fundamental_score,
+            decision=decision,
             generated_at=generated_at,
         )
 
@@ -169,6 +177,7 @@ class AnalysisExporter:
             technical_score=technical_score,
             fundamental_snapshot=fundamental_snapshot,
             fundamental_score=fundamental_score,
+            decision=decision,
             data_quality=quality_summary,
         )
 
@@ -220,6 +229,7 @@ class AnalysisExporter:
         technical_score: TechnicalScoreResult,
         fundamental_snapshot: FundamentalSnapshot,
         fundamental_score: FundamentalScoreResult,
+        decision: DecisionResult,
         generated_at: datetime,
     ) -> None:
         """
@@ -261,7 +271,18 @@ class AnalysisExporter:
                 "a FundamentalScoreResult"
             )
 
-        if not isinstance(generated_at, datetime):
+        if not isinstance(
+            decision,
+            DecisionResult,
+        ):
+            raise TypeError(
+                "decision must be a DecisionResult"
+            )
+
+        if not isinstance(
+            generated_at,
+            datetime,
+        ):
             raise TypeError(
                 "generated_at must be a datetime"
             )
@@ -271,6 +292,7 @@ class AnalysisExporter:
             technical_score.symbol,
             fundamental_snapshot.symbol,
             fundamental_score.symbol,
+            decision.symbol,
         }
 
         if len(symbols) != 1:
@@ -284,6 +306,8 @@ class AnalysisExporter:
             != fundamental_snapshot.currency
             or fundamental_snapshot.currency
             != fundamental_score.currency
+            or fundamental_score.currency
+            != decision.currency
         ):
             raise ValueError(
                 "Analysis components use "

@@ -7,6 +7,9 @@ from datetime import datetime, timezone
 
 import pytest
 
+from investment_terminal.decision_engine.decision_engine import (
+    DecisionEngine,
+)
 from investment_terminal.exporters.analysis_exporter import (
     AnalysisExporter,
 )
@@ -95,7 +98,7 @@ def create_technical_score(
             price_position=2.0,
         ),
         positive_factors=(
-            "Price remains above SMA200.",
+            "Price remains above the long-term moving average.",
         ),
         risk_factors=(
             "RSI indicates an overbought market.",
@@ -168,20 +171,29 @@ def create_fundamental_score(
     )
 
 
-def test_build_package_combines_analysis() -> None:
-    package = AnalysisExporter().build_package(
-        technical_analysis=(
-            create_technical_analysis()
-        ),
+def create_decision():
+    return DecisionEngine().evaluate(
+        technical_analysis=create_technical_analysis(),
         technical_score=create_technical_score(),
-        fundamental_snapshot=(
-            create_fundamental_snapshot()
-        ),
-        fundamental_score=(
-            create_fundamental_score()
-        ),
+        fundamental_snapshot=create_fundamental_snapshot(),
+        fundamental_score=create_fundamental_score(),
         generated_at=GENERATED_AT,
     )
+
+
+def create_package():
+    return AnalysisExporter().build_package(
+        technical_analysis=create_technical_analysis(),
+        technical_score=create_technical_score(),
+        fundamental_snapshot=create_fundamental_snapshot(),
+        fundamental_score=create_fundamental_score(),
+        decision=create_decision(),
+        generated_at=GENERATED_AT,
+    )
+
+
+def test_build_package_combines_analysis() -> None:
+    package = create_package()
 
     assert package.schema_version == "1.0"
     assert package.symbol == "MSFT"
@@ -197,64 +209,76 @@ def test_build_package_combines_analysis() -> None:
     )
     assert (
         package.data_quality.overall_percent
-        == pytest.approx(98.22, abs=0.01)
+        == pytest.approx(
+            98.22,
+            abs=0.01,
+        )
     )
+
+    assert package.decision.symbol == "MSFT"
+    assert (
+        package.decision.scores.overall
+        == pytest.approx(77.41)
+    )
+    assert package.decision.classification == "STRONG"
 
 
 def test_package_is_json_serializable() -> None:
-    package = AnalysisExporter().build_package(
-        technical_analysis=(
-            create_technical_analysis()
-        ),
-        technical_score=create_technical_score(),
-        fundamental_snapshot=(
-            create_fundamental_snapshot()
-        ),
-        fundamental_score=(
-            create_fundamental_score()
-        ),
-        generated_at=GENERATED_AT,
-    )
+    package = create_package()
 
     payload = package.to_dict()
+
     serialized = json.dumps(
         payload,
         allow_nan=False,
     )
 
     assert '"schema_version": "1.0"' in serialized
+
     assert (
-        payload["technical"]["analysis"]["timestamp"]
+        payload["technical"]
+        ["analysis"]
+        ["timestamp"]
         == GENERATED_AT.isoformat()
     )
+
     assert isinstance(
-        payload["technical"]["score"]
+        payload["technical"]
+        ["score"]
         ["positive_factors"],
         list,
     )
+
     assert isinstance(
         payload["data_quality"]
         ["fundamental_missing"],
         list,
     )
 
+    assert (
+        payload["decision"]
+        ["classification"]
+        == "STRONG"
+    )
+
+    assert isinstance(
+        payload["decision"]
+        ["risk_factors"],
+        list,
+    )
+
+    assert (
+        payload["decision"]
+        ["scores"]
+        ["overall"]
+        == pytest.approx(77.41)
+    )
+
 
 def test_save_json_creates_file(
     tmp_path,
 ) -> None:
-    package = AnalysisExporter().build_package(
-        technical_analysis=(
-            create_technical_analysis()
-        ),
-        technical_score=create_technical_score(),
-        fundamental_snapshot=(
-            create_fundamental_snapshot()
-        ),
-        fundamental_score=(
-            create_fundamental_score()
-        ),
-        generated_at=GENERATED_AT,
-    )
+    package = create_package()
 
     output_path = (
         tmp_path
@@ -277,11 +301,26 @@ def test_save_json_creates_file(
     )
 
     assert payload["symbol"] == "MSFT"
+
     assert (
         payload["fundamental"]
         ["score"]
         ["final_score"]
         == 85.68
+    )
+
+    assert (
+        payload["decision"]
+        ["scores"]
+        ["overall"]
+        == pytest.approx(77.41)
+    )
+
+    assert (
+        payload["decision"]
+        ["confidence"]
+        ["classification"]
+        == "VERY HIGH"
     )
 
 
@@ -305,6 +344,54 @@ def test_build_package_rejects_symbol_mismatch() -> None:
             fundamental_score=(
                 create_fundamental_score()
             ),
+            decision=create_decision(),
+            generated_at=GENERATED_AT,
+        )
+
+
+def test_build_package_rejects_decision_symbol_mismatch() -> None:
+    mismatched_decision = DecisionEngine().evaluate(
+        technical_analysis=(
+            create_technical_analysis(
+                symbol="AAPL"
+            )
+        ),
+        technical_score=(
+            create_technical_score(
+                symbol="AAPL"
+            )
+        ),
+        fundamental_snapshot=(
+            create_fundamental_snapshot(
+                symbol="AAPL"
+            )
+        ),
+        fundamental_score=(
+            create_fundamental_score(
+                symbol="AAPL"
+            )
+        ),
+        generated_at=GENERATED_AT,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="same symbol",
+    ):
+        AnalysisExporter().build_package(
+            technical_analysis=(
+                create_technical_analysis()
+            ),
+            technical_score=(
+                create_technical_score()
+            ),
+            fundamental_snapshot=(
+                create_fundamental_snapshot()
+            ),
+            fundamental_score=(
+                create_fundamental_score()
+            ),
+            decision=mismatched_decision,
             generated_at=GENERATED_AT,
         )
 
@@ -312,19 +399,7 @@ def test_build_package_rejects_symbol_mismatch() -> None:
 def test_save_json_rejects_wrong_extension(
     tmp_path,
 ) -> None:
-    package = AnalysisExporter().build_package(
-        technical_analysis=(
-            create_technical_analysis()
-        ),
-        technical_score=create_technical_score(),
-        fundamental_snapshot=(
-            create_fundamental_snapshot()
-        ),
-        fundamental_score=(
-            create_fundamental_score()
-        ),
-        generated_at=GENERATED_AT,
-    )
+    package = create_package()
 
     with pytest.raises(
         ValueError,
