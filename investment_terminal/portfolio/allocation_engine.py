@@ -80,6 +80,7 @@ class PortfolioAllocationEngine:
         currency: str = "USD",
         generated_at: datetime | None = None,
         constraints: AllocationConstraints | None = None,
+        max_positions: int | None = None,
     ) -> PortfolioAllocationResult:
         """
         Generate a target allocation for a recommendation universe.
@@ -108,6 +109,9 @@ class PortfolioAllocationEngine:
             profile=profile,
             constraints=constraints,
         )
+        resolved_max_positions = self._validate_max_positions(
+            max_positions
+        )
 
         if any(
             recommendation.currency
@@ -133,6 +137,11 @@ class PortfolioAllocationEngine:
             for index, score in enumerate(scores)
             if score > 0
         )
+
+        if resolved_max_positions is not None:
+            eligible_indices = eligible_indices[
+                :resolved_max_positions
+            ]
 
         if not eligible_indices:
             raise ValueError(
@@ -505,10 +514,20 @@ class PortfolioAllocationEngine:
         target_weight: float,
     ) -> str:
         if target_weight == 0:
+            if recommendation.recommendation in {
+                "WATCH",
+                "AVOID",
+            }:
+                return (
+                    f"{recommendation.symbol} receives no target "
+                    f"allocation because its analytical label is "
+                    f"{recommendation.recommendation}."
+                )
+
             return (
-                f"{recommendation.symbol} receives no target "
-                f"allocation because its analytical label is "
-                f"{recommendation.recommendation}."
+                f"{recommendation.symbol} remains in the market "
+                "ranking but receives no target allocation because "
+                "it is outside the selected funded-position limit."
             )
 
         return (
@@ -520,6 +539,28 @@ class PortfolioAllocationEngine:
             f"{recommendation.confidence_score:.2f}% confidence, "
             f"and a {recommendation.risk_level} risk level."
         )
+
+    @staticmethod
+    def _validate_max_positions(
+        value: int | None,
+    ) -> int | None:
+        """
+        Validate the optional maximum number of funded positions.
+        """
+        if value is None:
+            return None
+
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise TypeError(
+                "max_positions must be an integer or None"
+            )
+
+        if value <= 0:
+            raise ValueError(
+                "max_positions must be greater than zero"
+            )
+
+        return value
 
     @staticmethod
     def _validate_constraint_feasibility(

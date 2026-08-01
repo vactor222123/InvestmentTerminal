@@ -54,6 +54,7 @@ DEFAULT_CURRENCY = "USD"
 DEFAULT_OUTPUT_DIRECTORY = Path("output")
 DEFAULT_ALLOCATION_PROFILE = "BALANCED"
 DEFAULT_ALLOCATION_CAPITAL = 100_000.0
+DEFAULT_ALLOCATION_SIZE = 5
 
 SUPPORTED_RESOLUTIONS = (
     "D",
@@ -72,6 +73,7 @@ class PortfolioRankingOptions:
     currency: str
     resolution: str
     output_path: Path
+    allocation_size: int
 
 
 def main(
@@ -137,6 +139,7 @@ def main(
                 profile=options.profile,
                 currency=options.currency,
                 generated_at=generated_at,
+                max_positions=options.allocation_size,
             )
         )
 
@@ -197,6 +200,7 @@ def parse_arguments(
         currency=currency,
         resolution=resolution,
         output_path=output_path,
+        allocation_size=namespace.allocation_size,
     )
 
 
@@ -225,6 +229,15 @@ def build_argument_parser() -> argparse.ArgumentParser:
         help=(
             "Capital used by the allocation engine. "
             "Default: %(default)s."
+        ),
+    )
+    parser.add_argument(
+        "--allocation-size",
+        type=positive_int,
+        default=DEFAULT_ALLOCATION_SIZE,
+        help=(
+            "Maximum number of ranked candidates receiving "
+            "non-zero portfolio weights. Default: %(default)s."
         ),
     )
     parser.add_argument(
@@ -272,6 +285,23 @@ def positive_float(value: str) -> float:
     if numeric <= 0 or numeric == float("inf") or numeric != numeric:
         raise argparse.ArgumentTypeError(
             "capital must be a finite number greater than zero"
+        )
+
+    return numeric
+
+
+def positive_int(value: str) -> int:
+    """Argparse type requiring an integer greater than zero."""
+    try:
+        numeric = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            "value must be an integer"
+        ) from exc
+
+    if numeric <= 0:
+        raise argparse.ArgumentTypeError(
+            "value must be greater than zero"
         )
 
     return numeric
