@@ -51,7 +51,7 @@ def create_info() -> dict[str, object]:
         "quickRatio": 1.15,
         "operatingCashflow": 130_000_000_000,
         "freeCashflow": 75_000_000_000,
-        "dividendYield": 0.007,
+        "dividendYield": 0.7,
         "payoutRatio": 0.25,
         "operatingIncome": 120_000_000_000,
         "effectiveTaxRate": 0.18,
@@ -96,7 +96,12 @@ def test_get_fundamentals_maps_provider_fields() -> None:
     assert result.forward_pe == 30.0
     assert result.revenue_growth == 0.15
     assert result.free_cash_flow == 75_000_000_000
-    assert result.dividend_yield == 0.007
+    assert result.debt_to_equity == pytest.approx(
+    0.35
+)
+    assert result.dividend_yield == pytest.approx(
+    0.007
+)
 
     assert result.data_quality is not None
     assert (
@@ -133,6 +138,21 @@ def test_get_fundamentals_calculates_roic() -> None:
         == pytest.approx(expected)
     )
 
+def test_get_fundamentals_normalizes_percentage_points() -> None:
+    info = create_info()
+    info["dividendYield"] = 0.81
+    info["debtToEquity"] = 29.118
+
+    client, _ = create_client(info)
+
+    result = client.get_fundamentals("MSFT")
+
+    assert result.dividend_yield == pytest.approx(
+        0.0081
+    )
+    assert result.debt_to_equity == pytest.approx(
+        0.29118
+    )
 
 def test_get_fundamentals_uses_requested_currency_when_missing() -> None:
     info = create_info()

@@ -55,6 +55,30 @@ class YahooFundamentalClient:
         "payout_ratio": "payoutRatio",
     }
 
+    @classmethod
+    def _normalize_metric(
+        cls,
+        model_field: str,
+        value: object,
+    ) -> float | None:
+        """
+        Normalize provider-specific units into model conventions.
+        """
+        numeric_value = cls._optional_number(value)
+
+        if numeric_value is None:
+            return None
+
+        percentage_point_fields = {
+            "dividend_yield",
+            "debt_to_equity",
+        }
+
+        if model_field in percentage_point_fields:
+            return numeric_value / 100.0
+
+        return numeric_value
+
     def __init__(
         self,
         ticker_factory: Callable[[str], Any] | None = None,
@@ -119,12 +143,13 @@ class YahooFundamentalClient:
             )
 
         values = {
-            model_field: self._optional_number(
-                raw_info.get(provider_field)
-            )
-            for model_field, provider_field
-            in self.FIELD_MAP.items()
-        }
+    model_field: self._normalize_metric(
+        model_field=model_field,
+        value=raw_info.get(provider_field),
+    )
+    for model_field, provider_field
+    in self.FIELD_MAP.items()
+}
 
         return_on_invested_capital = (
             self._calculate_roic(raw_info)
