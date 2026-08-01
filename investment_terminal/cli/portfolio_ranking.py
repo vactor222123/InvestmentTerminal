@@ -26,7 +26,9 @@ from investment_terminal.portfolio.allocation_models import (
     PortfolioAllocationResult,
 )
 from investment_terminal.portfolio.ranking_engine import RankingEngine
-from investment_terminal.portfolio.recommendation_engine import RecommendationEngine
+from investment_terminal.portfolio.coverage_aware_recommendation_engine import (
+    CoverageAwareRecommendationEngine,
+)
 from investment_terminal.portfolio.thesis_generator import InvestmentThesisGenerator
 from investment_terminal.repositories.candle_repository import CandleRepository
 from investment_terminal.services.asset_analysis_service import AssetAnalysisService
@@ -139,9 +141,12 @@ def main(
             decisions=decisions,
             generated_at=generated_at,
         )
-        recommendation_result = RecommendationEngine().recommend(
-            ranking=ranking,
-            generated_at=generated_at,
+        recommendation_result = (
+            CoverageAwareRecommendationEngine()
+            .recommend(
+                ranking=ranking,
+                generated_at=generated_at,
+            )
         )
         thesis_result = InvestmentThesisGenerator().generate(
             recommendation_result=recommendation_result,

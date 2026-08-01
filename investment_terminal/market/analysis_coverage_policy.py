@@ -190,6 +190,51 @@ class AnalysisCoveragePolicy:
             reasons=(),
         )
 
+    def assess_risk_factors(
+        self,
+        risk_factors: tuple[str, ...],
+    ) -> AnalysisCoverageAssessment:
+        """
+        Reconstruct coverage controls from persisted decision risk factors.
+
+        This method is used after the fundamental score has already been
+        converted into a DecisionResult. It preserves reduced-coverage
+        safety controls without requiring the full score breakdown.
+        """
+        if not isinstance(
+            risk_factors,
+            tuple,
+        ):
+            raise TypeError(
+                "risk_factors must be a tuple"
+            )
+
+        if any(
+            not isinstance(item, str)
+            or not item.strip()
+            for item in risk_factors
+        ):
+            raise ValueError(
+                "risk_factors must contain only non-empty strings"
+            )
+
+        if SPECIALIZED_BANK_WARNING in risk_factors:
+            return AnalysisCoverageAssessment(
+                level=REDUCED,
+                recommendation_cap="WATCH",
+                allocation_eligible=False,
+                reasons=(
+                    "Specialized bank metrics are not yet available.",
+                ),
+            )
+
+        return AnalysisCoverageAssessment(
+            level=FULL,
+            recommendation_cap=None,
+            allocation_eligible=True,
+            reasons=(),
+        )
+
     @staticmethod
     def _applicable_maximum(
         fundamental_score: FundamentalScoreResult,
