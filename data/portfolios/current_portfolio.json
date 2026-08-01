@@ -1,0 +1,12 @@
+{
+  "name": "Viktor Investment Portfolio",
+  "policy": {
+    "core_target_weight": 0.85,
+    "tactical_target_weight": 0.10,
+    "cash_target_weight": 0.05,
+    "monthly_contribution": 2000.0,
+    "base_currency": "EUR"
+  },
+  "cash_balance": 1600.0,
+  "holdings": []
+}
