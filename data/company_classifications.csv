@@ -1,0 +1,31 @@
+symbol,sector,industry,business_model
+AAPL,Technology,Consumer Electronics,STANDARD
+MSFT,Technology,Software Infrastructure,STANDARD
+GOOGL,Communication Services,Internet Content and Information,STANDARD
+AMZN,Consumer Cyclical,Internet Retail,STANDARD
+META,Communication Services,Internet Content and Information,STANDARD
+NVDA,Technology,Semiconductors,STANDARD
+AVGO,Technology,Semiconductors,STANDARD
+ORCL,Technology,Software Infrastructure,STANDARD
+CRM,Technology,Software Application,STANDARD
+ADBE,Technology,Software Application,STANDARD
+JPM,Financial Services,Banks Diversified,BANK
+BAC,Financial Services,Banks Diversified,BANK
+GS,Financial Services,Capital Markets,BANK
+V,Financial Services,Credit Services,PAYMENT_NETWORK
+MA,Financial Services,Credit Services,PAYMENT_NETWORK
+LLY,Healthcare,Drug Manufacturers General,STANDARD
+JNJ,Healthcare,Drug Manufacturers General,STANDARD
+UNH,Healthcare,Healthcare Plans,INSURER
+ABBV,Healthcare,Drug Manufacturers General,STANDARD
+MRK,Healthcare,Drug Manufacturers General,STANDARD
+WMT,Consumer Defensive,Discount Stores,STANDARD
+COST,Consumer Defensive,Discount Stores,STANDARD
+HD,Consumer Cyclical,Home Improvement Retail,STANDARD
+MCD,Consumer Cyclical,Restaurants,STANDARD
+NKE,Consumer Cyclical,Footwear and Accessories,STANDARD
+CAT,Industrials,Farm and Heavy Construction Machinery,STANDARD
+GE,Industrials,Specialty Industrial Machinery,STANDARD
+HON,Industrials,Conglomerates,STANDARD
+XOM,Energy,Oil and Gas Integrated,STANDARD
+CVX,Energy,Oil and Gas Integrated,STANDARD
