@@ -2,11 +2,82 @@
   "name": "Viktor Investment Portfolio",
   "policy": {
     "core_target_weight": 0.85,
-    "tactical_target_weight": 0.10,
+    "tactical_target_weight": 0.1,
     "cash_target_weight": 0.05,
+    "invested_target_weight": 0.95,
     "monthly_contribution": 2000.0,
     "base_currency": "EUR"
   },
   "cash_balance": 1600.0,
-  "holdings": []
+  "invested_cost": 29167.96,
+  "total_cost_basis": 30767.96,
+  "core_cost": 29167.96,
+  "tactical_cost": 0.0,
+  "holdings": [
+    {
+      "symbol": "WORLD",
+      "name": "iShares Core MSCI World USD (Acc)",
+      "asset_type": "ETF",
+      "sleeve": "CORE",
+      "quantity": 126.51,
+      "average_cost": 122.15,
+      "currency": "EUR",
+      "isin": "IE00B4L5Y983",
+      "exchange_ticker": "EUNL",
+      "instrument_key": "IE00B4L5Y983",
+      "invested_cost": 15453.2
+    },
+    {
+      "symbol": "EMIMI",
+      "name": "iShares Core MSCI EM IMI USD (Acc)",
+      "asset_type": "ETF",
+      "sleeve": "CORE",
+      "quantity": 174.33,
+      "average_cost": 46.48,
+      "currency": "EUR",
+      "isin": "IE00BKM4GZ66",
+      "exchange_ticker": "IS3N",
+      "instrument_key": "IE00BKM4GZ66",
+      "invested_cost": 8102.86
+    },
+    {
+      "symbol": "AGGH",
+      "name": "Global Aggregate Bond EUR Hedged (Acc)",
+      "asset_type": "ETF",
+      "sleeve": "CORE",
+      "quantity": 500.14,
+      "average_cost": 5.0,
+      "currency": "EUR",
+      "isin": "IE00BDBRDM35",
+      "exchange_ticker": "EUNA",
+      "instrument_key": "IE00BDBRDM35",
+      "invested_cost": 2500.7
+    },
+    {
+      "symbol": "SEMICONDUCTOR",
+      "name": "Semiconductor ETF",
+      "asset_type": "ETF",
+      "sleeve": "CORE",
+      "quantity": 11.8,
+      "average_cost": 94.1,
+      "currency": "EUR",
+      "isin": "IE00BMC38736",
+      "exchange_ticker": "VVSM",
+      "instrument_key": "IE00BMC38736",
+      "invested_cost": 1110.38
+    },
+    {
+      "symbol": "EUROPE600",
+      "name": "Core STOXX Europe 600 EUR (Acc)",
+      "asset_type": "ETF",
+      "sleeve": "CORE",
+      "quantity": 6.37,
+      "average_cost": 314.1,
+      "currency": "EUR",
+      "isin": "LU0908500759",
+      "exchange_ticker": "LYP6",
+      "instrument_key": "LU0908500759",
+      "invested_cost": 2000.82
+    }
+  ]
 }

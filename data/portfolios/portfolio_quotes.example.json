@@ -1,0 +1,12 @@
+{
+  "quotes": [
+    {
+      "instrument_key": "IE00B4L5Y983",
+      "exchange_ticker": "IWDA",
+      "price": 110.0,
+      "currency": "EUR",
+      "quoted_at": "2026-08-01T18:00:00+00:00",
+      "source": "EXAMPLE"
+    }
+  ]
+}

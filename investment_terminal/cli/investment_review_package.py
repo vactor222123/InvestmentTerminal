@@ -11,14 +11,23 @@ from pathlib import Path
 from investment_terminal.portfolio.current_portfolio_loader import (
     CurrentPortfolioLoader,
 )
+from investment_terminal.portfolio.portfolio_market_value_service import (
+    PortfolioMarketValueService,
+)
 from investment_terminal.portfolio.portfolio_snapshot_service import (
     PortfolioSnapshotService,
+)
+from investment_terminal.portfolio.portfolio_quote_json_provider import (
+    JsonPortfolioPriceProvider,
 )
 from investment_terminal.review.portfolio_analysis_package_loader import (
     PortfolioAnalysisPackageLoader,
 )
 from investment_terminal.review.portfolio_analysis_review_adapter import (
     PortfolioAnalysisReviewAdapter,
+)
+from investment_terminal.review.portfolio_review_adapter import (
+    PortfolioReviewAdapter,
 )
 from investment_terminal.review.review_package_builder import (
     InvestmentReviewPackageBuilder,
@@ -36,6 +45,11 @@ DEFAULT_STOCK_ANALYSIS = (
     Path("output")
     / "us_large_cap_30_portfolio.json"
 )
+DEFAULT_PORTFOLIO_QUOTES = (
+    Path("data")
+    / "portfolios"
+    / "portfolio_quotes.json"
+)
 
 
 def main(
@@ -50,6 +64,10 @@ def main(
     snapshot = PortfolioSnapshotService().build(
         portfolio
     )
+    market_value = load_portfolio_market_value(
+        portfolio=portfolio,
+        quotes_path=options.portfolio_quotes,
+    )
 
     integrated = load_stock_analysis(
         options.stock_analysis
@@ -57,7 +75,10 @@ def main(
     warnings = build_warnings(
         stock_analysis_connected=(
             integrated is not None
-        )
+        ),
+        portfolio_market_value_connected=(
+            market_value is not None
+        ),
     )
 
     if integrated is None:
@@ -79,7 +100,15 @@ def main(
             "market_analysis"
         ],
         portfolio={
-            **snapshot.to_dict(),
+            **PortfolioReviewAdapter().adapt(
+                snapshot=snapshot,
+                market_value=market_value,
+                quotes_source=(
+                    str(options.portfolio_quotes)
+                    if market_value is not None
+                    else None
+                ),
+            ),
             "stock_analysis_source": (
                 str(options.stock_analysis)
                 if integrated is not None
@@ -177,6 +206,28 @@ def load_stock_analysis(
     )
 
 
+def load_portfolio_market_value(
+    *,
+    portfolio,
+    quotes_path: Path | None,
+):
+    if quotes_path is None:
+        return None
+
+    if not quotes_path.exists():
+        return None
+
+    provider = JsonPortfolioPriceProvider.load(
+        quotes_path
+    )
+
+    return PortfolioMarketValueService(
+        provider
+    ).calculate(
+        portfolio
+    )
+
+
 def disconnected_stock_sections() -> dict:
     return {
         "data_freshness": {
@@ -209,12 +260,19 @@ def disconnected_stock_sections() -> dict:
 def build_warnings(
     *,
     stock_analysis_connected: bool,
+    portfolio_market_value_connected: bool,
 ) -> tuple[str, ...]:
     warnings = [
         "ETF analysis is not integrated yet.",
         "Watchlist analysis is not integrated yet.",
         "News and geopolitical context must be added externally.",
     ]
+
+    if not portfolio_market_value_connected:
+        warnings.insert(
+            0,
+            "Portfolio market prices are not connected.",
+        )
 
     if not stock_analysis_connected:
         warnings.insert(
@@ -261,6 +319,15 @@ def build_argument_parser() -> argparse.ArgumentParser:
         default=CurrentPortfolioLoader.DEFAULT_PATH,
         help=(
             "Path to the current portfolio JSON. "
+            "Default: %(default)s."
+        ),
+    )
+    parser.add_argument(
+        "--portfolio-quotes",
+        type=Path,
+        default=DEFAULT_PORTFOLIO_QUOTES,
+        help=(
+            "Optional JSON file with current portfolio quotes. "
             "Default: %(default)s."
         ),
     )

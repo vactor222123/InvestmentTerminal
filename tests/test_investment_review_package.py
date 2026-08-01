@@ -146,8 +146,17 @@ def test_cli_generates_default_package(
     )
     assert (
         payload["sections"]["portfolio"]
+        ["cost_basis_snapshot"]
         ["cash_value"]
         == 1600.0
+    )
+    assert (
+        payload["sections"]["portfolio"]
+        ["status"]
+        in {
+            "COST_BASIS_ONLY",
+            "MARKET_VALUE_CONNECTED",
+        }
     )
 
 
