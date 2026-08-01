@@ -36,9 +36,7 @@ from investment_terminal.services.technical_score_service import (
 
 
 class DecisionEngine:
-    """
-    Combine technical and fundamental analysis.
-    """
+    """Combine technical and fundamental analysis."""
 
     SCHEMA_VERSION = "1.0"
 
@@ -60,9 +58,7 @@ class DecisionEngine:
         fundamental_score: FundamentalScoreResult,
         generated_at: datetime | None = None,
     ) -> DecisionResult:
-        """
-        Produce one structured investment decision.
-        """
+        """Produce one structured investment decision."""
         self._validate_components(
             technical_analysis=technical_analysis,
             technical_score=technical_score,
@@ -70,16 +66,10 @@ class DecisionEngine:
             fundamental_score=fundamental_score,
         )
 
-        overall_score = (
-            DecisionWeighting.calculate_overall(
-                technical_score=(
-                    technical_score.final_score
-                ),
-                fundamental_score=(
-                    fundamental_score.final_score
-                ),
-                weights=self.weights,
-            )
+        overall_score = DecisionWeighting.calculate_overall(
+            technical_score=technical_score.final_score,
+            fundamental_score=fundamental_score.final_score,
+            weights=self.weights,
         )
 
         technical_quality = (
@@ -88,13 +78,11 @@ class DecisionEngine:
             .completeness_percent
         )
 
+        # FundamentalScoreResult already contains the quality factor
+        # after business-model applicability has been applied.
         fundamental_quality = (
-            fundamental_snapshot
-            .data_quality
-            .completeness_percent
-            if fundamental_snapshot.data_quality
-            is not None
-            else 0.0
+            fundamental_score.data_quality_factor
+            * 100.0
         )
 
         technical_missing = (
@@ -102,7 +90,6 @@ class DecisionEngine:
             .data_quality
             .missing_indicators
         )
-
         fundamental_missing = (
             fundamental_score.missing_fields
         )
@@ -118,44 +105,29 @@ class DecisionEngine:
             ),
         )
 
-        quality = (
-            DecisionClassifiers.build_quality_summary(
-                technical_analysis=technical_analysis,
-                technical_score=technical_score,
-                fundamental_snapshot=(
-                    fundamental_snapshot
-                ),
-                fundamental_score=fundamental_score,
-            )
+        quality = DecisionClassifiers.build_quality_summary(
+            technical_analysis=technical_analysis,
+            technical_score=technical_score,
+            fundamental_snapshot=fundamental_snapshot,
+            fundamental_score=fundamental_score,
         )
 
-        positive_factors = (
-            DecisionFactorAggregator.merge(
-                technical_score.positive_factors,
-                fundamental_score.positive_factors,
-            )
+        positive_factors = DecisionFactorAggregator.merge(
+            technical_score.positive_factors,
+            fundamental_score.positive_factors,
         )
-
-        risk_factors = (
-            DecisionFactorAggregator.merge(
-                technical_score.risk_factors,
-                fundamental_score.risk_factors,
-            )
+        risk_factors = DecisionFactorAggregator.merge(
+            technical_score.risk_factors,
+            fundamental_score.risk_factors,
         )
-
         missing_data = (
             DecisionFactorAggregator.build_missing_data(
                 technical_missing=technical_missing,
-                fundamental_missing=(
-                    fundamental_missing
-                ),
+                fundamental_missing=fundamental_missing,
             )
         )
-
-        classification = (
-            DecisionClassifiers.classify_overall(
-                overall_score
-            )
+        classification = DecisionClassifiers.classify_overall(
+            overall_score
         )
 
         return DecisionResult(
@@ -168,19 +140,11 @@ class DecisionEngine:
             symbol=technical_analysis.symbol,
             currency=technical_analysis.currency,
             scores=DecisionScoreSummary(
-                technical=(
-                    technical_score.final_score
-                ),
-                fundamental=(
-                    fundamental_score.final_score
-                ),
+                technical=technical_score.final_score,
+                fundamental=fundamental_score.final_score,
                 overall=overall_score,
-                technical_weight=(
-                    self.weights.technical
-                ),
-                fundamental_weight=(
-                    self.weights.fundamental
-                ),
+                technical_weight=self.weights.technical,
+                fundamental_weight=self.weights.fundamental,
             ),
             quality=quality,
             confidence=confidence,
@@ -199,9 +163,6 @@ class DecisionEngine:
         quality,
         classification: str,
     ) -> str:
-        """
-        Create a deterministic summary without generative AI.
-        """
         return (
             f"Overall condition is {classification}. "
             f"Business quality is "
@@ -228,8 +189,7 @@ class DecisionEngine:
             TechnicalAnalysisResult,
         ):
             raise TypeError(
-                "technical_analysis must be "
-                "a TechnicalAnalysisResult"
+                "technical_analysis must be a TechnicalAnalysisResult"
             )
 
         if not isinstance(
@@ -237,8 +197,7 @@ class DecisionEngine:
             TechnicalScoreResult,
         ):
             raise TypeError(
-                "technical_score must be "
-                "a TechnicalScoreResult"
+                "technical_score must be a TechnicalScoreResult"
             )
 
         if not isinstance(
@@ -246,8 +205,7 @@ class DecisionEngine:
             FundamentalSnapshot,
         ):
             raise TypeError(
-                "fundamental_snapshot must be "
-                "a FundamentalSnapshot"
+                "fundamental_snapshot must be a FundamentalSnapshot"
             )
 
         if not isinstance(
@@ -255,8 +213,7 @@ class DecisionEngine:
             FundamentalScoreResult,
         ):
             raise TypeError(
-                "fundamental_score must be "
-                "a FundamentalScoreResult"
+                "fundamental_score must be a FundamentalScoreResult"
             )
 
         symbols = {
@@ -268,8 +225,7 @@ class DecisionEngine:
 
         if len(symbols) != 1:
             raise ValueError(
-                "Decision components must use "
-                "the same symbol"
+                "Decision components must use the same symbol"
             )
 
         currencies = {
@@ -280,6 +236,5 @@ class DecisionEngine:
 
         if len(currencies) != 1:
             raise ValueError(
-                "Decision components must use "
-                "the same currency"
+                "Decision components must use the same currency"
             )

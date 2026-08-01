@@ -22,6 +22,10 @@ from investment_terminal.services.technical_score_service import (
 class DecisionClassifiers:
     """
     Convert scores and metrics into descriptive classifications.
+
+    Fundamental descriptive labels are derived from the already
+    normalized FundamentalScoreResult. This keeps decision labels
+    aligned with generic or sector-aware fundamental scoring.
     """
 
     @staticmethod
@@ -48,9 +52,7 @@ class DecisionClassifiers:
         fundamental_snapshot: FundamentalSnapshot,
         fundamental_score: FundamentalScoreResult,
     ) -> DecisionQualitySummary:
-        """
-        Build descriptive quality categories.
-        """
+        """Build descriptive quality categories."""
         return DecisionQualitySummary(
             business_quality=(
                 cls._classify_business_quality(
@@ -59,7 +61,7 @@ class DecisionClassifiers:
             ),
             financial_health=(
                 cls._classify_financial_health(
-                    fundamental_snapshot
+                    fundamental_score
                 )
             ),
             growth=cls._classify_growth(
@@ -76,7 +78,7 @@ class DecisionClassifiers:
             ),
             risk_level=cls._classify_risk(
                 technical_analysis,
-                fundamental_snapshot,
+                fundamental_score,
             ),
         )
 
@@ -112,44 +114,48 @@ class DecisionClassifiers:
 
     @staticmethod
     def _classify_financial_health(
-        snapshot: FundamentalSnapshot,
+        score: FundamentalScoreResult,
     ) -> str:
-        strong_conditions = 0
-        available_conditions = 0
+        """
+        Classify the normalized balance-sheet component.
 
-        if snapshot.debt_to_equity is not None:
-            available_conditions += 1
+        A zero maximum means the component cannot be interpreted.
+        This guard also keeps the method safe for future specialized
+        score breakdown implementations.
+        """
+        maximum = score.breakdown.balance_sheet_max
 
-            if snapshot.debt_to_equity <= 0.5:
-                strong_conditions += 1
-
-        if snapshot.current_ratio is not None:
-            available_conditions += 1
-
-            if snapshot.current_ratio >= 1.2:
-                strong_conditions += 1
-
-        if snapshot.quick_ratio is not None:
-            available_conditions += 1
-
-            if snapshot.quick_ratio >= 1.0:
-                strong_conditions += 1
-
-        if available_conditions == 0:
+        if maximum <= 0:
             return "UNKNOWN"
 
-        ratio = (
-            strong_conditions
-            / available_conditions
+        percentage = (
+            score.breakdown.balance_sheet
+            / maximum
+            * 100.0
         )
 
-        if ratio >= 0.8:
+        if percentage >= 80.0:
             return "STRONG"
 
-        if ratio >= 0.5:
+        if percentage >= 50.0:
             return "ADEQUATE"
 
-        return "WEAK"
+        if percentage > 0.0:
+            return "WEAK"
+
+        balance_sheet_risks = {
+            "Debt-to-equity is elevated.",
+            "Debt-to-equity is high.",
+            "Current ratio is below one.",
+            "Quick liquidity is weak.",
+        }
+
+        if balance_sheet_risks.intersection(
+            score.risk_factors
+        ):
+            return "WEAK"
+
+        return "UNKNOWN"
 
     @staticmethod
     def _classify_growth(
@@ -224,8 +230,15 @@ class DecisionClassifiers:
     @staticmethod
     def _classify_risk(
         technical_analysis: TechnicalAnalysisResult,
-        fundamental_snapshot: FundamentalSnapshot,
+        fundamental_score: FundamentalScoreResult,
     ) -> str:
+        """
+        Combine technical risk with normalized fundamental risks.
+
+        Debt risk is counted only when the active fundamental scorer
+        considered debt-to-equity applicable and produced a matching
+        risk factor. Banks therefore avoid a duplicate generic penalty.
+        """
         risk_points = 0
 
         if (
@@ -245,11 +258,13 @@ class DecisionClassifiers:
         ):
             risk_points += 1
 
-        if (
-            fundamental_snapshot.debt_to_equity
-            is not None
-            and fundamental_snapshot.debt_to_equity
-            > 1.0
+        debt_risks = {
+            "Debt-to-equity is elevated.",
+            "Debt-to-equity is high.",
+        }
+
+        if debt_risks.intersection(
+            fundamental_score.risk_factors
         ):
             risk_points += 2
 
