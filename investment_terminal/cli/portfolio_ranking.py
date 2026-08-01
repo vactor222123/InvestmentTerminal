@@ -1,5 +1,5 @@
 """
-Run a live portfolio ranking with contextual recommendations.
+Run a live portfolio ranking with recommendations and theses.
 """
 
 from investment_terminal.clients.yahoo_fundamental_client import (
@@ -17,6 +17,9 @@ from investment_terminal.portfolio.ranking_engine import (
 from investment_terminal.portfolio.recommendation_engine import (
     RecommendationEngine,
 )
+from investment_terminal.portfolio.thesis_generator import (
+    InvestmentThesisGenerator,
+)
 from investment_terminal.repositories.candle_repository import (
     CandleRepository,
 )
@@ -30,7 +33,7 @@ from investment_terminal.services.technical_analysis_service import (
 
 def main() -> None:
     """
-    Execute a live portfolio ranking and recommendation run.
+    Execute a live portfolio analysis, ranking, and thesis run.
     """
     database = Database()
     database.initialize()
@@ -56,9 +59,8 @@ def main() -> None:
         )
 
         ranking_engine = RankingEngine()
-        recommendation_engine = (
-            RecommendationEngine()
-        )
+        recommendation_engine = RecommendationEngine()
+        thesis_generator = InvestmentThesisGenerator()
 
         decisions = [
             asset_analysis_service.analyze(
@@ -79,6 +81,10 @@ def main() -> None:
             )
         )
 
+        thesis_result = thesis_generator.generate(
+            recommendation_result=recommendation_result,
+        )
+
         print()
         print("=" * 110)
         print(
@@ -88,11 +94,11 @@ def main() -> None:
         print("=" * 110)
         print(
             f"Universe size : "
-            f"{recommendation_result.universe_size}"
+            f"{thesis_result.universe_size}"
         )
         print(
             f"Generated     : "
-            f"{recommendation_result.generated_at.isoformat()}"
+            f"{thesis_result.generated_at.isoformat()}"
         )
         print("-" * 110)
 
@@ -109,43 +115,46 @@ def main() -> None:
 
         print("-" * 110)
 
-        for recommendation in (
-            recommendation_result.recommendations
-        ):
+        for thesis in thesis_result.theses:
+            recommendation = thesis.recommendation
             candidate = recommendation.candidate
 
             print(
-                f"{recommendation.rank:<5}"
-                f"{recommendation.symbol:<8}"
+                f"{thesis.rank:<5}"
+                f"{thesis.symbol:<8}"
                 f"{candidate.overall_score:>10.2f}"
                 f"{candidate.technical_score:>10.2f}"
                 f"{candidate.fundamental_score:>10.2f}"
                 f"{candidate.confidence_score:>10.2f}"
                 f"{candidate.risk_level:>12}"
-                f"{recommendation.recommendation:>20}"
+                f"{thesis.recommendation_label:>20}"
             )
 
-        top = (
-            recommendation_result
-            .top_recommendation
-        )
+        top = thesis_result.top_thesis
+        candidate = top.recommendation.candidate
+        decision = candidate.decision
 
         print()
         print("=" * 110)
-        print("Top Portfolio Candidate")
+        print("Top Investment Thesis")
         print("=" * 110)
         print(f"Symbol            : {top.symbol}")
-        print(
-            f"Rank              : "
-            f"#{top.rank}"
-        )
+        print(f"Rank              : #{top.rank}")
         print(
             f"Recommendation    : "
-            f"{top.recommendation}"
+            f"{top.recommendation_label}"
         )
         print(
             f"Overall Score     : "
             f"{top.overall_score:.2f}"
+        )
+        print(
+            f"Technical Score   : "
+            f"{candidate.technical_score:.2f}"
+        )
+        print(
+            f"Fundamental Score : "
+            f"{candidate.fundamental_score:.2f}"
         )
         print(
             f"Confidence        : "
@@ -153,42 +162,65 @@ def main() -> None:
         )
         print(
             f"Business Quality  : "
-            f"{top.candidate.business_quality}"
+            f"{candidate.business_quality}"
+        )
+        print(
+            f"Financial Health  : "
+            f"{decision.quality.financial_health}"
+        )
+        print(
+            f"Growth            : "
+            f"{decision.quality.growth}"
+        )
+        print(
+            f"Valuation         : "
+            f"{decision.quality.valuation}"
+        )
+        print(
+            f"Technical State   : "
+            f"{decision.quality.technical_condition}"
         )
         print(
             f"Risk Level        : "
             f"{top.risk_level}"
         )
-        print(
-            f"Classification    : "
-            f"{top.candidate.classification}"
-        )
 
         print()
-        print("Why")
+        print("Headline")
+        print("-" * 110)
+        print(top.headline)
+
+        print()
+        print("Investment Thesis")
+        print("-" * 110)
+        print(top.thesis)
+
+        print()
+        print("Strengths")
         print("-" * 110)
 
-        for item in top.rationale:
-            print(f"+ {item}")
+        for strength in top.strengths:
+            print(f"+ {strength}")
 
-        if top.cautions:
+        if top.risks:
             print()
-            print("Cautions")
+            print("Risks")
             print("-" * 110)
 
-            for item in top.cautions:
-                print(f"- {item}")
+            for risk in top.risks:
+                print(f"- {risk}")
 
         print()
-        print("Decision Summary")
+        print("Analytical Action")
         print("-" * 110)
-        print(top.candidate.decision.summary)
+        print(top.action)
 
         print()
         print(
-            "Note: Recommendations are analytical "
-            "screening labels and are not personalized "
-            "financial advice."
+            "Note: Recommendations and actions are "
+            "analytical screening outputs. They are not "
+            "personalized financial advice or automatic "
+            "trading instructions."
         )
 
     finally:
