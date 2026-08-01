@@ -3,6 +3,7 @@ Current portfolio and investment-policy domain models.
 """
 
 from dataclasses import dataclass
+from decimal import Decimal, ROUND_HALF_UP
 from math import isfinite
 from numbers import Real
 from typing import Any
@@ -130,9 +131,9 @@ class PortfolioHolding:
 
     @property
     def invested_cost(self) -> float:
-        return round(
-            self.quantity * self.average_cost,
-            2,
+        return self._round_money(
+            Decimal(str(self.quantity))
+            * Decimal(str(self.average_cost))
         )
 
     @property
@@ -275,6 +276,27 @@ class PortfolioHolding:
             raise ValueError(
                 f"{field_name} must be a finite non-negative number"
             )
+
+
+    @staticmethod
+    def _round_money(
+        value: Decimal | Real,
+    ) -> float:
+        """
+        Round monetary values to cents using commercial half-up rounding.
+        """
+        decimal_value = (
+            value
+            if isinstance(value, Decimal)
+            else Decimal(str(value))
+        )
+
+        return float(
+            decimal_value.quantize(
+                Decimal("0.01"),
+                rounding=ROUND_HALF_UP,
+            )
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -437,20 +459,18 @@ class CurrentPortfolio:
 
     @property
     def invested_cost(self) -> float:
-        return round(
+        return PortfolioHolding._round_money(
             sum(
-                holding.invested_cost
+                Decimal(str(holding.invested_cost))
                 for holding in self.holdings
-            ),
-            2,
+            )
         )
 
     @property
     def total_cost_basis(self) -> float:
-        return round(
-            self.invested_cost
-            + self.cash_balance,
-            2,
+        return PortfolioHolding._round_money(
+            Decimal(str(self.invested_cost))
+            + Decimal(str(self.cash_balance))
         )
 
     @property
@@ -469,13 +489,12 @@ class CurrentPortfolio:
         self,
         sleeve: str,
     ) -> float:
-        return round(
+        return PortfolioHolding._round_money(
             sum(
-                holding.invested_cost
+                Decimal(str(holding.invested_cost))
                 for holding in self.holdings
                 if holding.sleeve == sleeve
-            ),
-            2,
+            )
         )
 
     def to_dict(self) -> dict[str, Any]:
