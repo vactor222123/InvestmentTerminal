@@ -3,6 +3,9 @@ Run a fresh live portfolio analysis with ranking, recommendations,
 theses, and compact JSON export.
 """
 
+import argparse
+from collections.abc import Sequence
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -16,6 +19,7 @@ from investment_terminal.portfolio.allocation_engine import (
     PortfolioAllocationEngine,
 )
 from investment_terminal.portfolio.allocation_models import (
+    ALLOCATION_PROFILES,
     PortfolioAllocationResult,
 )
 from investment_terminal.portfolio.ranking_engine import RankingEngine
@@ -44,32 +48,51 @@ from investment_terminal.universe.universe_models import (
 )
 
 
-UNIVERSE_KEY = "mega_cap_tech"
-RESOLUTION = "D"
-CURRENCY = "USD"
-OUTPUT_DIRECTORY = Path("output")
+DEFAULT_UNIVERSE_KEY = "mega_cap_tech"
+DEFAULT_RESOLUTION = "D"
+DEFAULT_CURRENCY = "USD"
+DEFAULT_OUTPUT_DIRECTORY = Path("output")
+DEFAULT_ALLOCATION_PROFILE = "BALANCED"
+DEFAULT_ALLOCATION_CAPITAL = 100_000.0
 
-ALLOCATION_PROFILE = "BALANCED"
-ALLOCATION_CAPITAL = 100_000.0
+SUPPORTED_RESOLUTIONS = (
+    "D",
+    "W",
+    "M",
+)
 
 
-def main() -> None:
+@dataclass(frozen=True, slots=True)
+class PortfolioRankingOptions:
+    """Validated command-line options for one portfolio run."""
+
+    universe_key: str
+    capital: float
+    profile: str
+    currency: str
+    resolution: str
+    output_path: Path
+
+
+def main(
+    argv: Sequence[str] | None = None,
+) -> None:
+    options = parse_arguments(argv)
     database = Database()
     database.initialize()
 
     try:
         repository = CandleRepository(database)
         universe = UniverseLoader().load(
-            UNIVERSE_KEY
-        )
-        output_path = build_output_path(
-            UNIVERSE_KEY
+            options.universe_key
         )
         checked_at = datetime.now(timezone.utc)
 
         refresh_result = refresh_market_data(
             repository=repository,
             universe=universe,
+            resolution=options.resolution,
+            currency=options.currency,
             checked_at=checked_at,
         )
         print_refresh_result(refresh_result)
@@ -87,8 +110,8 @@ def main() -> None:
         decisions = [
             asset_analysis_service.analyze(
                 symbol=symbol,
-                resolution=RESOLUTION,
-                currency=CURRENCY,
+                resolution=options.resolution,
+                currency=options.currency,
             )
             for symbol in universe.symbols
         ]
@@ -110,9 +133,9 @@ def main() -> None:
         allocation_result = (
             PortfolioAllocationEngine().allocate(
                 recommendations=recommendation_result,
-                total_capital=ALLOCATION_CAPITAL,
-                profile=ALLOCATION_PROFILE,
-                currency=CURRENCY,
+                total_capital=options.capital,
+                profile=options.profile,
+                currency=options.currency,
                 generated_at=generated_at,
             )
         )
@@ -129,7 +152,7 @@ def main() -> None:
         )
         saved_path = exporter.save_json(
             package=export_package,
-            output_path=output_path,
+            output_path=options.output_path,
         )
 
         print_portfolio_result(
@@ -142,12 +165,134 @@ def main() -> None:
         database.close()
 
 
+def parse_arguments(
+    argv: Sequence[str] | None = None,
+) -> PortfolioRankingOptions:
+    """Parse and normalize command-line options."""
+    parser = build_argument_parser()
+    namespace = parser.parse_args(argv)
+
+    universe_key = (
+        UniverseLoader
+        ._normalize_universe_name(
+            namespace.universe
+        )
+    )
+    profile = namespace.profile.upper()
+    currency = namespace.currency.upper()
+    resolution = namespace.resolution.upper()
+
+    output_path = (
+        namespace.output
+        if namespace.output is not None
+        else build_output_path(
+            universe_key
+        )
+    )
+
+    return PortfolioRankingOptions(
+        universe_key=universe_key,
+        capital=namespace.capital,
+        profile=profile,
+        currency=currency,
+        resolution=resolution,
+        output_path=output_path,
+    )
+
+
+def build_argument_parser() -> argparse.ArgumentParser:
+    """Create the portfolio-ranking command-line parser."""
+    parser = argparse.ArgumentParser(
+        description=(
+            "Refresh market data, analyze a configured universe, "
+            "rank candidates, generate recommendations and theses, "
+            "build a target allocation, and export compact JSON."
+        ),
+    )
+
+    parser.add_argument(
+        "--universe",
+        default=DEFAULT_UNIVERSE_KEY,
+        help=(
+            "Universe file name from data/universes without the "
+            ".txt extension. Default: %(default)s."
+        ),
+    )
+    parser.add_argument(
+        "--capital",
+        type=positive_float,
+        default=DEFAULT_ALLOCATION_CAPITAL,
+        help=(
+            "Capital used by the allocation engine. "
+            "Default: %(default)s."
+        ),
+    )
+    parser.add_argument(
+        "--profile",
+        type=str.upper,
+        choices=ALLOCATION_PROFILES,
+        default=DEFAULT_ALLOCATION_PROFILE,
+        help="Allocation profile. Default: %(default)s.",
+    )
+    parser.add_argument(
+        "--currency",
+        type=non_empty_upper_text,
+        default=DEFAULT_CURRENCY,
+        help="Analysis and allocation currency. Default: %(default)s.",
+    )
+    parser.add_argument(
+        "--resolution",
+        type=str.upper,
+        choices=SUPPORTED_RESOLUTIONS,
+        default=DEFAULT_RESOLUTION,
+        help="Market-data resolution. Default: %(default)s.",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help=(
+            "Optional JSON output path. When omitted, the file is "
+            "written to output/<universe>_portfolio.json."
+        ),
+    )
+
+    return parser
+
+
+def positive_float(value: str) -> float:
+    """Argparse type requiring a finite value greater than zero."""
+    try:
+        numeric = float(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            "capital must be a number"
+        ) from exc
+
+    if numeric <= 0 or numeric == float("inf") or numeric != numeric:
+        raise argparse.ArgumentTypeError(
+            "capital must be a finite number greater than zero"
+        )
+
+    return numeric
+
+
+def non_empty_upper_text(value: str) -> str:
+    """Argparse type for normalized non-empty text."""
+    normalized = value.strip().upper()
+
+    if not normalized:
+        raise argparse.ArgumentTypeError(
+            "value must be a non-empty string"
+        )
+
+    return normalized
+
+
 def build_output_path(
     universe_key: str,
 ) -> Path:
-    """
-    Build a deterministic JSON output path for a universe.
-    """
+    """Build a deterministic JSON output path for a universe."""
     normalized_key = (
         UniverseLoader
         ._normalize_universe_name(
@@ -156,7 +301,7 @@ def build_output_path(
     )
 
     return (
-        OUTPUT_DIRECTORY
+        DEFAULT_OUTPUT_DIRECTORY
         / f"{normalized_key}_portfolio.json"
     )
 
@@ -164,6 +309,8 @@ def build_output_path(
 def refresh_market_data(
     repository: CandleRepository,
     universe: InvestmentUniverse,
+    resolution: str,
+    currency: str,
     checked_at: datetime,
 ) -> UniverseMarketDataRefreshResult:
     historical_market_service = HistoricalMarketService(
@@ -179,8 +326,8 @@ def refresh_market_data(
     )
     return refresh_service.ensure_many(
         symbols=universe.symbols,
-        resolution=RESOLUTION,
-        currency=CURRENCY,
+        resolution=resolution,
+        currency=currency,
         checked_at=checked_at,
     )
 
