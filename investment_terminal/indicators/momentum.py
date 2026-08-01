@@ -3,6 +3,7 @@ Momentum technical indicators.
 """
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 from investment_terminal.indicators.indicator_utils import (
     close_series,
@@ -10,6 +11,17 @@ from investment_terminal.indicators.indicator_utils import (
     validate_period,
 )
 from investment_terminal.models.candle import Candle
+
+
+@dataclass(frozen=True, slots=True)
+class MACDResult:
+    """
+    Full MACD series.
+    """
+
+    macd_line: list[float | None]
+    signal_line: list[float | None]
+    histogram: list[float | None]
 
 
 class MomentumIndicators:
@@ -45,9 +57,7 @@ class MomentumIndicators:
             min_periods=period,
         ).mean()
 
-        relative_strength = (
-            average_gain / average_loss
-        )
+        relative_strength = average_gain / average_loss
 
         result = 100.0 - (
             100.0 / (1.0 + relative_strength)
@@ -72,3 +82,58 @@ class MomentumIndicators:
         )
 
         return series_to_optional_list(result)
+
+    @staticmethod
+    def macd(
+        candles: Sequence[Candle],
+        fast_period: int = 12,
+        slow_period: int = 26,
+        signal_period: int = 9,
+    ) -> MACDResult:
+        """
+        Calculate MACD, signal line and histogram.
+        """
+        closes = close_series(candles)
+
+        validate_period(fast_period)
+        validate_period(slow_period)
+        validate_period(signal_period)
+
+        if fast_period >= slow_period:
+            raise ValueError(
+                "fast_period must be smaller than slow_period"
+            )
+
+        fast_ema = closes.ewm(
+            span=fast_period,
+            adjust=False,
+            min_periods=fast_period,
+        ).mean()
+
+        slow_ema = closes.ewm(
+            span=slow_period,
+            adjust=False,
+            min_periods=slow_period,
+        ).mean()
+
+        macd_line = fast_ema - slow_ema
+
+        signal_line = macd_line.ewm(
+            span=signal_period,
+            adjust=False,
+            min_periods=signal_period,
+        ).mean()
+
+        histogram = macd_line - signal_line
+
+        return MACDResult(
+            macd_line=series_to_optional_list(
+                macd_line
+            ),
+            signal_line=series_to_optional_list(
+                signal_line
+            ),
+            histogram=series_to_optional_list(
+                histogram
+            ),
+        )

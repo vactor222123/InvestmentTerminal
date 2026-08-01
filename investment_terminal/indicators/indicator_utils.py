@@ -97,3 +97,76 @@ def series_to_optional_list(
         None if pd.isna(value) else float(value)
         for value in series
     ]
+    
+def ohlc_frame(
+    candles: Sequence[Candle],
+) -> pd.DataFrame:
+    """
+    Validate candles and return OHLC data.
+    """
+    candle_list = list(candles)
+    closes = close_series(candle_list)
+
+    opens: list[float] = []
+    highs: list[float] = []
+    lows: list[float] = []
+
+    for candle in candle_list:
+        numeric_values = {
+            "open price": candle.open_price,
+            "high price": candle.high_price,
+            "low price": candle.low_price,
+        }
+
+        validated: dict[str, float] = {}
+
+        for field_name, value in numeric_values.items():
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, Real)
+                or not isfinite(float(value))
+                or float(value) <= 0
+            ):
+                raise ValueError(
+                    f"every {field_name} must be "
+                    "a positive finite number"
+                )
+
+            validated[field_name] = float(value)
+
+        open_price = validated["open price"]
+        high_price = validated["high price"]
+        low_price = validated["low price"]
+        close_price = float(candle.close_price)
+
+        if high_price < max(
+            open_price,
+            low_price,
+            close_price,
+        ):
+            raise ValueError(
+                "high price must be the highest OHLC value"
+            )
+
+        if low_price > min(
+            open_price,
+            high_price,
+            close_price,
+        ):
+            raise ValueError(
+                "low price must be the lowest OHLC value"
+            )
+
+        opens.append(open_price)
+        highs.append(high_price)
+        lows.append(low_price)
+
+    return pd.DataFrame(
+        {
+            "open": opens,
+            "high": highs,
+            "low": lows,
+            "close": closes,
+        },
+        dtype="float64",
+    )
