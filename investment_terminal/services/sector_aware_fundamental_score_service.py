@@ -28,8 +28,9 @@ class SectorAwareFundamentalScoreService:
     """
     Score fundamentals after removing structurally inapplicable metrics.
 
-    Generic scoring remains the default for unclassified symbols. This
-    keeps the pipeline usable while the classification registry expands.
+    Component maxima are dynamic. A component with no applicable generic
+    metrics receives a maximum of zero and does not reduce the normalized
+    overall score. No positive score is invented for excluded metrics.
     """
 
     def __init__(
@@ -107,26 +108,26 @@ class SectorAwareFundamentalScoreService:
             positive_factors,
             risk_factors,
         )
-        profitability = (
-            FundamentalScoreService._score_profitability(
-                snapshot,
-                positive_factors,
-                risk_factors,
-            )
+        profitability = FundamentalScoreService._score_profitability(
+            snapshot,
+            positive_factors,
+            risk_factors,
         )
-        balance_sheet = self._score_balance_sheet(
+        balance_sheet, balance_sheet_max = self._score_balance_sheet(
             snapshot,
             classification,
             positive_factors,
             risk_factors,
         )
-        cash_flow = FundamentalScoreService._score_cash_flow(
+        cash_flow, cash_flow_max = self._score_cash_flow(
             snapshot,
+            classification,
             positive_factors,
             risk_factors,
         )
-        valuation = FundamentalScoreService._score_valuation(
+        valuation, valuation_max = self._score_valuation(
             snapshot,
+            classification,
             positive_factors,
             risk_factors,
         )
@@ -145,14 +146,36 @@ class SectorAwareFundamentalScoreService:
             cash_flow=cash_flow,
             valuation=valuation,
             shareholder_returns=shareholder_returns,
+            growth_max=20.0,
+            profitability_max=25.0,
+            balance_sheet_max=balance_sheet_max,
+            cash_flow_max=cash_flow_max,
+            valuation_max=valuation_max,
+            shareholder_returns_max=5.0,
         )
-        raw_score = (
+
+        earned_score = (
             growth
             + profitability
             + balance_sheet
             + cash_flow
             + valuation
             + shareholder_returns
+        )
+        applicable_maximum = (
+            breakdown.growth_max
+            + breakdown.profitability_max
+            + breakdown.balance_sheet_max
+            + breakdown.cash_flow_max
+            + breakdown.valuation_max
+            + breakdown.shareholder_returns_max
+        )
+        raw_score = (
+            earned_score
+            / applicable_maximum
+            * 100.0
+            if applicable_maximum > 0
+            else 0.0
         )
 
         applicable_fields = self.policy.applicable_metrics(
@@ -180,6 +203,12 @@ class SectorAwareFundamentalScoreService:
         if missing_fields:
             risk_factors.append(
                 "Some applicable fundamental metrics are unavailable."
+            )
+
+        if classification.business_model == "BANK":
+            risk_factors.append(
+                "Specialized bank metrics are not yet available; "
+                "the score uses a reduced generic metric set."
             )
 
         final_score = raw_score * data_quality_factor
@@ -210,75 +239,233 @@ class SectorAwareFundamentalScoreService:
         classification: CompanyClassification,
         positive: list[str],
         risks: list[str],
-    ) -> float:
+    ) -> tuple[float, float]:
         metrics: list[tuple[float, float]] = []
 
         if self.policy.is_applicable(
             classification,
             "debt_to_equity",
-        ) and snapshot.debt_to_equity is not None:
-            value = snapshot.debt_to_equity
+        ):
+            maximum = 7.0
+            if snapshot.debt_to_equity is not None:
+                value = snapshot.debt_to_equity
 
-            if value <= 0.5:
-                points = 7.0
-                positive.append(
-                    "Debt-to-equity is conservative."
-                )
-            elif value <= 1.0:
-                points = 5.0
-            elif value <= 2.0:
-                points = 2.5
-                risks.append(
-                    "Debt-to-equity is elevated."
-                )
+                if value <= 0.5:
+                    points = 7.0
+                    positive.append(
+                        "Debt-to-equity is conservative."
+                    )
+                elif value <= 1.0:
+                    points = 5.0
+                elif value <= 2.0:
+                    points = 2.5
+                    risks.append(
+                        "Debt-to-equity is elevated."
+                    )
+                else:
+                    points = 0.0
+                    risks.append(
+                        "Debt-to-equity is high."
+                    )
+
+                metrics.append((points, maximum))
             else:
-                points = 0.0
-                risks.append(
-                    "Debt-to-equity is high."
-                )
-
-            metrics.append((points, 7.0))
+                metrics.append((0.0, maximum))
 
         if self.policy.is_applicable(
             classification,
             "current_ratio",
-        ) and snapshot.current_ratio is not None:
-            value = snapshot.current_ratio
+        ):
+            maximum = 4.0
+            if snapshot.current_ratio is not None:
+                value = snapshot.current_ratio
 
-            if 1.2 <= value <= 3.0:
-                points = 4.0
-                positive.append(
-                    "Current liquidity is healthy."
-                )
-            elif value >= 1.0:
-                points = 2.5
+                if 1.2 <= value <= 3.0:
+                    points = 4.0
+                    positive.append(
+                        "Current liquidity is healthy."
+                    )
+                elif value >= 1.0:
+                    points = 2.5
+                else:
+                    points = 0.0
+                    risks.append(
+                        "Current ratio is below one."
+                    )
+
+                metrics.append((points, maximum))
             else:
-                points = 0.0
-                risks.append(
-                    "Current ratio is below one."
-                )
-
-            metrics.append((points, 4.0))
+                metrics.append((0.0, maximum))
 
         if self.policy.is_applicable(
             classification,
             "quick_ratio",
-        ) and snapshot.quick_ratio is not None:
-            value = snapshot.quick_ratio
+        ):
+            maximum = 4.0
+            if snapshot.quick_ratio is not None:
+                value = snapshot.quick_ratio
 
-            if value >= 1.0:
-                points = 4.0
-            elif value >= 0.7:
-                points = 2.0
+                if value >= 1.0:
+                    points = 4.0
+                elif value >= 0.7:
+                    points = 2.0
+                else:
+                    points = 0.0
+                    risks.append(
+                        "Quick liquidity is weak."
+                    )
+
+                metrics.append((points, maximum))
             else:
-                points = 0.0
-                risks.append(
-                    "Quick liquidity is weak."
-                )
+                metrics.append((0.0, maximum))
 
-            metrics.append((points, 4.0))
-
-        return FundamentalScoreService._normalize_component(
+        maximum = sum(item[1] for item in metrics)
+        score = FundamentalScoreService._normalize_component(
             metrics,
-            component_max=15.0,
+            component_max=maximum,
+        ) if maximum > 0 else 0.0
+
+        return score, maximum
+
+    def _score_cash_flow(
+        self,
+        snapshot: FundamentalSnapshot,
+        classification: CompanyClassification,
+        positive: list[str],
+        risks: list[str],
+    ) -> tuple[float, float]:
+        metrics: list[tuple[float, float]] = []
+
+        definitions = (
+            (
+                "operating_cash_flow",
+                snapshot.operating_cash_flow,
+                7.0,
+                "Operating cash flow is positive.",
+                "Operating cash flow is negative.",
+            ),
+            (
+                "free_cash_flow",
+                snapshot.free_cash_flow,
+                8.0,
+                "Free cash flow is positive.",
+                "Free cash flow is negative.",
+            ),
         )
+
+        for (
+            metric_name,
+            value,
+            maximum,
+            positive_message,
+            risk_message,
+        ) in definitions:
+            if not self.policy.is_applicable(
+                classification,
+                metric_name,
+            ):
+                continue
+
+            if value is None:
+                metrics.append((0.0, maximum))
+                continue
+
+            points = maximum if value > 0 else 0.0
+            metrics.append((points, maximum))
+
+            if value > 0:
+                positive.append(positive_message)
+            else:
+                risks.append(risk_message)
+
+        maximum = sum(item[1] for item in metrics)
+        score = FundamentalScoreService._normalize_component(
+            metrics,
+            component_max=maximum,
+        ) if maximum > 0 else 0.0
+
+        return score, maximum
+
+    def _score_valuation(
+        self,
+        snapshot: FundamentalSnapshot,
+        classification: CompanyClassification,
+        positive: list[str],
+        risks: list[str],
+    ) -> tuple[float, float]:
+        metrics: list[tuple[float, float]] = []
+
+        definitions = (
+            (
+                "forward_pe",
+                snapshot.forward_pe,
+                6.0,
+                (15.0, 25.0, 40.0),
+                "Forward P/E is attractive.",
+                "Forward P/E is elevated.",
+            ),
+            (
+                "peg_ratio",
+                snapshot.peg_ratio,
+                5.0,
+                (1.0, 2.0, 3.0),
+                "PEG ratio is attractive.",
+                "PEG ratio is elevated.",
+            ),
+            (
+                "enterprise_to_ebitda",
+                snapshot.enterprise_to_ebitda,
+                5.0,
+                (10.0, 18.0, 30.0),
+                "EV/EBITDA is attractive.",
+                "EV/EBITDA is elevated.",
+            ),
+            (
+                "price_to_sales",
+                snapshot.price_to_sales,
+                4.0,
+                (3.0, 8.0, 15.0),
+                "Price-to-sales is moderate.",
+                "Price-to-sales is elevated.",
+            ),
+        )
+
+        for (
+            metric_name,
+            value,
+            maximum,
+            thresholds,
+            positive_message,
+            risk_message,
+        ) in definitions:
+            if not self.policy.is_applicable(
+                classification,
+                metric_name,
+            ):
+                continue
+
+            if value is None:
+                metrics.append((0.0, maximum))
+                continue
+
+            points = FundamentalScoreService._inverse_threshold_points(
+                value=value,
+                maximum=maximum,
+                attractive=thresholds[0],
+                acceptable=thresholds[1],
+                expensive=thresholds[2],
+            )
+            metrics.append((points, maximum))
+
+            if value <= thresholds[0]:
+                positive.append(positive_message)
+            elif value > thresholds[2]:
+                risks.append(risk_message)
+
+        maximum = sum(item[1] for item in metrics)
+        score = FundamentalScoreService._normalize_component(
+            metrics,
+            component_max=maximum,
+        ) if maximum > 0 else 0.0
+
+        return score, maximum

@@ -20,28 +20,18 @@ from investment_terminal.services.technical_score_service import (
 
 
 class DecisionClassifiers:
-    """
-    Convert scores and metrics into descriptive classifications.
-
-    Fundamental descriptive labels are derived from the already
-    normalized FundamentalScoreResult. This keeps decision labels
-    aligned with generic or sector-aware fundamental scoring.
-    """
+    """Convert scores and metrics into descriptive classifications."""
 
     @staticmethod
     def classify_overall(score: float) -> str:
         if score >= 80.0:
             return "EXCELLENT"
-
         if score >= 65.0:
             return "STRONG"
-
         if score >= 50.0:
             return "BALANCED"
-
         if score >= 35.0:
             return "WEAK"
-
         return "VERY WEAK"
 
     @classmethod
@@ -52,17 +42,12 @@ class DecisionClassifiers:
         fundamental_snapshot: FundamentalSnapshot,
         fundamental_score: FundamentalScoreResult,
     ) -> DecisionQualitySummary:
-        """Build descriptive quality categories."""
         return DecisionQualitySummary(
-            business_quality=(
-                cls._classify_business_quality(
-                    fundamental_score
-                )
+            business_quality=cls._classify_business_quality(
+                fundamental_score
             ),
-            financial_health=(
-                cls._classify_financial_health(
-                    fundamental_score
-                )
+            financial_health=cls._classify_financial_health(
+                fundamental_score
             ),
             growth=cls._classify_growth(
                 fundamental_snapshot
@@ -70,11 +55,9 @@ class DecisionClassifiers:
             valuation=cls._classify_valuation(
                 fundamental_score
             ),
-            technical_condition=(
-                cls._classify_technical_condition(
-                    technical_analysis,
-                    technical_score,
-                )
+            technical_condition=cls._classify_technical_condition(
+                technical_analysis,
+                technical_score,
             ),
             risk_level=cls._classify_risk(
                 technical_analysis,
@@ -83,63 +66,63 @@ class DecisionClassifiers:
         )
 
     @staticmethod
+    def _component_percentage(
+        value: float,
+        maximum: float,
+    ) -> float | None:
+        if maximum <= 0:
+            return None
+        return value / maximum * 100.0
+
+    @classmethod
     def _classify_business_quality(
+        cls,
         score: FundamentalScoreResult,
     ) -> str:
-        profitability = (
-            score.breakdown.profitability
-            / score.breakdown.profitability_max
-            * 100.0
-        )
-        cash_flow = (
-            score.breakdown.cash_flow
-            / score.breakdown.cash_flow_max
-            * 100.0
+        percentages = tuple(
+            value
+            for value in (
+                cls._component_percentage(
+                    score.breakdown.profitability,
+                    score.breakdown.profitability_max,
+                ),
+                cls._component_percentage(
+                    score.breakdown.cash_flow,
+                    score.breakdown.cash_flow_max,
+                ),
+            )
+            if value is not None
         )
 
-        average = (
-            profitability + cash_flow
-        ) / 2.0
+        if not percentages:
+            return "UNKNOWN"
+
+        average = sum(percentages) / len(percentages)
 
         if average >= 85.0:
             return "EXCELLENT"
-
         if average >= 70.0:
             return "STRONG"
-
         if average >= 50.0:
             return "FAIR"
-
         return "WEAK"
 
-    @staticmethod
+    @classmethod
     def _classify_financial_health(
+        cls,
         score: FundamentalScoreResult,
     ) -> str:
-        """
-        Classify the normalized balance-sheet component.
-
-        A zero maximum means the component cannot be interpreted.
-        This guard also keeps the method safe for future specialized
-        score breakdown implementations.
-        """
-        maximum = score.breakdown.balance_sheet_max
-
-        if maximum <= 0:
-            return "UNKNOWN"
-
-        percentage = (
-            score.breakdown.balance_sheet
-            / maximum
-            * 100.0
+        percentage = cls._component_percentage(
+            score.breakdown.balance_sheet,
+            score.breakdown.balance_sheet_max,
         )
 
+        if percentage is None:
+            return "UNKNOWN"
         if percentage >= 80.0:
             return "STRONG"
-
         if percentage >= 50.0:
             return "ADEQUATE"
-
         if percentage > 0.0:
             return "WEAK"
 
@@ -149,12 +132,10 @@ class DecisionClassifiers:
             "Current ratio is below one.",
             "Quick liquidity is weak.",
         }
-
         if balance_sheet_risks.intersection(
             score.risk_factors
         ):
             return "WEAK"
-
         return "UNKNOWN"
 
     @staticmethod
@@ -169,45 +150,37 @@ class DecisionClassifiers:
             )
             if value is not None
         ]
-
         if not values:
             return "UNKNOWN"
 
         average = sum(values) / len(values)
-
         if average >= 0.20:
             return "VERY STRONG"
-
         if average >= 0.10:
             return "STRONG"
-
         if average >= 0.05:
             return "MODERATE"
-
         if average >= 0:
             return "LOW"
-
         return "NEGATIVE"
 
-    @staticmethod
+    @classmethod
     def _classify_valuation(
+        cls,
         score: FundamentalScoreResult,
     ) -> str:
-        percentage = (
-            score.breakdown.valuation
-            / score.breakdown.valuation_max
-            * 100.0
+        percentage = cls._component_percentage(
+            score.breakdown.valuation,
+            score.breakdown.valuation_max,
         )
-
+        if percentage is None:
+            return "UNKNOWN"
         if percentage >= 80.0:
             return "ATTRACTIVE"
-
         if percentage >= 60.0:
             return "FAIR"
-
         if percentage >= 40.0:
             return "ELEVATED"
-
         return "EXPENSIVE"
 
     @staticmethod
@@ -216,15 +189,13 @@ class DecisionClassifiers:
         score: TechnicalScoreResult,
     ) -> str:
         if (
-            analysis.bollinger_position
-            == "ABOVE_UPPER_BAND"
+            analysis.bollinger_position == "ABOVE_UPPER_BAND"
             or (
                 analysis.rsi14 is not None
                 and analysis.rsi14 > 70.0
             )
         ):
             return "POSITIVE BUT EXTENDED"
-
         return score.classification
 
     @staticmethod
@@ -232,24 +203,11 @@ class DecisionClassifiers:
         technical_analysis: TechnicalAnalysisResult,
         fundamental_score: FundamentalScoreResult,
     ) -> str:
-        """
-        Combine technical risk with normalized fundamental risks.
-
-        Debt risk is counted only when the active fundamental scorer
-        considered debt-to-equity applicable and produced a matching
-        risk factor. Banks therefore avoid a duplicate generic penalty.
-        """
         risk_points = 0
 
-        if (
-            technical_analysis.volatility_status
-            == "HIGH"
-        ):
+        if technical_analysis.volatility_status == "HIGH":
             risk_points += 2
-        elif (
-            technical_analysis.volatility_status
-            == "MODERATE"
-        ):
+        elif technical_analysis.volatility_status == "MODERATE":
             risk_points += 1
 
         if (
@@ -262,7 +220,6 @@ class DecisionClassifiers:
             "Debt-to-equity is elevated.",
             "Debt-to-equity is high.",
         }
-
         if debt_risks.intersection(
             fundamental_score.risk_factors
         ):
@@ -270,8 +227,6 @@ class DecisionClassifiers:
 
         if risk_points >= 4:
             return "HIGH"
-
         if risk_points >= 2:
             return "MEDIUM"
-
         return "LOW"

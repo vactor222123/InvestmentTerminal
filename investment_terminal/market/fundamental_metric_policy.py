@@ -23,6 +23,19 @@ CAPITAL_STRUCTURE_METRICS = frozenset(
     }
 )
 
+BANK_GENERIC_CASH_FLOW_METRICS = frozenset(
+    {
+        "operating_cash_flow",
+        "free_cash_flow",
+    }
+)
+
+BANK_GENERIC_VALUATION_METRICS = frozenset(
+    {
+        "enterprise_to_ebitda",
+    }
+)
+
 STANDARD_METRICS = frozenset(
     {
         "revenue_growth",
@@ -100,8 +113,8 @@ class FundamentalMetricPolicy:
     """
     Decide which generic metrics are meaningful for a business model.
 
-    This policy suppresses only metrics known to be structurally
-    misleading. It does not invent replacement metrics.
+    Excluded metrics neither affect scores nor count as missing data.
+    Specialized replacement metrics will be introduced separately.
     """
 
     def evaluate(
@@ -164,6 +177,35 @@ class FundamentalMetricPolicy:
                     "debt_to_equity is excluded for BANK because "
                     "deposits and financial leverage are structural "
                     "parts of the business model."
+                ),
+            )
+
+        if (
+            business_model == "BANK"
+            and normalized_metric in BANK_GENERIC_CASH_FLOW_METRICS
+        ):
+            return MetricApplicability(
+                metric_name=normalized_metric,
+                applicable=False,
+                reason=(
+                    f"{normalized_metric} is excluded for BANK "
+                    "because generic corporate cash-flow scoring "
+                    "is not directly comparable for deposit-taking "
+                    "financial institutions."
+                ),
+            )
+
+        if (
+            business_model == "BANK"
+            and normalized_metric in BANK_GENERIC_VALUATION_METRICS
+        ):
+            return MetricApplicability(
+                metric_name=normalized_metric,
+                applicable=False,
+                reason=(
+                    "enterprise_to_ebitda is excluded for BANK "
+                    "because enterprise-value and EBITDA-based "
+                    "valuation is not the preferred bank framework."
                 ),
             )
 
