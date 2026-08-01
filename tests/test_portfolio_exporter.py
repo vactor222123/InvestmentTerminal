@@ -1,5 +1,5 @@
 """
-Tests for portfolio JSON export.
+Tests for compact portfolio JSON export.
 """
 
 import json
@@ -93,7 +93,7 @@ def create_package():
 def test_build_package_combines_results() -> None:
     package = create_package()
 
-    assert package.schema_version == "1.0"
+    assert package.schema_version == "1.1"
     assert package.generated_at == GENERATED_AT
     assert package.universe_name == "Mega Cap Tech"
     assert package.universe_size == 3
@@ -131,7 +131,7 @@ def test_build_package_normalizes_universe_name() -> None:
     assert package.universe_name == "Mega Cap Tech"
 
 
-def test_package_is_json_serializable() -> None:
+def test_compact_package_is_json_serializable() -> None:
     package = create_package()
 
     payload = package.to_dict()
@@ -141,42 +141,148 @@ def test_package_is_json_serializable() -> None:
         allow_nan=False,
     )
 
-    assert payload["schema_version"] == "1.0"
+    assert payload["schema_version"] == "1.1"
     assert (
         payload["generated_at"]
         == GENERATED_AT.isoformat()
     )
+
     assert payload["universe"] == {
         "name": "Mega Cap Tech",
         "size": 3,
+        "symbols": [
+            "GOOGL",
+            "MSFT",
+            "AAPL",
+        ],
     }
+
     assert (
         payload["summary"]["top_symbol"]
         == "GOOGL"
     )
     assert (
-        payload["summary"]["top_recommendation"]
+        payload["summary"]["top_rank"]
+        == 1
+    )
+    assert (
+        payload["summary"]
+        ["top_recommendation"]
         == package.recommendations
         .top_recommendation
         .recommendation
     )
+
     assert isinstance(
         payload["ranking"]["candidates"],
         list,
     )
     assert isinstance(
-        payload["recommendations"]
-        ["recommendations"],
+        payload["recommendations"]["items"],
         list,
     )
     assert isinstance(
-        payload["theses"]["theses"],
+        payload["theses"]["items"],
         list,
     )
+
     assert '"top_headline"' in serialized
+    assert '"top_action"' in serialized
 
 
-def test_save_json_creates_file(
+def test_ranking_contains_decision_data_once() -> None:
+    payload = create_package().to_dict()
+
+    candidate = (
+        payload["ranking"]["candidates"][0]
+    )
+
+    assert candidate["symbol"] == "GOOGL"
+    assert candidate["rank"] == 1
+
+    assert "scores" in candidate
+    assert "quality" in candidate
+    assert "confidence" in candidate
+    assert "positive_factors" in candidate
+    assert "risk_factors" in candidate
+    assert "missing_data" in candidate
+    assert "summary" in candidate
+
+    assert "decision" not in candidate
+
+
+def test_recommendations_do_not_repeat_candidates() -> None:
+    payload = create_package().to_dict()
+
+    recommendation = (
+        payload["recommendations"]["items"][0]
+    )
+
+    assert recommendation["symbol"] == "GOOGL"
+    assert "recommendation" in recommendation
+    assert "rationale" in recommendation
+    assert "cautions" in recommendation
+
+    assert "candidate" not in recommendation
+    assert "decision" not in recommendation
+    assert "scores" not in recommendation
+
+
+def test_theses_do_not_repeat_recommendation_context() -> None:
+    payload = create_package().to_dict()
+
+    thesis = payload["theses"]["items"][0]
+
+    assert thesis["symbol"] == "GOOGL"
+    assert "headline" in thesis
+    assert "thesis" in thesis
+    assert "strengths" in thesis
+    assert "risks" in thesis
+    assert "action" in thesis
+
+    assert (
+        "recommendation_context"
+        not in thesis
+    )
+    assert "candidate" not in thesis
+    assert "decision" not in thesis
+
+
+def test_sections_are_connected_by_symbol_and_rank() -> None:
+    payload = create_package().to_dict()
+
+    ranking_items = (
+        payload["ranking"]["candidates"]
+    )
+    recommendation_items = (
+        payload["recommendations"]["items"]
+    )
+    thesis_items = payload["theses"]["items"]
+
+    for (
+        ranking_item,
+        recommendation_item,
+        thesis_item,
+    ) in zip(
+        ranking_items,
+        recommendation_items,
+        thesis_items,
+        strict=True,
+    ):
+        assert (
+            ranking_item["symbol"]
+            == recommendation_item["symbol"]
+            == thesis_item["symbol"]
+        )
+
+        assert (
+            ranking_item["rank"]
+            == recommendation_item["rank"]
+            == thesis_item["rank"]
+        )
+
+
+def test_save_json_creates_compact_file(
     tmp_path,
 ) -> None:
     package = create_package()
@@ -206,20 +312,32 @@ def test_save_json_creates_file(
         == "Mega Cap Tech"
     )
     assert payload["universe"]["size"] == 3
+
     assert (
         payload["summary"]["top_symbol"]
         == "GOOGL"
     )
+
     assert len(
         payload["ranking"]["candidates"]
     ) == 3
     assert len(
-        payload["recommendations"]
-        ["recommendations"]
+        payload["recommendations"]["items"]
     ) == 3
     assert len(
-        payload["theses"]["theses"]
+        payload["theses"]["items"]
     ) == 3
+
+    serialized = output_path.read_text(
+        encoding="utf-8",
+    )
+
+    assert (
+        serialized.count(
+            '"summary": "Overall condition'
+        )
+        == 3
+    )
 
 
 def test_build_package_rejects_symbol_order_mismatch() -> None:
@@ -295,6 +413,38 @@ def test_build_package_rejects_thesis_label_mismatch() -> None:
     with pytest.raises(
         ValueError,
         match="recommendation labels",
+    ):
+        PortfolioExporter().build_package(
+            universe_name="Mega Cap Tech",
+            ranking=ranking,
+            recommendations=recommendations,
+            theses=mismatched_theses,
+            generated_at=GENERATED_AT,
+        )
+
+
+def test_build_package_rejects_timestamp_mismatch() -> None:
+    ranking, recommendations, theses = (
+        create_components()
+    )
+
+    different_time = datetime(
+        2026,
+        8,
+        1,
+        18,
+        0,
+        tzinfo=timezone.utc,
+    )
+
+    mismatched_theses = replace(
+        theses,
+        generated_at=different_time,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="same generated_at timestamp",
     ):
         PortfolioExporter().build_package(
             universe_name="Mega Cap Tech",

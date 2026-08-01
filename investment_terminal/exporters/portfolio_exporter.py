@@ -1,5 +1,5 @@
 """
-Portfolio ranking, recommendation, and thesis JSON exporter.
+Compact portfolio ranking, recommendation, and thesis JSON exporter.
 """
 
 from dataclasses import dataclass
@@ -22,7 +22,15 @@ from investment_terminal.portfolio.thesis_models import (
 @dataclass(frozen=True, slots=True)
 class PortfolioExportPackage:
     """
-    Complete export package for one analyzed asset universe.
+    Complete compact export package for one analyzed universe.
+
+    Each analytical object is exported only once:
+
+    - ranking contains decisions and analytical scores;
+    - recommendations contain recommendation-specific information;
+    - theses contain human-readable thesis information.
+
+    Sections are connected through symbol and rank.
     """
 
     schema_version: str
@@ -103,7 +111,7 @@ class PortfolioExportPackage:
 
     def to_dict(self) -> dict[str, Any]:
         """
-        Convert the complete package to JSON-ready data.
+        Convert the package to a compact JSON-ready dictionary.
         """
         return {
             "schema_version": self.schema_version,
@@ -111,34 +119,272 @@ class PortfolioExportPackage:
             "universe": {
                 "name": self.universe_name,
                 "size": self.universe_size,
+                "symbols": [
+                    candidate.symbol
+                    for candidate
+                    in self.ranking.candidates
+                ],
             },
-            "summary": {
-                "top_symbol": self.top_symbol,
-                "top_recommendation": (
-                    self.recommendations
-                    .top_recommendation
-                    .recommendation
-                ),
-                "top_headline": (
-                    self.theses
-                    .top_thesis
-                    .headline
-                ),
-            },
-            "ranking": self.ranking.to_dict(),
+            "summary": self._build_summary(),
+            "ranking": self._build_ranking_section(),
             "recommendations": (
-                self.recommendations.to_dict()
+                self._build_recommendation_section()
             ),
-            "theses": self.theses.to_dict(),
+            "theses": self._build_thesis_section(),
+        }
+
+    def _build_summary(self) -> dict[str, Any]:
+        """
+        Build compact top-candidate summary information.
+        """
+        top_candidate = (
+            self.ranking.top_candidate
+        )
+        top_recommendation = (
+            self.recommendations.top_recommendation
+        )
+        top_thesis = self.theses.top_thesis
+
+        return {
+            "top_symbol": top_candidate.symbol,
+            "top_rank": top_candidate.rank,
+            "top_overall_score": (
+                top_candidate.overall_score
+            ),
+            "top_recommendation": (
+                top_recommendation.recommendation
+            ),
+            "top_risk_level": (
+                top_candidate.risk_level
+            ),
+            "top_headline": top_thesis.headline,
+            "top_action": top_thesis.action,
+        }
+
+    def _build_ranking_section(
+        self,
+    ) -> dict[str, Any]:
+        """
+        Export analytical decisions exactly once.
+        """
+        return {
+            "schema_version": (
+                self.ranking.schema_version
+            ),
+            "generated_at": (
+                self.ranking.generated_at.isoformat()
+            ),
+            "universe_size": (
+                self.ranking.universe_size
+            ),
+            "top_symbol": (
+                self.ranking.top_candidate.symbol
+            ),
+            "candidates": [
+                self._candidate_to_dict(candidate)
+                for candidate
+                in self.ranking.candidates
+            ],
+        }
+
+    def _build_recommendation_section(
+        self,
+    ) -> dict[str, Any]:
+        """
+        Export only recommendation-specific information.
+        """
+        return {
+            "schema_version": (
+                self.recommendations.schema_version
+            ),
+            "generated_at": (
+                self.recommendations
+                .generated_at
+                .isoformat()
+            ),
+            "universe_size": (
+                self.recommendations.universe_size
+            ),
+            "top_symbol": (
+                self.recommendations
+                .top_recommendation
+                .symbol
+            ),
+            "top_recommendation": (
+                self.recommendations
+                .top_recommendation
+                .recommendation
+            ),
+            "items": [
+                {
+                    "rank": recommendation.rank,
+                    "symbol": recommendation.symbol,
+                    "recommendation": (
+                        recommendation.recommendation
+                    ),
+                    "rationale": list(
+                        recommendation.rationale
+                    ),
+                    "cautions": list(
+                        recommendation.cautions
+                    ),
+                }
+                for recommendation
+                in self.recommendations.recommendations
+            ],
+        }
+
+    def _build_thesis_section(
+        self,
+    ) -> dict[str, Any]:
+        """
+        Export only thesis-specific information.
+        """
+        return {
+            "schema_version": (
+                self.theses.schema_version
+            ),
+            "generated_at": (
+                self.theses.generated_at.isoformat()
+            ),
+            "universe_size": (
+                self.theses.universe_size
+            ),
+            "top_symbol": (
+                self.theses.top_thesis.symbol
+            ),
+            "top_recommendation": (
+                self.theses
+                .top_thesis
+                .recommendation_label
+            ),
+            "items": [
+                {
+                    "rank": thesis.rank,
+                    "symbol": thesis.symbol,
+                    "recommendation": (
+                        thesis.recommendation_label
+                    ),
+                    "headline": thesis.headline,
+                    "thesis": thesis.thesis,
+                    "strengths": list(
+                        thesis.strengths
+                    ),
+                    "risks": list(
+                        thesis.risks
+                    ),
+                    "action": thesis.action,
+                }
+                for thesis in self.theses.theses
+            ],
+        }
+
+    @staticmethod
+    def _candidate_to_dict(
+        candidate,
+    ) -> dict[str, Any]:
+        """
+        Convert one ranked candidate without downstream duplication.
+        """
+        decision = candidate.decision
+
+        return {
+            "rank": candidate.rank,
+            "symbol": candidate.symbol,
+            "currency": candidate.currency,
+            "scores": {
+                "overall": (
+                    candidate.overall_score
+                ),
+                "technical": (
+                    candidate.technical_score
+                ),
+                "fundamental": (
+                    candidate.fundamental_score
+                ),
+                "confidence": (
+                    candidate.confidence_score
+                ),
+                "technical_weight": (
+                    decision.scores.technical_weight
+                ),
+                "fundamental_weight": (
+                    decision.scores.fundamental_weight
+                ),
+            },
+            "classification": (
+                candidate.classification
+            ),
+            "quality": {
+                "business_quality": (
+                    decision
+                    .quality
+                    .business_quality
+                ),
+                "financial_health": (
+                    decision
+                    .quality
+                    .financial_health
+                ),
+                "growth": (
+                    decision.quality.growth
+                ),
+                "valuation": (
+                    decision.quality.valuation
+                ),
+                "technical_condition": (
+                    decision
+                    .quality
+                    .technical_condition
+                ),
+                "risk_level": (
+                    decision.quality.risk_level
+                ),
+            },
+            "confidence": {
+                "score": (
+                    decision.confidence.score
+                ),
+                "classification": (
+                    decision
+                    .confidence
+                    .classification
+                ),
+                "technical_data_quality": (
+                    decision
+                    .confidence
+                    .technical_data_quality
+                ),
+                "fundamental_data_quality": (
+                    decision
+                    .confidence
+                    .fundamental_data_quality
+                ),
+                "missing_data_penalty": (
+                    decision
+                    .confidence
+                    .missing_data_penalty
+                ),
+            },
+            "positive_factors": list(
+                decision.positive_factors
+            ),
+            "risk_factors": list(
+                decision.risk_factors
+            ),
+            "missing_data": list(
+                decision.missing_data
+            ),
+            "summary": decision.summary,
         }
 
 
 class PortfolioExporter:
     """
-    Validate, combine, and save portfolio analysis results.
+    Validate, combine, and save compact portfolio results.
     """
 
-    SCHEMA_VERSION = "1.0"
+    SCHEMA_VERSION = "1.1"
 
     def build_package(
         self,
@@ -175,7 +421,7 @@ class PortfolioExporter:
         output_path: str | Path,
     ) -> Path:
         """
-        Save a portfolio export package as formatted JSON.
+        Save a compact portfolio package as formatted JSON.
         """
         if not isinstance(
             package,
@@ -221,7 +467,7 @@ class PortfolioExporter:
         generated_at: datetime,
     ) -> None:
         """
-        Ensure all portfolio components describe the same universe.
+        Ensure all components describe the same universe and run.
         """
         if (
             not isinstance(universe_name, str)
@@ -338,3 +584,16 @@ class PortfolioExporter:
                     "Thesis recommendation labels must "
                     "match recommendation results"
                 )
+
+        timestamps = {
+            ranking.generated_at,
+            recommendations.generated_at,
+            theses.generated_at,
+            generated_at,
+        }
+
+        if len(timestamps) != 1:
+            raise ValueError(
+                "Portfolio components must use "
+                "the same generated_at timestamp"
+            )
