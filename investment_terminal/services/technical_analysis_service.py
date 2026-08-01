@@ -44,12 +44,27 @@ class TechnicalAnalysisResult:
     ema20: float | None
     rsi14: float | None
 
+    macd_line: float | None
+    macd_signal: float | None
+    macd_histogram: float | None
+
+    atr14: float | None
+    atr_percent: float | None
+
+    bollinger_upper: float | None
+    bollinger_middle: float | None
+    bollinger_lower: float | None
+    bollinger_bandwidth: float | None
+
     price_above_sma20: bool | None
     price_above_sma50: bool | None
     price_above_sma200: bool | None
     sma50_above_sma200: bool | None
 
     trend: str
+    bollinger_position: str
+    volatility_status: str
+
     data_quality: TechnicalDataQuality
 
 
@@ -95,6 +110,7 @@ class TechnicalAnalysisService:
             )
 
         latest_candle = candles[-1]
+        latest_price = float(latest_candle.close_price)
 
         sma20 = TechnicalIndicators.latest(
             TechnicalIndicators.sma(
@@ -127,12 +143,64 @@ class TechnicalAnalysisService:
             )
         )
 
+        macd = TechnicalIndicators.macd(candles)
+
+        macd_line = TechnicalIndicators.latest(
+            macd.macd_line
+        )
+        macd_signal = TechnicalIndicators.latest(
+            macd.signal_line
+        )
+        macd_histogram = TechnicalIndicators.latest(
+            macd.histogram
+        )
+
+        atr14 = TechnicalIndicators.latest(
+            TechnicalIndicators.atr(
+                candles,
+                period=14,
+            )
+        )
+
+        atr_percent = (
+            atr14 / latest_price * 100.0
+            if atr14 is not None
+            else None
+        )
+
+        bollinger = TechnicalIndicators.bollinger_bands(
+            candles,
+            period=20,
+            standard_deviations=2.0,
+        )
+
+        bollinger_upper = TechnicalIndicators.latest(
+            bollinger.upper
+        )
+        bollinger_middle = TechnicalIndicators.latest(
+            bollinger.middle
+        )
+        bollinger_lower = TechnicalIndicators.latest(
+            bollinger.lower
+        )
+        bollinger_bandwidth = TechnicalIndicators.latest(
+            bollinger.bandwidth_percent
+        )
+
         indicator_values = {
             "sma20": sma20,
             "sma50": sma50,
             "sma200": sma200,
             "ema20": ema20,
             "rsi14": rsi14,
+            "macd_line": macd_line,
+            "macd_signal": macd_signal,
+            "macd_histogram": macd_histogram,
+            "atr14": atr14,
+            "bollinger_upper": bollinger_upper,
+            "bollinger_middle": bollinger_middle,
+            "bollinger_lower": bollinger_lower,
+            "bollinger_bandwidth": bollinger_bandwidth,
         }
 
         missing_indicators = tuple(
@@ -165,10 +233,6 @@ class TechnicalAnalysisService:
             ),
         )
 
-        latest_price = float(
-            latest_candle.close_price
-        )
-
         return TechnicalAnalysisResult(
             symbol=normalized_symbol,
             resolution=normalized_resolution,
@@ -180,6 +244,15 @@ class TechnicalAnalysisService:
             sma200=sma200,
             ema20=ema20,
             rsi14=rsi14,
+            macd_line=macd_line,
+            macd_signal=macd_signal,
+            macd_histogram=macd_histogram,
+            atr14=atr14,
+            atr_percent=atr_percent,
+            bollinger_upper=bollinger_upper,
+            bollinger_middle=bollinger_middle,
+            bollinger_lower=bollinger_lower,
+            bollinger_bandwidth=bollinger_bandwidth,
             price_above_sma20=self._compare(
                 latest_price,
                 sma20,
@@ -202,6 +275,15 @@ class TechnicalAnalysisService:
                 sma50=sma50,
                 sma200=sma200,
             ),
+            bollinger_position=self._classify_bollinger_position(
+                latest_price=latest_price,
+                upper=bollinger_upper,
+                middle=bollinger_middle,
+                lower=bollinger_lower,
+            ),
+            volatility_status=self._classify_volatility(
+                atr_percent
+            ),
             data_quality=data_quality,
         )
 
@@ -214,8 +296,6 @@ class TechnicalAnalysisService:
     ) -> str:
         """
         Classify the current moving-average structure.
-
-        This is descriptive context, not a buy or sell signal.
         """
         if sma200 is None:
             return "INSUFFICIENT_DATA"
@@ -242,6 +322,54 @@ class TechnicalAnalysisService:
             return "DOWNTREND"
 
         return "NEUTRAL"
+
+    @staticmethod
+    def _classify_bollinger_position(
+        latest_price: float,
+        upper: float | None,
+        middle: float | None,
+        lower: float | None,
+    ) -> str:
+        """
+        Classify price position relative to Bollinger Bands.
+        """
+        if (
+            upper is None
+            or middle is None
+            or lower is None
+        ):
+            return "INSUFFICIENT_DATA"
+
+        if latest_price > upper:
+            return "ABOVE_UPPER_BAND"
+
+        if latest_price < lower:
+            return "BELOW_LOWER_BAND"
+
+        if latest_price >= middle:
+            return "UPPER_HALF"
+
+        return "LOWER_HALF"
+
+    @staticmethod
+    def _classify_volatility(
+        atr_percent: float | None,
+    ) -> str:
+        """
+        Classify ATR as a percentage of the latest price.
+
+        Thresholds provide descriptive context and are not trading rules.
+        """
+        if atr_percent is None:
+            return "INSUFFICIENT_DATA"
+
+        if atr_percent < 2.0:
+            return "LOW"
+
+        if atr_percent < 4.0:
+            return "MODERATE"
+
+        return "HIGH"
 
     @staticmethod
     def _compare(

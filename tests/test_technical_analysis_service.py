@@ -139,9 +139,14 @@ def test_analyze_reports_incomplete_data() -> None:
         == 15.0
     )
     assert (
-        result.data_quality.missing_indicators
-        == ("sma50", "sma200")
+    result.data_quality.missing_indicators
+    == (
+        "sma50",
+        "sma200",
+        "macd_signal",
+        "macd_histogram",
     )
+)
     assert (
         result.data_quality.sufficient_for_long_term
         is False
