@@ -295,62 +295,126 @@ class RecommendationEngine:
 
         return tuple(rationale)
 
-    @staticmethod
+    @classmethod
     def _build_cautions(
+        cls,
         candidate: RankingCandidate,
     ) -> tuple[str, ...]:
         decision = candidate.decision
         cautions: list[str] = []
 
         if candidate.risk_level == "HIGH":
-            cautions.append(
-                "The current risk level is high."
+            cls._append_unique_caution(
+                cautions,
+                "The current risk level is high.",
             )
         elif candidate.risk_level == "MEDIUM":
-            cautions.append(
-                "The current risk level is medium."
+            cls._append_unique_caution(
+                cautions,
+                "The current risk level is medium.",
             )
 
         if decision.quality.valuation == "EXPENSIVE":
-            cautions.append(
-                "Valuation is expensive."
+            cls._append_unique_caution(
+                cautions,
+                "Valuation is expensive.",
             )
         elif decision.quality.valuation == "ELEVATED":
-            cautions.append(
-                "Valuation is elevated."
+            cls._append_unique_caution(
+                cautions,
+                "Valuation is elevated.",
             )
 
         if (
             decision.quality.technical_condition
             == "POSITIVE BUT EXTENDED"
         ):
-            cautions.append(
+            cls._append_unique_caution(
+                cautions,
                 "Technical conditions are positive "
-                "but extended."
+                "but extended.",
             )
-        elif decision.quality.technical_condition in {
-            "WEAK",
-            "VERY_WEAK",
-        }:
-            cautions.append(
-                "Technical conditions are weak."
+        elif (
+            decision.quality.technical_condition
+            in {
+                "WEAK",
+                "VERY WEAK",
+                "VERY_WEAK",
+            }
+        ):
+            cls._append_unique_caution(
+                cautions,
+                "Technical conditions are weak.",
             )
 
         if candidate.confidence_score < 85.0:
-            cautions.append(
-                "Data confidence is below the preferred level."
-            )
-
-        if decision.missing_data:
-            cautions.append(
-                "Some analytical data is unavailable."
+            cls._append_unique_caution(
+                cautions,
+                "Data confidence is below "
+                "the preferred level.",
             )
 
         for risk_factor in decision.risk_factors:
-            if risk_factor not in cautions:
-                cautions.append(risk_factor)
+            cls._append_unique_caution(
+                cautions,
+                risk_factor,
+            )
+
+        has_missing_data_explanation = any(
+            cls._is_missing_data_caution(
+                caution
+            )
+            for caution in cautions
+        )
+
+        if (
+            decision.missing_data
+            and not has_missing_data_explanation
+        ):
+            cls._append_unique_caution(
+                cautions,
+                "Some analytical data is unavailable.",
+            )
 
         return tuple(cautions)
+
+    @staticmethod
+    def _append_unique_caution(
+        cautions: list[str],
+        caution: str,
+    ) -> None:
+        normalized_caution = (
+            caution.strip().casefold()
+        )
+
+        existing = {
+            item.strip().casefold()
+            for item in cautions
+        }
+
+        if normalized_caution not in existing:
+            cautions.append(
+                caution.strip()
+            )
+
+    @staticmethod
+    def _is_missing_data_caution(
+        caution: str,
+    ) -> bool:
+        normalized = caution.casefold()
+
+        missing_data_terms = (
+            "unavailable",
+            "missing data",
+            "missing fundamental",
+            "missing technical",
+            "metrics are unavailable",
+        )
+
+        return any(
+            term in normalized
+            for term in missing_data_terms
+        )
 
     def _downgrade(
         self,
