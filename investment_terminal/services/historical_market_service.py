@@ -5,7 +5,9 @@ Historical market-data download and persistence service.
 from dataclasses import dataclass
 from datetime import datetime
 
-from investment_terminal.clients.finnhub_client import FinnhubClient
+from investment_terminal.clients.historical_data_client import (
+    HistoricalDataClient,
+)
 from investment_terminal.repositories.candle_repository import (
     CandleRepository,
 )
@@ -34,7 +36,7 @@ class HistoricalMarketService:
 
     def __init__(
         self,
-        client: FinnhubClient,
+        client: HistoricalDataClient,
         repository: CandleRepository,
     ) -> None:
         self.client = client
