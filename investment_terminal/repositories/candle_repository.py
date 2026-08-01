@@ -9,7 +9,9 @@ import sqlite3
 
 from investment_terminal.database.database import Database
 from investment_terminal.models.candle import Candle
-from investment_terminal.repositories.base_repository import BaseRepository
+from investment_terminal.repositories.base_repository import (
+    BaseRepository,
+)
 
 
 class CandleRepository(BaseRepository):
@@ -17,10 +19,16 @@ class CandleRepository(BaseRepository):
     Persist and retrieve historical OHLCV candles.
     """
 
-    def __init__(self, database: Database) -> None:
+    def __init__(
+        self,
+        database: Database,
+    ) -> None:
         self.database = database
 
-    def save(self, model: Candle) -> int:
+    def save(
+        self,
+        model: Candle,
+    ) -> int:
         """
         Save one candle and return its database ID.
 
@@ -51,14 +59,19 @@ class CandleRepository(BaseRepository):
             return int(cursor.lastrowid)
 
         except sqlite3.IntegrityError:
-            existing_id = self._get_existing_id(model)
+            existing_id = self._get_existing_id(
+                model
+            )
 
             if existing_id is None:
                 raise
 
             return existing_id
 
-    def save_many(self, candles: list[Candle]) -> int:
+    def save_many(
+        self,
+        candles: list[Candle],
+    ) -> int:
         """
         Save multiple candles in one transaction.
 
@@ -67,7 +80,9 @@ class CandleRepository(BaseRepository):
         Returns the number of newly inserted rows.
         """
         if not isinstance(candles, list):
-            raise TypeError("candles must be a list")
+            raise TypeError(
+                "candles must be a list"
+            )
 
         if not candles:
             return 0
@@ -100,7 +115,10 @@ class CandleRepository(BaseRepository):
 
         return cursor.rowcount
 
-    def get(self, candle_id: int) -> Candle | None:
+    def get(
+        self,
+        candle_id: int,
+    ) -> Candle | None:
         """
         Return one candle by database ID.
         """
@@ -129,6 +147,55 @@ class CandleRepository(BaseRepository):
 
         return self._row_to_candle(row)
 
+    def get_latest(
+        self,
+        symbol: str,
+        resolution: str,
+    ) -> Candle | None:
+        """
+        Return the most recent stored candle.
+
+        Return None when no candle exists for the requested
+        symbol and resolution.
+        """
+        normalized_symbol = self._normalize_text(
+            symbol,
+            field_name="symbol",
+        )
+        normalized_resolution = self._normalize_text(
+            resolution,
+            field_name="resolution",
+        )
+
+        row = self.database.connection.execute(
+            """
+            SELECT
+                symbol,
+                resolution,
+                timestamp,
+                open_price,
+                high_price,
+                low_price,
+                close_price,
+                volume,
+                currency
+            FROM candles
+            WHERE symbol = ?
+              AND resolution = ?
+            ORDER BY timestamp DESC
+            LIMIT 1
+            """,
+            (
+                normalized_symbol,
+                normalized_resolution,
+            ),
+        ).fetchone()
+
+        if row is None:
+            return None
+
+        return self._row_to_candle(row)
+
     def get_range(
         self,
         symbol: str,
@@ -150,14 +217,36 @@ class CandleRepository(BaseRepository):
             field_name="resolution",
         )
 
-        if start is not None and not isinstance(start, datetime):
-            raise TypeError("start must be a datetime or None")
+        if (
+            start is not None
+            and not isinstance(
+                start,
+                datetime,
+            )
+        ):
+            raise TypeError(
+                "start must be a datetime or None"
+            )
 
-        if end is not None and not isinstance(end, datetime):
-            raise TypeError("end must be a datetime or None")
+        if (
+            end is not None
+            and not isinstance(
+                end,
+                datetime,
+            )
+        ):
+            raise TypeError(
+                "end must be a datetime or None"
+            )
 
-        if start is not None and end is not None and start > end:
-            raise ValueError("start must not be later than end")
+        if (
+            start is not None
+            and end is not None
+            and start > end
+        ):
+            raise ValueError(
+                "start must not be later than end"
+            )
 
         query = """
             SELECT
@@ -182,11 +271,15 @@ class CandleRepository(BaseRepository):
 
         if start is not None:
             query += " AND timestamp >= ?"
-            parameters.append(start.isoformat())
+            parameters.append(
+                start.isoformat()
+            )
 
         if end is not None:
             query += " AND timestamp <= ?"
-            parameters.append(end.isoformat())
+            parameters.append(
+                end.isoformat()
+            )
 
         query += " ORDER BY timestamp ASC"
 
@@ -200,14 +293,20 @@ class CandleRepository(BaseRepository):
             for row in rows
         ]
 
-    def delete(self, candle_id: int) -> bool:
+    def delete(
+        self,
+        candle_id: int,
+    ) -> bool:
         """
         Delete one candle by ID.
         """
         self._validate_id(candle_id)
 
         cursor = self.database.connection.execute(
-            "DELETE FROM candles WHERE id = ?",
+            """
+            DELETE FROM candles
+            WHERE id = ?
+            """,
             (candle_id,),
         )
         self.database.connection.commit()
@@ -244,7 +343,9 @@ class CandleRepository(BaseRepository):
             ),
         ).fetchone()
 
-        return int(row["candle_count"])
+        return int(
+            row["candle_count"]
+        )
 
     def _get_existing_id(
         self,
@@ -287,11 +388,15 @@ class CandleRepository(BaseRepository):
         )
 
     @staticmethod
-    def _row_to_candle(row: sqlite3.Row) -> Candle:
+    def _row_to_candle(
+        row: sqlite3.Row,
+    ) -> Candle:
         return Candle(
             symbol=row["symbol"],
             resolution=row["resolution"],
-            timestamp=datetime.fromisoformat(row["timestamp"]),
+            timestamp=datetime.fromisoformat(
+                row["timestamp"]
+            ),
             open_price=row["open_price"],
             high_price=row["high_price"],
             low_price=row["low_price"],
@@ -305,8 +410,13 @@ class CandleRepository(BaseRepository):
         cls,
         candle: Candle,
     ) -> None:
-        if not isinstance(candle, Candle):
-            raise TypeError("model must be a Candle instance")
+        if not isinstance(
+            candle,
+            Candle,
+        ):
+            raise TypeError(
+                "model must be a Candle instance"
+            )
 
         cls._normalize_text(
             candle.symbol,
@@ -321,8 +431,13 @@ class CandleRepository(BaseRepository):
             field_name="currency",
         )
 
-        if not isinstance(candle.timestamp, datetime):
-            raise ValueError("candle timestamp must be a datetime")
+        if not isinstance(
+            candle.timestamp,
+            datetime,
+        ):
+            raise ValueError(
+                "candle timestamp must be a datetime"
+            )
 
         numeric_fields = {
             "open_price": candle.open_price,
@@ -332,30 +447,44 @@ class CandleRepository(BaseRepository):
             "volume": candle.volume,
         }
 
-        for field_name, value in numeric_fields.items():
+        for (
+            field_name,
+            value,
+        ) in numeric_fields.items():
             if (
                 isinstance(value, bool)
                 or not isinstance(value, Real)
                 or not isfinite(float(value))
             ):
                 raise ValueError(
-                    f"{field_name} must be a finite number"
+                    f"{field_name} must be "
+                    "a finite number"
                 )
 
         if candle.open_price <= 0:
-            raise ValueError("open_price must be greater than zero")
+            raise ValueError(
+                "open_price must be greater than zero"
+            )
 
         if candle.high_price <= 0:
-            raise ValueError("high_price must be greater than zero")
+            raise ValueError(
+                "high_price must be greater than zero"
+            )
 
         if candle.low_price <= 0:
-            raise ValueError("low_price must be greater than zero")
+            raise ValueError(
+                "low_price must be greater than zero"
+            )
 
         if candle.close_price <= 0:
-            raise ValueError("close_price must be greater than zero")
+            raise ValueError(
+                "close_price must be greater than zero"
+            )
 
         if candle.volume < 0:
-            raise ValueError("volume must not be negative")
+            raise ValueError(
+                "volume must not be negative"
+            )
 
         if candle.high_price < max(
             candle.open_price,
@@ -363,7 +492,8 @@ class CandleRepository(BaseRepository):
             candle.low_price,
         ):
             raise ValueError(
-                "high_price must be the highest OHLC value"
+                "high_price must be "
+                "the highest OHLC value"
             )
 
         if candle.low_price > min(
@@ -372,7 +502,8 @@ class CandleRepository(BaseRepository):
             candle.high_price,
         ):
             raise ValueError(
-                "low_price must be the lowest OHLC value"
+                "low_price must be "
+                "the lowest OHLC value"
             )
 
     @staticmethod
@@ -380,20 +511,30 @@ class CandleRepository(BaseRepository):
         value: str,
         field_name: str,
     ) -> str:
-        if not isinstance(value, str) or not value.strip():
+        if (
+            not isinstance(value, str)
+            or not value.strip()
+        ):
             raise ValueError(
-                f"{field_name} must be a non-empty string"
+                f"{field_name} must be "
+                "a non-empty string"
             )
 
         return value.strip().upper()
 
     @staticmethod
-    def _validate_id(candle_id: int) -> None:
+    def _validate_id(
+        candle_id: int,
+    ) -> None:
         if (
             isinstance(candle_id, bool)
-            or not isinstance(candle_id, int)
+            or not isinstance(
+                candle_id,
+                int,
+            )
             or candle_id <= 0
         ):
             raise ValueError(
-                "candle_id must be a positive integer"
+                "candle_id must be "
+                "a positive integer"
             )
