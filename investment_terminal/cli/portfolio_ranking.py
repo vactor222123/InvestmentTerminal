@@ -15,6 +15,9 @@ from investment_terminal.clients.yahoo_fundamental_client import (
 )
 from investment_terminal.database.database import Database
 from investment_terminal.exporters.portfolio_exporter import PortfolioExporter
+from investment_terminal.market.company_classification_registry import (
+    CompanyClassificationRegistry,
+)
 from investment_terminal.portfolio.allocation_engine import (
     PortfolioAllocationEngine,
 )
@@ -36,6 +39,9 @@ from investment_terminal.services.market_data_freshness_service import (
 from investment_terminal.services.market_data_refresh_service import (
     MarketDataRefreshService,
     UniverseMarketDataRefreshResult,
+)
+from investment_terminal.services.sector_aware_fundamental_score_service import (
+    SectorAwareFundamentalScoreService,
 )
 from investment_terminal.services.technical_analysis_service import (
     TechnicalAnalysisService,
@@ -104,9 +110,19 @@ def main(
             repository=repository,
         )
         fundamental_client = YahooFundamentalClient()
+        classification_registry = (
+            CompanyClassificationRegistry.load()
+        )
+        fundamental_score_service = (
+            SectorAwareFundamentalScoreService(
+                client=fundamental_client,
+                registry=classification_registry,
+            )
+        )
         asset_analysis_service = AssetAnalysisService(
             technical_analysis_service=technical_analysis_service,
             fundamental_client=fundamental_client,
+            fundamental_score_service=fundamental_score_service,
         )
 
         decisions = [

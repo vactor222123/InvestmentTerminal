@@ -37,21 +37,19 @@ STANDARD_METRICS = frozenset(
         "quick_ratio",
         "operating_cash_flow",
         "free_cash_flow",
-        "price_to_earnings",
+        "forward_pe",
         "price_to_sales",
         "peg_ratio",
-        "enterprise_value_to_ebitda",
+        "enterprise_to_ebitda",
         "dividend_yield",
-        "dividend_payout_ratio",
+        "payout_ratio",
     }
 )
 
 
 @dataclass(frozen=True, slots=True)
 class MetricApplicability:
-    """
-    Decision describing whether one metric should affect scoring.
-    """
+    """Decision describing whether one metric should affect scoring."""
 
     metric_name: str
     applicable: bool
@@ -66,10 +64,7 @@ class MetricApplicability:
                 "metric_name must be a non-empty string"
             )
 
-        if not isinstance(
-            self.applicable,
-            bool,
-        ):
+        if not isinstance(self.applicable, bool):
             raise TypeError(
                 "applicable must be a bool"
             )
@@ -105,10 +100,8 @@ class FundamentalMetricPolicy:
     """
     Decide which generic metrics are meaningful for a business model.
 
-    This first policy version intentionally stays conservative:
-    it suppresses only metrics known to be structurally misleading
-    for specific business models. It does not invent replacement
-    bank, insurer, payment-network, or REIT metrics.
+    This policy suppresses only metrics known to be structurally
+    misleading. It does not invent replacement metrics.
     """
 
     def evaluate(
@@ -121,8 +114,7 @@ class FundamentalMetricPolicy:
             CompanyClassification,
         ):
             raise TypeError(
-                "classification must be a "
-                "CompanyClassification"
+                "classification must be a CompanyClassification"
             )
 
         normalized_metric = self._normalize_metric_name(
@@ -139,9 +131,7 @@ class FundamentalMetricPolicy:
                 ),
             )
 
-        business_model = (
-            classification.business_model
-        )
+        business_model = classification.business_model
 
         if (
             business_model
@@ -150,8 +140,7 @@ class FundamentalMetricPolicy:
                 "PAYMENT_NETWORK",
                 "INSURER",
             }
-            and normalized_metric
-            in LIQUIDITY_METRICS
+            and normalized_metric in LIQUIDITY_METRICS
         ):
             return MetricApplicability(
                 metric_name=normalized_metric,
@@ -166,8 +155,7 @@ class FundamentalMetricPolicy:
 
         if (
             business_model == "BANK"
-            and normalized_metric
-            in CAPITAL_STRUCTURE_METRICS
+            and normalized_metric in CAPITAL_STRUCTURE_METRICS
         ):
             return MetricApplicability(
                 metric_name=normalized_metric,
@@ -188,19 +176,27 @@ class FundamentalMetricPolicy:
             ),
         )
 
+    def is_applicable(
+        self,
+        classification: CompanyClassification,
+        metric_name: str,
+    ) -> bool:
+        return self.evaluate(
+            classification,
+            metric_name,
+        ).applicable
+
     def applicable_metrics(
         self,
         classification: CompanyClassification,
     ) -> tuple[str, ...]:
         return tuple(
             metric
-            for metric in sorted(
-                STANDARD_METRICS
-            )
-            if self.evaluate(
+            for metric in sorted(STANDARD_METRICS)
+            if self.is_applicable(
                 classification,
                 metric,
-            ).applicable
+            )
         )
 
     def excluded_metrics(
@@ -214,9 +210,7 @@ class FundamentalMetricPolicy:
                     classification,
                     metric,
                 )
-                for metric in sorted(
-                    STANDARD_METRICS
-                )
+                for metric in sorted(STANDARD_METRICS)
             )
             if not result.applicable
         )

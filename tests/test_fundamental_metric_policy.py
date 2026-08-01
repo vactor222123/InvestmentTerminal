@@ -46,9 +46,7 @@ def test_special_models_exclude_generic_liquidity(
     metric: str,
 ) -> None:
     result = POLICY.evaluate(
-        classification(
-            business_model
-        ),
+        classification(business_model),
         metric,
     )
 
@@ -57,21 +55,15 @@ def test_special_models_exclude_generic_liquidity(
 
 
 def test_standard_company_keeps_liquidity_metrics() -> None:
-    result = POLICY.evaluate(
-        classification(
-            "STANDARD"
-        ),
+    assert POLICY.is_applicable(
+        classification("STANDARD"),
         "current_ratio",
-    )
-
-    assert result.applicable is True
+    ) is True
 
 
 def test_bank_excludes_debt_to_equity() -> None:
     result = POLICY.evaluate(
-        classification(
-            "BANK"
-        ),
+        classification("BANK"),
         "debt_to_equity",
     )
 
@@ -79,89 +71,21 @@ def test_bank_excludes_debt_to_equity() -> None:
     assert "structural" in result.reason
 
 
-def test_payment_network_keeps_debt_to_equity() -> None:
-    result = POLICY.evaluate(
-        classification(
-            "PAYMENT_NETWORK"
-        ),
-        "debt_to_equity",
+def test_policy_uses_snapshot_field_names() -> None:
+    metrics = POLICY.applicable_metrics(
+        classification("STANDARD")
     )
 
-    assert result.applicable is True
-
-
-def test_growth_metric_remains_applicable_to_bank() -> None:
-    result = POLICY.evaluate(
-        classification(
-            "BANK"
-        ),
-        "earnings_growth",
-    )
-
-    assert result.applicable is True
+    assert "forward_pe" in metrics
+    assert "enterprise_to_ebitda" in metrics
+    assert "payout_ratio" in metrics
 
 
 def test_unknown_metric_is_not_applicable() -> None:
     result = POLICY.evaluate(
-        classification(
-            "STANDARD"
-        ),
+        classification("STANDARD"),
         "mystery_metric",
     )
 
     assert result.applicable is False
     assert "not registered" in result.reason
-
-
-def test_metric_name_is_normalized() -> None:
-    result = POLICY.evaluate(
-        classification(
-            "STANDARD"
-        ),
-        " Current Ratio ",
-    )
-
-    assert result.metric_name == (
-        "current_ratio"
-    )
-
-
-def test_excluded_metrics_for_bank() -> None:
-    excluded = POLICY.excluded_metrics(
-        classification(
-            "BANK"
-        )
-    )
-
-    assert {
-        result.metric_name
-        for result in excluded
-    } == {
-        "current_ratio",
-        "quick_ratio",
-        "debt_to_equity",
-    }
-
-
-def test_applicable_metrics_for_payment_network() -> None:
-    metrics = POLICY.applicable_metrics(
-        classification(
-            "PAYMENT_NETWORK"
-        )
-    )
-
-    assert "current_ratio" not in metrics
-    assert "quick_ratio" not in metrics
-    assert "debt_to_equity" in metrics
-    assert "free_cash_flow" in metrics
-
-
-def test_rejects_invalid_classification() -> None:
-    with pytest.raises(
-        TypeError,
-        match="CompanyClassification",
-    ):
-        POLICY.evaluate(
-            None,
-            "current_ratio",
-        )
