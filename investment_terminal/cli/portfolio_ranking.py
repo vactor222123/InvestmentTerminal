@@ -109,6 +109,7 @@ def main() -> None:
         export_package = exporter.build_package(
             universe_name=UNIVERSE_NAME,
             market_data=refresh_result,
+            allocation=allocation_result,
             ranking=ranking,
             recommendations=recommendation_result,
             theses=thesis_result,

@@ -7,6 +7,9 @@ from datetime import date, datetime, timezone
 import pytest
 
 from investment_terminal.exporters.portfolio_exporter import PortfolioExporter
+from investment_terminal.portfolio.allocation_engine import (
+    PortfolioAllocationEngine,
+)
 from investment_terminal.portfolio.ranking_models import RankingResult
 from investment_terminal.portfolio.recommendation_engine import RecommendationEngine
 from investment_terminal.portfolio.thesis_generator import InvestmentThesisGenerator
@@ -82,14 +85,27 @@ def create_components():
         recommendations,
         generated_at=GENERATED_AT,
     )
-    return ranking, recommendations, theses
+    allocation = PortfolioAllocationEngine().allocate(
+        recommendations=recommendations,
+        total_capital=100_000.0,
+        profile="BALANCED",
+        currency="USD",
+        generated_at=GENERATED_AT,
+    )
+    return ranking, recommendations, theses, allocation
 
 
 def create_package():
-    ranking, recommendations, theses = create_components()
+    (
+        ranking,
+        recommendations,
+        theses,
+        allocation,
+    ) = create_components()
     return PortfolioExporter().build_package(
         universe_name="Mega Cap Tech",
         market_data=create_market_data(),
+        allocation=allocation,
         ranking=ranking,
         recommendations=recommendations,
         theses=theses,
@@ -99,7 +115,7 @@ def create_package():
 
 def test_build_package_combines_results() -> None:
     package = create_package()
-    assert package.schema_version == "1.2"
+    assert package.schema_version == "1.3"
     assert package.universe_size == 3
     assert package.top_symbol == "GOOGL"
     assert package.market_data.all_ready is True
@@ -107,7 +123,7 @@ def test_build_package_combines_results() -> None:
 
 def test_compact_package_contains_market_data() -> None:
     payload = create_package().to_dict()
-    assert payload["schema_version"] == "1.2"
+    assert payload["schema_version"] == "1.3"
     assert payload["market_data"]["all_ready"] is True
     assert payload["market_data"]["ready_count"] == 3
     assert payload["market_data"]["failed_count"] == 0
@@ -138,6 +154,77 @@ def test_summary_contains_market_data_status() -> None:
     summary = create_package().to_dict()["summary"]
     assert summary["market_data_ready"] is True
     assert summary["market_data_checked_at"] == CHECKED_AT.isoformat()
+    assert summary["allocation_profile"] == "BALANCED"
+    assert summary["allocation_total_capital"] == 100_000.0
+    assert summary["allocation_cash_weight"] == 0.10
+
+
+
+
+def test_compact_package_contains_allocation() -> None:
+    payload = create_package().to_dict()
+
+    allocation = payload["allocation"]
+
+    assert allocation["schema_version"] == "1.0"
+    assert allocation["profile"] == "BALANCED"
+    assert allocation["currency"] == "USD"
+    assert allocation["total_capital"] == 100_000.0
+    assert allocation["invested_amount"] == 90_000.0
+    assert allocation["cash_amount"] == 10_000.0
+    assert allocation["invested_weight"] == 0.90
+    assert allocation["cash_weight"] == 0.10
+    assert len(allocation["positions"]) == 3
+
+    assert [
+        position["symbol"]
+        for position in allocation["positions"]
+    ] == [
+        "GOOGL",
+        "MSFT",
+        "AAPL",
+    ]
+
+    assert sum(
+        position["target_weight"]
+        for position in allocation["positions"]
+    ) == pytest.approx(0.90)
+
+
+def test_allocation_does_not_repeat_decision_objects() -> None:
+    allocation = (
+        create_package()
+        .to_dict()["allocation"]
+    )
+
+    position = allocation["positions"][0]
+
+    assert "decision" not in position
+    assert "candidate" not in position
+    assert "recommendation_context" not in position
+
+
+def test_build_package_rejects_invalid_allocation() -> None:
+    (
+        ranking,
+        recommendations,
+        theses,
+        _,
+    ) = create_components()
+
+    with pytest.raises(
+        TypeError,
+        match="PortfolioAllocationResult",
+    ):
+        PortfolioExporter().build_package(
+            universe_name="Mega Cap Tech",
+            market_data=create_market_data(),
+            allocation=None,
+            ranking=ranking,
+            recommendations=recommendations,
+            theses=theses,
+            generated_at=GENERATED_AT,
+        )
 
 
 def test_market_data_does_not_duplicate_full_freshness_objects() -> None:
@@ -176,13 +263,19 @@ def test_sections_are_connected_by_symbol() -> None:
 
 
 def test_market_data_input_order_does_not_need_to_match_ranking() -> None:
-    ranking, recommendations, theses = create_components()
+    (
+        ranking,
+        recommendations,
+        theses,
+        allocation,
+    ) = create_components()
 
     package = PortfolioExporter().build_package(
         universe_name="Mega Cap Tech",
         market_data=create_market_data(
             ("MSFT", "AAPL", "GOOGL")
         ),
+        allocation=allocation,
         ranking=ranking,
         recommendations=recommendations,
         theses=theses,
@@ -206,12 +299,17 @@ def test_save_json_creates_file(tmp_path) -> None:
     saved = PortfolioExporter().save_json(create_package(), output_path)
     assert saved == output_path
     payload = json.loads(output_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.2"
+    assert payload["schema_version"] == "1.3"
     assert payload["market_data"]["items"][0]["policy"] == "TRADING_SESSION"
 
 
 def test_build_package_rejects_market_symbol_mismatch() -> None:
-    ranking, recommendations, theses = create_components()
+    (
+        ranking,
+        recommendations,
+        theses,
+        allocation,
+    ) = create_components()
 
     with pytest.raises(
         ValueError,
@@ -222,6 +320,7 @@ def test_build_package_rejects_market_symbol_mismatch() -> None:
             market_data=create_market_data(
                 ("GOOGL", "MSFT", "META")
             ),
+            allocation=allocation,
             ranking=ranking,
             recommendations=recommendations,
             theses=theses,
@@ -230,7 +329,12 @@ def test_build_package_rejects_market_symbol_mismatch() -> None:
 
 
 def test_build_package_rejects_not_ready_market_data() -> None:
-    ranking, recommendations, theses = create_components()
+    (
+        ranking,
+        recommendations,
+        theses,
+        allocation,
+    ) = create_components()
     stale = replace(
         create_freshness("GOOGL"),
         status="STALE",
@@ -266,6 +370,7 @@ def test_build_package_rejects_not_ready_market_data() -> None:
         PortfolioExporter().build_package(
             universe_name="Mega Cap Tech",
             market_data=market_data,
+            allocation=allocation,
             ranking=ranking,
             recommendations=recommendations,
             theses=theses,
@@ -274,11 +379,17 @@ def test_build_package_rejects_not_ready_market_data() -> None:
 
 
 def test_build_package_rejects_invalid_market_data() -> None:
-    ranking, recommendations, theses = create_components()
+    (
+        ranking,
+        recommendations,
+        theses,
+        allocation,
+    ) = create_components()
     with pytest.raises(TypeError, match="UniverseMarketDataRefreshResult"):
         PortfolioExporter().build_package(
             universe_name="Mega Cap Tech",
             market_data=None,
+            allocation=allocation,
             ranking=ranking,
             recommendations=recommendations,
             theses=theses,
@@ -287,11 +398,17 @@ def test_build_package_rejects_invalid_market_data() -> None:
 
 
 def test_build_package_rejects_timestamp_mismatch() -> None:
-    ranking, recommendations, theses = create_components()
+    (
+        ranking,
+        recommendations,
+        theses,
+        allocation,
+    ) = create_components()
     with pytest.raises(ValueError, match="same generated_at timestamp"):
         PortfolioExporter().build_package(
             universe_name="Mega Cap Tech",
             market_data=create_market_data(),
+            allocation=allocation,
             ranking=ranking,
             recommendations=recommendations,
             theses=replace(

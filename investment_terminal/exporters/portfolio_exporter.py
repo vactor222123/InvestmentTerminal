@@ -8,6 +8,9 @@ import json
 from pathlib import Path
 from typing import Any
 
+from investment_terminal.portfolio.allocation_models import (
+    PortfolioAllocationResult,
+)
 from investment_terminal.portfolio.ranking_models import RankingResult
 from investment_terminal.portfolio.recommendation_models import (
     PortfolioRecommendationResult,
@@ -26,6 +29,7 @@ class PortfolioExportPackage:
     generated_at: datetime
     universe_name: str
     market_data: UniverseMarketDataRefreshResult
+    allocation: PortfolioAllocationResult
     ranking: RankingResult
     recommendations: PortfolioRecommendationResult
     theses: PortfolioThesisResult
@@ -40,6 +44,14 @@ class PortfolioExportPackage:
         if not isinstance(self.market_data, UniverseMarketDataRefreshResult):
             raise TypeError(
                 "market_data must be a UniverseMarketDataRefreshResult"
+            )
+        if not isinstance(
+            self.allocation,
+            PortfolioAllocationResult,
+        ):
+            raise TypeError(
+                "allocation must be a "
+                "PortfolioAllocationResult"
             )
         if not isinstance(self.ranking, RankingResult):
             raise TypeError("ranking must be a RankingResult")
@@ -71,6 +83,7 @@ class PortfolioExportPackage:
                 "symbols": [candidate.symbol for candidate in self.ranking.candidates],
             },
             "market_data": self._build_market_data_section(),
+            "allocation": self._build_allocation_section(),
             "summary": self._build_summary(),
             "ranking": self._build_ranking_section(),
             "recommendations": self._build_recommendation_section(),
@@ -138,6 +151,33 @@ class PortfolioExportPackage:
             ),
         }
 
+
+    def _build_allocation_section(self) -> dict[str, Any]:
+        """
+        Export the generated target portfolio allocation.
+        """
+        return {
+            "schema_version": self.allocation.schema_version,
+            "generated_at": (
+                self.allocation.generated_at.isoformat()
+            ),
+            "profile": self.allocation.constraints.profile,
+            "currency": self.allocation.currency,
+            "total_capital": self.allocation.total_capital,
+            "invested_amount": self.allocation.invested_amount,
+            "cash_amount": self.allocation.cash_amount,
+            "invested_weight": self.allocation.invested_weight,
+            "cash_weight": self.allocation.cash_weight,
+            "top_symbol": self.allocation.top_position.symbol,
+            "constraints": (
+                self.allocation.constraints.to_dict()
+            ),
+            "positions": [
+                position.to_dict()
+                for position in self.allocation.positions
+            ],
+        }
+
     def _build_summary(self) -> dict[str, Any]:
         top_candidate = self.ranking.top_candidate
         top_recommendation = self.recommendations.top_recommendation
@@ -152,6 +192,15 @@ class PortfolioExportPackage:
             "top_action": top_thesis.action,
             "market_data_ready": self.market_data.all_ready,
             "market_data_checked_at": self.market_data.checked_at.isoformat(),
+            "allocation_profile": (
+                self.allocation.constraints.profile
+            ),
+            "allocation_total_capital": (
+                self.allocation.total_capital
+            ),
+            "allocation_cash_weight": (
+                self.allocation.cash_weight
+            ),
         }
 
     def _build_ranking_section(self) -> dict[str, Any]:
@@ -254,13 +303,14 @@ class PortfolioExportPackage:
 class PortfolioExporter:
     """Validate, combine, and save compact portfolio results."""
 
-    SCHEMA_VERSION = "1.2"
+    SCHEMA_VERSION = "1.3"
 
     def build_package(
         self,
         *,
         universe_name: str,
         market_data: UniverseMarketDataRefreshResult,
+        allocation: PortfolioAllocationResult,
         ranking: RankingResult,
         recommendations: PortfolioRecommendationResult,
         theses: PortfolioThesisResult,
@@ -269,6 +319,7 @@ class PortfolioExporter:
         self._validate_components(
             universe_name=universe_name,
             market_data=market_data,
+            allocation=allocation,
             ranking=ranking,
             recommendations=recommendations,
             theses=theses,
@@ -279,6 +330,7 @@ class PortfolioExporter:
             generated_at=generated_at,
             universe_name=universe_name,
             market_data=market_data,
+            allocation=allocation,
             ranking=ranking,
             recommendations=recommendations,
             theses=theses,
@@ -312,6 +364,7 @@ class PortfolioExporter:
         *,
         universe_name: str,
         market_data: UniverseMarketDataRefreshResult,
+        allocation: PortfolioAllocationResult,
         ranking: RankingResult,
         recommendations: PortfolioRecommendationResult,
         theses: PortfolioThesisResult,
@@ -322,6 +375,14 @@ class PortfolioExporter:
         if not isinstance(market_data, UniverseMarketDataRefreshResult):
             raise TypeError(
                 "market_data must be a UniverseMarketDataRefreshResult"
+            )
+        if not isinstance(
+            allocation,
+            PortfolioAllocationResult,
+        ):
+            raise TypeError(
+                "allocation must be a "
+                "PortfolioAllocationResult"
             )
         if not isinstance(ranking, RankingResult):
             raise TypeError("ranking must be a RankingResult")
@@ -343,6 +404,10 @@ class PortfolioExporter:
         )
         thesis_symbols = tuple(thesis.symbol for thesis in theses.theses)
         market_symbols = tuple(item.symbol for item in market_data.results)
+        allocation_symbols = tuple(
+            position.symbol
+            for position in allocation.positions
+        )
 
         if (
             ranking_symbols != recommendation_symbols
@@ -351,6 +416,12 @@ class PortfolioExporter:
             raise ValueError(
                 "Ranking, recommendation, and thesis components must "
                 "contain the same symbols in the same order"
+            )
+
+        if ranking_symbols != allocation_symbols:
+            raise ValueError(
+                "Allocation and portfolio components must contain "
+                "the same symbols in the same order"
             )
 
         if set(ranking_symbols) != set(market_symbols):
@@ -363,6 +434,7 @@ class PortfolioExporter:
             ranking.universe_size != recommendations.universe_size
             or ranking.universe_size != theses.universe_size
             or ranking.universe_size != market_data.universe_size
+            or ranking.universe_size != allocation.universe_size
         ):
             raise ValueError(
                 "Portfolio components must use the same universe size"
@@ -394,8 +466,15 @@ class PortfolioExporter:
             ranking.generated_at,
             recommendations.generated_at,
             theses.generated_at,
+            allocation.generated_at,
             generated_at,
         }
+        if allocation.currency != ranking.top_candidate.currency:
+            raise ValueError(
+                "allocation currency must match "
+                "the portfolio currency"
+            )
+
         if len(timestamps) != 1:
             raise ValueError(
                 "Portfolio components must use the same generated_at timestamp"
