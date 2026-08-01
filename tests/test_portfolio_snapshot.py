@@ -37,6 +37,8 @@ def create_portfolio() -> CurrentPortfolio:
                 sleeve="CORE",
                 quantity=100.0,
                 average_cost=100.0,
+                isin="IE00B4L5Y983",
+                exchange_ticker="IWDA",
             ),
             PortfolioHolding(
                 symbol="AGGH",
@@ -45,6 +47,8 @@ def create_portfolio() -> CurrentPortfolio:
                 sleeve="CORE",
                 quantity=50.0,
                 average_cost=100.0,
+                isin="IE00BDBRDM35",
+                exchange_ticker="AGGH",
             ),
             PortfolioHolding(
                 symbol="MSFT",

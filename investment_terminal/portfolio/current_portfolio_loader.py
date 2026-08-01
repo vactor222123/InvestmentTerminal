@@ -113,6 +113,12 @@ class CurrentPortfolioLoader:
                     "currency",
                     policy.base_currency,
                 ),
+                isin=item.get(
+                    "isin"
+                ),
+                exchange_ticker=item.get(
+                    "exchange_ticker"
+                ),
             )
             for item in holdings_payload
         )

@@ -71,6 +71,8 @@ def test_holding_calculates_invested_cost() -> None:
         quantity=10.0,
         average_cost=100.0,
         currency="EUR",
+        isin="IE00B4L5Y983",
+        exchange_ticker="IWDA",
     )
 
     assert holding.invested_cost == 1000.0
@@ -103,6 +105,8 @@ def test_portfolio_calculates_sleeve_totals() -> None:
                 sleeve="CORE",
                 quantity=10.0,
                 average_cost=100.0,
+                isin="IE00B4L5Y983",
+                exchange_ticker="IWDA",
             ),
             PortfolioHolding(
                 symbol="MSFT",
@@ -122,7 +126,7 @@ def test_portfolio_calculates_sleeve_totals() -> None:
     assert portfolio.total_cost_basis == 3400.0
 
 
-def test_portfolio_rejects_duplicate_symbols() -> None:
+def test_portfolio_rejects_duplicate_instruments() -> None:
     holding = PortfolioHolding(
         symbol="IWDA",
         name="MSCI World ETF",
@@ -130,11 +134,13 @@ def test_portfolio_rejects_duplicate_symbols() -> None:
         sleeve="CORE",
         quantity=10.0,
         average_cost=100.0,
+        isin="IE00B4L5Y983",
+        exchange_ticker="IWDA",
     )
 
     with pytest.raises(
         ValueError,
-        match="unique symbols",
+        match="unique instruments",
     ):
         CurrentPortfolio(
             name="Test",
@@ -184,7 +190,9 @@ def test_loader_reads_holdings(
                         "asset_type": "ETF",
                         "sleeve": "CORE",
                         "quantity": 2.0,
-                        "average_cost": 100.0
+                        "average_cost": 100.0,
+                        "isin": "IE00B4L5Y983",
+                        "exchange_ticker": "IWDA"
                     }
                 ]
             }

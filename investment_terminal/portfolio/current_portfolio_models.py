@@ -35,6 +35,8 @@ class PortfolioHolding:
     quantity: float
     average_cost: float
     currency: str = "EUR"
+    isin: str | None = None
+    exchange_ticker: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -79,6 +81,21 @@ class PortfolioHolding:
                 field_name="currency",
             ).upper(),
         )
+        object.__setattr__(
+            self,
+            "isin",
+            self._normalize_optional_isin(
+                self.isin
+            ),
+        )
+        object.__setattr__(
+            self,
+            "exchange_ticker",
+            self._normalize_optional_text(
+                self.exchange_ticker,
+                uppercase=True,
+            ),
+        )
 
         self._validate_positive_number(
             self.quantity,
@@ -103,12 +120,27 @@ class PortfolioHolding:
                 "Individual stocks must use the TACTICAL sleeve"
             )
 
+        if (
+            self.asset_type in {"ETF", "BOND", "GOLD"}
+            and self.isin is None
+        ):
+            raise ValueError(
+                "ETF, BOND, and GOLD holdings must provide an ISIN"
+            )
+
     @property
     def invested_cost(self) -> float:
         return round(
             self.quantity * self.average_cost,
             2,
         )
+
+    @property
+    def instrument_key(self) -> str:
+        """
+        Stable identifier used for duplicate detection and price mapping.
+        """
+        return self.isin or self.exchange_ticker or self.symbol
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -119,6 +151,9 @@ class PortfolioHolding:
             "quantity": self.quantity,
             "average_cost": self.average_cost,
             "currency": self.currency,
+            "isin": self.isin,
+            "exchange_ticker": self.exchange_ticker,
+            "instrument_key": self.instrument_key,
             "invested_cost": self.invested_cost,
         }
 
@@ -137,6 +172,56 @@ class PortfolioHolding:
             )
 
         return value.strip()
+
+    @staticmethod
+    def _normalize_optional_text(
+        value: object,
+        *,
+        uppercase: bool = False,
+    ) -> str | None:
+        if value is None:
+            return None
+
+        if (
+            not isinstance(value, str)
+            or not value.strip()
+        ):
+            raise ValueError(
+                "optional text values must be non-empty strings or None"
+            )
+
+        normalized = value.strip()
+
+        return (
+            normalized.upper()
+            if uppercase
+            else normalized
+        )
+
+    @classmethod
+    def _normalize_optional_isin(
+        cls,
+        value: object,
+    ) -> str | None:
+        normalized = cls._normalize_optional_text(
+            value,
+            uppercase=True,
+        )
+
+        if normalized is None:
+            return None
+
+        if (
+            len(normalized) != 12
+            or not normalized[:2].isalpha()
+            or not normalized[2:].isalnum()
+        ):
+            raise ValueError(
+                "isin must contain 12 alphanumeric characters "
+                "and start with a two-letter country code"
+            )
+
+        return normalized
 
     @classmethod
     def _normalize_choice(
@@ -194,12 +279,7 @@ class PortfolioHolding:
 
 @dataclass(frozen=True, slots=True)
 class PortfolioPolicy:
-    """
-    Long-term core and tactical-stock portfolio policy.
-
-    Core and tactical targets describe invested assets. Cash reserve is
-    tracked separately and therefore all three targets sum to one.
-    """
+    """Long-term core, tactical-stock, and cash policy."""
 
     core_target_weight: float
     tactical_target_weight: float
@@ -340,14 +420,14 @@ class CurrentPortfolio:
                 "holdings must contain only PortfolioHolding objects"
             )
 
-        symbols = tuple(
-            holding.symbol
+        instrument_keys = tuple(
+            holding.instrument_key
             for holding in self.holdings
         )
 
-        if len(symbols) != len(set(symbols)):
+        if len(instrument_keys) != len(set(instrument_keys)):
             raise ValueError(
-                "holdings must contain unique symbols"
+                "holdings must contain unique instruments"
             )
 
         PortfolioHolding._validate_non_negative_number(
