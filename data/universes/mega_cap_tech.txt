@@ -1,0 +1,6 @@
+# Mega Cap Tech test universe
+MSFT
+AAPL
+GOOGL
+META
+NVDA
