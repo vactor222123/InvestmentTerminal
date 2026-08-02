@@ -7,12 +7,6 @@ from math import isfinite
 from numbers import Real
 from typing import Any
 
-from investment_terminal.portfolio.current_portfolio_models import (
-    CurrentPortfolio,
-    SUPPORTED_ASSET_TYPES,
-    SUPPORTED_SLEEVES,
-)
-
 
 @dataclass(frozen=True, slots=True)
 class PortfolioBreakdownItem:
@@ -106,6 +100,7 @@ class PortfolioSnapshot:
     monthly_contribution: float
     asset_breakdown: tuple[PortfolioBreakdownItem, ...]
     sleeve_breakdown: tuple[PortfolioBreakdownItem, ...]
+    strategy_breakdown: tuple[PortfolioBreakdownItem, ...]
 
     WEIGHT_TOLERANCE = 0.0001
     AMOUNT_TOLERANCE = 0.01
@@ -154,6 +149,7 @@ class PortfolioSnapshot:
         for field_name in (
             "asset_breakdown",
             "sleeve_breakdown",
+            "strategy_breakdown",
         ):
             values = getattr(
                 self,
@@ -204,6 +200,10 @@ class PortfolioSnapshot:
             self.sleeve_breakdown,
             field_name="sleeve_breakdown",
         )
+        self._validate_breakdown(
+            self.strategy_breakdown,
+            field_name="strategy_breakdown",
+        )
 
     @property
     def cash_weight(self) -> float:
@@ -245,6 +245,15 @@ class PortfolioSnapshot:
             sleeve,
         )
 
+    def strategy(
+        self,
+        strategy: str,
+    ) -> PortfolioBreakdownItem:
+        return self._require_item(
+            self.strategy_breakdown,
+            strategy,
+        )
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "portfolio_name": self.portfolio_name,
@@ -262,6 +271,10 @@ class PortfolioSnapshot:
             "sleeve_breakdown": [
                 item.to_dict()
                 for item in self.sleeve_breakdown
+            ],
+            "strategy_breakdown": [
+                item.to_dict()
+                for item in self.strategy_breakdown
             ],
         }
 

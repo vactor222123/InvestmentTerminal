@@ -5,6 +5,7 @@ Portfolio snapshot calculation service.
 from investment_terminal.portfolio.current_portfolio_models import (
     CurrentPortfolio,
     SUPPORTED_ASSET_TYPES,
+    SUPPORTED_HOLDING_STRATEGIES,
     SUPPORTED_SLEEVES,
 )
 from investment_terminal.portfolio.portfolio_snapshot_models import (
@@ -43,6 +44,10 @@ class PortfolioSnapshotService:
             sleeve: 0.0
             for sleeve in SUPPORTED_SLEEVES
         }
+        strategy_amounts = {
+            strategy: 0.0
+            for strategy in SUPPORTED_HOLDING_STRATEGIES
+        }
 
         for holding in portfolio.holdings:
             asset_amounts[
@@ -50,6 +55,9 @@ class PortfolioSnapshotService:
             ] += holding.invested_cost
             sleeve_amounts[
                 holding.sleeve
+            ] += holding.invested_cost
+            strategy_amounts[
+                holding.strategy
             ] += holding.invested_cost
 
         asset_amounts["CASH"] = (
@@ -95,6 +103,31 @@ class PortfolioSnapshotService:
                     total_value=total_value,
                 )
                 for sleeve in SUPPORTED_SLEEVES
+            ),
+            strategy_breakdown=(
+                tuple(
+                    self._build_item(
+                        key=strategy,
+                        amount=round(
+                            strategy_amounts[
+                                strategy
+                            ],
+                            2,
+                        ),
+                        total_value=total_value,
+                    )
+                    for strategy in SUPPORTED_HOLDING_STRATEGIES
+                )
+                + (
+                    self._build_item(
+                        key="CASH_RESERVE",
+                        amount=round(
+                            portfolio.cash_balance,
+                            2,
+                        ),
+                        total_value=total_value,
+                    ),
+                )
             ),
         )
 
