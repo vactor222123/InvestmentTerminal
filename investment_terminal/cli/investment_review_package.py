@@ -14,6 +14,9 @@ from investment_terminal.portfolio.current_portfolio_loader import (
 from investment_terminal.portfolio.portfolio_market_value_service import (
     PortfolioMarketValueService,
 )
+from investment_terminal.portfolio.portfolio_policy_gap_service import (
+    PortfolioPolicyGapService,
+)
 from investment_terminal.portfolio.portfolio_snapshot_service import (
     PortfolioSnapshotService,
 )
@@ -64,6 +67,10 @@ def main(
     snapshot = PortfolioSnapshotService().build(
         portfolio
     )
+    policy_gap = PortfolioPolicyGapService().calculate(
+        snapshot=snapshot,
+        policy=portfolio.policy,
+    )
     market_value = load_portfolio_market_value(
         portfolio=portfolio,
         quotes_path=options.portfolio_quotes,
@@ -108,6 +115,7 @@ def main(
                     if market_value is not None
                     else None
                 ),
+                policy_gap=policy_gap,
             ),
             "stock_analysis_source": (
                 str(options.stock_analysis)
