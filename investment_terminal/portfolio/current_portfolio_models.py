@@ -277,7 +277,6 @@ class PortfolioHolding:
                 f"{field_name} must be a finite non-negative number"
             )
 
-
     @staticmethod
     def _round_money(
         value: Decimal | Real,
@@ -301,7 +300,14 @@ class PortfolioHolding:
 
 @dataclass(frozen=True, slots=True)
 class PortfolioPolicy:
-    """Long-term core, tactical-stock, and cash policy."""
+    """
+    Strategic whole-portfolio allocation policy.
+
+    All target weights are percentages of total portfolio value,
+    including cash. The supported ranges allow the preferred 80/10/10
+    allocation while retaining compatibility with the earlier 85/10/5
+    configuration.
+    """
 
     core_target_weight: float
     tactical_target_weight: float
@@ -310,6 +316,9 @@ class PortfolioPolicy:
     base_currency: str = "EUR"
 
     TOLERANCE = 0.0001
+    CORE_TARGET_RANGE = (0.75, 0.85)
+    TACTICAL_TARGET_RANGE = (0.05, 0.15)
+    CASH_TARGET_RANGE = (0.05, 0.15)
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -337,15 +346,21 @@ class PortfolioPolicy:
                 "portfolio policy weights must sum to 1.0"
             )
 
-        if not 0.85 <= self.core_target_weight <= 0.90:
-            raise ValueError(
-                "core_target_weight must be between 0.85 and 0.90"
-            )
-
-        if not 0.10 <= self.tactical_target_weight <= 0.15:
-            raise ValueError(
-                "tactical_target_weight must be between 0.10 and 0.15"
-            )
+        self._validate_target_range(
+            self.core_target_weight,
+            field_name="core_target_weight",
+            supported_range=self.CORE_TARGET_RANGE,
+        )
+        self._validate_target_range(
+            self.tactical_target_weight,
+            field_name="tactical_target_weight",
+            supported_range=self.TACTICAL_TARGET_RANGE,
+        )
+        self._validate_target_range(
+            self.cash_target_weight,
+            field_name="cash_target_weight",
+            supported_range=self.CASH_TARGET_RANGE,
+        )
 
         PortfolioHolding._validate_non_negative_number(
             self.monthly_contribution,
@@ -393,6 +408,21 @@ class PortfolioPolicy:
         ):
             raise ValueError(
                 f"{field_name} must be between 0 and 1"
+            )
+
+    @staticmethod
+    def _validate_target_range(
+        value: float,
+        *,
+        field_name: str,
+        supported_range: tuple[float, float],
+    ) -> None:
+        minimum, maximum = supported_range
+
+        if not minimum <= value <= maximum:
+            raise ValueError(
+                f"{field_name} must be between "
+                f"{minimum:.2f} and {maximum:.2f}"
             )
 
 

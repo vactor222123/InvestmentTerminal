@@ -19,20 +19,31 @@ from investment_terminal.portfolio.current_portfolio_models import (
 
 def create_policy() -> PortfolioPolicy:
     return PortfolioPolicy(
-        core_target_weight=0.85,
+        core_target_weight=0.80,
         tactical_target_weight=0.10,
-        cash_target_weight=0.05,
+        cash_target_weight=0.10,
         monthly_contribution=2000.0,
         base_currency="EUR",
     )
 
 
-def test_policy_matches_core_tactical_goal() -> None:
+def test_policy_matches_core_tactical_cash_goal() -> None:
     policy = create_policy()
 
-    assert policy.core_target_weight == 0.85
+    assert policy.core_target_weight == 0.80
     assert policy.tactical_target_weight == 0.10
-    assert policy.cash_target_weight == 0.05
+    assert policy.cash_target_weight == 0.10
+    assert policy.invested_target_weight == 0.90
+
+
+def test_policy_preserves_previous_85_10_5_configuration() -> None:
+    policy = PortfolioPolicy(
+        core_target_weight=0.85,
+        tactical_target_weight=0.10,
+        cash_target_weight=0.05,
+        monthly_contribution=2000.0,
+    )
+
     assert policy.invested_target_weight == 0.95
 
 
@@ -42,22 +53,55 @@ def test_policy_rejects_invalid_total() -> None:
         match="sum to 1.0",
     ):
         PortfolioPolicy(
-            core_target_weight=0.85,
+            core_target_weight=0.80,
             tactical_target_weight=0.10,
-            cash_target_weight=0.10,
+            cash_target_weight=0.15,
             monthly_contribution=2000.0,
         )
 
 
-def test_policy_rejects_core_outside_goal_range() -> None:
+@pytest.mark.parametrize(
+    (
+        "core_weight",
+        "tactical_weight",
+        "cash_weight",
+        "expected_field",
+    ),
+    (
+        (
+            0.70,
+            0.15,
+            0.15,
+            "core_target_weight",
+        ),
+        (
+            0.85,
+            0.04,
+            0.11,
+            "tactical_target_weight",
+        ),
+        (
+            0.85,
+            0.10,
+            0.05 - 0.01,
+            "sum to 1.0",
+        ),
+    ),
+)
+def test_policy_rejects_unsupported_targets(
+    core_weight: float,
+    tactical_weight: float,
+    cash_weight: float,
+    expected_field: str,
+) -> None:
     with pytest.raises(
         ValueError,
-        match="core_target_weight",
+        match=expected_field,
     ):
         PortfolioPolicy(
-            core_target_weight=0.80,
-            tactical_target_weight=0.15,
-            cash_target_weight=0.05,
+            core_target_weight=core_weight,
+            tactical_target_weight=tactical_weight,
+            cash_target_weight=cash_weight,
             monthly_contribution=2000.0,
         )
 
@@ -164,6 +208,8 @@ def test_loader_reads_example_template() -> None:
         "Example Investment Portfolio"
     )
     assert portfolio.cash_balance == 1000.0
+    assert portfolio.policy.core_target_weight == 0.80
+    assert portfolio.policy.cash_target_weight == 0.10
     assert portfolio.policy.monthly_contribution == 2000.0
     assert len(portfolio.holdings) == 2
 
@@ -180,9 +226,9 @@ def test_loader_reads_holdings(
             {
                 "name": "Test",
                 "policy": {
-                    "core_target_weight": 0.85,
+                    "core_target_weight": 0.80,
                     "tactical_target_weight": 0.10,
-                    "cash_target_weight": 0.05,
+                    "cash_target_weight": 0.10,
                     "monthly_contribution": 2000.0,
                     "base_currency": "EUR"
                 },
