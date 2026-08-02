@@ -8,6 +8,9 @@ from collections.abc import Sequence
 from datetime import datetime, timezone
 from pathlib import Path
 
+from investment_terminal.portfolio.contribution_plan_service import (
+    ContributionPlanner,
+)
 from investment_terminal.portfolio.current_portfolio_loader import (
     CurrentPortfolioLoader,
 )
@@ -75,6 +78,15 @@ def main(
         portfolio=portfolio,
         quotes_path=options.portfolio_quotes,
     )
+    contribution_plan = ContributionPlanner().plan(
+        policy_gap=policy_gap,
+        available_capital=resolve_available_capital(
+            explicit_capital=options.available_capital,
+            monthly_contribution=(
+                portfolio.policy.monthly_contribution
+            ),
+        ),
+    )
 
     integrated = load_stock_analysis(
         options.stock_analysis
@@ -121,6 +133,9 @@ def main(
                 str(options.stock_analysis)
                 if integrated is not None
                 else None
+            ),
+            "contribution_plan": (
+                contribution_plan.to_dict()
             ),
         },
         stock_analysis=sections[
@@ -198,6 +213,26 @@ def main(
         f"Output         : "
         f"{output}"
     )
+
+
+def resolve_available_capital(
+    *,
+    explicit_capital: float | None,
+    monthly_contribution: float,
+) -> float:
+    """
+    Use explicit capital when supplied; otherwise use the configured
+    monthly contribution as the planning amount.
+    """
+    if explicit_capital is None:
+        return monthly_contribution
+
+    if explicit_capital < 0:
+        raise ValueError(
+            "available capital must be non-negative"
+        )
+
+    return explicit_capital
 
 
 def load_stock_analysis(
@@ -343,6 +378,16 @@ def build_argument_parser() -> argparse.ArgumentParser:
         help=(
             "Path to the current portfolio JSON. "
             "Default: %(default)s."
+        ),
+    )
+    parser.add_argument(
+        "--available-capital",
+        type=float,
+        default=None,
+        help=(
+            "Capital available for the contribution plan. "
+            "When omitted, the portfolio monthly contribution "
+            "is used."
         ),
     )
     parser.add_argument(
