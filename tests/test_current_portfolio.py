@@ -153,15 +153,19 @@ def test_portfolio_rejects_duplicate_instruments() -> None:
         )
 
 
-def test_loader_reads_default_template() -> None:
-    portfolio = CurrentPortfolioLoader.load()
+def test_loader_reads_example_template() -> None:
+    portfolio = CurrentPortfolioLoader.load(
+        Path(
+            "data/portfolios/current_portfolio.example.json"
+        )
+    )
 
     assert portfolio.name == (
-        "Viktor Investment Portfolio"
+        "Example Investment Portfolio"
     )
-    assert portfolio.cash_balance == 1600.0
+    assert portfolio.cash_balance == 1000.0
     assert portfolio.policy.monthly_contribution == 2000.0
-    assert portfolio.holdings == ()
+    assert len(portfolio.holdings) == 2
 
 
 def test_loader_reads_holdings(

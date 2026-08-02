@@ -67,3 +67,12 @@ data/*.db
 
 # Generated analysis output
 output/
+
+# Personal portfolio working files
+data/portfolios/current_portfolio.json
+data/portfolios/portfolio_holdings.csv
+data/portfolios/portfolio_quotes.json
+
+# Generated investment outputs
+output/investment_review_package.json
+output/*_portfolio.json

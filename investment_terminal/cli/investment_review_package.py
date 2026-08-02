@@ -211,21 +211,36 @@ def load_portfolio_market_value(
     portfolio,
     quotes_path: Path | None,
 ):
+    """
+    Load market values only when quotes cover every holding.
+
+    Personal working quote files may be incomplete while the portfolio
+    is being configured. In that case the review package must fall back
+    to the cost-basis snapshot instead of failing completely.
+    """
     if quotes_path is None:
         return None
 
     if not quotes_path.exists():
         return None
 
-    provider = JsonPortfolioPriceProvider.load(
-        quotes_path
-    )
+    try:
+        provider = JsonPortfolioPriceProvider.load(
+            quotes_path
+        )
 
-    return PortfolioMarketValueService(
-        provider
-    ).calculate(
-        portfolio
-    )
+        return PortfolioMarketValueService(
+            provider
+        ).calculate(
+            portfolio
+        )
+    except (
+        FileNotFoundError,
+        KeyError,
+        TypeError,
+        ValueError,
+    ):
+        return None
 
 
 def disconnected_stock_sections() -> dict:

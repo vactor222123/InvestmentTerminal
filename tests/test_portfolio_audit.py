@@ -159,10 +159,46 @@ def test_audit_rejects_invalid_portfolio() -> None:
         )
 
 
-def test_cli_prints_default_audit(
+def write_empty_portfolio(
+    path: Path,
+) -> None:
+    path.write_text(
+        json.dumps(
+            {
+                "name": "Empty Test Portfolio",
+                "policy": {
+                    "core_target_weight": 0.85,
+                    "tactical_target_weight": 0.10,
+                    "cash_target_weight": 0.05,
+                    "monthly_contribution": 2000.0,
+                    "base_currency": "EUR"
+                },
+                "cash_balance": 1600.0,
+                "holdings": []
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+def test_cli_prints_empty_portfolio_audit(
+    tmp_path: Path,
     capsys,
 ) -> None:
-    main([])
+    portfolio_path = (
+        tmp_path
+        / "empty_portfolio.json"
+    )
+    write_empty_portfolio(
+        portfolio_path
+    )
+
+    main(
+        [
+            "--portfolio",
+            str(portfolio_path),
+        ]
+    )
 
     output = capsys.readouterr().out
 
@@ -170,15 +206,26 @@ def test_cli_prints_default_audit(
         "Current Portfolio Configuration Audit"
         in output
     )
-    assert "Viktor Investment Portfolio" in output
+    assert "Empty Test Portfolio" in output
     assert "EMPTY_PORTFOLIO" in output
 
 
-def test_cli_prints_json(
+def test_cli_prints_json_for_empty_portfolio(
+    tmp_path: Path,
     capsys,
 ) -> None:
+    portfolio_path = (
+        tmp_path
+        / "empty_portfolio.json"
+    )
+    write_empty_portfolio(
+        portfolio_path
+    )
+
     main(
         [
+            "--portfolio",
+            str(portfolio_path),
             "--json",
         ]
     )
@@ -191,12 +238,24 @@ def test_cli_prints_json(
     assert payload["is_market_data_ready"] is False
 
 
-def test_cli_strict_fails_for_empty_portfolio() -> None:
+def test_cli_strict_fails_for_empty_portfolio(
+    tmp_path: Path,
+) -> None:
+    portfolio_path = (
+        tmp_path
+        / "empty_portfolio.json"
+    )
+    write_empty_portfolio(
+        portfolio_path
+    )
+
     with pytest.raises(
         SystemExit,
     ) as exc:
         main(
             [
+                "--portfolio",
+                str(portfolio_path),
                 "--strict",
             ]
         )

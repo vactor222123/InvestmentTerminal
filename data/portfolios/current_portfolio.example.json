@@ -1,24 +1,35 @@
 {
-  "name": "Viktor Investment Portfolio",
+  "name": "Example Investment Portfolio",
   "policy": {
     "core_target_weight": 0.85,
-    "tactical_target_weight": 0.10,
+    "tactical_target_weight": 0.1,
     "cash_target_weight": 0.05,
     "monthly_contribution": 2000.0,
     "base_currency": "EUR"
   },
-  "cash_balance": 1600.0,
+  "cash_balance": 1000.0,
   "holdings": [
     {
-      "symbol": "EXAMPLE_WORLD",
-      "name": "Replace with exact ETF name",
+      "symbol": "WORLD",
+      "name": "Example MSCI World ETF",
       "asset_type": "ETF",
       "sleeve": "CORE",
-      "quantity": 1.0,
-      "average_cost": 1.0,
+      "quantity": 10.0,
+      "average_cost": 100.0,
       "currency": "EUR",
-      "isin": "IE0000000001",
-      "exchange_ticker": "EXAMPLE"
+      "isin": "IE00B4L5Y983",
+      "exchange_ticker": "EUNL"
+    },
+    {
+      "symbol": "MSFT",
+      "name": "Microsoft",
+      "asset_type": "STOCK",
+      "sleeve": "TACTICAL",
+      "quantity": 1.0,
+      "average_cost": 400.0,
+      "currency": "EUR",
+      "isin": null,
+      "exchange_ticker": "MSFT"
     }
   ]
 }
