@@ -24,6 +24,12 @@ SUPPORTED_SLEEVES = (
     "RESERVE",
 )
 
+SUPPORTED_HOLDING_STRATEGIES = (
+    "CORE_LONG_TERM",
+    "STOCK_LONG_TERM",
+    "POSITION_TRADE",
+)
+
 
 @dataclass(frozen=True, slots=True)
 class PortfolioHolding:
@@ -38,6 +44,7 @@ class PortfolioHolding:
     currency: str = "EUR"
     isin: str | None = None
     exchange_ticker: str | None = None
+    strategy: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -97,6 +104,13 @@ class PortfolioHolding:
                 uppercase=True,
             ),
         )
+        object.__setattr__(
+            self,
+            "strategy",
+            self._resolve_strategy(
+                self.strategy
+            ),
+        )
 
         self._validate_positive_number(
             self.quantity,
@@ -129,6 +143,29 @@ class PortfolioHolding:
                 "ETF, BOND, and GOLD holdings must provide an ISIN"
             )
 
+        if (
+            self.strategy == "CORE_LONG_TERM"
+            and self.sleeve != "CORE"
+        ):
+            raise ValueError(
+                "CORE_LONG_TERM holdings must use the CORE sleeve"
+            )
+
+        if (
+            self.strategy in {
+                "STOCK_LONG_TERM",
+                "POSITION_TRADE",
+            }
+            and (
+                self.asset_type != "STOCK"
+                or self.sleeve != "TACTICAL"
+            )
+        ):
+            raise ValueError(
+                "Stock strategies require a STOCK holding "
+                "in the TACTICAL sleeve"
+            )
+
     @property
     def invested_cost(self) -> float:
         return self._round_money(
@@ -154,9 +191,41 @@ class PortfolioHolding:
             "currency": self.currency,
             "isin": self.isin,
             "exchange_ticker": self.exchange_ticker,
+            "strategy": self.strategy,
             "instrument_key": self.instrument_key,
             "invested_cost": self.invested_cost,
         }
+
+    def _resolve_strategy(
+        self,
+        value: object,
+    ) -> str:
+        """
+        Resolve a backwards-compatible strategy classification.
+
+        Existing CORE holdings are treated as long-term core assets.
+        Existing TACTICAL stocks default to long-term stock positions.
+        Position trades must be marked explicitly.
+        """
+        if value is None:
+            if self.sleeve == "CORE":
+                return "CORE_LONG_TERM"
+
+            if (
+                self.sleeve == "TACTICAL"
+                and self.asset_type == "STOCK"
+            ):
+                return "STOCK_LONG_TERM"
+
+            raise ValueError(
+                "strategy must be provided for this holding"
+            )
+
+        return self._normalize_choice(
+            value,
+            field_name="strategy",
+            choices=SUPPORTED_HOLDING_STRATEGIES,
+        )
 
     @staticmethod
     def _normalize_text(
