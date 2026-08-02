@@ -28,6 +28,10 @@ class PortfolioHoldingCsvImporter:
         "exchange_ticker",
     )
 
+    OPTIONAL_COLUMNS = (
+        "strategy",
+    )
+
     @classmethod
     def load(
         cls,
@@ -146,6 +150,9 @@ class PortfolioHoldingCsvImporter:
                 ),
                 exchange_ticker=cls._optional_text(
                     row.get("exchange_ticker")
+                ),
+                strategy=cls._optional_text(
+                    row.get("strategy")
                 ),
             )
         except (

@@ -119,6 +119,9 @@ class CurrentPortfolioLoader:
                 exchange_ticker=item.get(
                     "exchange_ticker"
                 ),
+                strategy=item.get(
+                    "strategy"
+                ),
             )
             for item in holdings_payload
         )
