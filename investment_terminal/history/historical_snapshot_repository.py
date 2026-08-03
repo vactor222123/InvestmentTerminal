@@ -1,5 +1,5 @@
 """
-Repository for HistoricalSnapshot metadata in SQLite.
+SQLite repository for HistoricalSnapshot metadata.
 """
 
 import sqlite3
@@ -16,10 +16,11 @@ from investment_terminal.history.historical_sqlite_store import (
 
 class HistoricalSnapshotRepository:
     """
-    Persist and query immutable snapshot metadata in structured history.
+    Persist and query normalized historical snapshot metadata.
 
-    The repository does not read or rewrite archived JSON evidence. It stores
-    only the normalized metadata needed for search, timelines, and imports.
+    The immutable archived Review Package remains the source of truth.
+    This repository stores only the structured metadata required for search,
+    timeline construction, and later package imports.
     """
 
     def __init__(
@@ -40,7 +41,7 @@ class HistoricalSnapshotRepository:
         self,
         snapshot: HistoricalSnapshot,
     ) -> HistoricalSnapshot:
-        """Insert one snapshot and reject duplicate identity or path."""
+        """Insert one snapshot into structured history."""
         if not isinstance(
             snapshot,
             HistoricalSnapshot,
@@ -69,14 +70,14 @@ class HistoricalSnapshotRepository:
                     )
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
-                    self._snapshot_values(
+                    self._values(
                         snapshot
                     ),
                 )
         except sqlite3.IntegrityError as exc:
             raise ValueError(
-                "Historical snapshot could not be inserted: "
-                "snapshot_id, relative_path, or supersedes is invalid"
+                "Historical snapshot already exists or "
+                "contains an invalid reference"
             ) from exc
 
         return snapshot
@@ -88,9 +89,10 @@ class HistoricalSnapshotRepository:
         """
         Insert multiple snapshots atomically.
 
-        If any record fails, no snapshot from this batch is committed.
+        If any record fails validation or violates a database constraint,
+        the complete batch is rolled back.
         """
-        normalized = tuple(
+        items = tuple(
             snapshots
         )
 
@@ -99,11 +101,14 @@ class HistoricalSnapshotRepository:
                 snapshot,
                 HistoricalSnapshot,
             )
-            for snapshot in normalized
+            for snapshot in items
         ):
             raise TypeError(
                 "snapshots must contain only HistoricalSnapshot values"
             )
+
+        if not items:
+            return ()
 
         self.store.initialize()
 
@@ -126,10 +131,10 @@ class HistoricalSnapshotRepository:
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     tuple(
-                        self._snapshot_values(
+                        self._values(
                             snapshot
                         )
-                        for snapshot in normalized
+                        for snapshot in items
                     ),
                 )
         except sqlite3.IntegrityError as exc:
@@ -137,14 +142,14 @@ class HistoricalSnapshotRepository:
                 "Historical snapshot batch could not be inserted"
             ) from exc
 
-        return normalized
+        return items
 
     def get(
         self,
         snapshot_id: str,
     ) -> HistoricalSnapshot | None:
-        """Return one snapshot, or None when it is not present."""
-        normalized = HistoricalSnapshot._normalize_uuid(
+        """Return a snapshot by UUID, or None when it does not exist."""
+        normalized_id = HistoricalSnapshot._normalize_uuid(
             snapshot_id,
             field_name="snapshot_id",
         )
@@ -159,7 +164,7 @@ class HistoricalSnapshotRepository:
                 WHERE snapshot_id = ?
                 """,
                 (
-                    normalized,
+                    normalized_id,
                 ),
             ).fetchone()
 
@@ -174,7 +179,7 @@ class HistoricalSnapshotRepository:
         self,
         snapshot_id: str,
     ) -> HistoricalSnapshot:
-        """Return one snapshot or raise KeyError."""
+        """Return a snapshot by UUID or raise KeyError."""
         snapshot = self.get(
             snapshot_id
         )
@@ -185,6 +190,15 @@ class HistoricalSnapshotRepository:
             )
 
         return snapshot
+
+    def exists(
+        self,
+        snapshot_id: str,
+    ) -> bool:
+        """Return whether the snapshot is already imported."""
+        return self.get(
+            snapshot_id
+        ) is not None
 
     def find_by_package_id(
         self,
@@ -264,6 +278,7 @@ class HistoricalSnapshotRepository:
     def latest(
         self,
     ) -> HistoricalSnapshot | None:
+        """Return the latest generated snapshot."""
         self.store.initialize()
 
         with self.store.connect() as connection:
@@ -288,22 +303,23 @@ class HistoricalSnapshotRepository:
     def count(
         self,
     ) -> int:
+        """Return the number of structured snapshot records."""
         self.store.initialize()
 
         with self.store.connect() as connection:
             row = connection.execute(
                 """
-                SELECT COUNT(*) AS count
+                SELECT COUNT(*) AS snapshot_count
                 FROM snapshots
                 """
             ).fetchone()
 
         return int(
-            row["count"]
+            row["snapshot_count"]
         )
 
     @staticmethod
-    def _snapshot_values(
+    def _values(
         snapshot: HistoricalSnapshot,
     ) -> tuple[object, ...]:
         return (

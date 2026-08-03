@@ -1,5 +1,5 @@
 """
-Tests for the SQLite HistoricalSnapshot repository.
+Tests for HistoricalSnapshotRepository.
 """
 
 from datetime import datetime, timezone
@@ -87,16 +87,18 @@ def test_repository_adds_and_gets_snapshot(
     )
     snapshot = create_snapshot()
 
-    repository.add(
+    assert repository.add(
         snapshot
-    )
-
+    ) == snapshot
     assert repository.get(
         FIRST_ID
     ) == snapshot
     assert repository.require(
         FIRST_ID.upper()
     ) == snapshot
+    assert repository.exists(
+        FIRST_ID
+    )
     assert repository.count() == 1
 
 
@@ -110,6 +112,9 @@ def test_repository_returns_none_for_missing_snapshot(
     assert repository.get(
         FIRST_ID
     ) is None
+    assert not repository.exists(
+        FIRST_ID
+    )
 
     with pytest.raises(
         KeyError,
@@ -134,9 +139,7 @@ def test_repository_rejects_duplicate_snapshot(
 
     with pytest.raises(
         ValueError,
-        match=(
-            "Historical snapshot could not be inserted"
-        ),
+        match="Historical snapshot already exists",
     ):
         repository.add(
             snapshot
@@ -152,7 +155,7 @@ def test_repository_add_many_is_atomic(
         tmp_path
     )
     first = create_snapshot()
-    duplicate = create_snapshot(
+    duplicate_path = create_snapshot(
         snapshot_id=SECOND_ID,
         relative_path=first.relative_path,
     )
@@ -166,10 +169,23 @@ def test_repository_add_many_is_atomic(
         repository.add_many(
             (
                 first,
-                duplicate,
+                duplicate_path,
             )
         )
 
+    assert repository.count() == 0
+
+
+def test_repository_add_many_accepts_empty_input(
+    tmp_path: Path,
+) -> None:
+    repository = create_repository(
+        tmp_path
+    )
+
+    assert repository.add_many(
+        ()
+    ) == ()
     assert repository.count() == 0
 
 
@@ -245,6 +261,7 @@ def test_repository_finds_generated_range(
             tzinfo=timezone.utc,
         ),
     )
+
     repository.add_many(
         (
             first,
@@ -297,6 +314,7 @@ def test_repository_latest_returns_latest_generated(
             tzinfo=timezone.utc,
         ),
     )
+
     repository.add_many(
         (
             first,
@@ -317,7 +335,7 @@ def test_repository_latest_is_none_when_empty(
     assert repository.latest() is None
 
 
-def test_repository_rejects_invalid_dependency() -> None:
+def test_repository_rejects_invalid_store() -> None:
     with pytest.raises(
         TypeError,
         match=(
@@ -350,6 +368,33 @@ def test_generated_range_rejects_naive_datetime(
                 2026,
                 8,
                 5,
+                tzinfo=timezone.utc,
+            ),
+        )
+
+
+def test_generated_range_rejects_reverse_bounds(
+    tmp_path: Path,
+) -> None:
+    repository = create_repository(
+        tmp_path
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="end must not be earlier than start",
+    ):
+        repository.find_generated_between(
+            start=datetime(
+                2026,
+                8,
+                5,
+                tzinfo=timezone.utc,
+            ),
+            end=datetime(
+                2026,
+                8,
+                1,
                 tzinfo=timezone.utc,
             ),
         )
