@@ -4,8 +4,8 @@
 
 **Product:** Investment Terminal  
 **Document type:** High-level software architecture  
-**Document status:** Foundational  
-**Milestone:** 2 — Historical and Decision Intelligence  
+**Document status:** Canonical  
+**Milestone:** Sprint 12 — Historical Intelligence Foundation
 
 This document defines the high-level architecture of Investment Terminal.
 
@@ -14,22 +14,22 @@ It describes:
 - system boundaries;
 - architectural layers;
 - domains and responsibilities;
-- data flow;
 - dependency rules;
-- storage responsibilities;
-- integration points;
-- reliability expectations;
-- long-term evolution.
+- primary data flows;
+- current and historical storage;
+- application services and CLI boundaries;
+- reliability and integrity expectations;
+- long-term evolution toward the Knowledge Domain.
 
 Detailed schemas belong in `DATA_MODEL.md`. Non-negotiable governance rules belong in `CONSTITUTION.md`. Product purpose belongs in `PROJECT_VISION.md`.
 
 ---
 
-## Architectural Mission
+# 1. Architectural Mission
 
-Investment Terminal is designed as a long-term personal investment intelligence platform.
+Investment Terminal is a long-term personal investment intelligence platform.
 
-Its architecture must support a repeatable process:
+Its architecture supports a repeatable evidence lifecycle:
 
 ```text
 Collect evidence
@@ -44,21 +44,27 @@ Evaluate the portfolio
         ↓
 Build machine decision support
         ↓
-Generate one review package
+Generate one Review Package
         ↓
-Preserve immutable history
+Preserve immutable historical evidence
         ↓
-Compare with previous states
+Import structured history
         ↓
-Create historical knowledge
+Build timeline events
+        ↓
+Compare historical states
+        ↓
+Create future knowledge
         ↓
 Support AI-assisted human judgment
 ```
 
-The architecture is not optimized for automatic trading.
+The architecture is not optimized for autonomous trading.
 
 It is optimized for:
 
+- correctness;
+- determinism;
 - data quality;
 - traceability;
 - reproducibility;
@@ -68,9 +74,11 @@ It is optimized for:
 - maintainability;
 - long-term product evolution.
 
+The user remains the final decision-maker.
+
 ---
 
-# 1. System Context
+# 2. System Context
 
 Investment Terminal sits between external data sources and the final human investment decision.
 
@@ -80,14 +88,22 @@ External data sources
         ▼
 Investment Terminal Python Engine
         │
-        ├── structured current evidence
+        ├── validated market evidence
+        ├── portfolio state
+        ├── analysis outputs
         ├── machine recommendations
-        ├── portfolio analysis
-        ├── historical snapshots
-        └── confidence and limitations
+        ├── deployment evidence
+        ├── Review Packages
+        └── historical records
         │
         ▼
-investment_review_package.json
+Structured product artifacts
+        │
+        ├── current Review Package
+        ├── immutable archive
+        ├── append-only manifest
+        ├── SQLite history
+        └── timeline events
         │
         ▼
 AI interpretation with current external context
@@ -96,15 +112,15 @@ AI interpretation with current external context
 Human investment decision
 ```
 
-The Python engine creates deterministic evidence.
+The Python engine creates deterministic and structured evidence.
 
-The AI layer interprets that evidence together with current context.
+The AI layer may interpret that evidence together with current context.
 
-The user remains the final decision-maker.
+AI does not replace canonical calculations, archived facts, or the human decision.
 
 ---
 
-# 2. High-Level Architecture
+# 3. High-Level Architecture
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
@@ -127,8 +143,8 @@ The user remains the final decision-maker.
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                       STORAGE LAYER                         │
-│ SQLite current data · Configuration files · Source traces  │
+│                 CURRENT OPERATIONAL STORAGE                 │
+│ Quotes · Candles · Fundamentals · Configuration · Mapping  │
 └──────────────────────────────┬──────────────────────────────┘
                                │
                                ▼
@@ -140,40 +156,51 @@ The user remains the final decision-maker.
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    PORTFOLIO INTELLIGENCE                   │
-│ Holdings · Market value · Snapshot · Policy gap            │
-│ Contribution planning · Position strategy · Risk context   │
+│ Holdings · Market value · Policy gap · Contribution plan   │
+│ Strategy breakdown · Risk context · Deployment constraints │
 └──────────────────────────────┬──────────────────────────────┘
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    DECISION INTELLIGENCE                    │
-│ Machine recommendation · Deployment evidence · Confidence │
+│ Recommendation · Allocation · Deployment · Confidence      │
 │ Decision trace · Warnings · Missing context                │
 └──────────────────────────────┬──────────────────────────────┘
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                       REVIEW LAYER                          │
+│                       REVIEW DOMAIN                         │
 │ Unified investment_review_package.json                     │
-└──────────────────────────────┬──────────────────────────────┘
-                               │
-                 ┌─────────────┴─────────────┐
-                 ▼                           ▼
-┌──────────────────────────┐   ┌──────────────────────────────┐
-│ IMMUTABLE JSON ARCHIVE   │   │ STRUCTURED HISTORY SQLITE   │
-│ Exact evidence snapshot  │   │ Queryable historical facts │
-└─────────────┬────────────┘   └──────────────┬───────────────┘
-              └──────────────┬────────────────┘
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    HISTORICAL INTELLIGENCE                  │
-│ Diff · Transitions · Stability · Outcomes · Evolution      │
 └──────────────────────────────┬──────────────────────────────┘
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                      KNOWLEDGE LAYER                        │
-│ Historical patterns · Factor effectiveness · Analogues     │
+│                       HISTORY DOMAIN                        │
+│ Snapshot · Archive · Manifest · Verification · Import      │
+└───────────────┬───────────────────────────────┬─────────────┘
+                │                               │
+                ▼                               ▼
+┌──────────────────────────┐      ┌───────────────────────────┐
+│ IMMUTABLE JSON ARCHIVE   │      │ STRUCTURED HISTORY SQLITE│
+│ Canonical evidence       │      │ Rebuildable projection   │
+└───────────────┬──────────┘      └──────────────┬────────────┘
+                └─────────────────┬───────────────┘
+                                  ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    HISTORICAL TIMELINE                      │
+│ Snapshot · Portfolio · Holdings · Recommendation · Deploy  │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                 FUTURE HISTORICAL INTELLIGENCE              │
+│ Diff · Replay · Transitions · Stability · Outcomes         │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    FUTURE KNOWLEDGE DOMAIN                  │
+│ Patterns · Evidence relationships · Confidence calibration │
 └──────────────────────────────┬──────────────────────────────┘
                                │
                                ▼
@@ -188,9 +215,32 @@ The user remains the final decision-maker.
 
 ---
 
-# 3. Architectural Layers
+# 4. Architectural Style
 
-## 3.1 Configuration Layer
+Investment Terminal uses a modular monolith with domain-oriented boundaries.
+
+The project intentionally avoids premature distribution into services.
+
+Primary characteristics:
+
+- one deployable Python application;
+- independent domain modules;
+- explicit application services;
+- clear serialization boundaries;
+- local-first storage;
+- CLI entry points;
+- deterministic pipelines;
+- rebuildable historical projections.
+
+A module may depend on another domain only through explicit models, interfaces, or stable application contracts.
+
+The modular monolith may later expose APIs or split infrastructure where justified, but domain boundaries must exist before deployment boundaries.
+
+---
+
+# 5. Architectural Layers
+
+## 5.1 Configuration Layer
 
 The configuration layer defines product behavior without containing business logic.
 
@@ -198,7 +248,7 @@ Responsibilities:
 
 - environment configuration;
 - database paths;
-- source settings;
+- data-source settings;
 - portfolio settings;
 - universe definitions;
 - strategic allocation targets;
@@ -212,7 +262,7 @@ Important configuration should use explicit models or clearly named constants.
 
 ---
 
-## 3.2 Data Acquisition Layer
+## 5.2 Data Acquisition Layer
 
 The acquisition layer communicates with external or user-provided data sources.
 
@@ -246,7 +296,7 @@ The acquisition layer must not:
 
 ---
 
-## 3.3 Data Quality Layer
+## 5.3 Data Quality Layer
 
 The data quality layer determines whether evidence is safe to use.
 
@@ -264,52 +314,55 @@ Responsibilities:
 - source traceability;
 - structured warnings and errors.
 
-Data quality is a first-class domain rather than an implementation detail.
+Downstream analysis must be able to distinguish states such as:
 
-A downstream analysis must be able to distinguish:
+```text
+READY
+PARTIAL
+STALE
+MISSING
+INVALID
+CONNECTED
+NOT_CONNECTED
+```
 
-- `READY`;
-- `PARTIAL`;
-- `STALE`;
-- `MISSING`;
-- `INVALID`;
-- `NOT_CONNECTED`.
+Missing evidence is data and must remain visible.
 
 ---
 
-## 3.4 Current Storage Layer
+## 5.4 Current Operational Storage
 
-Current operational data is stored separately from immutable historical evidence.
+Current operational data is separate from immutable historical evidence.
 
-SQLite is the preferred source of truth for structured current market data and later structured history.
-
-The storage layer may contain:
+Current storage may contain:
 
 - completed market candles;
 - validated fundamentals;
+- quote mappings;
 - instrument metadata;
 - universe definitions;
-- quote mappings;
 - portfolio-related operational data;
-- later, historical normalized records.
+- local configuration;
+- current exports.
 
 Files remain appropriate for:
 
 - configuration;
 - user-maintained portfolio input;
 - stable exports;
-- exact immutable review snapshots;
 - fixtures and examples.
 
-Excel must not be used as the primary database.
+Excel is not the primary database.
+
+Current operational storage may be replaced or rebuilt without changing the semantics of archived history.
 
 ---
 
-## 3.5 Analysis Layer
+## 5.5 Analysis Layer
 
 The analysis layer converts validated evidence into calculated evidence.
 
-It contains independent domains such as:
+It contains independent capabilities such as:
 
 - technical analysis;
 - fundamental analysis;
@@ -323,48 +376,42 @@ It contains independent domains such as:
 Each analysis service should:
 
 - accept explicit validated inputs;
-- produce explicit typed outputs;
+- produce explicit outputs;
 - remain deterministic;
 - expose reason codes;
 - expose coverage and limitations;
-- avoid direct user-interface responsibilities.
+- avoid direct presentation responsibilities.
 
 ---
 
-## 3.6 Portfolio Intelligence Layer
+## 5.6 Portfolio Intelligence Layer
 
-The portfolio domain answers questions about assets actually owned by the user.
+The Portfolio Domain answers questions about assets owned by the user.
 
-Core responsibilities:
+Responsibilities:
 
 - represent holdings;
 - represent strategic policy;
 - calculate cost basis;
 - calculate current market value;
 - classify holding strategy;
-- calculate asset, sleeve, and strategy breakdowns;
+- calculate asset and sleeve breakdowns;
 - calculate policy gaps;
-- plan new contributions at the strategic-bucket level;
-- later, calculate performance, drawdown, concentration, and risk.
-
-The portfolio domain must distinguish:
-
-- `CORE_LONG_TERM`;
-- `STOCK_LONG_TERM`;
-- `POSITION_TRADE`;
-- `CASH_RESERVE`.
+- plan new contributions;
+- preserve portfolio constraints;
+- later calculate performance, drawdown, and concentration.
 
 Portfolio logic must not download market data directly.
 
-It consumes quotes through provider interfaces.
+It consumes quotes through explicit provider or repository boundaries.
 
 ---
 
-## 3.7 Decision Intelligence Layer
+## 5.7 Decision Intelligence Layer
 
-The decision layer converts analysis into structured machine decision support.
+The Decision Domain converts analysis into structured machine decision support.
 
-Examples:
+Outputs may include:
 
 - machine recommendation;
 - candidate priority;
@@ -372,10 +419,11 @@ Examples:
 - contribution plan;
 - deployment mode;
 - confidence;
+- rationale;
 - decision trace;
 - warning severity.
 
-This layer does not produce autonomous trades.
+This layer does not execute trades.
 
 Its outputs must remain:
 
@@ -387,121 +435,188 @@ Its outputs must remain:
 
 ---
 
-## 3.8 Review Layer
+## 5.8 Review Layer
 
-The review layer combines independently calculated sections into one product artifact:
+The Review Domain combines independently calculated sections into one product artifact:
 
 ```text
 investment_review_package.json
 ```
 
-The review layer is an assembler and adapter layer.
+The Review Domain is an assembler and adapter boundary.
 
 It must not:
 
 - calculate indicators;
 - download quotes;
+- duplicate portfolio calculations;
 - implement hidden recommendation rules;
-- recreate portfolio calculations;
 - silently discard errors.
 
 It may:
 
-- adapt typed domain objects to stable JSON;
-- include section status;
-- include source information;
-- include missing-data information;
+- adapt domain objects to stable JSON;
+- include section statuses;
+- include source metadata;
+- include warnings and limitations;
 - preserve compatibility;
-- expose one coherent interface to AI and history.
+- expose one coherent interface to AI and History.
 
 ---
 
-## 3.9 History Layer
+## 5.9 History Layer
 
-The history layer preserves the state of each meaningful review.
+The History Domain preserves completed Review Packages as historical evidence.
 
-It has two complementary storage forms.
+Its responsibilities are divided into focused components:
 
-### Exact JSON Archive
+```text
+HistoricalSnapshot
+HistoricalSnapshotArchive
+HistoricalSnapshotManifest
+HistoricalSnapshotService
+HistoricalSQLiteStore
+HistoricalSnapshotRepository
+HistoricalManifestImportService
+HistoricalReviewPackageLoader
+HistoricalPortfolioSummaryImporter
+HistoricalHoldingsImporter
+HistoricalRecommendationsImporter
+HistoricalDeploymentImporter
+HistoricalTimelineBuilder
+HistoricalImportPipeline
+```
 
-Purpose:
+The History Domain owns:
 
-- preserve the exact generated package;
-- allow future reproduction and inspection;
-- retain fields that may not yet exist in normalized history tables.
+- snapshot identity;
+- immutable archive writing;
+- exact-byte preservation;
+- SHA-256 integrity;
+- append-only manifest metadata;
+- path safety;
+- schema identity verification;
+- structured historical import;
+- timeline generation.
 
-Properties:
+It does not own:
 
-- immutable;
-- timestamped;
-- checksummed;
-- schema-versioned;
-- never overwritten.
-
-### Structured History Database
-
-Purpose:
-
-- support fast queries;
-- compare runs;
-- track recommendation transitions;
-- calculate portfolio evolution;
-- evaluate historical outcomes.
-
-The structured database is derived from exact snapshots but does not replace them.
+- technical analysis;
+- portfolio calculations;
+- recommendation generation;
+- AI interpretation.
 
 ---
 
-## 3.10 Historical Intelligence Layer
+## 5.10 Application Services
 
-This layer answers questions across multiple snapshots.
+Application services coordinate domain components.
 
-Responsibilities include:
+Examples:
 
-- identify the previous compatible snapshot;
-- calculate changes;
-- detect recommendation transitions;
+- snapshot preservation service;
+- manifest synchronization service;
+- historical import pipeline.
+
+Application services may:
+
+- orchestrate multiple domain operations;
+- enforce workflow ordering;
+- apply rollback or compensation;
+- return structured results.
+
+They must not duplicate lower-level validation or persistence rules.
+
+---
+
+## 5.11 CLI Layer
+
+CLI modules are application entry points.
+
+Their responsibilities are limited to:
+
+```text
+Parse arguments
+        ↓
+Resolve configuration and paths
+        ↓
+Construct dependencies
+        ↓
+Call application services
+        ↓
+Format results
+        ↓
+Return appropriate exit behavior
+```
+
+Current relevant CLIs include:
+
+```text
+investment_review_package.py
+archive_review_package.py
+import_history.py
+```
+
+CLI modules must not become containers for domain logic.
+
+When orchestration grows, it belongs in an application service or pipeline.
+
+---
+
+## 5.12 Future Historical Intelligence Layer
+
+Historical Intelligence operates across multiple snapshots.
+
+Planned responsibilities:
+
+- find previous compatible snapshots;
+- compare portfolio states;
+- calculate recommendation transitions;
 - measure signal duration;
 - track ranking movement;
 - track portfolio composition;
-- track policy-gap movement;
+- track deployment history;
 - track confidence movement;
-- evaluate future outcomes after historical signals.
+- evaluate outcomes after historical signals;
+- support replay.
 
-History storage records facts.
+History stores and verifies facts.
 
-Historical intelligence calculates relationships between those facts.
+Historical Intelligence calculates relationships between facts.
 
 ---
 
-## 3.11 Knowledge Layer
+## 5.13 Future Knowledge Domain
 
-The knowledge layer is a future domain built on sufficiently mature history.
+The Knowledge Domain will be built only on mature historical evidence.
 
-It may generate structured knowledge such as:
+Possible responsibilities:
 
-- which combinations of factors were historically effective;
-- which recommendation types were stable;
-- which market regimes affected outcomes;
-- which opportunities were repeatedly missed;
-- which portfolio actions improved strategic alignment;
-- which signals were unreliable under specific conditions.
+- historical pattern extraction;
+- factor-effectiveness analysis;
+- evidence relationships;
+- recommendation stability;
+- regime-aware observations;
+- confidence calibration;
+- decision-memory models.
 
 Knowledge must remain:
 
 - traceable to historical evidence;
-- statistically honest;
 - explicit about sample size;
-- separated from unsupported inference;
-- versioned when its calculation changes.
+- statistically honest;
+- versioned when calculations change;
+- separate from unsupported narrative inference.
+
+Knowledge may be rebuilt.
+
+Archived evidence may not be rewritten.
 
 ---
 
-## 3.12 AI Interpretation Layer
+## 5.14 AI Interpretation Layer
 
-AI consumes structured product evidence.
-
-It may add current context such as:
+AI consumes structured product evidence and may add current context such as:
 
 - company and sector news;
 - macroeconomic developments;
@@ -511,11 +626,12 @@ It may add current context such as:
 - scheduled events;
 - contradictory narratives.
 
-AI is not the source of truth for deterministic product facts.
+AI is not the Source of Truth for deterministic product facts.
 
-AI must preserve the distinction between:
+AI must distinguish:
 
 - package-derived facts;
+- archived historical facts;
 - externally researched facts;
 - inference;
 - judgment;
@@ -523,31 +639,7 @@ AI must preserve the distinction between:
 
 ---
 
-## 3.13 CLI Layer
-
-CLI modules are entry points.
-
-They should perform only:
-
-```text
-Parse arguments
-        ↓
-Resolve dependencies and paths
-        ↓
-Call application services
-        ↓
-Render output
-        ↓
-Return an appropriate exit code
-```
-
-CLI modules must not become containers for domain logic.
-
-Reusable logic belongs in services.
-
----
-
-# 4. Domain Map
+# 6. Domain Map
 
 ## Market Domain
 
@@ -567,11 +659,13 @@ Does not own:
 - final recommendations;
 - historical knowledge.
 
+---
+
 ## Technical Domain
 
 Owns:
 
-- technical indicators;
+- indicators;
 - trend condition;
 - momentum condition;
 - volatility measures;
@@ -579,9 +673,11 @@ Owns:
 
 Does not own:
 
-- downloads;
+- market-data transport;
 - portfolio allocation;
-- external news interpretation.
+- AI interpretation.
+
+---
 
 ## Fundamental Domain
 
@@ -597,7 +693,9 @@ Does not own:
 
 - technical indicators;
 - portfolio positions;
-- AI interpretation.
+- historical storage.
+
+---
 
 ## Ranking Domain
 
@@ -605,28 +703,34 @@ Owns:
 
 - candidate comparison;
 - ranking order;
-- component score aggregation;
+- component-score aggregation;
 - ranking reason data.
 
 Does not own:
 
-- final personal action;
-- portfolio trade execution.
+- final human action;
+- trade execution;
+- snapshot archiving.
+
+---
 
 ## Recommendation Domain
 
 Owns:
 
-- machine recommendation labels;
+- recommendation labels;
 - recommendation reasons;
-- recommendation warnings;
+- warnings;
 - coverage-aware adjustments;
-- recommendation stability inputs.
+- recommendation output.
 
 Does not own:
 
 - human final decisions;
-- automatic orders.
+- automatic orders;
+- immutable history.
+
+---
 
 ## Portfolio Domain
 
@@ -635,11 +739,25 @@ Owns:
 - holdings;
 - policy;
 - cash;
+- cost basis;
 - market value;
 - portfolio snapshots;
 - policy gaps;
 - contribution plans;
 - holding strategies.
+
+---
+
+## Decision Domain
+
+Owns:
+
+- deployment evidence;
+- confidence;
+- decision trace;
+- machine-level action framing.
+
+---
 
 ## Review Domain
 
@@ -651,36 +769,34 @@ Owns:
 - serialization boundaries;
 - AI-facing export.
 
+---
+
 ## History Domain
 
 Owns:
 
-- snapshot archiving;
-- manifests;
-- checksums;
-- normalized historical records;
-- previous-snapshot discovery.
+- historical snapshot identity;
+- archive writing;
+- manifest indexing;
+- checksum verification;
+- structured historical storage;
+- timeline event generation.
 
-## Decision Domain
+The History Domain treats archived Review Package bytes as canonical evidence.
 
-Owns:
-
-- deployment evidence;
-- confidence;
-- decision trace;
-- machine-level action framing.
+---
 
 ## Knowledge Domain
 
 Owns future derived historical knowledge.
 
-It must not mutate historical facts.
+It must not mutate historical facts or become a parallel archive.
 
 ---
 
-# 5. Primary Data Flows
+# 7. Primary Data Flows
 
-## 5.1 Market Analysis Flow
+## 7.1 Market Analysis Flow
 
 ```text
 Universe definition
@@ -699,17 +815,19 @@ Ranking
         ↓
 Machine recommendations
         ↓
-Review-package sections
+Review Package sections
 ```
 
-## 5.2 Portfolio Flow
+---
+
+## 7.2 Portfolio Flow
 
 ```text
 Portfolio JSON or CSV
         ↓
-PortfolioHolding validation
+Holding validation
         ↓
-CurrentPortfolio
+Current portfolio model
         ↓
 Quote provider
         ↓
@@ -721,484 +839,502 @@ Strategy breakdown
         ↓
 Policy gap
         ↓
-Contribution plan
+Contribution or deployment plan
         ↓
-Review-package portfolio section
+Review Package portfolio section
 ```
 
-## 5.3 Historical Flow
+---
+
+## 7.3 Review Flow
 
 ```text
-Completed review package
-        ↓
-Schema validation
-        ↓
-Checksum
-        ↓
-Immutable archive write
-        ↓
-Manifest update
-        ↓
-Structured history ingestion
-        ↓
-Previous compatible snapshot lookup
-        ↓
-Diff and transition generation
-        ↓
-Future knowledge analysis
-```
-
-## 5.4 AI Review Flow
-
-```text
-Current review package
+Analysis-domain outputs
         +
-Historical summary or export
+Portfolio-domain outputs
         +
-Current external context
+Decision-domain outputs
         ↓
-Fact / signal / context separation
+Review adapters
         ↓
-Integrated interpretation
+Review Package builder
         ↓
-Confidence and limitations
-        ↓
-Human final decision
+Validated JSON export
 ```
+
+The Review Package is the stable handoff artifact between current-state analysis, History, AI interpretation, and future integrations.
 
 ---
 
-# 6. Dependency Rules
-
-Dependencies should flow inward toward stable domain models and services.
-
-The following rules apply:
-
-1. Acquisition may depend on provider contracts and source models.
-2. Analysis may depend on validated domain evidence.
-3. Portfolio may depend on quote-provider interfaces, not concrete downloaders.
-4. Review may depend on domain outputs, not provider clients.
-5. History may depend on stable serialized review contracts.
-6. Knowledge may depend on history, never the reverse.
-7. AI interpretation consumes review and history; deterministic domains do not depend on AI.
-8. CLI may depend on application services; services must not depend on CLI.
-9. Tests may depend on public interfaces and explicit fixtures.
-10. Domain modules must not import unrelated CLI modules.
-
-Forbidden dependency examples:
+## 7.4 Snapshot Preservation Flow
 
 ```text
-Portfolio → Yahoo downloader
-Review → RSI calculator
-History → Market refresh
-Fundamentals → Portfolio allocation
-AI → mutate historical database
-CLI → contain core scoring rules
+Completed Review Package
+        ↓
+Read exact bytes
+        ↓
+Validate package identity
+        ↓
+Generate snapshot UUID
+        ↓
+Calculate SHA-256
+        ↓
+Exclusive archive write
+        ↓
+Create HistoricalSnapshot metadata
+        ↓
+Append manifest record
+```
+
+If manifest registration fails, an unregistered archive created by that operation is removed.
+
+Existing historical evidence is never modified.
+
+---
+
+## 7.5 Manifest Synchronization Flow
+
+```text
+manifest.jsonl
+        ↓
+Load canonical snapshot metadata
+        ↓
+Check SQLite repository
+        ↓
+Select missing snapshots
+        ↓
+Atomic metadata insertion
+        ↓
+ManifestImportResult
+```
+
+Repeated execution is safe.
+
+---
+
+## 7.6 Historical Import Flow
+
+```text
+Registered HistoricalSnapshot
+        ↓
+Resolve safe archive path
+        ↓
+Read exact bytes
+        ↓
+Verify SHA-256
+        ↓
+Validate JSON identity
+        ↓
+Import portfolio summary
+        ↓
+Import holdings
+        ↓
+Import recommendations
+        ↓
+Import deployment
+        ↓
+Build timeline events
+```
+
+If detail import fails, partial detail rows are removed while valid snapshot metadata remains registered.
+
+---
+
+## 7.7 AI Review Flow
+
+```text
+Current Review Package
+        +
+Relevant historical evidence
+        +
+Current external research
+        ↓
+AI synthesis
+        ↓
+Explicit facts, inference, uncertainty, and scenarios
+        ↓
+Human judgment
 ```
 
 ---
 
-# 7. Canonical Models and Sources of Truth
+# 8. Historical Storage Architecture
 
-Investment Terminal must avoid multiple competing representations of the same concept.
+Sprint 12 established three distinct historical representations.
 
-Examples of canonical ownership:
+## 8.1 Immutable Archived Review Package
 
-- `PortfolioHolding` — one owned instrument;
-- `CurrentPortfolio` — current owned positions and policy;
-- `PortfolioMarketValueResult` — current priced portfolio state;
-- recommendation result — machine recommendation source;
-- `PortfolioPolicyGapResult` — strategic allocation difference;
-- `ContributionPlan` — strategic use of available capital;
-- `DeploymentDecision` — machine market-deployment evidence;
-- review package — AI-facing current evidence interface;
-- historical snapshot — immutable record of one generated package.
+Default location:
 
-A JSON export is not a second business model.
+```text
+data/history/YYYY/MM/<snapshot-file>.json
+```
 
-It is a serialized representation of a canonical model.
+Purpose:
 
----
-
-# 8. Storage Architecture
-
-## Operational SQLite
-
-Used for current structured evidence, including completed candles and later other validated source data.
+- preserve exact evidence;
+- retain all source fields;
+- support later verification;
+- support future replay;
+- survive SQLite schema changes.
 
 Properties:
 
-- queryable;
-- transactional;
-- normalized where useful;
-- replaceable through repeatable refresh logic;
-- not itself the immutable review archive.
-
-## Portfolio Configuration Files
-
-Used for user-controlled portfolio input and examples.
-
-Properties:
-
-- human-readable;
-- validated;
-- explicit currencies and identifiers;
-- separated from generated outputs.
-
-## Review Exports
-
-Used for current product output.
-
-Properties:
-
+- immutable;
+- exact-byte preservation;
+- SHA-256 identified;
 - schema-versioned;
-- complete enough for AI analysis;
-- deterministic where inputs are unchanged;
-- clear about missing sections.
+- timezone-aware metadata;
+- never overwritten.
 
-## History Archive
+This is the canonical historical Source of Truth.
 
-Used for immutable exact evidence.
+---
+
+## 8.2 Append-only Manifest
+
+Default location:
+
+```text
+data/history/manifest.jsonl
+```
+
+Purpose:
+
+- index archived snapshots;
+- expose archive location;
+- preserve package and product identity;
+- support synchronization;
+- support search by snapshot or package.
 
 Properties:
 
 - append-only;
-- timestamped;
-- checksum-protected;
-- never silently overwritten.
+- duplicate protected;
+- human inspectable;
+- independent from SQLite;
+- rebuild support for structured history.
 
-## History SQLite
+---
 
-Used for historical queries and analytics.
+## 8.3 Structured History SQLite
+
+Default location:
+
+```text
+data/history/history.db
+```
+
+Current schema:
+
+```text
+schema_metadata
+snapshots
+portfolio_summary
+holdings
+recommendations
+deployment
+timeline_events
+```
+
+Purpose:
+
+- efficient search;
+- normalized historical queries;
+- future comparison;
+- timeline filtering;
+- historical analytics;
+- future Knowledge projections.
 
 Properties:
 
-- linked to archived snapshot identity;
-- migration-capable;
-- rebuildable from immutable snapshots where feasible.
+- rebuildable;
+- indexed;
+- foreign-key constrained;
+- schema-versioned;
+- not canonical evidence.
 
 ---
 
-# 9. Error and Partial-Result Architecture
+# 9. Source-of-Truth Rules
 
-Investment Terminal distinguishes between:
-
-- recoverable section failure;
-- partial evidence;
-- invalid configuration;
-- unavailable external source;
-- critical product failure.
-
-A recoverable failure may allow package generation, but must produce structured status and warnings.
-
-Example:
-
-```json
-{
-  "status": "PARTIAL",
-  "issues": [
-    {
-      "code": "QUOTE_NOT_FOUND",
-      "symbol": "EMIMI",
-      "severity": "WARNING",
-      "effect": "Portfolio market value is incomplete."
-    }
-  ]
-}
-```
-
-Critical failures include situations where:
-
-- the package cannot be trusted;
-- schema guarantees cannot be met;
-- required identity or time metadata is missing;
-- output would appear complete while being materially invalid.
-
-No broad exception handler may silently convert arbitrary failures into `None`.
-
----
-
-# 10. Confidence Architecture
-
-Confidence is a separate future domain.
-
-It must aggregate evidence quality rather than forecast profitability.
-
-Potential components:
+The canonical hierarchy is:
 
 ```text
-Data quality
-Data freshness
-Source coverage
-Fundamental coverage
-Technical agreement
-Trend stability
-Portfolio fit
-Market context
-External context coverage
-Historical consistency
-Decision stability
+Immutable archived Review Package
+        ↓
+Append-only manifest metadata
+        ↓
+Rebuildable SQLite history
+        ↓
+Derived timeline and future knowledge
 ```
 
-The confidence architecture must support:
+Rules:
 
-- component-level values;
-- reason codes;
-- penalties;
-- missing components;
-- weight versioning;
-- overall explanation;
-- product-wide consistent terminology.
-
-Multiple unrelated confidence implementations are not permitted.
-
----
-
-# 11. Decision Trace Architecture
-
-Every important recommendation or deployment output should eventually reference a structured decision trace.
-
-A trace may contain:
-
-- decision identity;
-- instrument;
-- decision type;
-- generated timestamp;
-- input evidence references;
-- positive reasons;
-- negative reasons;
-- warnings;
-- thresholds;
-- confidence;
-- model version;
-- previous decision;
-- changed reasons.
-
-Decision trace data must be included in history so future outcome analysis can evaluate not only the label, but the reasons behind it.
+1. Archived JSON is canonical historical evidence.
+2. Manifest is the canonical append-only snapshot index.
+3. SQLite is a normalized projection.
+4. Timeline events are derived records.
+5. Future knowledge is a derived interpretation.
+6. Derived data must not introduce facts absent from source evidence.
+7. SQLite may be rebuilt without altering the archive.
+8. A checksum mismatch blocks import.
+9. No consumer outside the History Domain should depend directly on archive folder layout.
 
 ---
 
-# 12. Security and Privacy Boundaries
+# 10. Dependency Rules
 
-The product may contain sensitive personal financial information.
+Allowed dependency direction:
 
-Architecture must therefore prefer:
+```text
+CLI
+ ↓
+Application Services / Pipelines
+ ↓
+Domain Services and Repositories
+ ↓
+Models and Infrastructure Adapters
+```
 
-- local storage for portfolio data;
-- no unnecessary transmission of raw personal data;
-- explicit user action before sharing review packages externally;
-- separation between example files and private files;
-- secrets in environment variables or secure mechanisms;
-- no credentials committed to Git;
-- minimal connector permissions.
+Domain dependency principles:
 
-Future broker integration must use read-only access first.
+- Market may be consumed by Portfolio and Analysis.
+- Analysis may feed Recommendation and Review.
+- Portfolio may feed Decision and Review.
+- Decision may feed Review.
+- Review may feed History.
+- History may feed future Historical Intelligence and Knowledge.
+- Knowledge must not mutate Review or History.
+- AI may consume outputs but must not become a dependency of deterministic domains.
 
-Automatic trade permissions are outside the product scope.
+Forbidden patterns:
+
+- business rules in CLI;
+- History importing analysis internals;
+- Portfolio directly calling external APIs;
+- Review recalculating domain values;
+- Knowledge rewriting historical records;
+- circular imports between domains;
+- hidden shared mutable state.
 
 ---
 
-# 13. Performance Philosophy
+# 11. Integrity and Reliability Boundaries
 
-Correctness and traceability are more important than premature optimization.
+Historical operations must verify:
 
-Performance work should focus on:
+- safe relative paths;
+- archive-root containment;
+- file existence;
+- exact SHA-256;
+- UTF-8 encoding;
+- valid JSON;
+- object structure;
+- schema identity;
+- generated timestamp identity;
+- foreign-key integrity;
+- duplicate constraints.
 
-- avoiding duplicate downloads;
-- caching appropriate source data;
-- incremental updates;
-- efficient SQLite queries;
-- batch processing;
-- avoiding repeated serialization;
-- bounded external requests.
+Workflow reliability requires:
 
-Performance optimizations must not reduce explainability or historical integrity.
+- explicit failures;
+- idempotent synchronization;
+- repeat-import protection;
+- deterministic ordering;
+- database transactions where practical;
+- compensating cleanup where a single transaction is not available;
+- structured result objects.
+
+A partially imported snapshot must not be reported as fully imported.
 
 ---
 
-# 14. Test Architecture
+# 12. Schema Evolution
 
-The test structure should include:
+Review Package schemas and SQLite schemas evolve independently.
 
-- model validation tests;
-- service unit tests;
-- provider contract tests;
-- importer and loader tests;
-- serialization tests;
+Requirements:
+
+- every persistent schema has a version;
+- old archives remain readable;
+- breaking changes require migration or compatibility adapters;
+- new importers must handle supported historical shapes explicitly;
+- timeline payload semantics must remain documented;
+- schema migrations must be introduced before SQLite schema version 2.
+
+The exact archived package must remain available even when normalized tables change.
+
+---
+
+# 13. Testing Architecture
+
+Tests should mirror architectural responsibilities.
+
+Expected test categories:
+
+- domain invariant tests;
+- archive exact-byte tests;
+- checksum and path-safety tests;
+- manifest append and duplicate tests;
+- repository atomicity tests;
+- importer normalization tests;
+- rollback tests;
+- idempotence tests;
+- timeline determinism tests;
+- pipeline integration tests;
 - CLI tests;
-- package integration tests;
-- regression tests;
-- historical immutability tests;
-- schema compatibility tests;
-- deterministic timestamp tests.
+- full regression tests.
 
-External providers should be isolated behind interfaces and replaced with fakes in unit tests.
-
-Every production bug should produce a regression test.
-
----
-
-# 15. Repository Structure
-
-The exact repository will evolve, but the intended domain structure is:
+Preferred progression:
 
 ```text
-InvestmentTerminal/
-├── investment_terminal/
-│   ├── cli/
-│   ├── config/
-│   ├── database/
-│   ├── fundamentals/
-│   ├── indicators/
-│   ├── market/
-│   ├── portfolio/
-│   ├── ranking/
-│   ├── recommendation/
-│   ├── review/
-│   ├── history/          # planned
-│   ├── decision/         # may emerge from review services
-│   ├── knowledge/        # future
-│   └── common/           # only for truly shared contracts
-├── data/
-│   ├── portfolios/
-│   ├── universes/
-│   ├── market/
-│   └── history/          # planned immutable archive
-├── output/
-├── tests/
-├── docs/
-│   ├── adr/
-│   ├── PROJECT_VISION.md
-│   ├── CONSTITUTION.md
-│   ├── ARCHITECTURE.md
-│   └── DATA_MODEL.md
-└── README.md
+Focused module test
+        ↓
+Domain integration test
+        ↓
+CLI or workflow test
+        ↓
+Full pytest suite
 ```
 
-New generic `utils` or `helpers` modules should be avoided unless responsibility is genuinely cross-domain and clearly named.
+External internet access should not be required for deterministic unit and History tests.
 
 ---
 
-# 16. Current Architecture and Target Architecture
+# 14. Current CLI Workflows
 
-The product is in transition from its original architecture.
+Generate current Review Package:
 
-The original design emphasized:
+```powershell
+python -m investment_terminal.cli.investment_review_package
+```
 
-- Finnhub;
-- Yahoo Finance;
-- SQLite;
-- Excel reports;
-- a central decision engine.
+Archive Review Package:
 
-The current architecture has evolved toward:
+```powershell
+python -m investment_terminal.cli.archive_review_package
+```
 
-- Yahoo-backed completed-candle storage;
-- sector-aware fundamentals;
-- ranking and coverage-aware recommendations;
-- explicit portfolio models;
-- strategy classification;
-- market-value calculation;
-- policy gaps;
-- contribution planning;
-- unified JSON review packages;
-- external AI interpretation;
-- planned immutable historical intelligence.
+Synchronize and import history:
 
-The new architecture does not discard the useful original principles:
+```powershell
+python -m investment_terminal.cli.import_history
+```
 
-- data quality first;
-- automation before manual work;
-- single source of truth;
-- modular architecture;
-- tests before release;
-- no decisions from incomplete data.
+Metadata-only synchronization:
 
-It updates the system boundaries and product flow to match the actual long-term product.
+```powershell
+python -m investment_terminal.cli.import_history --metadata-only
+```
 
----
-
-# 17. Evolution Roadmap
+Current workflow remains intentionally explicit:
 
 ```text
-Foundation
+Generate
     ↓
-Documentation and architecture freeze
+Archive
     ↓
-Immutable historical journal
-    ↓
-Structured history database
-    ↓
-Diff and transition intelligence
-    ↓
-Decision trace
-    ↓
-Confidence framework
-    ↓
-Recommendation outcome analysis
-    ↓
-Knowledge engine
-    ↓
-AI-assisted personal investment operating system
+Import
 ```
 
-Each stage must preserve compatibility with the prior evidence trail.
+Direct automatic archival from the existing Review Package CLI is deferred until a stable orchestration boundary is implemented.
 
 ---
 
-# 18. Architecture Quality Attributes
+# 15. Current Architectural Limitations
 
-The architecture is evaluated against:
+The following capabilities are not yet complete:
 
-- reliability;
-- explainability;
-- traceability;
-- reproducibility;
-- determinism;
-- maintainability;
-- testability;
-- extensibility;
-- historical integrity;
-- backward compatibility;
-- security;
-- operational transparency.
+- direct Review Package generation-to-archive orchestration;
+- public timeline query repository;
+- historical replay service;
+- snapshot comparison service;
+- recommendation transition analysis;
+- outcome tracking;
+- import-state table;
+- SQLite migration framework;
+- archive integrity audit CLI;
+- manifest rebuild tooling;
+- Knowledge Domain implementation.
 
-A new feature that improves functionality while materially damaging these attributes requires redesign.
-
----
-
-# 19. Architecture Review Process
-
-After approximately five to ten meaningful sprints, an architecture review should assess:
-
-- whether domains remain focused;
-- whether canonical models are duplicated;
-- whether CLI logic has grown improperly;
-- whether package schemas remain coherent;
-- whether errors remain visible;
-- whether history remains compatible;
-- whether confidence logic is centralized;
-- whether documentation matches code;
-- whether any module should be simplified or removed.
-
-Architecture review is a product-maintenance activity, not a failure response.
+These are planned extensions of the current architecture, not reasons to replace it.
 
 ---
 
-# 20. Guiding Architectural Statements
+# 16. Evolution Path
 
-> Architecture exists to keep future development understandable.
+## Near-term
 
-> Data quality is part of product logic.
+- align `DATA_MODEL.md`;
+- align `DOMAIN_MAP.md`;
+- align `ROADMAP.md`;
+- add timeline query APIs;
+- add replay support;
+- add snapshot comparison;
+- add schema migration foundation;
+- test the History pipeline with real generated Review Packages.
 
-> Review Package is the interface between deterministic evidence and interpretation.
+## Medium-term
 
-> History is a first-class product domain.
+- portfolio evolution queries;
+- recommendation history;
+- deployment outcome tracking;
+- confidence history;
+- transition models;
+- evidence relationships.
 
-> Knowledge is derived from history; it never replaces history.
+## Long-term
 
-> AI consumes structured evidence; it does not become the source of deterministic facts.
+- Knowledge Domain;
+- pattern extraction;
+- decision memory;
+- confidence calibration;
+- AI synthesis grounded in archived evidence.
 
-> Clear responsibilities are preferred over clever coupling.
+---
 
-> Investment Terminal is a decision-support platform, not an autonomous trading system.
+# 17. Architectural Decision Guidance
+
+A new feature should be placed by asking:
+
+- Is it raw evidence acquisition?
+- Is it validation?
+- Is it deterministic analysis?
+- Is it portfolio logic?
+- Is it decision logic?
+- Is it review assembly?
+- Is it historical preservation?
+- Is it cross-snapshot intelligence?
+- Is it derived knowledge?
+- Is it only presentation or CLI behavior?
+
+If a feature performs more than one of these responsibilities, it should usually be decomposed.
+
+---
+
+# 18. Architectural Invariants
+
+The following rules are non-negotiable:
+
+1. The user remains the final decision-maker.
+2. Deterministic calculations stay outside AI.
+3. Review assembles; it does not recreate analysis.
+4. Historical evidence is immutable.
+5. Archived JSON is canonical historical evidence.
+6. SQLite history is rebuildable.
+7. Verification occurs before historical derivation.
+8. CLI contains no domain business logic.
+9. Missing data remains explicit.
+10. New capabilities extend domain boundaries rather than bypass them.
+11. Future knowledge must remain traceable to evidence.
+12. No historical correction silently overwrites prior history.
+
+---
+
+# 19. Guiding Statement
+
+> Investment Terminal should preserve not only what the system believes now, but what it believed before, which evidence supported it, and how that belief changed over time.
+
+The architecture must make this possible without sacrificing correctness, traceability, or maintainability.
