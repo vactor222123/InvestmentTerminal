@@ -356,3 +356,173 @@ def test_store_rejects_invalid_extension(
         HistoricalSQLiteStore(
             tmp_path / database_name
         )
+
+
+
+def test_transaction_rollback_preserves_previously_committed_rows(
+    tmp_path: Path,
+) -> None:
+    store = HistoricalSQLiteStore(
+        tmp_path / "history.db"
+    )
+
+    with store.transaction() as connection:
+        connection.execute(
+            """
+            INSERT INTO snapshots (
+                snapshot_id,
+                package_schema_version,
+                generated_at,
+                archived_at,
+                relative_path,
+                checksum_sha256,
+                status
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "snapshot-existing",
+                "1.0",
+                "2026-08-03T17:35:00+00:00",
+                "2026-08-03T17:36:00+00:00",
+                "2026/08/existing.json",
+                "a" * 64,
+                "ARCHIVED",
+            ),
+        )
+
+    with pytest.raises(
+        RuntimeError,
+        match="second import failed",
+    ):
+        with store.transaction() as connection:
+            connection.execute(
+                """
+                INSERT INTO snapshots (
+                    snapshot_id,
+                    package_schema_version,
+                    generated_at,
+                    archived_at,
+                    relative_path,
+                    checksum_sha256,
+                    status
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    "snapshot-new",
+                    "1.0",
+                    "2026-08-04T17:35:00+00:00",
+                    "2026-08-04T17:36:00+00:00",
+                    "2026/08/new.json",
+                    "b" * 64,
+                    "ARCHIVED",
+                ),
+            )
+            raise RuntimeError(
+                "second import failed"
+            )
+
+    with store.connect() as connection:
+        rows = connection.execute(
+            """
+            SELECT snapshot_id
+            FROM snapshots
+            ORDER BY snapshot_id
+            """
+        ).fetchall()
+
+    assert tuple(
+        row["snapshot_id"]
+        for row in rows
+    ) == (
+        "snapshot-existing",
+    )
+
+
+def test_transaction_rolls_back_on_base_exception(
+    tmp_path: Path,
+) -> None:
+    store = HistoricalSQLiteStore(
+        tmp_path / "history.db"
+    )
+
+    class SimulatedInterruption(
+        BaseException
+    ):
+        pass
+
+    with pytest.raises(
+        SimulatedInterruption,
+    ):
+        with store.transaction() as connection:
+            connection.execute(
+                """
+                INSERT INTO snapshots (
+                    snapshot_id,
+                    package_schema_version,
+                    generated_at,
+                    archived_at,
+                    relative_path,
+                    checksum_sha256,
+                    status
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    "snapshot-interrupted",
+                    "1.0",
+                    "2026-08-03T17:35:00+00:00",
+                    "2026-08-03T17:36:00+00:00",
+                    "2026/08/interrupted.json",
+                    "c" * 64,
+                    "ARCHIVED",
+                ),
+            )
+            raise SimulatedInterruption()
+
+    with store.connect() as connection:
+        count = connection.execute(
+            """
+            SELECT COUNT(*)
+            FROM snapshots
+            """
+        ).fetchone()[0]
+
+    assert count == 0
+
+
+def test_transaction_enforces_foreign_keys(
+    tmp_path: Path,
+) -> None:
+    store = HistoricalSQLiteStore(
+        tmp_path / "history.db"
+    )
+
+    with pytest.raises(
+        sqlite3.IntegrityError,
+    ):
+        with store.transaction() as connection:
+            connection.execute(
+                """
+                INSERT INTO portfolio_summary (
+                    snapshot_id,
+                    portfolio_name
+                )
+                VALUES (?, ?)
+                """,
+                (
+                    "missing-snapshot",
+                    "Portfolio",
+                ),
+            )
+
+    with store.connect() as connection:
+        count = connection.execute(
+            """
+            SELECT COUNT(*)
+            FROM portfolio_summary
+            """
+        ).fetchone()[0]
+
+    assert count == 0
