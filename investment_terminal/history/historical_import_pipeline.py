@@ -223,7 +223,7 @@ class HistoricalImportPipeline:
             timeline_events = self.timeline_builder.build(
                 snapshot
             )
-        except Exception:
+        except BaseException:
             self._remove_partial_import(
                 snapshot.snapshot_id
             )

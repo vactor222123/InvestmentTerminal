@@ -360,3 +360,47 @@ def test_pipeline_rejects_invalid_loader(
             ),
             loader=object(),  # type: ignore[arg-type]
         )
+
+
+def test_pipeline_removes_partial_rows_on_interruption(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pipeline, store, snapshot = create_pipeline(
+        tmp_path
+    )
+
+    class SimulatedInterruption(
+        BaseException
+    ):
+        pass
+
+    def interrupt_timeline_build(
+        snapshot_to_build: HistoricalSnapshot,
+    ) -> int:
+        raise SimulatedInterruption()
+
+    monkeypatch.setattr(
+        pipeline.timeline_builder,
+        "build",
+        interrupt_timeline_build,
+    )
+
+    with pytest.raises(
+        SimulatedInterruption,
+    ):
+        pipeline.import_snapshot(
+            snapshot
+        )
+
+    for table in (
+        "portfolio_summary",
+        "holdings",
+        "recommendations",
+        "deployment",
+        "timeline_events",
+    ):
+        assert table_count(
+            store,
+            table,
+        ) == 0
