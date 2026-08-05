@@ -8,6 +8,12 @@ from pathlib import PurePosixPath
 from typing import Any
 from uuid import UUID
 
+from investment_terminal.utils.validation import (
+    normalize_optional_text,
+    normalize_required_text,
+    validate_aware_datetime,
+)
+
 
 @dataclass(frozen=True, slots=True)
 class HistoricalSnapshot:
@@ -41,17 +47,17 @@ class HistoricalSnapshot:
         object.__setattr__(
             self,
             "package_schema_version",
-            self._normalize_required_text(
+            normalize_required_text(
                 self.package_schema_version,
                 field_name="package_schema_version",
             ),
         )
 
-        self._validate_aware_datetime(
+        validate_aware_datetime(
             self.generated_at,
             field_name="generated_at",
         )
-        self._validate_aware_datetime(
+        validate_aware_datetime(
             self.archived_at,
             field_name="archived_at",
         )
@@ -78,7 +84,7 @@ class HistoricalSnapshot:
         object.__setattr__(
             self,
             "package_id",
-            self._normalize_optional_text(
+            normalize_optional_text(
                 self.package_id,
                 field_name="package_id",
             ),
@@ -86,7 +92,7 @@ class HistoricalSnapshot:
         object.__setattr__(
             self,
             "product_version",
-            self._normalize_optional_text(
+            normalize_optional_text(
                 self.product_version,
                 field_name="product_version",
             ),
@@ -128,37 +134,6 @@ class HistoricalSnapshot:
         }
 
     @staticmethod
-    def _normalize_required_text(
-        value: object,
-        *,
-        field_name: str,
-    ) -> str:
-        if (
-            not isinstance(value, str)
-            or not value.strip()
-        ):
-            raise ValueError(
-                f"{field_name} must be a non-empty string"
-            )
-
-        return value.strip()
-
-    @classmethod
-    def _normalize_optional_text(
-        cls,
-        value: object,
-        *,
-        field_name: str,
-    ) -> str | None:
-        if value is None:
-            return None
-
-        return cls._normalize_required_text(
-            value,
-            field_name=field_name,
-        )
-
-    @staticmethod
     def _normalize_uuid(
         value: object,
         *,
@@ -197,28 +172,6 @@ class HistoricalSnapshot:
             value,
             field_name=field_name,
         )
-
-    @staticmethod
-    def _validate_aware_datetime(
-        value: object,
-        *,
-        field_name: str,
-    ) -> None:
-        if not isinstance(
-            value,
-            datetime,
-        ):
-            raise TypeError(
-                f"{field_name} must be a datetime"
-            )
-
-        if (
-            value.tzinfo is None
-            or value.utcoffset() is None
-        ):
-            raise ValueError(
-                f"{field_name} must be timezone-aware"
-            )
 
     @staticmethod
     def _normalize_relative_path(
@@ -299,12 +252,10 @@ class HistoricalSnapshot:
         cls,
         value: object,
     ) -> str:
-        normalized = (
-            cls._normalize_required_text(
-                value,
-                field_name="status",
-            )
-            .upper()
+        normalized = normalize_required_text(
+            value,
+            field_name="status",
+            uppercase=True,
         )
 
         if normalized not in cls.SUPPORTED_STATUSES:

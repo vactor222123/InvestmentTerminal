@@ -12,6 +12,10 @@ from investment_terminal.history.historical_snapshot_models import (
 from investment_terminal.history.historical_sqlite_store import (
     HistoricalSQLiteStore,
 )
+from investment_terminal.utils.validation import (
+    normalize_required_text,
+    validate_aware_datetime,
+)
 
 
 class HistoricalSnapshotRepository:
@@ -204,7 +208,7 @@ class HistoricalSnapshotRepository:
         self,
         package_id: str,
     ) -> tuple[HistoricalSnapshot, ...]:
-        normalized = HistoricalSnapshot._normalize_required_text(
+        normalized = normalize_required_text(
             package_id,
             field_name="package_id",
         )
@@ -237,11 +241,11 @@ class HistoricalSnapshotRepository:
         start: datetime,
         end: datetime,
     ) -> tuple[HistoricalSnapshot, ...]:
-        self._validate_aware_datetime(
+        validate_aware_datetime(
             start,
             field_name="start",
         )
-        self._validate_aware_datetime(
+        validate_aware_datetime(
             end,
             field_name="end",
         )
@@ -357,25 +361,3 @@ class HistoricalSnapshotRepository:
             supersedes=row["supersedes"],
             status=row["status"],
         )
-
-    @staticmethod
-    def _validate_aware_datetime(
-        value: object,
-        *,
-        field_name: str,
-    ) -> None:
-        if not isinstance(
-            value,
-            datetime,
-        ):
-            raise TypeError(
-                f"{field_name} must be a datetime"
-            )
-
-        if (
-            value.tzinfo is None
-            or value.utcoffset() is None
-        ):
-            raise ValueError(
-                f"{field_name} must be timezone-aware"
-            )
