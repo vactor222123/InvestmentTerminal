@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import os
 import tempfile
+from contextlib import suppress
 from pathlib import Path
 from typing import Any
 
@@ -48,11 +49,9 @@ def write_bytes_atomic(
             destination,
         )
     except BaseException:
-        if (
-            temporary_path is not None
-            and temporary_path.exists()
-        ):
-            temporary_path.unlink()
+        _remove_temporary_file(
+            temporary_path
+        )
         raise
 
     return destination
@@ -130,3 +129,15 @@ def _normalize_path(
         )
 
     return destination
+
+
+def _remove_temporary_file(
+    temporary_path: Path | None,
+) -> None:
+    if temporary_path is None:
+        return
+
+    with suppress(
+        OSError,
+    ):
+        temporary_path.unlink()

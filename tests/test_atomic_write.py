@@ -197,3 +197,124 @@ def test_failed_replace_removes_temporary_file(
             ".document.txt.*.tmp"
         )
     ) == []
+
+
+def test_failed_replace_preserves_existing_destination(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "document.txt"
+    destination.write_text(
+        "original",
+        encoding="utf-8",
+    )
+
+    def fail_replace(
+        source: object,
+        target: object,
+    ) -> None:
+        raise PermissionError(
+            "destination is locked"
+        )
+
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write.os.replace",
+        fail_replace,
+    )
+
+    with pytest.raises(
+        PermissionError,
+        match="destination is locked",
+    ):
+        write_text_atomic(
+            destination,
+            "replacement",
+        )
+
+    assert destination.read_text(
+        encoding="utf-8"
+    ) == "original"
+    assert list(
+        tmp_path.glob(
+            ".document.txt.*.tmp"
+        )
+    ) == []
+
+
+def test_failed_fsync_removes_temporary_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "document.txt"
+
+    def fail_fsync(
+        file_descriptor: int,
+    ) -> None:
+        raise OSError(
+            "disk sync failed"
+        )
+
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write.os.fsync",
+        fail_fsync,
+    )
+
+    with pytest.raises(
+        OSError,
+        match="disk sync failed",
+    ):
+        write_text_atomic(
+            destination,
+            "content",
+        )
+
+    assert not destination.exists()
+    assert list(
+        tmp_path.glob(
+            ".document.txt.*.tmp"
+        )
+    ) == []
+
+
+def test_cleanup_failure_does_not_mask_write_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "document.txt"
+
+    def fail_replace(
+        source: object,
+        target: object,
+    ) -> None:
+        raise OSError(
+            "replace failed"
+        )
+
+    def fail_unlink(
+        self: Path,
+        missing_ok: bool = False,
+    ) -> None:
+        raise PermissionError(
+            "cleanup failed"
+        )
+
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write.os.replace",
+        fail_replace,
+    )
+    monkeypatch.setattr(
+        Path,
+        "unlink",
+        fail_unlink,
+    )
+
+    with pytest.raises(
+        OSError,
+        match="replace failed",
+    ):
+        write_text_atomic(
+            destination,
+            "content",
+        )
+
+    assert not destination.exists()
