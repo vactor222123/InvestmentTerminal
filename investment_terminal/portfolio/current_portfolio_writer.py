@@ -2,7 +2,6 @@
 Write imported holdings into the current portfolio JSON.
 """
 
-import json
 from dataclasses import replace
 from pathlib import Path
 
@@ -11,6 +10,9 @@ from investment_terminal.portfolio.current_portfolio_loader import (
 )
 from investment_terminal.portfolio.portfolio_holding_import_models import (
     PortfolioHoldingImportResult,
+)
+from investment_terminal.utils.atomic_write import (
+    write_json_atomic,
 )
 
 
@@ -57,18 +59,7 @@ class CurrentPortfolioWriter:
             holdings=import_result.holdings,
         )
 
-        destination.parent.mkdir(
-            parents=True,
-            exist_ok=True,
+        return write_json_atomic(
+            destination,
+            updated.to_dict(),
         )
-        destination.write_text(
-            json.dumps(
-                updated.to_dict(),
-                indent=2,
-                allow_nan=False,
-            )
-            + "\n",
-            encoding="utf-8",
-        )
-
-        return destination
