@@ -8,6 +8,11 @@ from math import isfinite
 from numbers import Real
 from typing import Any
 
+from investment_terminal.utils.validation import (
+    normalize_required_text,
+    validate_score_0_100,
+)
+
 
 @dataclass(frozen=True, slots=True)
 class DecisionScoreSummary:
@@ -28,9 +33,8 @@ class DecisionScoreSummary:
             "fundamental",
             "overall",
         ):
-            value = getattr(self, field_name)
-            _validate_score(
-                value=value,
+            validate_score_0_100(
+                getattr(self, field_name),
                 field_name=field_name,
             )
 
@@ -83,21 +87,14 @@ class DecisionQualitySummary:
             "technical_condition",
             "risk_level",
         ):
-            value = getattr(self, field_name)
-
-            if (
-                not isinstance(value, str)
-                or not value.strip()
-            ):
-                raise ValueError(
-                    f"{field_name} must be "
-                    "a non-empty string"
-                )
-
             object.__setattr__(
                 self,
                 field_name,
-                value.strip().upper(),
+                normalize_required_text(
+                    getattr(self, field_name),
+                    field_name=field_name,
+                    uppercase=True,
+                ),
             )
 
     def to_dict(self) -> dict[str, str]:
@@ -125,30 +122,24 @@ class DecisionConfidence:
             "technical_data_quality",
             "fundamental_data_quality",
         ):
-            value = getattr(self, field_name)
-            _validate_score(
-                value=value,
+            validate_score_0_100(
+                getattr(self, field_name),
                 field_name=field_name,
             )
 
-        _validate_score(
-            value=self.missing_data_penalty,
+        validate_score_0_100(
+            self.missing_data_penalty,
             field_name="missing_data_penalty",
         )
-
-        if (
-            not isinstance(self.classification, str)
-            or not self.classification.strip()
-        ):
-            raise ValueError(
-                "classification must be "
-                "a non-empty string"
-            )
 
         object.__setattr__(
             self,
             "classification",
-            self.classification.strip().upper(),
+            normalize_required_text(
+                self.classification,
+                field_name="classification",
+                uppercase=True,
+            ),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -185,14 +176,10 @@ class DecisionResult:
     summary: str
 
     def __post_init__(self) -> None:
-        if (
-            not isinstance(self.schema_version, str)
-            or not self.schema_version.strip()
-        ):
-            raise ValueError(
-                "schema_version must be "
-                "a non-empty string"
-            )
+        normalized_schema_version = normalize_required_text(
+            self.schema_version,
+            field_name="schema_version",
+        )
 
         if not isinstance(
             self.generated_at,
@@ -202,26 +189,25 @@ class DecisionResult:
                 "generated_at must be a datetime"
             )
 
-        normalized_symbol = _normalize_text(
+        normalized_symbol = normalize_required_text(
             self.symbol,
             field_name="symbol",
+            uppercase=True,
         )
-        normalized_currency = _normalize_text(
+        normalized_currency = normalize_required_text(
             self.currency,
             field_name="currency",
+            uppercase=True,
         )
-        normalized_classification = _normalize_text(
+        normalized_classification = normalize_required_text(
             self.classification,
             field_name="classification",
+            uppercase=True,
         )
-
-        if (
-            not isinstance(self.summary, str)
-            or not self.summary.strip()
-        ):
-            raise ValueError(
-                "summary must be a non-empty string"
-            )
+        normalized_summary = normalize_required_text(
+            self.summary,
+            field_name="summary",
+        )
 
         for collection_name in (
             "positive_factors",
@@ -251,7 +237,7 @@ class DecisionResult:
         object.__setattr__(
             self,
             "schema_version",
-            self.schema_version.strip(),
+            normalized_schema_version,
         )
         object.__setattr__(
             self,
@@ -271,7 +257,7 @@ class DecisionResult:
         object.__setattr__(
             self,
             "summary",
-            self.summary.strip(),
+            normalized_summary,
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -300,28 +286,6 @@ class DecisionResult:
         }
 
 
-def _validate_score(
-    value: object,
-    field_name: str,
-) -> None:
-    """
-    Validate a score expressed on a 0–100 scale.
-    """
-    if (
-        isinstance(value, bool)
-        or not isinstance(value, Real)
-        or not isfinite(float(value))
-    ):
-        raise ValueError(
-            f"{field_name} must be a finite number"
-        )
-
-    if not 0.0 <= float(value) <= 100.0:
-        raise ValueError(
-            f"{field_name} must be between 0 and 100"
-        )
-
-
 def _validate_weight(
     value: object,
     field_name: str,
@@ -342,21 +306,3 @@ def _validate_weight(
         raise ValueError(
             f"{field_name} must be between 0 and 1"
         )
-
-
-def _normalize_text(
-    value: str,
-    field_name: str,
-) -> str:
-    """
-    Normalize required textual fields.
-    """
-    if (
-        not isinstance(value, str)
-        or not value.strip()
-    ):
-        raise ValueError(
-            f"{field_name} must be a non-empty string"
-        )
-
-    return value.strip().upper()
