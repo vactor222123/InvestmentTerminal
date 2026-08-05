@@ -3,6 +3,8 @@ SQLite schema and connection management for structured history.
 """
 
 import sqlite3
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 
@@ -94,6 +96,33 @@ class HistoricalSQLiteStore:
         )
 
         return connection
+
+    @contextmanager
+    def transaction(
+        self,
+    ) -> Iterator[sqlite3.Connection]:
+        """
+        Yield one connection with an explicit all-or-nothing transaction.
+
+        The caller owns the complete logical operation performed inside the
+        context. Successful exit commits; any exception rolls back. The
+        connection is always closed.
+        """
+        self.initialize()
+        connection = self.connect()
+
+        try:
+            connection.execute(
+                "BEGIN"
+            )
+            yield connection
+        except BaseException:
+            connection.rollback()
+            raise
+        else:
+            connection.commit()
+        finally:
+            connection.close()
 
     def schema_version(
         self,
@@ -299,3 +328,4 @@ class HistoricalSQLiteStore:
                 event_type
             );
         """
+

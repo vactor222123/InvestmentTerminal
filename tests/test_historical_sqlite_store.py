@@ -161,6 +161,169 @@ def test_store_rejects_duplicate_archive_path(
             )
 
 
+def test_transaction_commits_successful_work(
+    tmp_path: Path,
+) -> None:
+    store = HistoricalSQLiteStore(
+        tmp_path / "history.db"
+    )
+
+    with store.transaction() as connection:
+        connection.execute(
+            """
+            INSERT INTO snapshots (
+                snapshot_id,
+                package_schema_version,
+                generated_at,
+                archived_at,
+                relative_path,
+                checksum_sha256,
+                status
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "snapshot-1",
+                "1.0",
+                "2026-08-03T17:35:00+00:00",
+                "2026-08-03T17:36:00+00:00",
+                "2026/08/review.json",
+                "a" * 64,
+                "ARCHIVED",
+            ),
+        )
+
+    with store.connect() as connection:
+        row = connection.execute(
+            """
+            SELECT snapshot_id
+            FROM snapshots
+            """
+        ).fetchone()
+
+    assert row["snapshot_id"] == "snapshot-1"
+
+
+def test_transaction_rolls_back_all_work_on_failure(
+    tmp_path: Path,
+) -> None:
+    store = HistoricalSQLiteStore(
+        tmp_path / "history.db"
+    )
+
+    with pytest.raises(
+        RuntimeError,
+        match="import failed",
+    ):
+        with store.transaction() as connection:
+            connection.execute(
+                """
+                INSERT INTO snapshots (
+                    snapshot_id,
+                    package_schema_version,
+                    generated_at,
+                    archived_at,
+                    relative_path,
+                    checksum_sha256,
+                    status
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    "snapshot-1",
+                    "1.0",
+                    "2026-08-03T17:35:00+00:00",
+                    "2026-08-03T17:36:00+00:00",
+                    "2026/08/review.json",
+                    "a" * 64,
+                    "ARCHIVED",
+                ),
+            )
+            connection.execute(
+                """
+                INSERT INTO portfolio_summary (
+                    snapshot_id,
+                    portfolio_name
+                )
+                VALUES (?, ?)
+                """,
+                (
+                    "snapshot-1",
+                    "Portfolio",
+                ),
+            )
+            raise RuntimeError(
+                "import failed"
+            )
+
+    with store.connect() as connection:
+        snapshot_count = connection.execute(
+            """
+            SELECT COUNT(*)
+            FROM snapshots
+            """
+        ).fetchone()[0]
+        summary_count = connection.execute(
+            """
+            SELECT COUNT(*)
+            FROM portfolio_summary
+            """
+        ).fetchone()[0]
+
+    assert snapshot_count == 0
+    assert summary_count == 0
+
+
+def test_transaction_closes_connection_after_success(
+    tmp_path: Path,
+) -> None:
+    store = HistoricalSQLiteStore(
+        tmp_path / "history.db"
+    )
+
+    with store.transaction() as connection:
+        connection.execute(
+            "SELECT 1"
+        )
+
+    with pytest.raises(
+        sqlite3.ProgrammingError,
+        match="closed database",
+    ):
+        connection.execute(
+            "SELECT 1"
+        )
+
+
+def test_transaction_closes_connection_after_failure(
+    tmp_path: Path,
+) -> None:
+    store = HistoricalSQLiteStore(
+        tmp_path / "history.db"
+    )
+    connection: sqlite3.Connection | None = None
+
+    with pytest.raises(
+        RuntimeError,
+        match="failed",
+    ):
+        with store.transaction() as active_connection:
+            connection = active_connection
+            raise RuntimeError(
+                "failed"
+            )
+
+    assert connection is not None
+
+    with pytest.raises(
+        sqlite3.ProgrammingError,
+        match="closed database",
+    ):
+        connection.execute(
+            "SELECT 1"
+        )
+
+
 def test_schema_version_is_none_before_initialization(
     tmp_path: Path,
 ) -> None:
