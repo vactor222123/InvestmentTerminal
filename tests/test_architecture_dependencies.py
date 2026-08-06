@@ -1,5 +1,5 @@
 """
-Architecture tests protecting the CLI composition boundary.
+Architecture tests protecting dependency boundaries.
 """
 
 from __future__ import annotations
@@ -11,17 +11,61 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_ROOT = PROJECT_ROOT / "investment_terminal"
 CLI_PACKAGE = PACKAGE_ROOT / "cli"
+HISTORY_PACKAGE = PACKAGE_ROOT / "history"
 
 
 def test_non_cli_modules_do_not_import_cli_package() -> None:
+    violations = _find_forbidden_imports(
+        forbidden_package="investment_terminal.cli",
+        excluded_directories=(
+            CLI_PACKAGE,
+        ),
+    )
+
+    assert violations == [], (
+        "The CLI is a composition boundary and must not be "
+        "imported by domain or infrastructure modules:\n"
+        + "\n".join(
+            violations
+        )
+    )
+
+
+def test_non_history_modules_do_not_import_history_package() -> None:
+    violations = _find_forbidden_imports(
+        forbidden_package="investment_terminal.history",
+        excluded_directories=(
+            CLI_PACKAGE,
+            HISTORY_PACKAGE,
+        ),
+    )
+
+    assert violations == [], (
+        "History is a downstream evidence and query boundary. "
+        "Only History itself and the CLI composition layer may "
+        "import it:\n"
+        + "\n".join(
+            violations
+        )
+    )
+
+
+def _find_forbidden_imports(
+    *,
+    forbidden_package: str,
+    excluded_directories: tuple[Path, ...],
+) -> list[str]:
     violations: list[str] = []
 
     for module_path in sorted(
         PACKAGE_ROOT.rglob("*.py")
     ):
-        if _is_inside(
-            module_path,
-            CLI_PACKAGE,
+        if any(
+            _is_inside(
+                module_path,
+                directory,
+            )
+            for directory in excluded_directories
         ):
             continue
 
@@ -36,16 +80,14 @@ def test_non_cli_modules_do_not_import_cli_package() -> None:
         for node in ast.walk(
             tree
         ):
-            imported_names = _imported_names(
+            for imported_name in _imported_names(
                 node
-            )
-
-            for imported_name in imported_names:
+            ):
                 if (
                     imported_name
-                    == "investment_terminal.cli"
+                    == forbidden_package
                     or imported_name.startswith(
-                        "investment_terminal.cli."
+                        f"{forbidden_package}."
                     )
                 ):
                     relative_path = module_path.relative_to(
@@ -56,13 +98,7 @@ def test_non_cli_modules_do_not_import_cli_package() -> None:
                         f"imports {imported_name}"
                     )
 
-    assert violations == [], (
-        "The CLI is a composition boundary and must not be "
-        "imported by domain or infrastructure modules:\n"
-        + "\n".join(
-            violations
-        )
-    )
+    return violations
 
 
 def _imported_names(
