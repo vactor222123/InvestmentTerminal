@@ -180,6 +180,61 @@ def test_service_removes_archive_when_manifest_fails(
     ).exists()
 
 
+def test_service_removes_archive_when_manifest_is_interrupted(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = tmp_path / "review.json"
+    write_package(
+        source
+    )
+    service = create_service(
+        tmp_path
+    )
+
+    class SimulatedInterruption(
+        BaseException
+    ):
+        pass
+
+    def interrupt_append(
+        snapshot: object,
+    ) -> Path:
+        raise SimulatedInterruption()
+
+    monkeypatch.setattr(
+        service.manifest,
+        "append",
+        interrupt_append,
+    )
+
+    with pytest.raises(
+        SimulatedInterruption,
+    ):
+        service.preserve(
+            source
+        )
+
+    assert tuple(
+        (
+            tmp_path
+            / "history"
+        ).rglob(
+            "*.json"
+        )
+    ) == ()
+    assert not (
+        tmp_path
+        / "history"
+        / "2026"
+    ).exists()
+    assert not (
+        tmp_path
+        / "history"
+        / "manifest.jsonl"
+    ).exists()
+
+
 def test_service_does_not_remove_completed_snapshot(
     tmp_path: Path,
 ) -> None:

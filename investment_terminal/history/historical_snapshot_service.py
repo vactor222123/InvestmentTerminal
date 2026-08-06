@@ -26,9 +26,9 @@ class HistoricalSnapshotService:
             -> HistoricalSnapshot metadata
             -> append-only manifest
 
-    If manifest registration fails, the newly-created archive file is removed
-    because the workflow has not completed and the snapshot has not become a
-    registered historical record.
+    If manifest registration fails or is interrupted, the newly-created
+    archive file is removed because the workflow has not completed and the
+    snapshot has not become a registered historical record.
     """
 
     def __init__(
@@ -82,7 +82,7 @@ class HistoricalSnapshotService:
             self.manifest.append(
                 snapshot
             )
-        except Exception:
+        except BaseException:
             self._remove_unregistered_snapshot(
                 archived_path
             )
