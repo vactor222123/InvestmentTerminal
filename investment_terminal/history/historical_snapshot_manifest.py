@@ -3,6 +3,7 @@ Append-only manifest for immutable historical review snapshots.
 """
 
 import json
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -46,7 +47,8 @@ class HistoricalSnapshotManifest:
         Append one snapshot metadata record.
 
         Duplicate snapshot IDs and archive paths are rejected before the
-        manifest is changed.
+        manifest is changed. A failed append restores the previous manifest
+        length so an incomplete JSON line is never retained.
         """
         if not isinstance(
             snapshot,
@@ -95,16 +97,32 @@ class HistoricalSnapshotManifest:
             parents=True,
             exist_ok=True,
         )
+        existed_before = self.manifest_path.exists()
+        previous_size = (
+            self.manifest_path.stat().st_size
+            if existed_before
+            else 0
+        )
 
-        with self.manifest_path.open(
-            "a",
-            encoding="utf-8",
-            newline="\n",
-        ) as manifest:
-            manifest.write(
-                record
+        try:
+            with self.manifest_path.open(
+                "a",
+                encoding="utf-8",
+                newline="\n",
+            ) as manifest:
+                manifest.write(
+                    record
+                )
+                manifest.flush()
+                os.fsync(
+                    manifest.fileno()
+                )
+        except BaseException:
+            self._restore_after_failed_append(
+                previous_size=previous_size,
+                existed_before=existed_before,
             )
-            manifest.flush()
+            raise
 
         return self.manifest_path
 
@@ -250,6 +268,37 @@ class HistoricalSnapshotManifest:
                 snapshot.snapshot_id,
             ),
         )
+
+    def _restore_after_failed_append(
+        self,
+        *,
+        previous_size: int,
+        existed_before: bool,
+    ) -> None:
+        try:
+            with self.manifest_path.open(
+                "r+b",
+            ) as manifest:
+                manifest.truncate(
+                    previous_size
+                )
+                manifest.flush()
+                os.fsync(
+                    manifest.fileno()
+                )
+
+            if (
+                not existed_before
+                and previous_size == 0
+            ):
+                self.manifest_path.unlink(
+                    missing_ok=True
+                )
+        except OSError as exc:
+            raise RuntimeError(
+                "Historical manifest append failed and the "
+                "previous manifest state could not be restored"
+            ) from exc
 
     @classmethod
     def _parse_line(
