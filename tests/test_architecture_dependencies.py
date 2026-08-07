@@ -81,7 +81,8 @@ def _find_forbidden_imports(
             tree
         ):
             for imported_name in _imported_names(
-                node
+                node,
+                module_path=module_path,
             ):
                 if (
                     imported_name
@@ -103,6 +104,8 @@ def _find_forbidden_imports(
 
 def _imported_names(
     node: ast.AST,
+    *,
+    module_path: Path,
 ) -> tuple[str, ...]:
     if isinstance(
         node,
@@ -117,16 +120,65 @@ def _imported_names(
         node,
         ast.ImportFrom,
     ):
-        module_name = node.module
+        resolved = _resolve_import_from(
+            node,
+            module_path=module_path,
+        )
 
-        if module_name is None:
+        if resolved is None:
             return ()
 
         return (
-            module_name,
+            resolved,
         )
 
     return ()
+
+
+def _resolve_import_from(
+    node: ast.ImportFrom,
+    *,
+    module_path: Path,
+) -> str | None:
+    if node.level == 0:
+        return node.module
+
+    relative_module = module_path.relative_to(
+        PROJECT_ROOT
+    ).with_suffix("")
+    package_parts = list(
+        relative_module.parts[:-1]
+    )
+    parent_count = node.level - 1
+
+    if parent_count > len(
+        package_parts
+    ):
+        return None
+
+    base_parts = (
+        package_parts[
+            : len(package_parts) - parent_count
+        ]
+        if parent_count
+        else package_parts
+    )
+    imported_parts = (
+        node.module.split(".")
+        if node.module
+        else []
+    )
+    absolute_parts = [
+        *base_parts,
+        *imported_parts,
+    ]
+
+    if not absolute_parts:
+        return None
+
+    return ".".join(
+        absolute_parts
+    )
 
 
 def _is_inside(
