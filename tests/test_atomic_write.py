@@ -94,6 +94,122 @@ def test_write_text_atomic_preserves_existing_file_mode(
     ) == expected_mode
 
 
+def test_write_text_atomic_syncs_parent_after_replace(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "document.txt"
+    calls: list[Path] = []
+
+    def record_sync(
+        directory: Path,
+    ) -> None:
+        calls.append(
+            directory
+        )
+
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write."
+        "_sync_parent_directory",
+        record_sync,
+    )
+
+    write_text_atomic(
+        destination,
+        "content",
+    )
+
+    assert calls == [
+        tmp_path,
+    ]
+
+
+def test_parent_sync_happens_after_replace(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "document.txt"
+    events: list[str] = []
+    real_replace = os.replace
+
+    def record_replace(
+        source: object,
+        target: object,
+    ) -> None:
+        events.append(
+            "replace"
+        )
+        real_replace(
+            source,
+            target,
+        )
+
+    def record_sync(
+        directory: Path,
+    ) -> None:
+        events.append(
+            "sync"
+        )
+
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write.os.replace",
+        record_replace,
+    )
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write."
+        "_sync_parent_directory",
+        record_sync,
+    )
+
+    write_text_atomic(
+        destination,
+        "content",
+    )
+
+    assert events == [
+        "replace",
+        "sync",
+    ]
+
+
+def test_parent_sync_failure_reports_durability_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "document.txt"
+
+    def fail_sync(
+        directory: Path,
+    ) -> None:
+        raise OSError(
+            "directory sync failed"
+        )
+
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write."
+        "_sync_parent_directory",
+        fail_sync,
+    )
+
+    with pytest.raises(
+        OSError,
+        match="directory sync failed",
+    ):
+        write_text_atomic(
+            destination,
+            "content",
+        )
+
+    assert destination.read_text(
+        encoding="utf-8"
+    ) == "content"
+    assert list(
+        tmp_path.glob(
+            ".document.txt.*.tmp"
+        )
+    ) == []
+
+
 def test_write_text_atomic_preserves_unicode(
     tmp_path: Path,
 ) -> None:

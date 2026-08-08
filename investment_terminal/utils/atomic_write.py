@@ -58,6 +58,11 @@ def write_bytes_atomic(
             temporary_path,
             destination,
         )
+        temporary_path = None
+
+        _sync_parent_directory(
+            destination.parent
+        )
     except BaseException:
         _remove_temporary_file(
             temporary_path
@@ -162,6 +167,41 @@ def _existing_file_mode(
     return stat.S_IMODE(
         current_mode
     )
+
+
+def _sync_parent_directory(
+    directory: Path,
+) -> None:
+    """
+    Persist the directory entry created by os.replace when supported.
+
+    Windows does not provide a portable directory fsync through os.open,
+    so the file-level fsync remains the strongest portable guarantee there.
+    """
+    if os.name == "nt":
+        return
+
+    flags = os.O_RDONLY
+
+    if hasattr(
+        os,
+        "O_DIRECTORY",
+    ):
+        flags |= os.O_DIRECTORY
+
+    directory_fd = os.open(
+        directory,
+        flags,
+    )
+
+    try:
+        os.fsync(
+            directory_fd
+        )
+    finally:
+        os.close(
+            directory_fd
+        )
 
 
 def _remove_temporary_file(
