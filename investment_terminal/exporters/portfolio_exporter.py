@@ -19,6 +19,9 @@ from investment_terminal.portfolio.thesis_models import PortfolioThesisResult
 from investment_terminal.services.market_data_refresh_service import (
     UniverseMarketDataRefreshResult,
 )
+from investment_terminal.utils.atomic_write import (
+    write_text_atomic,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -348,16 +351,18 @@ class PortfolioExporter:
         if path.suffix.lower() != ".json":
             raise ValueError("output_path must use the .json extension")
 
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("w", encoding="utf-8") as file:
-            json.dump(
-                package.to_dict(),
-                file,
-                ensure_ascii=False,
-                indent=2,
-                allow_nan=False,
-            )
-        return path
+        payload = json.dumps(
+            package.to_dict(),
+            ensure_ascii=False,
+            indent=2,
+            allow_nan=False,
+        )
+
+        return write_text_atomic(
+            path,
+            payload,
+            encoding="utf-8",
+        )
 
     @staticmethod
     def _validate_components(
