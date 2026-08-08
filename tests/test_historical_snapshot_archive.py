@@ -134,6 +134,111 @@ def test_archive_preserves_exact_package_bytes(
     )
 
 
+def test_archive_flushes_and_syncs_before_success(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = tmp_path / "review.json"
+    write_package(
+        source
+    )
+    calls = 0
+
+    def record_fsync(
+        file_descriptor: int,
+    ) -> None:
+        nonlocal calls
+        calls += 1
+
+    monkeypatch.setattr(
+        "investment_terminal.history."
+        "historical_snapshot_archive.os.fsync",
+        record_fsync,
+    )
+
+    create_archive(
+        tmp_path / "history"
+    ).archive(
+        source
+    )
+
+    assert calls == 1
+
+
+def test_archive_removes_incomplete_file_when_sync_fails(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = tmp_path / "review.json"
+    write_package(
+        source
+    )
+    archive_root = tmp_path / "history"
+
+    def fail_fsync(
+        file_descriptor: int,
+    ) -> None:
+        raise OSError(
+            "archive sync failed"
+        )
+
+    monkeypatch.setattr(
+        "investment_terminal.history."
+        "historical_snapshot_archive.os.fsync",
+        fail_fsync,
+    )
+
+    with pytest.raises(
+        OSError,
+        match="archive sync failed",
+    ):
+        create_archive(
+            archive_root
+        ).archive(
+            source
+        )
+
+    assert tuple(
+        archive_root.rglob(
+            "*.json"
+        )
+    ) == ()
+
+
+def test_archive_does_not_remove_existing_file_on_collision(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "review.json"
+    package_bytes = write_package(
+        source
+    )
+    archive = create_archive(
+        tmp_path / "history"
+    )
+
+    first = archive.archive(
+        source
+    )
+    archived_path = (
+        archive.archive_root
+        / first.relative_path
+    )
+
+    with pytest.raises(
+        FileExistsError,
+        match=(
+            "Historical snapshot already exists"
+        ),
+    ):
+        archive.archive(
+            source
+        )
+
+    assert archived_path.read_bytes() == (
+        package_bytes
+    )
+
+
 def test_archive_accepts_zulu_timestamp(
     tmp_path: Path,
 ) -> None:

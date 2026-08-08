@@ -143,6 +143,8 @@ Do not use atomic replacement for immutable exclusive archives or append-only ma
 
 - preserve exact package bytes;
 - use exclusive creation;
+- flush and synchronize archive bytes before reporting success;
+- remove a newly-created archive file if the exclusive write fails before completion;
 - never overwrite completed evidence;
 - verify checksum before historical use.
 

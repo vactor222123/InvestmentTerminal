@@ -4,7 +4,9 @@ Immutable archive writer for investment review packages.
 
 import hashlib
 import json
+import os
 from collections.abc import Callable
+from contextlib import suppress
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -117,18 +119,10 @@ class HistoricalSnapshotArchive:
             exist_ok=True,
         )
 
-        try:
-            with destination.open(
-                "xb",
-            ) as output:
-                output.write(
-                    package_bytes
-                )
-        except FileExistsError as exc:
-            raise FileExistsError(
-                "Historical snapshot already exists: "
-                f"{destination}"
-            ) from exc
+        self._write_exclusive_durable(
+            destination,
+            package_bytes,
+        )
 
         checksum = hashlib.sha256(
             package_bytes
@@ -146,6 +140,38 @@ class HistoricalSnapshotArchive:
             supersedes=supersedes,
             status="ARCHIVED",
         )
+
+    @staticmethod
+    def _write_exclusive_durable(
+        destination: Path,
+        package_bytes: bytes,
+    ) -> None:
+        created = False
+
+        try:
+            with destination.open(
+                "xb",
+            ) as output:
+                created = True
+                output.write(
+                    package_bytes
+                )
+                output.flush()
+                os.fsync(
+                    output.fileno()
+                )
+        except FileExistsError as exc:
+            raise FileExistsError(
+                "Historical snapshot already exists: "
+                f"{destination}"
+            ) from exc
+        except BaseException:
+            if created:
+                with suppress(
+                    OSError,
+                ):
+                    destination.unlink()
+            raise
 
     @staticmethod
     def _load_payload(
