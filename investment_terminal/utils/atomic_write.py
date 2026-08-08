@@ -7,6 +7,7 @@ flushed to disk, and then replaced atomically.
 
 from __future__ import annotations
 
+import errno
 import json
 import os
 import stat
@@ -14,6 +15,25 @@ import tempfile
 from contextlib import suppress
 from pathlib import Path
 from typing import Any
+
+
+_UNSUPPORTED_DIRECTORY_SYNC_ERRNOS = frozenset(
+    code
+    for code in (
+        errno.EINVAL,
+        getattr(
+            errno,
+            "ENOTSUP",
+            None,
+        ),
+        getattr(
+            errno,
+            "EOPNOTSUPP",
+            None,
+        ),
+    )
+    if code is not None
+)
 
 
 def write_bytes_atomic(
@@ -180,6 +200,8 @@ def _sync_parent_directory(
 
     Windows does not provide a portable directory fsync through os.open,
     so the file-level fsync remains the strongest portable guarantee there.
+    Filesystems that explicitly report directory synchronization as
+    unsupported are tolerated; other I/O failures remain visible.
     """
     if os.name == "nt":
         return
@@ -192,19 +214,41 @@ def _sync_parent_directory(
     ):
         flags |= os.O_DIRECTORY
 
-    directory_fd = os.open(
-        directory,
-        flags,
-    )
+    try:
+        directory_fd = os.open(
+            directory,
+            flags,
+        )
+    except OSError as exc:
+        if _is_unsupported_directory_sync_error(
+            exc
+        ):
+            return
+        raise
 
     try:
-        os.fsync(
-            directory_fd
-        )
+        try:
+            os.fsync(
+                directory_fd
+            )
+        except OSError as exc:
+            if not _is_unsupported_directory_sync_error(
+                exc
+            ):
+                raise
     finally:
         os.close(
             directory_fd
         )
+
+
+def _is_unsupported_directory_sync_error(
+    exc: OSError,
+) -> bool:
+    return (
+        exc.errno
+        in _UNSUPPORTED_DIRECTORY_SYNC_ERRNOS
+    )
 
 
 def _remove_temporary_file(

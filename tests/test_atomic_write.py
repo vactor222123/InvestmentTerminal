@@ -2,6 +2,7 @@
 Tests for atomic filesystem write helpers.
 """
 
+import errno
 import json
 import os
 import stat
@@ -269,6 +270,105 @@ def test_parent_sync_failure_reports_durability_failure(
             ".document.txt.*.tmp"
         )
     ) == []
+
+
+@pytest.mark.skipif(
+    os.name == "nt",
+    reason=(
+        "directory synchronization is skipped "
+        "on Windows"
+    ),
+)
+def test_parent_sync_tolerates_unsupported_fsync(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "document.txt"
+    real_fsync = os.fsync
+    calls = 0
+
+    def unsupported_directory_fsync(
+        file_descriptor: int,
+    ) -> None:
+        nonlocal calls
+        calls += 1
+
+        if calls == 1:
+            real_fsync(
+                file_descriptor
+            )
+            return
+
+        raise OSError(
+            errno.EINVAL,
+            "directory fsync unsupported",
+        )
+
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write.os.fsync",
+        unsupported_directory_fsync,
+    )
+
+    result = write_text_atomic(
+        destination,
+        "content",
+    )
+
+    assert result == destination
+    assert destination.read_text(
+        encoding="utf-8"
+    ) == "content"
+
+
+@pytest.mark.skipif(
+    os.name == "nt",
+    reason=(
+        "directory synchronization is skipped "
+        "on Windows"
+    ),
+)
+def test_parent_sync_propagates_real_fsync_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "document.txt"
+    real_fsync = os.fsync
+    calls = 0
+
+    def failing_directory_fsync(
+        file_descriptor: int,
+    ) -> None:
+        nonlocal calls
+        calls += 1
+
+        if calls == 1:
+            real_fsync(
+                file_descriptor
+            )
+            return
+
+        raise OSError(
+            errno.EIO,
+            "directory sync failed",
+        )
+
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write.os.fsync",
+        failing_directory_fsync,
+    )
+
+    with pytest.raises(
+        OSError,
+        match="directory sync failed",
+    ):
+        write_text_atomic(
+            destination,
+            "content",
+        )
+
+    assert destination.read_text(
+        encoding="utf-8"
+    ) == "content"
 
 
 def test_write_text_atomic_preserves_unicode(

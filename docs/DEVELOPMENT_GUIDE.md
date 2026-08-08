@@ -125,7 +125,9 @@ Expected behavior:
 - flush and synchronize temporary file contents before replacement;
 - preserve existing destination permissions when replacing a file;
 - replace atomically;
-- synchronize the parent directory after replacement when the platform supports it;
+- synchronize the parent directory after replacement when the platform and filesystem support it;
+- tolerate only explicit unsupported-directory-sync errors;
+- propagate real directory I/O failures;
 - remove temporary files after pre-replacement failures.
 
 A failure reported after `os.replace` may mean the new destination contents are already
