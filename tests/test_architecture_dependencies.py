@@ -89,6 +89,7 @@ def test_relative_from_import_resolves_imported_alias() -> None:
             / "module.py"
         ),
     ) == (
+        "investment_terminal",
         "investment_terminal.history",
     )
 
@@ -112,6 +113,53 @@ def test_relative_from_import_resolves_explicit_module() -> None:
         ),
     ) == (
         "investment_terminal.history",
+        "investment_terminal.history.repository",
+    )
+
+
+def test_absolute_from_import_resolves_imported_alias() -> None:
+    tree = ast.parse(
+        "from investment_terminal import history\n"
+    )
+    node = tree.body[0]
+
+    assert isinstance(
+        node,
+        ast.ImportFrom,
+    )
+    assert _imported_names(
+        node,
+        module_path=(
+            PACKAGE_ROOT
+            / "portfolio"
+            / "module.py"
+        ),
+    ) == (
+        "investment_terminal",
+        "investment_terminal.history",
+    )
+
+
+def test_absolute_from_import_resolves_explicit_module() -> None:
+    tree = ast.parse(
+        "from investment_terminal.history import repository\n"
+    )
+    node = tree.body[0]
+
+    assert isinstance(
+        node,
+        ast.ImportFrom,
+    )
+    assert _imported_names(
+        node,
+        module_path=(
+            PACKAGE_ROOT
+            / "portfolio"
+            / "module.py"
+        ),
+    ) == (
+        "investment_terminal.history",
+        "investment_terminal.history.repository",
     )
 
 
@@ -193,14 +241,18 @@ def _imported_names(
         if base_package is None:
             return ()
 
-        if node.module is not None:
-            return (
-                base_package,
-            )
+        names = [
+            base_package,
+        ]
 
-        return tuple(
+        names.extend(
             f"{base_package}.{alias.name}"
             for alias in node.names
+            if alias.name != "*"
+        )
+
+        return tuple(
+            names
         )
 
     return ()
