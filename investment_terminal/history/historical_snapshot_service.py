@@ -127,14 +127,27 @@ class HistoricalSnapshotService:
         directory: Path,
     ) -> None:
         """
-        Remove empty year/month directories without touching non-empty paths.
+        Remove empty year/month directories and durably persist each removal.
         """
         current = directory
 
         for _ in range(2):
+            parent = current.parent
+
             try:
                 current.rmdir()
             except OSError:
                 return
 
-            current = current.parent
+            try:
+                sync_directory(
+                    parent
+                )
+            except OSError as exc:
+                raise RuntimeError(
+                    "Snapshot rollback removed an empty archive "
+                    "directory but could not durably persist that "
+                    f"removal: {current}"
+                ) from exc
+
+            current = parent

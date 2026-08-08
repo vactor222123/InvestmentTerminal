@@ -167,7 +167,9 @@ Do not use atomic replacement for immutable exclusive archives or append-only ma
 - a snapshot is complete only after both archive creation and manifest registration succeed;
 - if manifest registration fails, remove the newly-created unregistered archive;
 - synchronize the archive directory after removing that file so rollback has an explicit durability boundary;
-- treat failure to durably remove an unregistered archive as a workflow recovery failure;
+- remove empty year/month archive directories only when they are truly empty;
+- synchronize each parent directory after removing an empty archive directory;
+- treat failure to durably persist file or directory cleanup as a workflow recovery failure;
 - never remove an already-registered historical snapshot.
 
 ### SQLite

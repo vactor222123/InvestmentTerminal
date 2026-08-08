@@ -221,9 +221,16 @@ def test_service_syncs_archive_directory_after_cleanup(
             source
         )
 
-    assert len(calls) == 1
-    assert calls[0].name == "08"
-    assert calls[0].parent.name == "2026"
+    assert [
+        path.relative_to(
+            tmp_path
+        ).as_posix()
+        for path in calls
+    ] == [
+        "history/2026/08",
+        "history/2026",
+        "history",
+    ]
 
 
 def test_service_reports_cleanup_durability_failure(
