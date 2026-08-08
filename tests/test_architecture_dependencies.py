@@ -71,6 +71,50 @@ def test_upstream_modules_do_not_import_review_package() -> None:
     )
 
 
+def test_relative_from_import_resolves_imported_alias() -> None:
+    tree = ast.parse(
+        "from .. import history\n"
+    )
+    node = tree.body[0]
+
+    assert isinstance(
+        node,
+        ast.ImportFrom,
+    )
+    assert _imported_names(
+        node,
+        module_path=(
+            PACKAGE_ROOT
+            / "portfolio"
+            / "module.py"
+        ),
+    ) == (
+        "investment_terminal.history",
+    )
+
+
+def test_relative_from_import_resolves_explicit_module() -> None:
+    tree = ast.parse(
+        "from ..history import repository\n"
+    )
+    node = tree.body[0]
+
+    assert isinstance(
+        node,
+        ast.ImportFrom,
+    )
+    assert _imported_names(
+        node,
+        module_path=(
+            PACKAGE_ROOT
+            / "portfolio"
+            / "module.py"
+        ),
+    ) == (
+        "investment_terminal.history",
+    )
+
+
 def _find_forbidden_imports(
     *,
     forbidden_package: str,
@@ -141,16 +185,22 @@ def _imported_names(
         node,
         ast.ImportFrom,
     ):
-        resolved = _resolve_import_from(
+        base_package = _resolve_import_from(
             node,
             module_path=module_path,
         )
 
-        if resolved is None:
+        if base_package is None:
             return ()
 
-        return (
-            resolved,
+        if node.module is not None:
+            return (
+                base_package,
+            )
+
+        return tuple(
+            f"{base_package}.{alias.name}"
+            for alias in node.names
         )
 
     return ()
