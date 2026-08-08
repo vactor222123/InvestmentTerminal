@@ -3,6 +3,8 @@ Tests for atomic filesystem write helpers.
 """
 
 import json
+import os
+import stat
 from pathlib import Path
 
 import pytest
@@ -64,6 +66,32 @@ def test_write_text_atomic_replaces_existing_file(
     assert destination.read_text(
         encoding="utf-8"
     ) == "new"
+
+
+def test_write_text_atomic_preserves_existing_file_mode(
+    tmp_path: Path,
+) -> None:
+    destination = tmp_path / "document.txt"
+    destination.write_text(
+        "old",
+        encoding="utf-8",
+    )
+    os.chmod(
+        destination,
+        0o640,
+    )
+    expected_mode = stat.S_IMODE(
+        destination.stat().st_mode
+    )
+
+    write_text_atomic(
+        destination,
+        "new",
+    )
+
+    assert stat.S_IMODE(
+        destination.stat().st_mode
+    ) == expected_mode
 
 
 def test_write_text_atomic_preserves_unicode(
@@ -269,6 +297,48 @@ def test_failed_fsync_removes_temporary_file(
         )
 
     assert not destination.exists()
+    assert list(
+        tmp_path.glob(
+            ".document.txt.*.tmp"
+        )
+    ) == []
+
+
+def test_failed_permission_copy_removes_temporary_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "document.txt"
+    destination.write_text(
+        "original",
+        encoding="utf-8",
+    )
+
+    def fail_chmod(
+        path: object,
+        mode: int,
+    ) -> None:
+        raise PermissionError(
+            "chmod failed"
+        )
+
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write.os.chmod",
+        fail_chmod,
+    )
+
+    with pytest.raises(
+        PermissionError,
+        match="chmod failed",
+    ):
+        write_text_atomic(
+            destination,
+            "replacement",
+        )
+
+    assert destination.read_text(
+        encoding="utf-8"
+    ) == "original"
     assert list(
         tmp_path.glob(
             ".document.txt.*.tmp"

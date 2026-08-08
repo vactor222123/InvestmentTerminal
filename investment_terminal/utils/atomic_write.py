@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import stat
 import tempfile
 from contextlib import suppress
 from pathlib import Path
@@ -30,6 +31,9 @@ def write_bytes_atomic(
     )
 
     temporary_path: Path | None = None
+    destination_mode = _existing_file_mode(
+        destination
+    )
 
     try:
         with tempfile.NamedTemporaryFile(
@@ -43,6 +47,12 @@ def write_bytes_atomic(
             temporary.write(data)
             temporary.flush()
             os.fsync(temporary.fileno())
+
+        if destination_mode is not None:
+            os.chmod(
+                temporary_path,
+                destination_mode,
+            )
 
         os.replace(
             temporary_path,
@@ -139,6 +149,19 @@ def _normalize_path(
         )
 
     return destination
+
+
+def _existing_file_mode(
+    destination: Path,
+) -> int | None:
+    try:
+        current_mode = destination.stat().st_mode
+    except FileNotFoundError:
+        return None
+
+    return stat.S_IMODE(
+        current_mode
+    )
 
 
 def _remove_temporary_file(
