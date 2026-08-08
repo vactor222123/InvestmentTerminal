@@ -20,6 +20,7 @@ class HistoricalSnapshotIntegrityResult:
     expected_checksum_sha256: str
     actual_checksum_sha256: str
     is_valid: bool
+    package_bytes: bytes
 
 
 class HistoricalSnapshotIntegrityVerifier:
@@ -82,7 +83,23 @@ class HistoricalSnapshotIntegrityVerifier:
                 actual_checksum
                 == snapshot.checksum_sha256
             ),
+            package_bytes=package_bytes,
         )
+
+    def read_verified_bytes(
+        self,
+        snapshot: HistoricalSnapshot,
+    ) -> bytes:
+        """Read and return archive bytes only after checksum verification."""
+        result = self.verify(snapshot)
+
+        if not result.is_valid:
+            raise ValueError(
+                "Historical snapshot checksum mismatch: "
+                f"{snapshot.snapshot_id}"
+            )
+
+        return result.package_bytes
 
     def require_valid(
         self,
@@ -91,9 +108,7 @@ class HistoricalSnapshotIntegrityVerifier:
         """
         Return the archive path only when checksum verification succeeds.
         """
-        result = self.verify(
-            snapshot
-        )
+        result = self.verify(snapshot)
 
         if not result.is_valid:
             raise ValueError(

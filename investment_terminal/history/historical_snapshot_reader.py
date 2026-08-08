@@ -78,29 +78,34 @@ class HistoricalSnapshotReader:
                 "snapshot must be a HistoricalSnapshot"
             )
 
-        archive_path = self.verifier.require_valid(
-            snapshot
-        )
+        package_bytes = self.verifier.read_verified_bytes(snapshot)
+
+        return self.deserialize_verified_bytes(package_bytes)
+
+    @staticmethod
+    def deserialize_verified_bytes(
+        package_bytes: bytes,
+    ) -> dict[str, Any]:
+        """Decode and deserialize bytes already verified by the integrity layer."""
+        if not isinstance(package_bytes, bytes):
+            raise TypeError("package_bytes must be bytes")
 
         try:
-            payload = json.loads(
-                archive_path.read_text(
-                    encoding="utf-8"
-                )
-            )
+            text = package_bytes.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise ValueError("Historical snapshot archive must be UTF-8 encoded") from exc
+
+        try:
+            payload = json.loads(text)
         except json.JSONDecodeError as exc:
-            raise ValueError(
-                "Historical snapshot archive contains invalid JSON: "
-                f"{archive_path}"
-            ) from exc
+            raise ValueError("Historical snapshot archive contains invalid JSON") from exc
 
         if not isinstance(
             payload,
             dict,
         ):
             raise ValueError(
-                "Historical snapshot archive root must be a JSON object: "
-                f"{archive_path}"
+                "Historical snapshot archive root must be a JSON object"
             )
 
         return payload

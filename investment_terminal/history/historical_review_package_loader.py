@@ -2,11 +2,15 @@
 Load and verify immutable archived Review Packages.
 """
 
-import hashlib
-import json
 from pathlib import Path
 from typing import Any
 
+from investment_terminal.history.historical_snapshot_integrity import (
+    HistoricalSnapshotIntegrityVerifier,
+)
+from investment_terminal.history.historical_snapshot_reader import (
+    HistoricalSnapshotReader,
+)
 from investment_terminal.history.historical_snapshot_models import (
     HistoricalSnapshot,
 )
@@ -38,6 +42,9 @@ class HistoricalReviewPackageLoader:
             if isinstance(archive_root, Path)
             else Path(archive_root)
         )
+        self.verifier = HistoricalSnapshotIntegrityVerifier(
+            self.archive_root
+        )
 
     def load(
         self,
@@ -52,53 +59,38 @@ class HistoricalReviewPackageLoader:
                 "snapshot must be a HistoricalSnapshot"
             )
 
-        archive_path = self.resolve_path(
-            snapshot
-        )
-
         try:
-            package_bytes = archive_path.read_bytes()
+            package_bytes = self.verifier.read_verified_bytes(snapshot)
         except FileNotFoundError as exc:
             raise FileNotFoundError(
                 "Archived Review Package does not exist: "
-                f"{archive_path}"
+                f"{self.verifier.resolve_path(snapshot)}"
             ) from exc
-
-        actual_checksum = hashlib.sha256(
-            package_bytes
-        ).hexdigest()
-
-        if actual_checksum != snapshot.checksum_sha256:
+        except ValueError as exc:
             raise ValueError(
                 "Archived Review Package checksum does not match "
                 f"snapshot {snapshot.snapshot_id}"
-            )
-
-        try:
-            text = package_bytes.decode(
-                "utf-8"
-            )
-        except UnicodeDecodeError as exc:
-            raise ValueError(
-                "Archived Review Package must be UTF-8 encoded"
             ) from exc
 
         try:
-            payload = json.loads(
-                text
+            payload = HistoricalSnapshotReader.deserialize_verified_bytes(
+                package_bytes
             )
-        except json.JSONDecodeError as exc:
-            raise ValueError(
-                "Archived Review Package must contain valid JSON"
-            ) from exc
-
-        if not isinstance(
-            payload,
-            dict,
-        ):
-            raise ValueError(
-                "Archived Review Package JSON must contain an object"
-            )
+        except ValueError as exc:
+            message = str(exc)
+            if "UTF-8" in message:
+                raise ValueError(
+                    "Archived Review Package must be UTF-8 encoded"
+                ) from exc
+            if "invalid JSON" in message:
+                raise ValueError(
+                    "Archived Review Package must contain valid JSON"
+                ) from exc
+            if "JSON object" in message:
+                raise ValueError(
+                    "Archived Review Package JSON must contain an object"
+                ) from exc
+            raise
 
         self._validate_package_identity(
             payload=payload,
