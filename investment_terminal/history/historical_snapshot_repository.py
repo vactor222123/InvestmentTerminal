@@ -363,6 +363,102 @@ class HistoricalSnapshotRepository:
             row
         )
 
+    def previous_before(
+        self,
+        snapshot_id: str,
+    ) -> HistoricalSnapshot | None:
+        """Return the immediately preceding snapshot in canonical order."""
+        target = self.require(
+            snapshot_id
+        )
+
+        self.store.initialize()
+
+        with self.store.connect() as connection:
+            row = connection.execute(
+                """
+                SELECT *
+                FROM snapshots
+                WHERE generated_at < ?
+                   OR (
+                        generated_at = ?
+                    AND archived_at < ?
+                   )
+                   OR (
+                        generated_at = ?
+                    AND archived_at = ?
+                    AND snapshot_id < ?
+                   )
+                ORDER BY generated_at DESC,
+                         archived_at DESC,
+                         snapshot_id DESC
+                LIMIT 1
+                """,
+                (
+                    target.generated_at.isoformat(),
+                    target.generated_at.isoformat(),
+                    target.archived_at.isoformat(),
+                    target.generated_at.isoformat(),
+                    target.archived_at.isoformat(),
+                    target.snapshot_id,
+                ),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        return self._from_row(
+            row
+        )
+
+    def next_after(
+        self,
+        snapshot_id: str,
+    ) -> HistoricalSnapshot | None:
+        """Return the immediately following snapshot in canonical order."""
+        target = self.require(
+            snapshot_id
+        )
+
+        self.store.initialize()
+
+        with self.store.connect() as connection:
+            row = connection.execute(
+                """
+                SELECT *
+                FROM snapshots
+                WHERE generated_at > ?
+                   OR (
+                        generated_at = ?
+                    AND archived_at > ?
+                   )
+                   OR (
+                        generated_at = ?
+                    AND archived_at = ?
+                    AND snapshot_id > ?
+                   )
+                ORDER BY generated_at,
+                         archived_at,
+                         snapshot_id
+                LIMIT 1
+                """,
+                (
+                    target.generated_at.isoformat(),
+                    target.generated_at.isoformat(),
+                    target.archived_at.isoformat(),
+                    target.generated_at.isoformat(),
+                    target.archived_at.isoformat(),
+                    target.snapshot_id,
+                ),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        return self._from_row(
+            row
+        )
+
     def count(
         self,
     ) -> int:

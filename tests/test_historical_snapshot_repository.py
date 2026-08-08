@@ -24,6 +24,9 @@ FIRST_ID = (
 SECOND_ID = (
     "f9b7adca-2f2b-47a4-901d-05ca37c445df"
 )
+THIRD_ID = (
+    "7a5dc1c4-9d9a-4c17-a63c-1f8bb35e2199"
+)
 
 
 def create_snapshot(
@@ -417,6 +420,181 @@ def test_repository_latest_is_none_when_empty(
     )
 
     assert repository.latest() is None
+
+
+def test_repository_navigates_previous_and_next(
+    tmp_path: Path,
+) -> None:
+    repository = create_repository(
+        tmp_path
+    )
+    first = create_snapshot()
+    second = create_snapshot(
+        snapshot_id=SECOND_ID,
+        package_id="review-002",
+        generated_at=datetime(
+            2026,
+            8,
+            4,
+            17,
+            35,
+            tzinfo=timezone.utc,
+        ),
+        archived_at=datetime(
+            2026,
+            8,
+            4,
+            17,
+            36,
+            tzinfo=timezone.utc,
+        ),
+    )
+    third = create_snapshot(
+        snapshot_id=THIRD_ID,
+        package_id="review-003",
+        generated_at=datetime(
+            2026,
+            8,
+            5,
+            17,
+            35,
+            tzinfo=timezone.utc,
+        ),
+        archived_at=datetime(
+            2026,
+            8,
+            5,
+            17,
+            36,
+            tzinfo=timezone.utc,
+        ),
+    )
+
+    repository.add_many(
+        (
+            third,
+            first,
+            second,
+        )
+    )
+
+    assert repository.previous_before(
+        second.snapshot_id
+    ) == first
+    assert repository.next_after(
+        second.snapshot_id
+    ) == third
+    assert repository.previous_before(
+        first.snapshot_id
+    ) is None
+    assert repository.next_after(
+        third.snapshot_id
+    ) is None
+
+
+def test_repository_navigation_uses_full_canonical_order(
+    tmp_path: Path,
+) -> None:
+    repository = create_repository(
+        tmp_path
+    )
+    generated = datetime(
+        2026,
+        8,
+        3,
+        17,
+        35,
+        tzinfo=timezone.utc,
+    )
+    archived = datetime(
+        2026,
+        8,
+        3,
+        17,
+        36,
+        tzinfo=timezone.utc,
+    )
+
+    first = create_snapshot(
+        snapshot_id=FIRST_ID,
+        package_id="review-001",
+        generated_at=generated,
+        archived_at=archived,
+    )
+    second = create_snapshot(
+        snapshot_id=THIRD_ID,
+        package_id="review-002",
+        generated_at=generated,
+        archived_at=archived,
+    )
+    third = create_snapshot(
+        snapshot_id=SECOND_ID,
+        package_id="review-003",
+        generated_at=generated,
+        archived_at=datetime(
+            2026,
+            8,
+            3,
+            17,
+            37,
+            tzinfo=timezone.utc,
+        ),
+    )
+
+    repository.add_many(
+        (
+            third,
+            second,
+            first,
+        )
+    )
+
+    ordered = repository.list_all()
+
+    assert ordered == (
+        first,
+        second,
+        third,
+    )
+    assert repository.next_after(
+        first.snapshot_id
+    ) == second
+    assert repository.previous_before(
+        second.snapshot_id
+    ) == first
+    assert repository.next_after(
+        second.snapshot_id
+    ) == third
+    assert repository.previous_before(
+        third.snapshot_id
+    ) == second
+
+
+@pytest.mark.parametrize(
+    "method_name",
+    (
+        "previous_before",
+        "next_after",
+    ),
+)
+def test_repository_navigation_rejects_missing_snapshot(
+    tmp_path: Path,
+    method_name: str,
+) -> None:
+    repository = create_repository(
+        tmp_path
+    )
+
+    with pytest.raises(
+        KeyError,
+        match="No historical snapshot found",
+    ):
+        getattr(
+            repository,
+            method_name,
+        )(
+            FIRST_ID
+        )
 
 
 def test_repository_rejects_invalid_store() -> None:
