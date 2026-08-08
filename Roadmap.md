@@ -1,7 +1,7 @@
 # Investment Terminal — Product Roadmap
 
 **Status:** Canonical Roadmap  
-**Updated after:** Sprint 13 — Historical Comparison and Replay  
+**Updated after:** Sprint 14 — Outcome-Aware Historical Intelligence  
 **Current development branch:** `develop`
 
 ## 1. Product Evolution
@@ -13,7 +13,9 @@ Foundation
 → Unified Review Package
 → Historical Intelligence Foundation
 → Historical Comparison and Replay
-→ Outcome Analysis and Confidence
+→ Outcome-Aware Historical Intelligence
+→ Historical Outcome Methodology Hardening
+→ Statistically Honest Effectiveness Research
 → Knowledge Domain
 → Evidence-Grounded AI Experience
 ```
@@ -26,105 +28,92 @@ Architecture and canonical product documentation foundation.
 
 Delivered:
 
-- `HistoricalSnapshot`;
 - immutable Review Package archive;
 - SHA-256 integrity;
 - append-only manifest;
-- archive CLI;
-- SQLite history schema;
-- snapshot repository;
-- manifest synchronization;
-- verified loader;
-- summary/holdings/recommendations/deployment import;
-- timeline builder;
-- import pipeline;
-- import CLI.
+- History SQLite foundation;
+- verified historical package loader;
+- typed historical imports;
+- timeline foundation.
 
-## 4. Completed Implementation: Sprint 13 — Historical Comparison and Replay
+## 4. Completed: Sprint 13 — Historical Comparison and Replay
 
-Sprint 13 extends History from preservation into safe historical intelligence.
+Delivered:
 
-Delivered capabilities:
-
-### Query foundation
-
-- canonical timeline event model;
-- timeline repository;
-- snapshot navigation queries.
-
-### Schema evolution
-
-- schema migration foundation;
-- schema target version 2;
-- explicit snapshot import-state table/model/repository;
-- import-state workflow integration;
-- legacy import-state reconciliation.
-
-### Comparison foundation
-
-- scalar and aggregate comparison models;
-- comparison facts repository;
-- snapshot compatibility service;
-- portfolio-summary read model/repository/comparator;
-- holdings read model/repository/comparator;
-- recommendations read model/repository/comparator;
-- deployment read model/repository/comparator;
-- aggregate snapshot comparison service.
-
-### Replay foundation
-
-- replay request/result models;
+- timeline queries and navigation;
+- schema migrations and explicit import state;
+- typed historical comparison;
+- compatibility assessment;
 - exact archived replay;
 - normalized historical replay;
-- explicit rejection of current-code recalculation.
+- read-only query/comparison/replay CLIs;
+- deterministic realistic History E2E coverage.
 
-### CLI
+## 5. Completed: Sprint 14 — Outcome-Aware Historical Intelligence
 
-- History query CLI;
-- snapshot comparison CLI;
-- historical replay CLI.
+Delivered:
 
-### Integration quality
+- canonical outcome models;
+- `ELAPSED_DAYS` observation-window semantics;
+- historical recommendation state and transition analysis;
+- chronological recommendation history;
+- exact local candle price-evidence boundary;
+- raw descriptive price-movement calculation;
+- `COMPLETE / PARTIAL / UNAVAILABLE / NOT_MATURE` observation status;
+- descriptive in-memory aggregation;
+- read-only outcome CLI;
+- deterministic realistic outcome E2E fixture;
+- explicit decision to keep outcomes on demand and History schema at version 2.
 
-- deterministic realistic two-snapshot end-to-end fixture;
-- archive → manifest → migration → sync → import → timeline → query → comparison → replay.
+Sprint 14 deliberately did not implement recommendation-effectiveness scoring or confidence calibration.
 
-## 5. Sprint 13 Remaining Closure
+## 6. Current: Sprint 15 — Historical Outcome Methodology Hardening
 
-- canonical documentation reconciliation;
-- Sprint 13 architecture/review document;
-- final Definition of Done verification.
+Sprint 15 should make outcome observation semantics realistic enough for exchange-traded instruments without weakening evidence discipline.
 
-## 6. Deferred Scope
+Primary themes:
 
-Not part of Sprint 13:
+- explicit trading-session observation windows;
+- explicit endpoint/evidence selection policy;
+- market-session/calendar boundary;
+- methodology identity/version contracts;
+- deterministic session-aware local evidence lookup;
+- broader read-only outcome querying/filtering;
+- methodology-aware CLI output;
+- realistic E2E coverage across weekends/holidays/session gaps.
 
-- current-code historical recalculation;
-- external-data replay;
-- performance attribution;
-- outcome analysis;
-- recommendation effectiveness scoring;
+Sprint 15 should not introduce predictive confidence or success scoring.
+
+## 7. Deferred Scope
+
+Not part of Sprint 15 unless explicitly re-approved after methodology work:
+
+- recommendation success/failure labels;
+- hit-rate/effectiveness scoring;
 - confidence calibration;
-- Knowledge Domain;
-- autonomous portfolio actions.
+- factor-effectiveness inference;
+- causal attribution;
+- portfolio performance attribution;
+- tax-lot performance;
+- autonomous portfolio actions;
+- Knowledge Domain.
 
-## 7. Next Product Direction
+## 8. Next Product Direction
 
-After Sprint 13 closure, the next logical layer is outcome-aware Historical Intelligence.
+After Sprint 15, the next decision should be whether the available historical sample and methodology quality are sufficient for **statistically honest effectiveness research**.
 
-Candidate themes:
+Before any confidence model, define:
 
-- historical recommendation outcome windows;
-- signal duration;
-- ranking movement;
-- decision stability;
-- evidence coverage over time;
-- portfolio evolution;
-- statistically honest confidence calibration.
+- minimum sample sizes;
+- grouping dimensions;
+- survivorship rules;
+- missing-evidence treatment;
+- multiple-window handling;
+- methodology-version comparability;
+- uncertainty reporting;
+- explicit non-causal interpretation.
 
-These features must build on verified History rather than bypass it.
-
-## 8. Long-Term Direction
+## 9. Knowledge Domain Boundary
 
 The Knowledge Domain begins only after historical evidence volume and semantics are mature enough.
 
@@ -132,11 +121,11 @@ Knowledge must remain:
 
 - evidence-linked;
 - sample-size aware;
-- versioned;
+- methodology-version aware;
 - rebuildable;
 - separate from immutable historical facts.
 
-## 9. Definition of Done
+## 10. Definition of Done
 
 A milestone is complete only when:
 
