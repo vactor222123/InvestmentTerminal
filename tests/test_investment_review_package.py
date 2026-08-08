@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from investment_terminal.cli.investment_review_package import (
+    export_payload,
     main,
 )
 from investment_terminal.review.review_package_builder import (
@@ -113,6 +114,50 @@ def test_exporter_rejects_invalid_package(
             None,
             tmp_path / "review.json",
         )
+
+
+def test_cli_payload_export_is_atomic(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    output = tmp_path / "review.json"
+    output.write_text(
+        '{"state":"previous"}\n',
+        encoding="utf-8",
+    )
+
+    def fail_replace(
+        source: object,
+        destination: object,
+    ) -> None:
+        raise OSError(
+            "replace failed"
+        )
+
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write.os.replace",
+        fail_replace,
+    )
+
+    with pytest.raises(
+        OSError,
+        match="replace failed",
+    ):
+        export_payload(
+            {
+                "state": "new",
+            },
+            output,
+        )
+
+    assert output.read_text(
+        encoding="utf-8",
+    ) == '{"state":"previous"}\n'
+    assert list(
+        tmp_path.glob(
+            ".review.json.*.tmp"
+        )
+    ) == []
 
 
 def test_cli_generates_default_package(

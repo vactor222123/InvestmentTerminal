@@ -41,6 +41,9 @@ from investment_terminal.review.review_package_builder import (
 from investment_terminal.review.review_package_exporter import (
     InvestmentReviewPackageExporter,
 )
+from investment_terminal.utils.atomic_write import (
+    write_json_atomic,
+)
 
 
 DEFAULT_OUTPUT = (
@@ -347,21 +350,12 @@ def export_payload(
     payload: dict,
     output_path: Path,
 ) -> Path:
-    output_path.parent.mkdir(
-        parents=True,
-        exist_ok=True,
+    return write_json_atomic(
+        output_path,
+        payload,
+        indent=2,
+        trailing_newline=True,
     )
-    output_path.write_text(
-        json.dumps(
-            payload,
-            indent=2,
-            allow_nan=False,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-
-    return output_path
 
 
 def build_argument_parser() -> argparse.ArgumentParser:
