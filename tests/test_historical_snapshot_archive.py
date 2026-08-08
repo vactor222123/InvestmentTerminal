@@ -239,6 +239,114 @@ def test_archive_does_not_remove_existing_file_on_collision(
     )
 
 
+@pytest.mark.parametrize(
+    (
+        "kwargs",
+        "message",
+    ),
+    (
+        (
+            {
+                "package_id": "   ",
+            },
+            "package_id must be a non-empty string",
+        ),
+        (
+            {
+                "product_version": "   ",
+            },
+            "product_version must be a non-empty string",
+        ),
+        (
+            {
+                "supersedes": "not-a-uuid",
+            },
+            "supersedes must be a valid UUID string",
+        ),
+    ),
+)
+def test_invalid_snapshot_metadata_does_not_create_archive(
+    tmp_path: Path,
+    kwargs: dict[str, str],
+    message: str,
+) -> None:
+    source = tmp_path / "review.json"
+    write_package(
+        source
+    )
+    archive_root = tmp_path / "history"
+
+    with pytest.raises(
+        ValueError,
+        match=message,
+    ):
+        create_archive(
+            archive_root
+        ).archive(
+            source,
+            **kwargs,
+        )
+
+    assert not archive_root.exists()
+
+
+def test_archived_at_before_generated_at_does_not_create_archive(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "review.json"
+    write_package(
+        source,
+        generated_at=(
+            "2026-08-04T17:35:00+00:00"
+        ),
+    )
+    archive_root = tmp_path / "history"
+    archive = HistoricalSnapshotArchive(
+        archive_root,
+        clock=lambda: ARCHIVED_AT,
+        uuid_factory=lambda: SNAPSHOT_ID,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "archived_at must not be earlier than generated_at"
+        ),
+    ):
+        archive.archive(
+            source
+        )
+
+    assert not archive_root.exists()
+
+
+def test_invalid_snapshot_id_does_not_create_archive(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "review.json"
+    write_package(
+        source
+    )
+    archive_root = tmp_path / "history"
+    archive = HistoricalSnapshotArchive(
+        archive_root,
+        clock=lambda: ARCHIVED_AT,
+        uuid_factory=lambda: "invalid",  # type: ignore[arg-type]
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "snapshot_id must be a valid UUID string"
+        ),
+    ):
+        archive.archive(
+            source
+        )
+
+    assert not archive_root.exists()
+
+
 def test_archive_accepts_zulu_timestamp(
     tmp_path: Path,
 ) -> None:

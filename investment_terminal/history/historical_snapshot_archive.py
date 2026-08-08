@@ -21,8 +21,9 @@ class HistoricalSnapshotArchive:
     """
     Preserve an existing review-package JSON file without changing its bytes.
 
-    The source package is validated, copied into the append-only archive with
-    exclusive file creation, checksummed, and represented by a canonical
+    The source package and snapshot metadata are validated before any archive
+    file is created. Valid packages are copied into the append-only archive
+    with exclusive file creation and represented by a canonical
     HistoricalSnapshot metadata object.
     """
 
@@ -107,10 +108,27 @@ class HistoricalSnapshotArchive:
             generated_at=generated_at,
             snapshot_id=snapshot_id,
         )
+        checksum = hashlib.sha256(
+            package_bytes
+        ).hexdigest()
+
+        snapshot = HistoricalSnapshot(
+            snapshot_id=snapshot_id,
+            package_id=resolved_package_id,
+            package_schema_version=schema_version,
+            product_version=product_version,
+            generated_at=generated_at,
+            archived_at=archived_at,
+            relative_path=relative_path,
+            checksum_sha256=checksum,
+            supersedes=supersedes,
+            status="ARCHIVED",
+        )
+
         destination = (
             self.archive_root
             / Path(
-                relative_path
+                snapshot.relative_path
             )
         )
 
@@ -124,22 +142,7 @@ class HistoricalSnapshotArchive:
             package_bytes,
         )
 
-        checksum = hashlib.sha256(
-            package_bytes
-        ).hexdigest()
-
-        return HistoricalSnapshot(
-            snapshot_id=snapshot_id,
-            package_id=resolved_package_id,
-            package_schema_version=schema_version,
-            product_version=product_version,
-            generated_at=generated_at,
-            archived_at=archived_at,
-            relative_path=relative_path,
-            checksum_sha256=checksum,
-            supersedes=supersedes,
-            status="ARCHIVED",
-        )
+        return snapshot
 
     @staticmethod
     def _write_exclusive_durable(

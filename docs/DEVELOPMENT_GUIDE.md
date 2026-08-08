@@ -142,6 +142,7 @@ Do not use atomic replacement for immutable exclusive archives or append-only ma
 ### Archive
 
 - preserve exact package bytes;
+- validate the complete snapshot metadata contract before creating archive evidence;
 - use exclusive creation;
 - flush and synchronize archive bytes before reporting success;
 - remove a newly-created archive file if the exclusive write fails before completion;
