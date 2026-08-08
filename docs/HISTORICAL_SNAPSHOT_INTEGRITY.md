@@ -26,5 +26,7 @@ Rules:
 - manifest metadata identifies the expected checksum;
 - missing archive files fail explicitly;
 - checksum mismatches fail before historical data is consumed;
+- resolved archive paths must remain inside `archive_root`;
+- symlink/path redirection outside the archive root is rejected before reads;
 - verification never modifies the archive or manifest;
 - integrity verification belongs to the History Domain, not CLI or review code.

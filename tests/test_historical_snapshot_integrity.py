@@ -89,7 +89,7 @@ def test_verify_accepts_unchanged_archive(
 
     assert result.is_valid is True
     assert result.snapshot_id == SNAPSHOT_ID
-    assert result.archive_path == archive_path
+    assert result.archive_path == archive_path.resolve()
     assert (
         result.expected_checksum_sha256
         == result.actual_checksum_sha256
@@ -169,7 +169,7 @@ def test_require_valid_returns_verified_archive_path(
         )
     )
 
-    assert result == archive_path
+    assert result == archive_path.resolve()
 
 
 def test_require_valid_rejects_checksum_mismatch(
@@ -247,3 +247,69 @@ def test_verify_rejects_invalid_snapshot_type(
         ).verify(
             object(),  # type: ignore[arg-type]
         )
+
+
+def test_resolve_path_rejects_symlink_escape(
+    tmp_path: Path,
+) -> None:
+    archive_root = tmp_path / "history"
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    archive_root.mkdir()
+    link = archive_root / "2026"
+    try:
+        link.symlink_to(
+            outside,
+            target_is_directory=True,
+        )
+    except OSError:
+        pytest.skip(
+            "directory symlinks are not available"
+        )
+
+    snapshot = create_snapshot(
+        relative_path=(
+            "2026/"
+            f"{SNAPSHOT_ID}.json"
+        ),
+        checksum_sha256="a" * 64,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "path escapes the archive root"
+        ),
+    ):
+        HistoricalSnapshotIntegrityVerifier(
+            archive_root
+        ).verify(
+            snapshot
+        )
+
+
+def test_resolve_path_accepts_nested_archive_path(
+    tmp_path: Path,
+) -> None:
+    archive_root = tmp_path / "history"
+    relative_path = (
+        "2026/08/"
+        f"{SNAPSHOT_ID}.json"
+    )
+    snapshot = create_snapshot(
+        relative_path=relative_path,
+        checksum_sha256="a" * 64,
+    )
+
+    resolved = (
+        HistoricalSnapshotIntegrityVerifier(
+            archive_root
+        ).resolve_path(
+            snapshot
+        )
+    )
+
+    assert resolved == (
+        archive_root
+        / relative_path
+    ).resolve()

@@ -27,7 +27,7 @@ class HistoricalSnapshotIntegrityVerifier:
     Verify that archived snapshot bytes still match manifest metadata.
 
     Historical evidence must never be consumed silently after corruption,
-    partial replacement, or manual modification.
+    partial replacement, manual modification, or archive-root escape.
     """
 
     def __init__(
@@ -55,9 +55,8 @@ class HistoricalSnapshotIntegrityVerifier:
                 "snapshot must be a HistoricalSnapshot"
             )
 
-        archive_path = (
-            self.archive_root
-            / snapshot.relative_path
+        archive_path = self.resolve_path(
+            snapshot
         )
 
         try:
@@ -103,3 +102,40 @@ class HistoricalSnapshotIntegrityVerifier:
             )
 
         return result.archive_path
+
+    def resolve_path(
+        self,
+        snapshot: HistoricalSnapshot,
+    ) -> Path:
+        """
+        Resolve a snapshot path without permitting archive-root escape.
+
+        Resolution is performed before file reads so symlinks or junction-like
+        path components cannot redirect verification outside archive_root.
+        """
+        if not isinstance(
+            snapshot,
+            HistoricalSnapshot,
+        ):
+            raise TypeError(
+                "snapshot must be a HistoricalSnapshot"
+            )
+
+        root = self.archive_root.resolve()
+        candidate = (
+            root
+            / Path(
+                snapshot.relative_path
+            )
+        ).resolve()
+
+        try:
+            candidate.relative_to(
+                root
+            )
+        except ValueError as exc:
+            raise ValueError(
+                "Historical snapshot path escapes the archive root"
+            ) from exc
+
+        return candidate
