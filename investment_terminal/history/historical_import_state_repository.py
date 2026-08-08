@@ -161,6 +161,72 @@ class HistoricalImportStateRepository:
 
         return state
 
+    def initialize_legacy_imported(
+        self,
+        snapshot: HistoricalSnapshot,
+        *,
+        at: datetime,
+    ) -> HistoricalImportState:
+        """
+        Backfill IMPORTED state for a proven-complete legacy projection.
+
+        Stage timestamps record reconciliation observation time because the
+        original pre-import-state execution timestamps are not recoverable.
+        """
+        if not isinstance(
+            snapshot,
+            HistoricalSnapshot,
+        ):
+            raise TypeError(
+                "snapshot must be a HistoricalSnapshot"
+            )
+
+        self._require_schema()
+        validate_aware_datetime(
+            at,
+            field_name="at",
+        )
+
+        state = HistoricalImportState(
+            snapshot_id=snapshot.snapshot_id,
+            status="IMPORTED",
+            metadata_synchronized_at=at,
+            package_verified_at=at,
+            details_imported_at=at,
+            timeline_built_at=at,
+            importer_version=snapshot.product_version,
+            updated_at=at,
+        )
+
+        try:
+            with self.store.connect() as connection:
+                connection.execute(
+                    """
+                    INSERT INTO historical_import_state (
+                        snapshot_id,
+                        status,
+                        metadata_synchronized_at,
+                        package_verified_at,
+                        details_imported_at,
+                        timeline_built_at,
+                        importer_version,
+                        failure_reason,
+                        updated_at
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    self._values(
+                        state
+                    ),
+                )
+        except sqlite3.IntegrityError as exc:
+            raise ValueError(
+                "Historical import state already exists or "
+                "references an unknown snapshot"
+            ) from exc
+
+        return state
+
     def mark_verified(
         self,
         snapshot_id: str,

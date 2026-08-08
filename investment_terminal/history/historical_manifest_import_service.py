@@ -142,11 +142,23 @@ class HistoricalManifestImportService:
                     self.state_repository.get(
                         snapshot.snapshot_id
                     )
-                    is None
+                    is not None
                 ):
+                    continue
+
+                reconciliation_time = self._now()
+
+                if self.repository.has_complete_detail_import(
+                    snapshot.snapshot_id
+                ):
+                    self.state_repository.initialize_legacy_imported(
+                        snapshot,
+                        at=reconciliation_time,
+                    )
+                else:
                     self.state_repository.initialize_metadata(
                         snapshot,
-                        at=self._now(),
+                        at=reconciliation_time,
                     )
 
         imported = len(

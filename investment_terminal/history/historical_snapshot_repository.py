@@ -45,7 +45,6 @@ class HistoricalSnapshotRepository:
         self,
         snapshot: HistoricalSnapshot,
     ) -> HistoricalSnapshot:
-        """Insert one snapshot into structured history."""
         if not isinstance(
             snapshot,
             HistoricalSnapshot,
@@ -90,12 +89,6 @@ class HistoricalSnapshotRepository:
         self,
         snapshots: Iterable[HistoricalSnapshot],
     ) -> tuple[HistoricalSnapshot, ...]:
-        """
-        Insert multiple snapshots atomically.
-
-        If any record fails validation or violates a database constraint,
-        the complete batch is rolled back.
-        """
         items = tuple(
             snapshots
         )
@@ -152,7 +145,6 @@ class HistoricalSnapshotRepository:
         self,
         snapshot_id: str,
     ) -> HistoricalSnapshot | None:
-        """Return a snapshot by UUID, or None when it does not exist."""
         normalized_id = HistoricalSnapshot._normalize_uuid(
             snapshot_id,
             field_name="snapshot_id",
@@ -183,7 +175,6 @@ class HistoricalSnapshotRepository:
         self,
         snapshot_id: str,
     ) -> HistoricalSnapshot:
-        """Return a snapshot by UUID or raise KeyError."""
         snapshot = self.get(
             snapshot_id
         )
@@ -199,7 +190,6 @@ class HistoricalSnapshotRepository:
         self,
         snapshot_id: str,
     ) -> bool:
-        """Return whether the snapshot is already imported."""
         return self.get(
             snapshot_id
         ) is not None
@@ -207,7 +197,6 @@ class HistoricalSnapshotRepository:
     def list_all(
         self,
     ) -> tuple[HistoricalSnapshot, ...]:
-        """Return all registered snapshots in chronological order."""
         self.store.initialize()
 
         with self.store.connect() as connection:
@@ -230,7 +219,6 @@ class HistoricalSnapshotRepository:
         self,
         snapshot_id: str,
     ) -> bool:
-        """Return whether any structured detail or timeline row exists."""
         normalized_id = HistoricalSnapshot._normalize_uuid(
             snapshot_id,
             field_name="snapshot_id",
@@ -262,6 +250,87 @@ class HistoricalSnapshotRepository:
                     return True
 
         return False
+
+    def has_complete_detail_import(
+        self,
+        snapshot_id: str,
+    ) -> bool:
+        """
+        Return whether legacy structured rows form a complete import projection.
+
+        This method exists for reconciliation of pre-import-state databases.
+        Normal workflow completion is determined by HistoricalImportState.
+        """
+        normalized_id = HistoricalSnapshot._normalize_uuid(
+            snapshot_id,
+            field_name="snapshot_id",
+        )
+
+        self.store.initialize()
+
+        with self.store.connect() as connection:
+            summary_count = self._count_rows(
+                connection,
+                "portfolio_summary",
+                normalized_id,
+            )
+            if summary_count != 1:
+                return False
+
+            holdings_count = self._count_rows(
+                connection,
+                "holdings",
+                normalized_id,
+            )
+            recommendations_count = self._count_rows(
+                connection,
+                "recommendations",
+                normalized_id,
+            )
+            deployment_count = self._count_rows(
+                connection,
+                "deployment",
+                normalized_id,
+            )
+
+            event_counts = {
+                row["event_type"]: int(
+                    row["event_count"]
+                )
+                for row in connection.execute(
+                    """
+                    SELECT event_type, COUNT(*) AS event_count
+                    FROM timeline_events
+                    WHERE snapshot_id = ?
+                    GROUP BY event_type
+                    """,
+                    (
+                        normalized_id,
+                    ),
+                ).fetchall()
+            }
+
+        expected = {
+            "SNAPSHOT_ARCHIVED": 1,
+            "PORTFOLIO_SUMMARY_RECORDED": 1,
+        }
+
+        if holdings_count:
+            expected[
+                "HOLDING_RECORDED"
+            ] = holdings_count
+
+        if recommendations_count:
+            expected[
+                "RECOMMENDATION_RECORDED"
+            ] = recommendations_count
+
+        if deployment_count:
+            expected[
+                "DEPLOYMENT_RECORDED"
+            ] = deployment_count
+
+        return event_counts == expected
 
     def find_by_package_id(
         self,
@@ -341,7 +410,6 @@ class HistoricalSnapshotRepository:
     def latest(
         self,
     ) -> HistoricalSnapshot | None:
-        """Return the latest generated snapshot."""
         self.store.initialize()
 
         with self.store.connect() as connection:
@@ -367,7 +435,6 @@ class HistoricalSnapshotRepository:
         self,
         snapshot_id: str,
     ) -> HistoricalSnapshot | None:
-        """Return the immediately preceding snapshot in canonical order."""
         target = self.require(
             snapshot_id
         )
@@ -415,7 +482,6 @@ class HistoricalSnapshotRepository:
         self,
         snapshot_id: str,
     ) -> HistoricalSnapshot | None:
-        """Return the immediately following snapshot in canonical order."""
         target = self.require(
             snapshot_id
         )
@@ -462,7 +528,6 @@ class HistoricalSnapshotRepository:
     def count(
         self,
     ) -> int:
-        """Return the number of structured snapshot records."""
         self.store.initialize()
 
         with self.store.connect() as connection:
@@ -475,6 +540,27 @@ class HistoricalSnapshotRepository:
 
         return int(
             row["snapshot_count"]
+        )
+
+    @staticmethod
+    def _count_rows(
+        connection: sqlite3.Connection,
+        table: str,
+        snapshot_id: str,
+    ) -> int:
+        row = connection.execute(
+            f"""
+            SELECT COUNT(*) AS row_count
+            FROM {table}
+            WHERE snapshot_id = ?
+            """,
+            (
+                snapshot_id,
+            ),
+        ).fetchone()
+
+        return int(
+            row["row_count"]
         )
 
     @staticmethod
