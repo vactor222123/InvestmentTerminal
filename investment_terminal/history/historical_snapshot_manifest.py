@@ -11,6 +11,9 @@ from typing import Any
 from investment_terminal.history.historical_snapshot_models import (
     HistoricalSnapshot,
 )
+from investment_terminal.utils.atomic_write import (
+    sync_directory,
+)
 
 
 class HistoricalSnapshotManifest:
@@ -116,6 +119,11 @@ class HistoricalSnapshotManifest:
                 manifest.flush()
                 os.fsync(
                     manifest.fileno()
+                )
+
+            if not existed_before:
+                sync_directory(
+                    self.manifest_path.parent
                 )
         except BaseException:
             self._restore_after_failed_append(
@@ -293,6 +301,9 @@ class HistoricalSnapshotManifest:
             ):
                 self.manifest_path.unlink(
                     missing_ok=True
+                )
+                sync_directory(
+                    self.manifest_path.parent
                 )
         except OSError as exc:
             raise RuntimeError(

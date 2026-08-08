@@ -130,6 +130,9 @@ Expected behavior:
 - propagate real directory I/O failures;
 - remove temporary files after pre-replacement failures.
 
+Use `sync_directory()` from the same module when another persistence strategy
+needs an explicit directory-entry durability boundary.
+
 A failure reported after `os.replace` may mean the new destination contents are already
 visible but the final durability synchronization failed. Callers must not assume that
 an exception from the post-replacement directory sync implies that the previous file
@@ -154,6 +157,9 @@ Do not use atomic replacement for immutable exclusive archives or append-only ma
 - append one compact JSON object per line;
 - reject duplicate snapshot IDs and archive paths;
 - preserve append order;
+- flush and synchronize each appended record;
+- synchronize the manifest directory when the manifest file is first created;
+- roll back and remove a first-created manifest if its durability boundary fails;
 - do not silently rewrite history.
 
 ### SQLite

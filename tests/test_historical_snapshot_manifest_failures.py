@@ -145,3 +145,109 @@ def test_failed_first_append_removes_empty_manifest(
 
     assert not manifest.manifest_path.exists()
     assert manifest.load_all() == ()
+
+
+def test_first_append_syncs_manifest_directory(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = HistoricalSnapshotManifest(
+        tmp_path / "manifest.jsonl"
+    )
+    calls: list[Path] = []
+
+    monkeypatch.setattr(
+        "investment_terminal.history."
+        "historical_snapshot_manifest.sync_directory",
+        lambda directory: calls.append(
+            directory
+        ),
+    )
+
+    manifest.append(
+        create_snapshot(
+            FIRST_ID
+        )
+    )
+
+    assert calls == [
+        tmp_path,
+    ]
+
+
+def test_directory_sync_failure_rolls_back_first_manifest(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = HistoricalSnapshotManifest(
+        tmp_path / "manifest.jsonl"
+    )
+    calls = 0
+
+    def fail_then_recover(
+        directory: Path,
+    ) -> None:
+        nonlocal calls
+        calls += 1
+
+        if calls == 1:
+            raise OSError(
+                "directory sync failed"
+            )
+
+    monkeypatch.setattr(
+        "investment_terminal.history."
+        "historical_snapshot_manifest.sync_directory",
+        fail_then_recover,
+    )
+
+    with pytest.raises(
+        OSError,
+        match="directory sync failed",
+    ):
+        manifest.append(
+            create_snapshot(
+                FIRST_ID
+            )
+        )
+
+    assert calls == 2
+    assert not manifest.manifest_path.exists()
+    assert manifest.load_all() == ()
+
+
+def test_existing_manifest_append_does_not_resync_directory(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = HistoricalSnapshotManifest(
+        tmp_path / "manifest.jsonl"
+    )
+    manifest.append(
+        create_snapshot(
+            FIRST_ID
+        )
+    )
+
+    def fail_if_called(
+        directory: Path,
+    ) -> None:
+        raise AssertionError(
+            "existing manifest directory must not be resynced"
+        )
+
+    monkeypatch.setattr(
+        "investment_terminal.history."
+        "historical_snapshot_manifest.sync_directory",
+        fail_if_called,
+    )
+
+    manifest.append(
+        create_snapshot(
+            SECOND_ID
+        )
+    )
+
+    assert len(
+        manifest.load_all()
+    ) == 2

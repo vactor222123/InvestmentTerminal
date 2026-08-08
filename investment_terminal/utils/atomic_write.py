@@ -155,6 +155,25 @@ def write_json_atomic(
     )
 
 
+def sync_directory(
+    directory: str | Path,
+) -> None:
+    """
+    Persist directory-entry changes when the platform/filesystem supports it.
+
+    Unsupported directory synchronization is tolerated. Other I/O failures
+    remain visible to the caller.
+    """
+    normalized = (
+        directory
+        if isinstance(directory, Path)
+        else Path(directory)
+    )
+    _sync_parent_directory(
+        normalized
+    )
+
+
 def _normalize_path(
     path: str | Path,
 ) -> Path:
@@ -196,7 +215,7 @@ def _sync_parent_directory(
     directory: Path,
 ) -> None:
     """
-    Persist the directory entry created by os.replace when supported.
+    Persist a directory entry when supported.
 
     Windows does not provide a portable directory fsync through os.open,
     so the file-level fsync remains the strongest portable guarantee there.
