@@ -189,6 +189,90 @@ def test_repository_add_many_accepts_empty_input(
     assert repository.count() == 0
 
 
+def test_repository_lists_all_in_chronological_order(
+    tmp_path: Path,
+) -> None:
+    repository = create_repository(
+        tmp_path
+    )
+    first = create_snapshot()
+    second = create_snapshot(
+        snapshot_id=SECOND_ID,
+        package_id="review-002",
+        generated_at=datetime(
+            2026,
+            8,
+            4,
+            17,
+            35,
+            tzinfo=timezone.utc,
+        ),
+        archived_at=datetime(
+            2026,
+            8,
+            4,
+            17,
+            36,
+            tzinfo=timezone.utc,
+        ),
+    )
+
+    repository.add_many(
+        (
+            second,
+            first,
+        )
+    )
+
+    assert repository.list_all() == (
+        first,
+        second,
+    )
+
+
+def test_repository_list_all_returns_empty_tuple(
+    tmp_path: Path,
+) -> None:
+    repository = create_repository(
+        tmp_path
+    )
+
+    assert repository.list_all() == ()
+
+
+def test_repository_reports_detail_import_state(
+    tmp_path: Path,
+) -> None:
+    repository = create_repository(
+        tmp_path
+    )
+    snapshot = create_snapshot()
+    repository.add(
+        snapshot
+    )
+
+    assert not repository.has_detail_import(
+        snapshot.snapshot_id
+    )
+
+    with repository.store.connect() as connection:
+        connection.execute(
+            """
+            INSERT INTO portfolio_summary (
+                snapshot_id
+            )
+            VALUES (?)
+            """,
+            (
+                snapshot.snapshot_id,
+            ),
+        )
+
+    assert repository.has_detail_import(
+        snapshot.snapshot_id
+    )
+
+
 def test_repository_finds_package_history(
     tmp_path: Path,
 ) -> None:

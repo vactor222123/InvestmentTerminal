@@ -204,6 +204,65 @@ class HistoricalSnapshotRepository:
             snapshot_id
         ) is not None
 
+    def list_all(
+        self,
+    ) -> tuple[HistoricalSnapshot, ...]:
+        """Return all registered snapshots in chronological order."""
+        self.store.initialize()
+
+        with self.store.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT *
+                FROM snapshots
+                ORDER BY generated_at, archived_at, snapshot_id
+                """
+            ).fetchall()
+
+        return tuple(
+            self._from_row(
+                row
+            )
+            for row in rows
+        )
+
+    def has_detail_import(
+        self,
+        snapshot_id: str,
+    ) -> bool:
+        """Return whether any structured detail or timeline row exists."""
+        normalized_id = HistoricalSnapshot._normalize_uuid(
+            snapshot_id,
+            field_name="snapshot_id",
+        )
+
+        self.store.initialize()
+
+        with self.store.connect() as connection:
+            for table in (
+                "portfolio_summary",
+                "holdings",
+                "recommendations",
+                "deployment",
+                "timeline_events",
+            ):
+                row = connection.execute(
+                    f"""
+                    SELECT 1
+                    FROM {table}
+                    WHERE snapshot_id = ?
+                    LIMIT 1
+                    """,
+                    (
+                        normalized_id,
+                    ),
+                ).fetchone()
+
+                if row is not None:
+                    return True
+
+        return False
+
     def find_by_package_id(
         self,
         package_id: str,

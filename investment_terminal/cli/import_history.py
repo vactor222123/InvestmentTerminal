@@ -152,28 +152,12 @@ def main(
                     ),
                 )
                 if options.snapshot_id is not None
-                else repository.find_generated_between(
-                    start=min(
-                        snapshot.generated_at
-                        for snapshot in repository_snapshots(
-                            repository
-                        )
-                    ),
-                    end=max(
-                        snapshot.generated_at
-                        for snapshot in repository_snapshots(
-                            repository
-                        )
-                    ),
-                )
-                if repository.count() > 0
-                else ()
+                else repository.list_all()
             )
 
             for snapshot in snapshots:
-                if snapshot_details_exist(
-                    store,
-                    snapshot.snapshot_id,
+                if repository.has_detail_import(
+                    snapshot.snapshot_id
                 ):
                     continue
 
@@ -244,67 +228,6 @@ def main(
         f"Database         : "
         f"{database_path}"
     )
-
-
-def repository_snapshots(
-    repository: HistoricalSnapshotRepository,
-):
-    """
-    Return all registered snapshots in chronological order.
-
-    The repository currently exposes bounded date search rather than a public
-    list-all method, so the CLI reads the normalized snapshot table directly.
-    """
-    repository.store.initialize()
-
-    with repository.store.connect() as connection:
-        rows = connection.execute(
-            """
-            SELECT snapshot_id
-            FROM snapshots
-            ORDER BY generated_at, archived_at, snapshot_id
-            """
-        ).fetchall()
-
-    return tuple(
-        repository.require(
-            row["snapshot_id"]
-        )
-        for row in rows
-    )
-
-
-def snapshot_details_exist(
-    store: HistoricalSQLiteStore,
-    snapshot_id: str,
-) -> bool:
-    """Return whether any detail or timeline row already exists."""
-    store.initialize()
-
-    with store.connect() as connection:
-        for table in (
-            "portfolio_summary",
-            "holdings",
-            "recommendations",
-            "deployment",
-            "timeline_events",
-        ):
-            row = connection.execute(
-                f"""
-                SELECT 1
-                FROM {table}
-                WHERE snapshot_id = ?
-                LIMIT 1
-                """,
-                (
-                    snapshot_id,
-                ),
-            ).fetchone()
-
-            if row is not None:
-                return True
-
-    return False
 
 
 if __name__ == "__main__":

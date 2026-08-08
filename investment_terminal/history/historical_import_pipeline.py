@@ -186,7 +186,7 @@ class HistoricalImportPipeline:
                 "SQLite record"
             )
 
-        if self._has_detail_rows(
+        if self.repository.has_detail_import(
             snapshot.snapshot_id
         ):
             raise ValueError(
@@ -238,37 +238,6 @@ class HistoricalImportPipeline:
             deployment_imported=deployment,
             timeline_events_created=timeline_events,
         )
-
-    def _has_detail_rows(
-        self,
-        snapshot_id: str,
-    ) -> bool:
-        self.store.initialize()
-
-        with self.store.connect() as connection:
-            for table in (
-                "portfolio_summary",
-                "holdings",
-                "recommendations",
-                "deployment",
-                "timeline_events",
-            ):
-                row = connection.execute(
-                    f"""
-                    SELECT 1
-                    FROM {table}
-                    WHERE snapshot_id = ?
-                    LIMIT 1
-                    """,
-                    (
-                        snapshot_id,
-                    ),
-                ).fetchone()
-
-                if row is not None:
-                    return True
-
-        return False
 
     def _remove_partial_import(
         self,
