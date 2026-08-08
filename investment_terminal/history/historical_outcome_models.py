@@ -88,8 +88,7 @@ class HistoricalObservationWindow:
                 self.value,
                 bool,
             )
-            or self.value
-            <= 0
+            or self.value <= 0
         ):
             raise ValueError(
                 "value must be a positive integer"
@@ -120,6 +119,10 @@ class HistoricalOutcomeEvidence:
     endpoint_price: float | None
     origin_source: str | None
     endpoint_source: str | None
+    origin_currency: str | None = None
+    endpoint_currency: str | None = None
+    origin_resolution: str | None = None
+    endpoint_resolution: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -163,30 +166,56 @@ class HistoricalOutcomeEvidence:
                 field_name="endpoint_price",
             ),
         )
-        object.__setattr__(
-            self,
-            "origin_source",
-            normalize_optional_text(
-                self.origin_source,
-                field_name="origin_source",
-            ),
-        )
-        object.__setattr__(
-            self,
-            "endpoint_source",
-            normalize_optional_text(
-                self.endpoint_source,
-                field_name="endpoint_source",
-            ),
-        )
 
-        if (
-            self.origin_price is not None
-            and self.origin_source is None
+        for field_name in (
+            "origin_source",
+            "endpoint_source",
         ):
-            raise ValueError(
-                "origin_source is required when origin_price is present"
+            object.__setattr__(
+                self,
+                field_name,
+                normalize_optional_text(
+                    getattr(
+                        self,
+                        field_name,
+                    ),
+                    field_name=field_name,
+                ),
             )
+
+        for field_name in (
+            "origin_currency",
+            "endpoint_currency",
+            "origin_resolution",
+            "endpoint_resolution",
+        ):
+            object.__setattr__(
+                self,
+                field_name,
+                normalize_optional_text(
+                    getattr(
+                        self,
+                        field_name,
+                    ),
+                    field_name=field_name,
+                    uppercase=True,
+                ),
+            )
+
+        self._validate_point(
+            prefix="origin",
+            price=self.origin_price,
+            source=self.origin_source,
+            currency=self.origin_currency,
+            resolution=self.origin_resolution,
+        )
+        self._validate_point(
+            prefix="endpoint",
+            price=self.endpoint_price,
+            source=self.endpoint_source,
+            currency=self.endpoint_currency,
+            resolution=self.endpoint_resolution,
+        )
 
         if (
             self.endpoint_price is not None
@@ -196,12 +225,42 @@ class HistoricalOutcomeEvidence:
                 "endpoint_at is required when endpoint_price is present"
             )
 
-        if (
-            self.endpoint_price is not None
-            and self.endpoint_source is None
-        ):
+    @staticmethod
+    def _validate_point(
+        *,
+        prefix: str,
+        price: float | None,
+        source: str | None,
+        currency: str | None,
+        resolution: str | None,
+    ) -> None:
+        metadata = (
+            source,
+            currency,
+            resolution,
+        )
+
+        if price is None:
+            if any(
+                value is not None
+                for value in metadata
+            ):
+                raise ValueError(
+                    f"{prefix} provenance requires {prefix}_price"
+                )
+            return
+
+        if source is None:
             raise ValueError(
-                "endpoint_source is required when endpoint_price is present"
+                f"{prefix}_source is required when {prefix}_price is present"
+            )
+        if currency is None:
+            raise ValueError(
+                f"{prefix}_currency is required when {prefix}_price is present"
+            )
+        if resolution is None:
+            raise ValueError(
+                f"{prefix}_resolution is required when {prefix}_price is present"
             )
 
     @property
@@ -228,6 +287,10 @@ class HistoricalOutcomeEvidence:
             "endpoint_price": self.endpoint_price,
             "origin_source": self.origin_source,
             "endpoint_source": self.endpoint_source,
+            "origin_currency": self.origin_currency,
+            "endpoint_currency": self.endpoint_currency,
+            "origin_resolution": self.origin_resolution,
+            "endpoint_resolution": self.endpoint_resolution,
             "complete_prices": self.has_complete_prices,
         }
 

@@ -53,6 +53,26 @@ def evidence(
             if endpoint_price is not None
             else None
         ),
+        origin_currency=(
+            "EUR"
+            if origin_price is not None
+            else None
+        ),
+        endpoint_currency=(
+            "EUR"
+            if endpoint_price is not None
+            else None
+        ),
+        origin_resolution=(
+            "D"
+            if origin_price is not None
+            else None
+        ),
+        endpoint_resolution=(
+            "D"
+            if endpoint_price is not None
+            else None
+        ),
     )
 
 
@@ -133,9 +153,7 @@ def test_currency_mismatch_is_rejected_without_fx_assumption() -> None:
 
 
 def test_calculator_does_not_interpret_recommendation_action() -> None:
-    calculator = HistoricalRecommendationOutcomeCalculator()
-
-    result = calculator.calculate(
+    result = HistoricalRecommendationOutcomeCalculator().calculate(
         evidence=evidence(
             origin_price=100.0,
             endpoint_price=90.0,
