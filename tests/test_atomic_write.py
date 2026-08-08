@@ -94,6 +94,67 @@ def test_write_text_atomic_preserves_existing_file_mode(
     ) == expected_mode
 
 
+def test_existing_mode_is_applied_before_file_sync(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "document.txt"
+    destination.write_text(
+        "old",
+        encoding="utf-8",
+    )
+
+    events: list[str] = []
+    real_chmod = os.chmod
+    real_fsync = os.fsync
+
+    def record_chmod(
+        path: object,
+        mode: int,
+    ) -> None:
+        events.append(
+            "chmod"
+        )
+        real_chmod(
+            path,
+            mode,
+        )
+
+    def record_fsync(
+        file_descriptor: int,
+    ) -> None:
+        events.append(
+            "fsync"
+        )
+        real_fsync(
+            file_descriptor
+        )
+
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write.os.chmod",
+        record_chmod,
+    )
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write.os.fsync",
+        record_fsync,
+    )
+    monkeypatch.setattr(
+        "investment_terminal.utils.atomic_write."
+        "_sync_parent_directory",
+        lambda directory: None,
+    )
+
+    write_text_atomic(
+        destination,
+        "new",
+    )
+
+    assert events[:2] == [
+        "chmod",
+        "fsync",
+    ]
+
+
 def test_write_text_atomic_syncs_parent_after_replace(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

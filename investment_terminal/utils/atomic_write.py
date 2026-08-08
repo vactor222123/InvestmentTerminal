@@ -46,12 +46,15 @@ def write_bytes_atomic(
             temporary_path = Path(temporary.name)
             temporary.write(data)
             temporary.flush()
-            os.fsync(temporary.fileno())
 
-        if destination_mode is not None:
-            os.chmod(
-                temporary_path,
-                destination_mode,
+            if destination_mode is not None:
+                os.chmod(
+                    temporary_path,
+                    destination_mode,
+                )
+
+            os.fsync(
+                temporary.fileno()
             )
 
         os.replace(
