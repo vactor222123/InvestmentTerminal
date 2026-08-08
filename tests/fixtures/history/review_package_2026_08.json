@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0",
+  "package_id": "monthly-review-2026-08",
+  "generated_at": "2026-08-31T18:00:00+00:00",
+  "metadata": {
+    "portfolio_owner": "E2E Test Investor",
+    "review_period": "2026-08",
+    "purpose": "Monthly portfolio review"
+  },
+  "sections": {
+    "portfolio": {
+      "status": "MARKET_VALUE_CONNECTED",
+      "cost_basis_snapshot": {
+        "portfolio_name": "Long-Term Portfolio",
+        "base_currency": "EUR",
+        "total_value": 26500.0,
+        "invested_value": 24500.0,
+        "cash_value": 2000.0,
+        "monthly_contribution": 1500.0
+      },
+      "cost_basis_holdings": [
+        {
+          "instrument_key": "WORLD",
+          "symbol": "IWDA",
+          "name": "Core MSCI World",
+          "asset_type": "ETF",
+          "sleeve": "CORE",
+          "strategy": "LONG_TERM",
+          "currency": "EUR",
+          "quantity": 126.0,
+          "average_cost": 101.0,
+          "cost_basis": 12726.0
+        },
+        {
+          "instrument_key": "EM",
+          "symbol": "EIMI",
+          "name": "Core MSCI Emerging Markets IMI",
+          "asset_type": "ETF",
+          "sleeve": "CORE",
+          "strategy": "LONG_TERM",
+          "currency": "EUR",
+          "quantity": 108.0,
+          "average_cost": 70.5,
+          "cost_basis": 7614.0
+        },
+        {
+          "instrument_key": "BOND",
+          "symbol": "AGGH",
+          "name": "Global Aggregate Bond",
+          "asset_type": "ETF",
+          "sleeve": "DEFENSIVE",
+          "strategy": "STABILITY",
+          "currency": "EUR",
+          "quantity": 60.0,
+          "average_cost": 50.0,
+          "cost_basis": 3000.0
+        }
+      ],
+      "market_value": {
+        "portfolio_name": "Long-Term Portfolio",
+        "base_currency": "EUR",
+        "total_market_value": 28100.0,
+        "invested_market_value": 26100.0,
+        "cash_value": 2000.0,
+        "positions": [
+          {
+            "instrument_key": "WORLD",
+            "symbol": "IWDA",
+            "name": "Core MSCI World",
+            "asset_type": "ETF",
+            "sleeve": "CORE",
+            "strategy": "LONG_TERM",
+            "currency": "EUR",
+            "quantity": 126.0,
+            "market_price": 112.0,
+            "market_value": 14112.0
+          },
+          {
+            "instrument_key": "EM",
+            "symbol": "EIMI",
+            "name": "Core MSCI Emerging Markets IMI",
+            "asset_type": "ETF",
+            "sleeve": "CORE",
+            "strategy": "LONG_TERM",
+            "currency": "EUR",
+            "quantity": 108.0,
+            "market_price": 76.0,
+            "market_value": 8208.0
+          },
+          {
+            "instrument_key": "BOND",
+            "symbol": "AGGH",
+            "name": "Global Aggregate Bond",
+            "asset_type": "ETF",
+            "sleeve": "DEFENSIVE",
+            "strategy": "STABILITY",
+            "currency": "EUR",
+            "quantity": 60.0,
+            "market_price": 63.0,
+            "market_value": 3780.0
+          }
+        ]
+      }
+    },
+    "machine_recommendations": {
+      "status": "CONNECTED",
+      "recommendations": {
+        "items": [
+          {
+            "recommendation_id": "WORLD-REBALANCE",
+            "symbol": "IWDA",
+            "recommendation": "HOLD",
+            "score": 80.0,
+            "confidence": 0.86,
+            "rationale": "Core allocation remains appropriate after the contribution."
+          },
+          {
+            "recommendation_id": "EM-ADD",
+            "symbol": "EIMI",
+            "recommendation": "HOLD",
+            "score": 74.0,
+            "confidence": 0.72,
+            "rationale": "Emerging-market weight is now close enough to target."
+          }
+        ]
+      },
+      "allocation": {
+        "items": [
+          {
+            "deployment_id": "NEXT-CONTRIBUTION-WORLD",
+            "symbol": "IWDA",
+            "amount": 1050.0,
+            "share": 0.7,
+            "reason": "Direct more of the next contribution to the core sleeve."
+          },
+          {
+            "deployment_id": "NEXT-CONTRIBUTION-EM",
+            "symbol": "EIMI",
+            "amount": 450.0,
+            "share": 0.3,
+            "reason": "Keep a smaller contribution to emerging markets."
+          }
+        ]
+      }
+    }
+  }
+}

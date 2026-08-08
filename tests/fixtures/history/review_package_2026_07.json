@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0",
+  "package_id": "monthly-review-2026-07",
+  "generated_at": "2026-07-31T18:00:00+00:00",
+  "metadata": {
+    "portfolio_owner": "E2E Test Investor",
+    "review_period": "2026-07",
+    "purpose": "Monthly portfolio review"
+  },
+  "sections": {
+    "portfolio": {
+      "status": "COST_BASIS_ONLY",
+      "cost_basis_snapshot": {
+        "portfolio_name": "Long-Term Portfolio",
+        "base_currency": "EUR",
+        "total_value": 25000.0,
+        "invested_value": 22000.0,
+        "cash_value": 3000.0,
+        "monthly_contribution": 1500.0
+      },
+      "cost_basis_holdings": [
+        {
+          "instrument_key": "WORLD",
+          "symbol": "IWDA",
+          "name": "Core MSCI World",
+          "asset_type": "ETF",
+          "sleeve": "CORE",
+          "strategy": "LONG_TERM",
+          "currency": "EUR",
+          "quantity": 120.0,
+          "average_cost": 100.0,
+          "cost_basis": 12000.0
+        },
+        {
+          "instrument_key": "EM",
+          "symbol": "EIMI",
+          "name": "Core MSCI Emerging Markets IMI",
+          "asset_type": "ETF",
+          "sleeve": "CORE",
+          "strategy": "LONG_TERM",
+          "currency": "EUR",
+          "quantity": 100.0,
+          "average_cost": 70.0,
+          "cost_basis": 7000.0
+        },
+        {
+          "instrument_key": "BOND",
+          "symbol": "AGGH",
+          "name": "Global Aggregate Bond",
+          "asset_type": "ETF",
+          "sleeve": "DEFENSIVE",
+          "strategy": "STABILITY",
+          "currency": "EUR",
+          "quantity": 60.0,
+          "average_cost": 50.0,
+          "cost_basis": 3000.0
+        }
+      ],
+      "market_value": null
+    },
+    "machine_recommendations": {
+      "status": "CONNECTED",
+      "recommendations": {
+        "items": [
+          {
+            "recommendation_id": "WORLD-REBALANCE",
+            "symbol": "IWDA",
+            "recommendation": "HOLD",
+            "score": 78.0,
+            "confidence": 0.82,
+            "rationale": "Core allocation remains inside the target band."
+          },
+          {
+            "recommendation_id": "EM-ADD",
+            "symbol": "EIMI",
+            "recommendation": "BUY",
+            "score": 84.0,
+            "confidence": 0.76,
+            "rationale": "Use part of the next contribution to restore emerging-market weight."
+          }
+        ]
+      },
+      "allocation": {
+        "items": [
+          {
+            "deployment_id": "NEXT-CONTRIBUTION-WORLD",
+            "symbol": "IWDA",
+            "amount": 900.0,
+            "share": 0.6,
+            "reason": "Maintain core developed-market exposure."
+          },
+          {
+            "deployment_id": "NEXT-CONTRIBUTION-EM",
+            "symbol": "EIMI",
+            "amount": 600.0,
+            "share": 0.4,
+            "reason": "Move emerging markets toward target allocation."
+          }
+        ]
+      }
+    }
+  }
+}
