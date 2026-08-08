@@ -1,9 +1,10 @@
 # Sprint 14 Plan — Outcome-Aware Historical Intelligence
 
 **Sprint:** 14  
-**Status:** Planned  
+**Status:** Completed  
 **Theme:** Outcome-Aware Historical Intelligence  
-**Depends on:** Sprint 13 — Historical Query, Comparison, and Replay Foundation
+**Depends on:** Sprint 13 — Historical Query, Comparison, and Replay Foundation  
+**Closure baseline:** `develop @ 9107eaf`
 
 ---
 
@@ -11,207 +12,91 @@
 
 Extend Historical Intelligence from “what changed?” to the first safe, evidence-grounded form of “what happened afterward?”
 
-Sprint 14 must introduce outcome semantics before outcome scoring.
+Sprint 14 introduced outcome semantics before outcome scoring.
 
-The sprint should create explicit contracts for:
+The implemented system now provides explicit contracts for:
 
-- observation windows;
-- outcome evidence;
-- recommendation transitions;
-- price movement after historical signals;
-- incomplete or unavailable outcome evidence;
-- provenance and methodology.
+- elapsed-time observation windows;
+- recommendation history and transitions;
+- exact local historical price evidence;
+- complete, partial, unavailable, and not-mature outcome observations;
+- transparent raw close-price movement;
+- descriptive aggregation with visible sample coverage;
+- a read-only outcome CLI;
+- deterministic end-to-end verification.
 
-The sprint must not equate correlation with causation and must not imply that a recommendation caused a later market move.
-
----
-
-# 2. Product Questions
-
-Sprint 14 should enable the system to answer:
-
-- What recommendation existed at snapshot T0?
-- Did the recommendation change before a selected observation window ended?
-- What valid price evidence exists at T0 and at the observation endpoint?
-- What simple price movement occurred over that explicitly defined interval?
-- Is the outcome fully observed, partially observed, or unavailable?
-- Which source and timestamp produced each outcome value?
-- Can multiple recommendation observations be summarized without hiding sample size?
-
-The sprint should **not** yet answer:
-
-- Was the recommendation “correct” in a universal sense?
-- Did the recommendation cause the later return?
-- What would the user’s realized portfolio return have been?
-- What is the calibrated probability of future success?
+The implementation does not equate correlation with causation and does not claim that a recommendation caused a later market move.
 
 ---
 
-# 3. Architectural Baseline
-
-Sprint 13 provides:
+# 2. Delivered Architecture
 
 ```text
-HistoricalSnapshot
+Archived Review Package JSON
         ↓
-Typed History repositories
+History SQLite projection
         ↓
-Timeline
+HistoricalRecommendationHistoryService
         ↓
-Compatibility
-        ↓
-SnapshotComparison
-        ↓
-Replay
-```
-
-Sprint 14 extends this carefully:
-
-```text
-Historical Recommendation Evidence
+HistoricalRecommendationState / Transition
         +
-Explicit Observation Window
+HistoricalObservationWindowPolicy
         +
-Explicit Price Evidence
+HistoricalOutcomePriceEvidenceProvider
         ↓
-Outcome Observation
+HistoricalOutcomeObservationService
         ↓
-Outcome Query / Aggregation
+HistoricalRecommendationOutcomeCalculator
         ↓
-Future Confidence Calibration
+HistoricalOutcomeAggregator
+        ↓
+Read-only outcome CLI
 ```
 
-Outcome data must remain derived evidence, not a rewrite of the original snapshot.
+Outcome observations remain derived, rebuildable, and on demand.
 
 ---
 
-# 4. Core Design Rules
+# 3. Canonical Sprint 14 Semantics
 
-1. Historical archive remains immutable canonical evidence.
-2. Outcome calculations are derived and rebuildable.
-3. Every observation window is explicit.
-4. Every endpoint timestamp is explicit.
-5. Price evidence must carry provenance.
-6. Missing endpoint data remains missing.
-7. No nearest-date substitution unless the policy is explicit and documented.
-8. No present-day quote may silently stand in for a historical endpoint.
-9. Recommendation transitions and price outcomes are separate concepts.
-10. Simple price movement is not portfolio performance.
-11. No outcome score without minimum-sample semantics.
-12. No confidence calibration in the first package set.
-13. CLI is added only after models/repositories/services exist.
-14. All output ordering is deterministic.
-15. No external-data fetch inside pure comparison/outcome models.
+## Observation window
 
----
-
-# 5. Explicit Non-Goals
-
-Sprint 14 will not implement:
-
-- portfolio performance attribution;
-- cash-flow-adjusted portfolio returns;
-- tax-lot outcomes;
-- dividend-adjusted total return unless explicitly supported by evidence;
-- FX-adjusted multi-currency return;
-- current-code historical replay;
-- AI-generated historical conclusions;
-- causal attribution;
-- autonomous trading;
-- broker execution;
-- Knowledge Domain;
-- statistically calibrated recommendation confidence unless sample-size requirements are first approved.
-
----
-
-# 6. Outcome Terminology
-
-## Observation Origin
-
-The historical point from which an outcome is evaluated.
-
-Usually:
+The first supported policy is:
 
 ```text
-recommendation snapshot generated_at
+ELAPSED_DAYS
 ```
 
-## Observation Window
+`N` means `N` absolute 24-hour periods from the recommendation snapshot `generated_at`.
 
-An explicit interval after the origin.
+The policy normalizes timestamps to UTC before endpoint calculation.
 
-Examples may eventually include:
+Sprint 14 does not implement trading-session windows, exchange calendars, weekend adjustment, holiday adjustment, or nearest-session substitution.
+
+## Price evidence
+
+Outcome price evidence is read from exact persisted local candles.
+
+Required provenance includes:
+
+- instrument/symbol;
+- exact observation timestamp;
+- close price;
+- currency;
+- candle resolution;
+- source.
+
+The source is explicitly identified as:
 
 ```text
-1 trading day
-5 trading days
-20 trading days
-60 trading days
+LOCAL_CANDLE_REPOSITORY_CLOSE
 ```
 
-The final implementation must define whether windows are trading-session based or elapsed-time based. This decision must be explicit before calculations are added.
+No current quote fallback, network fetch, or nearest-date substitution is permitted.
 
-## Outcome Endpoint
+## Observation statuses
 
-The timestamp/session selected by the observation-window policy.
-
-## Outcome Evidence
-
-The source values used to calculate an observation, including:
-
-- instrument identity;
-- origin timestamp;
-- endpoint timestamp;
-- origin price;
-- endpoint price;
-- source/provenance;
-- evidence status.
-
-## Outcome Observation
-
-A derived result describing what was observed after one historical recommendation.
-
-It is not the historical recommendation itself.
-
-## Recommendation Transition
-
-A factual change in recommendation state across snapshots.
-
-It is separate from market-price outcome.
-
----
-
-# 7. Proposed Task Sequence
-
-## Task 1 — Outcome Semantics and Models
-
-### Goal
-
-Define immutable contracts before calculating outcomes.
-
-### Proposed models
-
-```text
-HistoricalObservationWindow
-HistoricalOutcomeEvidence
-HistoricalRecommendationObservation
-```
-
-### Required concepts
-
-- explicit window kind;
-- explicit window value;
-- origin snapshot ID;
-- stable recommendation key;
-- symbol/instrument identity;
-- recommendation action at origin;
-- origin timestamp;
-- endpoint timestamp;
-- observation status;
-- evidence provenance;
-- warnings/limitations.
-
-### Observation status candidates
+Canonical statuses are:
 
 ```text
 COMPLETE
@@ -220,354 +105,245 @@ UNAVAILABLE
 NOT_MATURE
 ```
 
-The exact enum must be validated against the implementation needs before code is committed.
+`COMPLETE` requires exact origin and endpoint evidence suitable for the supported raw calculation.
 
-### Deliverables
+`PARTIAL` preserves incomplete evidence or an unsupported same-observation calculation condition such as currency mismatch.
 
-```text
-investment_terminal/history/historical_outcome_models.py
-tests/test_historical_outcome_models.py
-```
+`UNAVAILABLE` represents an observation that cannot be evaluated from the required recommendation/evidence identity.
 
----
+`NOT_MATURE` means the explicit endpoint has not yet been reached at the supplied `as_of`.
 
-## Task 2 — Observation-Window Policy
+## Recommendation transitions
 
-### Goal
+Historical recommendation transitions are factual and independent from price outcomes.
 
-Define deterministic endpoint semantics.
-
-### Required decisions
-
-Choose and document one supported foundation:
-
-- elapsed-time windows; or
-- trading-session windows.
-
-Do not implement both prematurely.
-
-### Requirements
-
-- timezone-aware;
-- deterministic;
-- no market-data access inside the value object/policy;
-- explicit not-yet-mature handling;
-- no hidden weekend/holiday assumptions.
-
-### Deliverables
+Supported transition types include:
 
 ```text
-investment_terminal/history/historical_observation_window.py
-tests/test_historical_observation_window.py
+FIRST_OBSERVED
+ACTION_CHANGED
+METRICS_CHANGED
+DESCRIPTIVE_CHANGED
+DISAPPEARED
+REAPPEARED
+UNCHANGED
 ```
 
----
+Stable recommendation keys and chronological snapshot ordering are required.
 
-## Task 3 — Historical Recommendation Transition Model
+## Outcome calculation
 
-### Goal
-
-Represent recommendation state across multiple snapshots without conflating it with price outcome.
-
-### Detect
-
-- first observed recommendation;
-- action change;
-- score/confidence movement;
-- disappearance;
-- reappearance;
-- duration between observed states.
-
-### Requirements
-
-- stable recommendation key;
-- chronological ordering;
-- no fuzzy matching;
-- no price calculations.
-
----
-
-## Task 4 — Recommendation History Repository / Service
-
-### Goal
-
-Provide chronological recommendation observations through typed History boundaries.
-
-### Requirements
-
-- no raw SQL in CLI;
-- stable deterministic ordering;
-- snapshot/generated-at provenance;
-- explicit missing history.
-
----
-
-## Task 5 — Outcome Price Evidence Boundary
-
-### Goal
-
-Define how historical endpoint prices enter outcome analysis.
-
-This task must audit existing market-history repositories before implementation.
-
-### Required properties
-
-- explicit source;
-- explicit timestamp/session;
-- instrument identity;
-- no current quote fallback;
-- missing evidence visible;
-- no network call inside pure outcome calculation.
-
-An adapter may use existing local historical-market infrastructure if architecture permits it after focused audit.
-
----
-
-## Task 6 — Single Recommendation Outcome Calculator
-
-### Goal
-
-Calculate one descriptive outcome from explicit recommendation + price evidence.
-
-### Initial metric
-
-Prefer one simple transparent metric, for example raw price change:
+The first supported descriptive metric is raw close-price movement:
 
 ```text
 (endpoint_price / origin_price) - 1
 ```
 
-Only after Task 5 establishes evidence semantics.
+The calculator does not interpret recommendation action and does not label an observation as success or failure.
 
-### Requirements
+Multi-currency FX-adjusted outcome calculation is not supported.
 
-- no division by zero;
-- no “success/failure” label by default;
-- no portfolio-performance wording;
-- no causal wording;
-- explicit incomplete evidence behavior.
+## Aggregation
+
+Aggregation is in memory and read only.
+
+It exposes:
+
+- total observation count;
+- complete count;
+- partial count;
+- unavailable count;
+- not-mature count;
+- complete-evidence coverage fraction;
+- action counts;
+- mean raw price-change fraction for `COMPLETE` observations;
+- median raw price-change fraction for `COMPLETE` observations.
+
+It does not expose success rate, hit rate, recommendation effectiveness, confidence calibration, portfolio performance, or causal attribution.
 
 ---
+
+# 4. Task Closure
+
+## Task 1 — Outcome Semantics and Models
+
+**Completed.**
+
+Delivered canonical immutable models for observation windows, evidence, and recommendation observations.
+
+## Task 2 — Observation-Window Policy
+
+**Completed.**
+
+Selected `ELAPSED_DAYS` as the single Sprint 14 foundation.
+
+No hidden market-calendar semantics were added.
+
+## Task 3 — Historical Recommendation Transition Model
+
+**Completed.**
+
+Recommendation state and transition contracts cover first observation, action/metric/descriptive changes, disappearance, reappearance, and unchanged state.
+
+## Task 4 — Recommendation History Repository / Service
+
+**Completed.**
+
+Historical recommendation state is exposed chronologically through typed History boundaries.
+
+No raw SQL was moved into CLI.
+
+## Task 5 — Outcome Price Evidence Boundary
+
+**Completed.**
+
+The implementation reuses the existing local `CandleRepository` through a read-only exact-price adapter.
+
+No network or current-price fallback exists in this boundary.
+
+## Task 6 — Single Recommendation Outcome Calculator
+
+**Completed.**
+
+Implemented transparent raw close-price movement with explicit evidence/currency requirements and no action interpretation.
 
 ## Task 7 — Outcome Observation Service
 
-### Goal
+**Completed.**
 
-Orchestrate:
-
-```text
-Historical recommendation
-+ observation window
-+ explicit price evidence boundary
-→ HistoricalRecommendationObservation
-```
-
-### Requirements
-
-- application-service orchestration only;
-- no raw SQL;
-- no archive mutation;
-- no hidden external context;
-- deterministic output.
-
----
+The application service orchestrates recommendation state, window maturity, exact evidence, status selection, and optional calculation.
 
 ## Task 8 — Outcome Persistence Decision
 
-### Goal
+**Completed.**
 
-Decide whether Sprint 14 outcome observations should be:
+Decision:
 
-- calculated on demand only; or
-- persisted as a rebuildable derived projection.
+```text
+Outcome observations = rebuildable on-demand derived results
+History schema target = 2
+Schema v3 = deferred
+```
 
-Do not create a new table before this decision is justified.
-
-If persistence is chosen, a new schema migration must be explicit.
-
----
+See `docs/SPRINT_14_OUTCOME_PERSISTENCE_DECISION.md`.
 
 ## Task 9 — Outcome Query / Aggregation Models
 
-### Goal
+**Completed.**
 
-Provide descriptive aggregation without statistical overclaiming.
-
-Potential fields:
-
-- observation count;
-- complete count;
-- partial/unavailable count;
-- action breakdown;
-- median/mean movement only where mathematically justified;
-- explicit sample size.
-
-No confidence calibration yet.
-
----
+Added pure descriptive aggregation over already-produced observations.
 
 ## Task 10 — Outcome CLI
 
-### Goal
+**Completed.**
 
-Expose the approved outcome service through a thin read-only CLI.
-
-CLI must be added only after service semantics stabilize.
-
----
+Added a thin read-only CLI with human-readable and JSON output.
 
 ## Task 11 — Realistic Sprint 14 E2E Fixture
 
-### Required flow
+**Completed.**
+
+The deterministic fixture covers:
 
 ```text
-Historical Review Packages
-→ imported History
+Review Packages
+→ archive
+→ manifest
+→ History import
 → recommendation history
-→ explicit price evidence
-→ observation window
-→ outcome observation
-→ query / CLI
+→ recommendation transition
+→ exact local candles
+→ mature / not-mature outcome observations
+→ aggregation
+→ CLI JSON
 ```
 
-Requirements:
+It also verifies that outcome analysis does not create an outcome table in History.
 
-- deterministic;
-- no network;
-- explicit timestamps;
-- missing-data case;
-- not-mature case;
-- recommendation transition case.
+## Task 12 — Documentation and Sprint Review
+
+**Completed by this documentation package, subject to final local regression and clean-tree verification.**
 
 ---
 
-## Task 12 — Documentation and Sprint 14 Review
+# 5. Persistence Decision
 
-Update canonical documentation only after implementation semantics are proven.
+Sprint 14 does not persist outcome observations.
 
-Create:
+Source-of-truth hierarchy remains:
 
 ```text
-docs/SPRINT_14_REVIEW.md
+Archived Review Package JSON
+    canonical historical Review Package evidence
+
+History SQLite
+    rebuildable normalized historical projection
+
+Local candle database
+    persisted historical market-data evidence
+
+Outcome observation
+    rebuildable derived result
 ```
+
+No History schema version 3 is introduced.
+
+Persistence may be reconsidered only after a concrete requirement establishes the need for caching, methodology audit snapshots, frozen research datasets, external evidence archiving, byte-stable derived-result reproducibility, or expensive large-scale materialization.
 
 ---
 
-# 8. Architecture Guardrails
+# 6. Explicit Non-Goals Preserved
 
-Allowed:
+Sprint 14 does not implement:
 
-```text
-Outcome Service
-→ History repositories
-→ explicit price-evidence adapter/repository
-→ pure outcome calculator
-```
-
-Forbidden:
-
-```text
-Outcome model → network
-Outcome comparator → raw SQL
-CLI → outcome business rules
-History archive → mutation
-Outcome service → current quote fallback
-Outcome calculation → causal claim
-Outcome aggregation → hidden sample-size threshold
-```
+- portfolio performance attribution;
+- cash-flow-adjusted returns;
+- tax-lot outcomes;
+- dividend-adjusted total return;
+- FX-adjusted multi-currency return;
+- success/failure scoring;
+- recommendation effectiveness scoring;
+- confidence calibration;
+- factor-effectiveness inference;
+- causal attribution;
+- AI-generated historical conclusions;
+- current-code historical recalculation;
+- autonomous trading;
+- broker execution;
+- Knowledge Domain.
 
 ---
 
-# 9. Data / Schema Strategy
+# 7. Definition of Done Reconciliation
 
-Sprint 14 should **not assume schema version 3 is required**.
-
-First determine whether outcome observations need persistence.
-
-If persistence is justified:
-
-- add an explicit migration;
-- preserve schema-2 databases;
-- keep outcome rows rebuildable;
-- never move canonical evidence out of the archive;
-- document ownership in History/Historical Intelligence.
-
----
-
-# 10. Testing Strategy
-
-Required categories:
-
-- model validation;
-- timezone validation;
-- observation-window edge cases;
-- immature window handling;
-- missing price evidence;
-- stable recommendation identity;
-- transition ordering;
-- zero-price protection;
-- deterministic outcome calculation;
-- provenance preservation;
-- aggregation sample-size visibility;
-- CLI JSON output if CLI is added;
-- end-to-end fixture;
-- architecture dependencies;
-- full regression suite.
-
-Commands:
-
-```powershell
-python -m pytest tests\<focused-test>.py -q
-python -m pytest -q
-```
-
----
-
-# 11. Definition of Done
-
-Sprint 14 is complete only when:
+Implemented and evidenced in repository code/tests:
 
 - outcome terminology is canonical;
 - observation-window semantics are explicit;
 - recommendation transition history is queryable;
-- price outcome evidence has explicit provenance;
-- at least one descriptive outcome calculation is implemented safely;
-- incomplete/not-mature observations are explicit;
-- no current-data leakage exists;
-- no performance/causality overclaim exists;
-- architecture boundaries are protected;
-- realistic E2E tests pass;
-- full regression tests pass;
-- documentation is aligned;
-- Sprint 14 review exists;
-- working tree is clean;
-- all changes are committed and pushed.
+- price evidence carries explicit provenance;
+- one transparent descriptive outcome calculation exists;
+- incomplete and not-mature states are explicit;
+- no current quote fallback is part of the outcome boundary;
+- no network fetch is part of the outcome boundary;
+- no portfolio-performance or causality metric is emitted;
+- aggregation keeps sample counts and coverage visible;
+- CLI remains a composition/rendering boundary;
+- realistic deterministic E2E coverage exists;
+- outcome persistence remains deferred and schema target remains 2.
 
----
+Closure still requires the developer workstation checks:
 
-# 12. Recommended First Implementation Package
-
-After this planning package, do **not** start with a repository or database migration.
-
-Start with:
-
-```text
-Task 1 — Outcome Semantics and Models
+```powershell
+python -m pytest -q
+git diff --check
+git status --short
 ```
 
-Before writing that package, audit only:
-
-- recommendation historical read model;
-- recommendation comparator;
-- timeline model;
-- snapshot model;
-- current market/historical price model conventions;
-- Constitution/Data Model terminology.
-
-The first code package should establish vocabulary and invariants without adding SQL or external data access.
+Sprint 14 is formally closed after those commands pass, the documentation commit is pushed, and the working tree is clean.
 
 ---
 
-# 13. Sprint Statement
+# 8. Sprint Statement
 
-> Sprint 13 taught Investment Terminal what changed. Sprint 14 will teach it how to observe what happened afterward — without pretending that observation is causation.
+> Sprint 13 taught Investment Terminal what changed. Sprint 14 taught it how to observe what happened afterward — while keeping observation, performance, effectiveness, and causality separate.

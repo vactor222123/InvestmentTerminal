@@ -11,6 +11,7 @@ branch: develop
 
 ```text
 Sprint 14 — Outcome-Aware Historical Intelligence
+closure review
 ```
 
 ## Completed foundations
@@ -41,33 +42,22 @@ Sprint 14 — Outcome-Aware Historical Intelligence
 - normalized historical replay;
 - read-only History query/comparison/replay CLIs;
 - realistic deterministic History end-to-end fixture;
-- Sprint 13 architecture and Definition-of-Done review.
+- Sprint 13 architecture and Definition-of-Done review;
+- canonical historical outcome models;
+- elapsed-day observation-window policy;
+- historical recommendation state and transition analysis;
+- chronological recommendation-history service;
+- exact local candle outcome-evidence boundary;
+- raw descriptive historical price-movement calculator;
+- outcome observation orchestration with explicit maturity/evidence status;
+- explicit decision to keep outcomes on demand and History schema at version 2;
+- descriptive outcome aggregation with visible coverage/sample counts;
+- read-only historical outcome CLI;
+- realistic deterministic Sprint 14 outcome end-to-end fixture.
 
 ## Sprint 13 closure
 
 Sprint 13 is formally closed.
-
-Delivered flow:
-
-```text
-Immutable Review Package
-        ↓
-Manifest
-        ↓
-Schema-managed SQLite History
-        ↓
-Explicit Import State
-        ↓
-Timeline Queries
-        ↓
-Compatibility
-        ↓
-Snapshot Comparison
-        ↓
-Exact / Normalized Replay
-        ↓
-Read-only CLI
-```
 
 Stable historical source-of-truth rule:
 
@@ -77,63 +67,150 @@ manifest.jsonl               = append-only index
 history.db                   = rebuildable projection
 ```
 
-## Sprint 14 objective
+## Sprint 14 delivered capability
 
-Sprint 14 should add the first **outcome-aware** historical intelligence while preserving the evidence semantics established in Sprints 12–13.
+Sprint 14 adds the first outcome-aware Historical Intelligence layer.
 
-The sprint must answer concrete historical questions such as:
+Implemented flow:
 
-- What happened after a historical recommendation?
-- Over what explicitly defined observation window?
-- Which price evidence was actually available for that observation?
-- Did the recommendation remain stable, reverse, or disappear before the observation matured?
-- How should incomplete outcome evidence be represented?
-- Which conclusions are descriptive facts and which would be unsupported causality claims?
+```text
+Historical recommendation evidence
+        +
+Explicit elapsed-time window
+        +
+Exact local historical close-price evidence
+        ↓
+Outcome observation
+        ↓
+Raw descriptive price movement
+        ↓
+Descriptive aggregation
+        ↓
+Read-only CLI
+```
 
-Sprint 14 must not turn snapshot value changes into implicit investment performance.
+The system can now answer:
 
-## Sprint 14 guardrails
+- what recommendation existed at a historical snapshot;
+- how that recommendation changed across snapshots;
+- whether an explicit outcome window has matured;
+- whether exact origin/endpoint price evidence exists;
+- what raw close-price movement occurred over a complete observation;
+- how many observations are complete, partial, unavailable, or not mature;
+- which action counts and descriptive raw-movement summaries exist for complete observations.
 
-Keep these rules stable:
+The system still does **not** claim:
 
-- no hindsight leakage;
-- no rewriting archived evidence;
-- no silent use of present-day data as historical evidence;
-- no performance claims without an explicit methodology;
-- no unsupported causality claims;
-- no false precision from small samples;
-- no confidence calibration before sample-size requirements are defined;
-- no Knowledge Domain before outcome semantics are stable;
-- no external-data reconstruction without provenance and version contracts.
+- that a recommendation caused a later price move;
+- that raw price movement is portfolio performance;
+- that a recommendation was universally correct or incorrect;
+- that historical outcomes calibrate future confidence;
+- that a small historical sample establishes effectiveness.
+
+## Sprint 14 canonical semantics
+
+### Observation window
+
+Sprint 14 supports:
+
+```text
+ELAPSED_DAYS
+```
+
+The endpoint is `N` absolute 24-hour periods after origin, calculated in UTC.
+
+Trading-session calendars and nearest-session substitution are not supported.
+
+### Outcome evidence
+
+Price evidence comes from exact local persisted candles.
+
+No current quote fallback, network fetch, or nearest-date substitution is allowed.
+
+Evidence preserves timestamp, source, currency, and resolution provenance.
+
+### Observation status
+
+```text
+COMPLETE
+PARTIAL
+UNAVAILABLE
+NOT_MATURE
+```
+
+### Outcome metric
+
+```text
+(endpoint_price / origin_price) - 1
+```
+
+This is raw close-price movement only.
+
+### Aggregation
+
+Aggregation exposes counts, complete-evidence coverage, action breakdown, and mean/median raw movement over `COMPLETE` observations only.
+
+It does not expose success rate, hit rate, recommendation effectiveness, confidence calibration, or causal scoring.
+
+## Sprint 14 persistence decision
+
+Outcome observations remain on-demand derived results.
+
+```text
+History schema target = 2
+Schema v3 = deferred
+```
+
+Current source-of-truth hierarchy:
+
+```text
+Archived Review Package JSON
+    canonical historical Review Package evidence
+
+History SQLite
+    rebuildable normalized historical projection
+
+Local candle database
+    persisted historical market-data evidence
+
+Outcome observation
+    rebuildable derived result
+```
 
 ## Current architectural baseline
 
-### Comparison
+### History
 
-`HistoricalSnapshotComparisonService` is the aggregate read-only comparison boundary.
+History repositories own History persistence queries.
 
-It consumes typed History repositories and compatibility assessment.
+The immutable archive remains canonical historical Review Package evidence.
 
-It does not own raw SQL and does not calculate portfolio performance.
+### Historical Intelligence
 
-### Replay
-
-`HistoricalReplayService` supports:
+Historical Intelligence owns relationships and derived analysis across historical evidence:
 
 ```text
-EXACT_ARCHIVED_PACKAGE
-NORMALIZED_HISTORICAL_VIEW
+timeline
+comparison
+replay
+recommendation transitions
+outcome observations
+descriptive outcome aggregation
 ```
 
-`CURRENT_CODE_RECALCULATION` remains defined but unsupported.
+### Market evidence
 
-Replay never accesses external data.
+Historical outcome price evidence uses exact local candles through the existing candle repository boundary.
+
+It does not fetch network data.
 
 ### CLI
 
 CLI remains a composition/rendering boundary.
 
-No History query, comparison, replay, or future outcome business rule belongs directly in CLI code.
+The outcome CLI composes typed History repositories, the recommendation-history service, window policy, price-evidence adapter, observation service, calculator, and aggregator.
+
+Outcome business rules remain outside CLI.
 
 ## Quality baseline
 
@@ -146,27 +223,45 @@ python -m pytest -q
 
 The passing-test count is intentionally not hard-coded as a permanent project metric.
 
-## Near-term priorities
+Before Sprint 14 is formally closed, run:
 
-1. Define historical outcome questions and terminology.
-2. Define explicit observation-window models.
-3. Define outcome evidence provenance before adding calculations.
-4. Add read models/repositories only where current History data can support them.
-5. Separate recommendation transition facts from later price outcome facts.
-6. Add outcome calculations only after missing-data and window semantics are explicit.
-7. Add CLI only after the service boundary exists.
-8. Add a realistic deterministic Sprint 14 fixture before closure.
+```powershell
+python -m pytest -q
+git diff --check
+git status --short
+```
+
+## Sprint 14 closure status
+
+Implementation Tasks 1–11 are complete.
+
+Task 12 documentation reconciliation is prepared.
+
+Formal closure requires:
+
+1. full regression suite passes;
+2. documentation diff check passes;
+3. documentation changes are committed and pushed;
+4. working tree is clean.
+
+After those checks, Sprint 14 is formally closed and Sprint 15 planning may begin.
 
 ## Deferred capabilities
 
 Not currently implemented:
 
+- trading-session outcome windows;
+- market-calendar-aware endpoint selection;
+- nearest-session price substitution;
+- dividend-adjusted total-return outcomes;
+- FX-adjusted multi-currency outcomes;
+- outcome persistence/materialization;
 - current-code historical recalculation;
 - external-context historical replay;
 - portfolio performance attribution;
 - tax-lot performance;
-- multi-currency historical performance conversion;
 - recommendation effectiveness scoring;
+- success/hit-rate scoring;
 - confidence calibration from historical outcomes;
 - factor-effectiveness inference;
 - Knowledge Domain;
@@ -188,6 +283,12 @@ Keep these unless requirements materially change:
 - History Domain as evidence/persistence boundary;
 - Historical Intelligence as relationship-analysis boundary;
 - CLI as composition boundary;
-- archived JSON as historical source of truth;
-- SQLite as rebuildable History projection;
-- History repositories own History persistence queries.
+- archived JSON as historical Review Package source of truth;
+- SQLite History as a rebuildable projection;
+- local persisted candles as Sprint 14 historical price evidence;
+- exact timestamp matching for Sprint 14 outcome evidence;
+- elapsed-day observation windows as the first supported policy;
+- raw close-price movement is descriptive evidence, not portfolio performance;
+- recommendation transitions and price outcomes remain separate;
+- outcome observations remain on demand;
+- History schema target remains version 2 until persistence is justified.
