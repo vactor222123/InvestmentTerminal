@@ -10,111 +10,184 @@ branch: develop
 ## Current phase
 
 ```text
-Sprint 13 — Architecture Stabilization
+Sprint 14 — Outcome-Aware Historical Intelligence
 ```
 
 ## Completed foundations
 
 - portfolio modelling and current portfolio workflows;
 - market-data clients, repositories, freshness and refresh services;
-- technical indicators and scoring;
-- fundamental analysis and data-quality handling;
-- decision engine;
-- ranking and recommendation flows;
+- technical and fundamental analysis;
+- decision, ranking, and recommendation flows;
 - contribution and deployment planning;
 - unified Review Package;
-- immutable historical review archive;
+- immutable historical Review Package archive;
 - append-only snapshot manifest;
-- checksum, path-safety, encoding, schema and timestamp identity validation;
-- historical SQLite store;
-- normalized historical import pipeline;
-- historical timeline events;
-- Sprint 12 architecture review;
-- shared validation helpers;
-- atomic write infrastructure and JSON integrations;
+- checksum, path-safety, encoding, schema, and timestamp identity validation;
+- History SQLite schema with controlled migrations;
+- explicit historical import state;
 - atomic historical detail import;
-- unified verified historical byte reads;
-- History query boundary for CLI and import pipeline.
-
-## Sprint 13 progress
-
-### Completed
-
-- shared validation module;
-- decision-model validation migration;
-- historical snapshot validation migration;
-- atomic write helper;
-- atomic JSON writes for:
-  - review-package export;
-  - current portfolio replacement;
-- historical detail import transaction ownership;
-- rollback-safe retry after failed detail import;
-- archive-root confinement for historical integrity verification;
 - read-once verified historical byte contract;
-- History query ownership moved behind `HistoricalSnapshotRepository`;
-- direct History SQLite queries removed from `import_history.py`.
+- typed History repositories;
+- historical timeline models and queries;
+- snapshot navigation;
+- snapshot compatibility assessment;
+- portfolio-summary comparison;
+- holdings comparison;
+- recommendations comparison;
+- deployment comparison;
+- aggregate snapshot comparison;
+- exact archived replay;
+- normalized historical replay;
+- read-only History query/comparison/replay CLIs;
+- realistic deterministic History end-to-end fixture;
+- Sprint 13 architecture and Definition-of-Done review.
 
-### In progress
+## Sprint 13 closure
 
-- persistence failure-path coverage;
-- archive/manifest recovery behavior;
-- architecture dependency tests;
-- governance and engineering documentation;
-- broader Sprint 13 historical query/comparison/replay work.
+Sprint 13 is formally closed.
 
-### Next priorities
+Delivered flow:
 
-1. Complete governance/status reconciliation after History hardening.
-2. Add remaining dependency-direction tests.
-3. Continue public History query and timeline interfaces from the Sprint 13 plan.
-4. Define explicit import-state evolution only when required by the broader Sprint 13 design.
-5. Continue snapshot comparison and replay foundations without weakening immutable evidence rules.
+```text
+Immutable Review Package
+        ↓
+Manifest
+        ↓
+Schema-managed SQLite History
+        ↓
+Explicit Import State
+        ↓
+Timeline Queries
+        ↓
+Compatibility
+        ↓
+Snapshot Comparison
+        ↓
+Exact / Normalized Replay
+        ↓
+Read-only CLI
+```
 
-## Current quality baseline
+Stable historical source-of-truth rule:
 
-The exact current passing-test count must be taken from the latest local run rather than hard-coded as a permanent project metric.
+```text
+Archived Review Package JSON = canonical historical evidence
+manifest.jsonl               = append-only index
+history.db                   = rebuildable projection
+```
 
-After every package:
+## Sprint 14 objective
+
+Sprint 14 should add the first **outcome-aware** historical intelligence while preserving the evidence semantics established in Sprints 12–13.
+
+The sprint must answer concrete historical questions such as:
+
+- What happened after a historical recommendation?
+- Over what explicitly defined observation window?
+- Which price evidence was actually available for that observation?
+- Did the recommendation remain stable, reverse, or disappear before the observation matured?
+- How should incomplete outcome evidence be represented?
+- Which conclusions are descriptive facts and which would be unsupported causality claims?
+
+Sprint 14 must not turn snapshot value changes into implicit investment performance.
+
+## Sprint 14 guardrails
+
+Keep these rules stable:
+
+- no hindsight leakage;
+- no rewriting archived evidence;
+- no silent use of present-day data as historical evidence;
+- no performance claims without an explicit methodology;
+- no unsupported causality claims;
+- no false precision from small samples;
+- no confidence calibration before sample-size requirements are defined;
+- no Knowledge Domain before outcome semantics are stable;
+- no external-data reconstruction without provenance and version contracts.
+
+## Current architectural baseline
+
+### Comparison
+
+`HistoricalSnapshotComparisonService` is the aggregate read-only comparison boundary.
+
+It consumes typed History repositories and compatibility assessment.
+
+It does not own raw SQL and does not calculate portfolio performance.
+
+### Replay
+
+`HistoricalReplayService` supports:
+
+```text
+EXACT_ARCHIVED_PACKAGE
+NORMALIZED_HISTORICAL_VIEW
+```
+
+`CURRENT_CODE_RECALCULATION` remains defined but unsupported.
+
+Replay never accesses external data.
+
+### CLI
+
+CLI remains a composition/rendering boundary.
+
+No History query, comparison, replay, or future outcome business rule belongs directly in CLI code.
+
+## Quality baseline
+
+After each logical package:
 
 ```powershell
 python -m pytest tests\<focused-test>.py -q
 python -m pytest -q
 ```
 
-## Known architectural priorities
+The passing-test count is intentionally not hard-coded as a permanent project metric.
 
-### Before the next feature-heavy sprint
+## Near-term priorities
 
-- consistent timezone-aware persistence;
-- safe mutable file writes;
-- tested transaction rollback;
-- explicit partial-failure recovery where transactions cannot provide atomicity;
-- protected dependency direction;
-- documented schema-version ownership;
-- rebuildable History projections from immutable archive evidence.
+1. Define historical outcome questions and terminology.
+2. Define explicit observation-window models.
+3. Define outcome evidence provenance before adding calculations.
+4. Add read models/repositories only where current History data can support them.
+5. Separate recommendation transition facts from later price outcome facts.
+6. Add outcome calculations only after missing-data and window semantics are explicit.
+7. Add CLI only after the service boundary exists.
+8. Add a realistic deterministic Sprint 14 fixture before closure.
 
-### Improve incrementally
+## Deferred capabilities
 
-- repository protocols;
-- typed domain classifications;
-- structured exception hierarchy;
-- explicit configuration injection;
-- database migrations;
-- consolidated serialization helpers only where proven useful.
+Not currently implemented:
+
+- current-code historical recalculation;
+- external-context historical replay;
+- portfolio performance attribution;
+- tax-lot performance;
+- multi-currency historical performance conversion;
+- recommendation effectiveness scoring;
+- confidence calibration from historical outcomes;
+- factor-effectiveness inference;
+- Knowledge Domain;
+- autonomous trading.
 
 ## Stable decisions
 
-Keep these unless requirements change:
+Keep these unless requirements materially change:
 
 - immutable historical packages;
 - append-only manifest;
 - SHA-256 verification;
 - exclusive archive creation;
-- verified bytes are the exact bytes later decoded and parsed;
-- deterministic ranking and recommendation ordering;
-- frozen analytical result models;
+- verified bytes are the bytes later decoded and parsed;
+- timezone-aware persisted timestamps;
+- stable-key historical identity;
+- deterministic ordering;
 - Review Domain as assembly boundary;
+- History Domain as evidence/persistence boundary;
+- Historical Intelligence as relationship-analysis boundary;
 - CLI as composition boundary;
 - archived JSON as historical source of truth;
-- SQLite as a rebuildable structured History projection;
-- History-domain repositories own History persistence queries.
+- SQLite as rebuildable History projection;
+- History repositories own History persistence queries.
