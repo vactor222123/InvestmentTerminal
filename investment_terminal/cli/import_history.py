@@ -10,11 +10,19 @@ from pathlib import Path
 from investment_terminal.history.historical_import_pipeline import (
     HistoricalImportPipeline,
 )
+from investment_terminal.history.historical_import_state_repository import (
+    HistoricalImportStateRepository,
+)
 from investment_terminal.history.historical_manifest_import_service import (
     HistoricalManifestImportService,
 )
 from investment_terminal.history.historical_review_package_loader import (
     HistoricalReviewPackageLoader,
+)
+from investment_terminal.history.historical_schema_migrations import (
+    HISTORICAL_SCHEMA_MIGRATIONS,
+    HISTORICAL_SCHEMA_TARGET_VERSION,
+    HistoricalSchemaMigrator,
 )
 from investment_terminal.history.historical_snapshot_manifest import (
     HistoricalSnapshotManifest,
@@ -124,12 +132,23 @@ def main(
     store = HistoricalSQLiteStore(
         database_path
     )
+    store.initialize()
+    HistoricalSchemaMigrator(
+        store=store,
+        migrations=HISTORICAL_SCHEMA_MIGRATIONS,
+        target_version=HISTORICAL_SCHEMA_TARGET_VERSION,
+    ).migrate()
+
     repository = HistoricalSnapshotRepository(
+        store
+    )
+    state_repository = HistoricalImportStateRepository(
         store
     )
     manifest_importer = HistoricalManifestImportService(
         manifest=manifest,
         repository=repository,
+        state_repository=state_repository,
     )
 
     try:
@@ -143,6 +162,7 @@ def main(
                 loader=HistoricalReviewPackageLoader(
                     options.history_root
                 ),
+                state_repository=state_repository,
             )
 
             snapshots = (
@@ -156,9 +176,11 @@ def main(
             )
 
             for snapshot in snapshots:
-                if repository.has_detail_import(
+                state = state_repository.require(
                     snapshot.snapshot_id
-                ):
+                )
+
+                if state.status == "IMPORTED":
                     continue
 
                 imported_results.append(

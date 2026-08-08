@@ -3,7 +3,12 @@ Import HistoricalSnapshot metadata from the append-only manifest into SQLite.
 """
 
 from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Callable
 
+from investment_terminal.history.historical_import_state_repository import (
+    HistoricalImportStateRepository,
+)
 from investment_terminal.history.historical_snapshot_manifest import (
     HistoricalSnapshotManifest,
 )
@@ -54,7 +59,6 @@ class ManifestImportResult:
     def changed(
         self,
     ) -> bool:
-        """Return whether this run imported at least one new snapshot."""
         return self.imported_records > 0
 
     def to_dict(
@@ -69,19 +73,15 @@ class ManifestImportResult:
 
 
 class HistoricalManifestImportService:
-    """
-    Synchronize snapshot metadata from manifest.jsonl into history.db.
-
-    Existing snapshot IDs are skipped. New manifest entries are inserted in
-    one atomic batch. Archived JSON files remain the historical source of
-    truth; this service imports only normalized metadata.
-    """
+    """Synchronize manifest metadata and optional explicit import state."""
 
     def __init__(
         self,
         *,
         manifest: HistoricalSnapshotManifest,
         repository: HistoricalSnapshotRepository,
+        state_repository: HistoricalImportStateRepository | None = None,
+        clock: Callable[[], datetime] | None = None,
     ) -> None:
         if not isinstance(
             manifest,
@@ -99,15 +99,29 @@ class HistoricalManifestImportService:
                 "repository must be a HistoricalSnapshotRepository"
             )
 
+        if (
+            state_repository is not None
+            and not isinstance(
+                state_repository,
+                HistoricalImportStateRepository,
+            )
+        ):
+            raise TypeError(
+                "state_repository must be a HistoricalImportStateRepository"
+            )
+
         self.manifest = manifest
         self.repository = repository
+        self.state_repository = state_repository
+        self._clock = clock or (
+            lambda: datetime.now(
+                timezone.utc
+            )
+        )
 
     def synchronize(
         self,
     ) -> ManifestImportResult:
-        """
-        Import every manifest snapshot not already present in SQLite.
-        """
         manifest_snapshots = self.manifest.load_all()
 
         pending = tuple(
@@ -122,6 +136,19 @@ class HistoricalManifestImportService:
             pending
         )
 
+        if self.state_repository is not None:
+            for snapshot in manifest_snapshots:
+                if (
+                    self.state_repository.get(
+                        snapshot.snapshot_id
+                    )
+                    is None
+                ):
+                    self.state_repository.initialize_metadata(
+                        snapshot,
+                        at=self._now(),
+                    )
+
         imported = len(
             pending
         )
@@ -134,3 +161,22 @@ class HistoricalManifestImportService:
             imported_records=imported,
             skipped_records=total - imported,
         )
+
+    def _now(
+        self,
+    ) -> datetime:
+        value = self._clock()
+
+        if (
+            not isinstance(
+                value,
+                datetime,
+            )
+            or value.tzinfo is None
+            or value.utcoffset() is None
+        ):
+            raise ValueError(
+                "clock must return a timezone-aware datetime"
+            )
+
+        return value

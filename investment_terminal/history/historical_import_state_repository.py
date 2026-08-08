@@ -44,16 +44,17 @@ class HistoricalImportStateRepository:
     def get(
         self,
         snapshot_id: str,
+        *,
+        connection: sqlite3.Connection | None = None,
     ) -> HistoricalImportState | None:
         """Return import state for one snapshot, or None when absent."""
         self._require_schema()
-
         normalized_id = HistoricalSnapshot._normalize_uuid(
             snapshot_id,
             field_name="snapshot_id",
         )
 
-        with self.store.connect() as connection:
+        if connection is not None:
             row = connection.execute(
                 """
                 SELECT *
@@ -64,6 +65,18 @@ class HistoricalImportStateRepository:
                     normalized_id,
                 ),
             ).fetchone()
+        else:
+            with self.store.connect() as owned_connection:
+                row = owned_connection.execute(
+                    """
+                    SELECT *
+                    FROM historical_import_state
+                    WHERE snapshot_id = ?
+                    """,
+                    (
+                        normalized_id,
+                    ),
+                ).fetchone()
 
         if row is None:
             return None
@@ -75,10 +88,13 @@ class HistoricalImportStateRepository:
     def require(
         self,
         snapshot_id: str,
+        *,
+        connection: sqlite3.Connection | None = None,
     ) -> HistoricalImportState:
         """Return import state for one snapshot or raise KeyError."""
         state = self.get(
-            snapshot_id
+            snapshot_id,
+            connection=connection,
         )
 
         if state is None:
@@ -104,7 +120,6 @@ class HistoricalImportStateRepository:
             )
 
         self._require_schema()
-
         validate_aware_datetime(
             at,
             field_name="at",
@@ -151,12 +166,13 @@ class HistoricalImportStateRepository:
         snapshot_id: str,
         *,
         at: datetime,
+        connection: sqlite3.Connection | None = None,
     ) -> HistoricalImportState:
-        """Transition METADATA_ONLY or FAILED state to VERIFIED."""
         return self._transition(
             snapshot_id,
             status="VERIFIED",
             at=at,
+            connection=connection,
         )
 
     def mark_importing(
@@ -165,8 +181,8 @@ class HistoricalImportStateRepository:
         *,
         at: datetime,
         importer_version: str | None = None,
+        connection: sqlite3.Connection | None = None,
     ) -> HistoricalImportState:
-        """Transition VERIFIED state to IMPORTING."""
         normalized_version = normalize_optional_text(
             importer_version,
             field_name="importer_version",
@@ -176,6 +192,7 @@ class HistoricalImportStateRepository:
             status="IMPORTING",
             at=at,
             importer_version=normalized_version,
+            connection=connection,
         )
 
     def mark_imported(
@@ -183,12 +200,13 @@ class HistoricalImportStateRepository:
         snapshot_id: str,
         *,
         at: datetime,
+        connection: sqlite3.Connection | None = None,
     ) -> HistoricalImportState:
-        """Transition IMPORTING state to IMPORTED."""
         return self._transition(
             snapshot_id,
             status="IMPORTED",
             at=at,
+            connection=connection,
         )
 
     def mark_failed(
@@ -197,8 +215,8 @@ class HistoricalImportStateRepository:
         *,
         reason: str,
         at: datetime,
+        connection: sqlite3.Connection | None = None,
     ) -> HistoricalImportState:
-        """Transition a non-completed import state to FAILED."""
         normalized_reason = normalize_required_text(
             reason,
             field_name="reason",
@@ -208,6 +226,7 @@ class HistoricalImportStateRepository:
             status="FAILED",
             at=at,
             failure_reason=normalized_reason,
+            connection=connection,
         )
 
     def _transition(
@@ -218,14 +237,15 @@ class HistoricalImportStateRepository:
         at: datetime,
         importer_version: str | None = None,
         failure_reason: str | None = None,
+        connection: sqlite3.Connection | None = None,
     ) -> HistoricalImportState:
         validate_aware_datetime(
             at,
             field_name="at",
         )
-
         current = self.require(
-            snapshot_id
+            snapshot_id,
+            connection=connection,
         )
         next_status = current.require_transition_to(
             status
@@ -254,9 +274,7 @@ class HistoricalImportStateRepository:
         state = HistoricalImportState(
             snapshot_id=current.snapshot_id,
             status=next_status,
-            metadata_synchronized_at=(
-                current.metadata_synchronized_at
-            ),
+            metadata_synchronized_at=current.metadata_synchronized_at,
             package_verified_at=package_verified_at,
             details_imported_at=details_imported_at,
             timeline_built_at=timeline_built_at,
@@ -265,46 +283,64 @@ class HistoricalImportStateRepository:
             updated_at=at,
         )
 
-        with self.store.connect() as connection:
-            cursor = connection.execute(
-                """
-                UPDATE historical_import_state
-                SET status = ?,
-                    package_verified_at = ?,
-                    details_imported_at = ?,
-                    timeline_built_at = ?,
-                    importer_version = ?,
-                    failure_reason = ?,
-                    updated_at = ?
-                WHERE snapshot_id = ?
-                  AND status = ?
-                """,
-                (
-                    state.status,
-                    self._serialize_datetime(
-                        state.package_verified_at
-                    ),
-                    self._serialize_datetime(
-                        state.details_imported_at
-                    ),
-                    self._serialize_datetime(
-                        state.timeline_built_at
-                    ),
-                    state.importer_version,
-                    state.failure_reason,
-                    state.updated_at.isoformat(),
-                    state.snapshot_id,
-                    current.status,
-                ),
+        if connection is not None:
+            self._update_state(
+                connection,
+                state,
+                current.status,
             )
-
-            if cursor.rowcount != 1:
-                raise RuntimeError(
-                    "Historical import state changed concurrently"
+        else:
+            with self.store.connect() as owned_connection:
+                self._update_state(
+                    owned_connection,
+                    state,
+                    current.status,
                 )
 
         return state
 
+    @staticmethod
+    def _update_state(
+        connection: sqlite3.Connection,
+        state: HistoricalImportState,
+        expected_status: str,
+    ) -> None:
+        cursor = connection.execute(
+            """
+            UPDATE historical_import_state
+            SET status = ?,
+                package_verified_at = ?,
+                details_imported_at = ?,
+                timeline_built_at = ?,
+                importer_version = ?,
+                failure_reason = ?,
+                updated_at = ?
+            WHERE snapshot_id = ?
+              AND status = ?
+            """,
+            (
+                state.status,
+                HistoricalImportStateRepository._serialize_datetime(
+                    state.package_verified_at
+                ),
+                HistoricalImportStateRepository._serialize_datetime(
+                    state.details_imported_at
+                ),
+                HistoricalImportStateRepository._serialize_datetime(
+                    state.timeline_built_at
+                ),
+                state.importer_version,
+                state.failure_reason,
+                state.updated_at.isoformat(),
+                state.snapshot_id,
+                expected_status,
+            ),
+        )
+
+        if cursor.rowcount != 1:
+            raise RuntimeError(
+                "Historical import state changed concurrently"
+            )
 
     def _require_schema(
         self,

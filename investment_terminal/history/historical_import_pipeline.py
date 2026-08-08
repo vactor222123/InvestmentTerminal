@@ -3,13 +3,17 @@ End-to-end import pipeline for one archived historical snapshot.
 """
 
 from dataclasses import dataclass
-from typing import Any
+from datetime import datetime, timezone
+from typing import Callable
 
 from investment_terminal.history.historical_deployment_importer import (
     HistoricalDeploymentImporter,
 )
 from investment_terminal.history.historical_holdings_importer import (
     HistoricalHoldingsImporter,
+)
+from investment_terminal.history.historical_import_state_repository import (
+    HistoricalImportStateRepository,
 )
 from investment_terminal.history.historical_portfolio_summary_importer import (
     HistoricalPortfolioSummaryImporter,
@@ -90,29 +94,15 @@ class HistoricalImportResult:
 
 
 class HistoricalImportPipeline:
-    """
-    Import one archived Review Package into structured historical tables.
-
-    Workflow:
-
-        HistoricalSnapshot
-            -> verify archived JSON
-            -> portfolio_summary
-            -> holdings
-            -> recommendations
-            -> deployment
-            -> timeline_events
-
-    Snapshot metadata must already exist in SQLite, normally through the
-    manifest import service. If a later stage fails, all detail rows created
-    for this snapshot are removed while the snapshot metadata is preserved.
-    """
+    """Import one archived Review Package into structured historical tables."""
 
     def __init__(
         self,
         *,
         store: HistoricalSQLiteStore,
         loader: HistoricalReviewPackageLoader,
+        state_repository: HistoricalImportStateRepository | None = None,
+        clock: Callable[[], datetime] | None = None,
     ) -> None:
         if not isinstance(
             store,
@@ -130,8 +120,20 @@ class HistoricalImportPipeline:
                 "loader must be a HistoricalReviewPackageLoader"
             )
 
+        if (
+            state_repository is not None
+            and not isinstance(
+                state_repository,
+                HistoricalImportStateRepository,
+            )
+        ):
+            raise TypeError(
+                "state_repository must be a HistoricalImportStateRepository"
+            )
+
         self.store = store
         self.loader = loader
+        self.state_repository = state_repository
         self.repository = HistoricalSnapshotRepository(
             store
         )
@@ -148,20 +150,22 @@ class HistoricalImportPipeline:
                 store
             )
         )
-        self.deployment_importer = (
-            HistoricalDeploymentImporter(
-                store
-            )
+        self.deployment_importer = HistoricalDeploymentImporter(
+            store
         )
         self.timeline_builder = HistoricalTimelineBuilder(
             store
+        )
+        self._clock = clock or (
+            lambda: datetime.now(
+                timezone.utc
+            )
         )
 
     def import_snapshot(
         self,
         snapshot: HistoricalSnapshot,
     ) -> HistoricalImportResult:
-        """Verify and import one snapshot into all structured tables."""
         if not isinstance(
             snapshot,
             HistoricalSnapshot,
@@ -186,50 +190,132 @@ class HistoricalImportPipeline:
                 "SQLite record"
             )
 
-        if self.repository.has_detail_import(
+        if self.state_repository is None:
+            if self.repository.has_detail_import(
+                snapshot.snapshot_id
+            ):
+                raise ValueError(
+                    "Historical snapshot details have already been imported"
+                )
+            payload = self.loader.load(
+                snapshot
+            )
+            return self._import_details(
+                snapshot=snapshot,
+                payload=payload,
+            )
+
+        state = self.state_repository.require(
             snapshot.snapshot_id
-        ):
+        )
+
+        if state.status == "IMPORTED":
             raise ValueError(
                 "Historical snapshot details have already been imported"
             )
 
-        payload = self.loader.load(
-            snapshot
+        if state.status not in (
+            "METADATA_ONLY",
+            "FAILED",
+        ):
+            raise ValueError(
+                "Historical snapshot import state is not ready for import: "
+                f"{state.status}"
+            )
+
+        try:
+            payload = self.loader.load(
+                snapshot
+            )
+            self.state_repository.mark_verified(
+                snapshot.snapshot_id,
+                at=self._now(),
+            )
+
+            with self.store.transaction() as connection:
+                self.state_repository.mark_importing(
+                    snapshot.snapshot_id,
+                    at=self._now(),
+                    importer_version=snapshot.product_version,
+                    connection=connection,
+                )
+                result = self._import_details(
+                    snapshot=snapshot,
+                    payload=payload,
+                    connection=connection,
+                )
+                self.state_repository.mark_imported(
+                    snapshot.snapshot_id,
+                    at=self._now(),
+                    connection=connection,
+                )
+
+            return result
+        except BaseException as exc:
+            current = self.state_repository.require(
+                snapshot.snapshot_id
+            )
+
+            if current.status not in (
+                "FAILED",
+                "IMPORTED",
+            ):
+                reason = (
+                    str(
+                        exc
+                    ).strip()
+                    or exc.__class__.__name__
+                )
+                self.state_repository.mark_failed(
+                    snapshot.snapshot_id,
+                    reason=reason,
+                    at=self._now(),
+                )
+
+            raise
+
+    def _import_details(
+        self,
+        *,
+        snapshot: HistoricalSnapshot,
+        payload: dict,
+        connection=None,
+    ) -> HistoricalImportResult:
+        if connection is None:
+            with self.store.transaction() as owned_connection:
+                return self._import_details(
+                    snapshot=snapshot,
+                    payload=payload,
+                    connection=owned_connection,
+                )
+
+        self.summary_importer.import_summary(
+            snapshot=snapshot,
+            payload=payload,
+            connection=connection,
         )
-
-        self.store.initialize()
-
-        with self.store.transaction() as connection:
-            self.summary_importer.import_summary(
+        holdings = self.holdings_importer.import_holdings(
+            snapshot=snapshot,
+            payload=payload,
+            connection=connection,
+        )
+        recommendations = (
+            self.recommendations_importer
+            .import_recommendations(
                 snapshot=snapshot,
                 payload=payload,
                 connection=connection,
             )
-            holdings = self.holdings_importer.import_holdings(
-                snapshot=snapshot,
-                payload=payload,
-                connection=connection,
-            )
-            recommendations = (
-                self.recommendations_importer
-                .import_recommendations(
-                    snapshot=snapshot,
-                    payload=payload,
-                    connection=connection,
-                )
-            )
-            deployment = (
-                self.deployment_importer
-                .import_deployment(
-                    snapshot=snapshot,
-                    payload=payload,
-                    connection=connection,
-                )
-            )
-            timeline_events = self.timeline_builder.build(
-                snapshot,
-                connection=connection,
-            )
+        )
+        deployment = self.deployment_importer.import_deployment(
+            snapshot=snapshot,
+            payload=payload,
+            connection=connection,
+        )
+        timeline_events = self.timeline_builder.build(
+            snapshot,
+            connection=connection,
+        )
 
         return HistoricalImportResult(
             snapshot_id=snapshot.snapshot_id,
@@ -239,16 +325,29 @@ class HistoricalImportPipeline:
             timeline_events_created=timeline_events,
         )
 
+    def _now(
+        self,
+    ) -> datetime:
+        value = self._clock()
+
+        if (
+            not isinstance(
+                value,
+                datetime,
+            )
+            or value.tzinfo is None
+            or value.utcoffset() is None
+        ):
+            raise ValueError(
+                "clock must return a timezone-aware datetime"
+            )
+
+        return value
+
     def _remove_partial_import(
         self,
         snapshot_id: str,
     ) -> None:
-        """
-        Remove detail rows from an incomplete pipeline run.
-
-        Snapshot metadata is intentionally retained so the immutable manifest
-        and structured snapshot index remain synchronized.
-        """
         self.store.initialize()
 
         with self.store.connect() as connection:
