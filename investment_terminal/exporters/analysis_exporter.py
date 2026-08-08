@@ -23,6 +23,9 @@ from investment_terminal.services.technical_analysis_service import (
 from investment_terminal.services.technical_score_service import (
     TechnicalScoreResult,
 )
+from investment_terminal.utils.atomic_write import (
+    write_text_atomic,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -204,24 +207,18 @@ class AnalysisExporter:
                 "output_path must use the .json extension"
             )
 
-        path.parent.mkdir(
-            parents=True,
-            exist_ok=True,
+        payload = json.dumps(
+            package.to_dict(),
+            ensure_ascii=False,
+            indent=2,
+            allow_nan=False,
         )
 
-        with path.open(
-            "w",
+        return write_text_atomic(
+            path,
+            payload,
             encoding="utf-8",
-        ) as file:
-            json.dump(
-                package.to_dict(),
-                file,
-                ensure_ascii=False,
-                indent=2,
-                allow_nan=False,
-            )
-
-        return path
+        )
 
     @staticmethod
     def _validate_components(
