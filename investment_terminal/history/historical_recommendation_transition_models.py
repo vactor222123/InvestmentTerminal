@@ -163,6 +163,7 @@ class HistoricalRecommendationTransition:
     FIRST_OBSERVED: ClassVar[str] = "FIRST_OBSERVED"
     ACTION_CHANGED: ClassVar[str] = "ACTION_CHANGED"
     METRICS_CHANGED: ClassVar[str] = "METRICS_CHANGED"
+    DESCRIPTIVE_CHANGED: ClassVar[str] = "DESCRIPTIVE_CHANGED"
     DISAPPEARED: ClassVar[str] = "DISAPPEARED"
     REAPPEARED: ClassVar[str] = "REAPPEARED"
     UNCHANGED: ClassVar[str] = "UNCHANGED"
@@ -171,6 +172,7 @@ class HistoricalRecommendationTransition:
         FIRST_OBSERVED,
         ACTION_CHANGED,
         METRICS_CHANGED,
+        DESCRIPTIVE_CHANGED,
         DISAPPEARED,
         REAPPEARED,
         UNCHANGED,
@@ -314,9 +316,7 @@ class HistoricalRecommendationTransition:
             previous.score != current.score
             or previous.confidence != current.confidence
         )
-        descriptive_changed = (
-            previous.symbol != current.symbol
-        )
+        descriptive_changed = previous.symbol != current.symbol
 
         if self.transition_type == self.ACTION_CHANGED:
             if not action_changed:
@@ -329,6 +329,17 @@ class HistoricalRecommendationTransition:
             if action_changed or not metrics_changed:
                 raise ValueError(
                     "METRICS_CHANGED requires unchanged action and changed score/confidence"
+                )
+            return
+
+        if self.transition_type == self.DESCRIPTIVE_CHANGED:
+            if (
+                action_changed
+                or metrics_changed
+                or not descriptive_changed
+            ):
+                raise ValueError(
+                    "DESCRIPTIVE_CHANGED requires unchanged action/metrics and changed symbol"
                 )
             return
 
