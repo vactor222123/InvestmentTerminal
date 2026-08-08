@@ -122,7 +122,16 @@ Expected behavior:
 - reject non-finite JSON numbers;
 - write UTF-8;
 - finish with a newline unless a contract says otherwise;
-- replace atomically.
+- flush and synchronize temporary file contents before replacement;
+- preserve existing destination permissions when replacing a file;
+- replace atomically;
+- synchronize the parent directory after replacement when the platform supports it;
+- remove temporary files after pre-replacement failures.
+
+A failure reported after `os.replace` may mean the new destination contents are already
+visible but the final durability synchronization failed. Callers must not assume that
+an exception from the post-replacement directory sync implies that the previous file
+contents were restored.
 
 Do not use atomic replacement for immutable exclusive archives or append-only manifests without a specific design decision.
 
@@ -218,7 +227,3 @@ Update documentation when changing:
 - public contracts;
 - persistence behavior;
 - workflows;
-- project status;
-- engineering rules.
-
-Major decisions should become ADRs rather than remaining only in chat or commit messages.
