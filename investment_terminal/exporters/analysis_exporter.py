@@ -4,7 +4,6 @@ Combined technical, fundamental and decision analysis exporter.
 
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import datetime
-import json
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +23,7 @@ from investment_terminal.services.technical_score_service import (
     TechnicalScoreResult,
 )
 from investment_terminal.utils.atomic_write import (
-    write_text_atomic,
+    write_json_atomic,
 )
 
 
@@ -207,17 +206,12 @@ class AnalysisExporter:
                 "output_path must use the .json extension"
             )
 
-        payload = json.dumps(
+        return write_json_atomic(
+            path,
             package.to_dict(),
             ensure_ascii=False,
             indent=2,
-            allow_nan=False,
-        )
-
-        return write_text_atomic(
-            path,
-            payload,
-            encoding="utf-8",
+            trailing_newline=False,
         )
 
     @staticmethod

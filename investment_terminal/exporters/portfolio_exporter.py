@@ -4,7 +4,6 @@ Compact portfolio ranking, recommendation, thesis, and market-data JSON exporter
 
 from dataclasses import dataclass
 from datetime import datetime
-import json
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +19,7 @@ from investment_terminal.services.market_data_refresh_service import (
     UniverseMarketDataRefreshResult,
 )
 from investment_terminal.utils.atomic_write import (
-    write_text_atomic,
+    write_json_atomic,
 )
 
 
@@ -351,17 +350,12 @@ class PortfolioExporter:
         if path.suffix.lower() != ".json":
             raise ValueError("output_path must use the .json extension")
 
-        payload = json.dumps(
+        return write_json_atomic(
+            path,
             package.to_dict(),
             ensure_ascii=False,
             indent=2,
-            allow_nan=False,
-        )
-
-        return write_text_atomic(
-            path,
-            payload,
-            encoding="utf-8",
+            trailing_newline=False,
         )
 
     @staticmethod

@@ -87,13 +87,23 @@ def write_json_atomic(
     *,
     indent: int | None = 2,
     sort_keys: bool = False,
+    ensure_ascii: bool = True,
     trailing_newline: bool = True,
 ) -> Path:
     """Serialize and atomically write a JSON document."""
+    if not isinstance(
+        ensure_ascii,
+        bool,
+    ):
+        raise TypeError(
+            "ensure_ascii must be a bool"
+        )
+
     text = json.dumps(
         payload,
         indent=indent,
         sort_keys=sort_keys,
+        ensure_ascii=ensure_ascii,
         allow_nan=False,
     )
 
