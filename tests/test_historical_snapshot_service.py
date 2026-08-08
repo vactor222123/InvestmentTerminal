@@ -180,6 +180,114 @@ def test_service_removes_archive_when_manifest_fails(
     ).exists()
 
 
+def test_service_syncs_archive_directory_after_cleanup(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = tmp_path / "review.json"
+    write_package(
+        source
+    )
+    service = create_service(
+        tmp_path
+    )
+    calls: list[Path] = []
+
+    def fail_append(
+        snapshot: object,
+    ) -> Path:
+        raise ValueError(
+            "manifest failure"
+        )
+
+    monkeypatch.setattr(
+        service.manifest,
+        "append",
+        fail_append,
+    )
+    monkeypatch.setattr(
+        "investment_terminal.history."
+        "historical_snapshot_service.sync_directory",
+        lambda directory: calls.append(
+            directory
+        ),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="manifest failure",
+    ):
+        service.preserve(
+            source
+        )
+
+    assert len(calls) == 1
+    assert calls[0].name == "08"
+    assert calls[0].parent.name == "2026"
+
+
+def test_service_reports_cleanup_durability_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = tmp_path / "review.json"
+    write_package(
+        source
+    )
+    service = create_service(
+        tmp_path
+    )
+
+    def fail_append(
+        snapshot: object,
+    ) -> Path:
+        raise ValueError(
+            "manifest failure"
+        )
+
+    def fail_sync(
+        directory: Path,
+    ) -> None:
+        raise OSError(
+            "directory sync failed"
+        )
+
+    monkeypatch.setattr(
+        service.manifest,
+        "append",
+        fail_append,
+    )
+    monkeypatch.setattr(
+        "investment_terminal.history."
+        "historical_snapshot_service.sync_directory",
+        fail_sync,
+    )
+
+    with pytest.raises(
+        RuntimeError,
+        match=(
+            "unregistered archive file could not "
+            "be durably removed"
+        ),
+    ) as exc_info:
+        service.preserve(
+            source
+        )
+
+    assert isinstance(
+        exc_info.value.__cause__,
+        OSError,
+    )
+    assert tuple(
+        (
+            tmp_path
+            / "history"
+        ).rglob(
+            "*.json"
+        )
+    ) == ()
+
+
 def test_service_removes_archive_when_manifest_is_interrupted(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

@@ -162,6 +162,14 @@ Do not use atomic replacement for immutable exclusive archives or append-only ma
 - roll back and remove a first-created manifest if its durability boundary fails;
 - do not silently rewrite history.
 
+### Workflow cleanup
+
+- a snapshot is complete only after both archive creation and manifest registration succeed;
+- if manifest registration fails, remove the newly-created unregistered archive;
+- synchronize the archive directory after removing that file so rollback has an explicit durability boundary;
+- treat failure to durably remove an unregistered archive as a workflow recovery failure;
+- never remove an already-registered historical snapshot.
+
 ### SQLite
 
 - treat it as a rebuildable analytical representation;

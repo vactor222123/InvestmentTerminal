@@ -13,6 +13,9 @@ from investment_terminal.history.historical_snapshot_manifest import (
 from investment_terminal.history.historical_snapshot_models import (
     HistoricalSnapshot,
 )
+from investment_terminal.utils.atomic_write import (
+    sync_directory,
+)
 
 
 class HistoricalSnapshotService:
@@ -97,6 +100,7 @@ class HistoricalSnapshotService:
         """
         Remove an archive file created by an incomplete workflow.
 
+        The deletion is synchronized before cleanup is considered complete.
         Only the newly-created unregistered file is removed. Existing manifest
         entries and completed historical snapshots are never modified.
         """
@@ -104,10 +108,13 @@ class HistoricalSnapshotService:
             archived_path.unlink(
                 missing_ok=True
             )
+            sync_directory(
+                archived_path.parent
+            )
         except OSError as exc:
             raise RuntimeError(
                 "Snapshot manifest registration failed and the "
-                "unregistered archive file could not be removed: "
+                "unregistered archive file could not be durably removed: "
                 f"{archived_path}"
             ) from exc
 
