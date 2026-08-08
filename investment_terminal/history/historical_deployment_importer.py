@@ -4,6 +4,7 @@ Import historical deployment and allocation decisions into SQLite.
 
 import json
 import sqlite3
+from contextlib import nullcontext
 from math import isfinite
 from numbers import Real
 from typing import Any
@@ -87,6 +88,7 @@ class HistoricalDeploymentImporter:
         *,
         snapshot: HistoricalSnapshot,
         payload: dict[str, Any],
+        connection: sqlite3.Connection | None = None,
     ) -> int:
         """Insert all available deployment records for one snapshot."""
         if not isinstance(
@@ -109,10 +111,11 @@ class HistoricalDeploymentImporter:
             payload
         )
 
-        self.store.initialize()
+        if connection is None:
+            self.store.initialize()
 
         try:
-            with self.store.connect() as connection:
+            with (nullcontext(connection) if connection is not None else self.store.connect()) as connection:
                 connection.executemany(
                     """
                     INSERT INTO deployment (

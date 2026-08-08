@@ -4,6 +4,7 @@ Build historical timeline events from normalized SQLite history.
 
 import json
 import sqlite3
+from contextlib import nullcontext
 from datetime import datetime, timezone
 from typing import Any
 
@@ -49,6 +50,8 @@ class HistoricalTimelineBuilder:
     def build(
         self,
         snapshot: HistoricalSnapshot,
+        *,
+        connection: sqlite3.Connection | None = None,
     ) -> int:
         """Create all timeline events available for one snapshot."""
         if not isinstance(
@@ -59,9 +62,10 @@ class HistoricalTimelineBuilder:
                 "snapshot must be a HistoricalSnapshot"
             )
 
-        self.store.initialize()
+        if connection is None:
+            self.store.initialize()
 
-        with self.store.connect() as connection:
+        with (nullcontext(connection) if connection is not None else self.store.connect()) as connection:
             if not self._snapshot_exists(
                 connection,
                 snapshot.snapshot_id,

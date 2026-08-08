@@ -197,20 +197,25 @@ class HistoricalImportPipeline:
             snapshot
         )
 
-        try:
+        self.store.initialize()
+
+        with self.store.transaction() as connection:
             self.summary_importer.import_summary(
                 snapshot=snapshot,
                 payload=payload,
+                connection=connection,
             )
             holdings = self.holdings_importer.import_holdings(
                 snapshot=snapshot,
                 payload=payload,
+                connection=connection,
             )
             recommendations = (
                 self.recommendations_importer
                 .import_recommendations(
                     snapshot=snapshot,
                     payload=payload,
+                    connection=connection,
                 )
             )
             deployment = (
@@ -218,16 +223,13 @@ class HistoricalImportPipeline:
                 .import_deployment(
                     snapshot=snapshot,
                     payload=payload,
+                    connection=connection,
                 )
             )
             timeline_events = self.timeline_builder.build(
-                snapshot
+                snapshot,
+                connection=connection,
             )
-        except BaseException:
-            self._remove_partial_import(
-                snapshot.snapshot_id
-            )
-            raise
 
         return HistoricalImportResult(
             snapshot_id=snapshot.snapshot_id,

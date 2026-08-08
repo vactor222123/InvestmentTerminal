@@ -3,6 +3,7 @@ Import portfolio summary data from a verified Review Package into SQLite.
 """
 
 import sqlite3
+from contextlib import nullcontext
 from math import isfinite
 from numbers import Real
 from typing import Any
@@ -42,6 +43,7 @@ class HistoricalPortfolioSummaryImporter:
         *,
         snapshot: HistoricalSnapshot,
         payload: dict[str, Any],
+        connection: sqlite3.Connection | None = None,
     ) -> None:
         """Insert one immutable portfolio summary for a snapshot."""
         if not isinstance(
@@ -64,10 +66,11 @@ class HistoricalPortfolioSummaryImporter:
             payload
         )
 
-        self.store.initialize()
+        if connection is None:
+            self.store.initialize()
 
         try:
-            with self.store.connect() as connection:
+            with (nullcontext(connection) if connection is not None else self.store.connect()) as connection:
                 connection.execute(
                     """
                     INSERT INTO portfolio_summary (

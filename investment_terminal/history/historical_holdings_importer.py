@@ -3,6 +3,7 @@ Import historical portfolio holdings from a verified Review Package.
 """
 
 import sqlite3
+from contextlib import nullcontext
 from math import isfinite
 from numbers import Real
 from typing import Any
@@ -44,6 +45,7 @@ class HistoricalHoldingsImporter:
         *,
         snapshot: HistoricalSnapshot,
         payload: dict[str, Any],
+        connection: sqlite3.Connection | None = None,
     ) -> int:
         """Insert all available holdings for one snapshot."""
         if not isinstance(
@@ -66,10 +68,11 @@ class HistoricalHoldingsImporter:
             payload
         )
 
-        self.store.initialize()
+        if connection is None:
+            self.store.initialize()
 
         try:
-            with self.store.connect() as connection:
+            with (nullcontext(connection) if connection is not None else self.store.connect()) as connection:
                 connection.executemany(
                     """
                     INSERT INTO holdings (

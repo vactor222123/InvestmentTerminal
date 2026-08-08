@@ -377,6 +377,8 @@ def test_pipeline_removes_partial_rows_on_interruption(
 
     def interrupt_timeline_build(
         snapshot_to_build: HistoricalSnapshot,
+        *,
+        connection,
     ) -> int:
         raise SimulatedInterruption()
 
@@ -404,3 +406,16 @@ def test_pipeline_removes_partial_rows_on_interruption(
             store,
             table,
         ) == 0
+
+    assert table_count(
+        store,
+        "snapshots",
+    ) == 1
+
+    monkeypatch.undo()
+
+    result = pipeline.import_snapshot(
+        snapshot
+    )
+
+    assert result.snapshot_id == SNAPSHOT_ID
