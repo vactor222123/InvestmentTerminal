@@ -1,4 +1,3 @@
-
 # ADR-0002 — History Is Immutable
 
 **Status:** Accepted  
@@ -192,9 +191,13 @@ A change violates this ADR if it:
 | Area | Status |
 |---|---|
 | Review Package | Implemented |
-| Immutable archive | Planned (Sprint 12) |
-| Snapshot manifest | Planned |
-| Checksum verification | Planned |
+| Immutable archive | Implemented |
+| Snapshot manifest | Implemented |
+| Archive-root path safety | Implemented |
+| Checksum verification | Implemented |
+| Read-once verified byte path | Implemented |
+| Structured historical import | Implemented |
+| Atomic detail import | Implemented |
 | Snapshot diff | Planned |
 | Historical replay | Planned |
 
@@ -215,7 +218,6 @@ A change violates this ADR if it:
 Future enhancements may include:
 
 - snapshot signing;
-- integrity verification;
 - archive compaction metadata;
 - retention policies;
 - distributed archive support.

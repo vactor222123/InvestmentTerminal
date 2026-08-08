@@ -1,4 +1,3 @@
-
 # ADR-0003 — SQLite Is the Canonical Structured History Store
 
 **Status:** Accepted  
@@ -186,10 +185,18 @@ A change violates this ADR when:
 
 | Area | Status |
 |---|---|
-| Review Package archive | Planned |
-| SQLite schema | Planned |
-| Import pipeline | Planned |
-| Timeline queries | Planned |
+| Review Package archive | Implemented |
+| SQLite schema | Implemented |
+| Snapshot metadata repository | Implemented |
+| Structured import pipeline | Implemented |
+| Atomic snapshot-detail transaction | Implemented |
+| Timeline event generation | Implemented |
+| CLI History query boundary | Implemented |
+| Public snapshot query repository | Partially implemented |
+| Public timeline query repository | Planned |
+| Schema migration tooling | Planned |
+| Snapshot comparison | Planned |
+| Historical replay | Planned |
 | Knowledge integration | Future |
 
 ---
@@ -210,7 +217,6 @@ A change violates this ADR when:
 Future enhancements may include:
 
 - migration tooling;
-- integrity verification;
 - indexing improvements;
 - optional cloud-backed implementations.
 

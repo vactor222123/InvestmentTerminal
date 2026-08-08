@@ -25,13 +25,16 @@ Sprint 13 — Architecture Stabilization
 - unified Review Package;
 - immutable historical review archive;
 - append-only snapshot manifest;
-- checksum and schema validation;
+- checksum, path-safety, encoding, schema and timestamp identity validation;
 - historical SQLite store;
 - normalized historical import pipeline;
 - historical timeline events;
 - Sprint 12 architecture review;
 - shared validation helpers;
-- first atomic write infrastructure and JSON integrations.
+- atomic write infrastructure and JSON integrations;
+- atomic historical detail import;
+- unified verified historical byte reads;
+- History query boundary for CLI and import pipeline.
 
 ## Sprint 13 progress
 
@@ -43,28 +46,33 @@ Sprint 13 — Architecture Stabilization
 - atomic write helper;
 - atomic JSON writes for:
   - review-package export;
-  - current portfolio replacement.
+  - current portfolio replacement;
+- historical detail import transaction ownership;
+- rollback-safe retry after failed detail import;
+- archive-root confinement for historical integrity verification;
+- read-once verified historical byte contract;
+- History query ownership moved behind `HistoricalSnapshotRepository`;
+- direct History SQLite queries removed from `import_history.py`.
 
 ### In progress
 
 - persistence failure-path coverage;
-- final atomic-write integration review;
-- transaction ownership;
 - archive/manifest recovery behavior;
 - architecture dependency tests;
-- AI and engineering documentation.
+- governance and engineering documentation;
+- broader Sprint 13 historical query/comparison/replay work.
 
 ### Next priorities
 
-1. Add failure-path tests for atomic JSON integrations.
-2. Clarify transaction ownership for historical imports.
-3. Define archive/manifest partial-failure recovery.
-4. Add dependency-direction tests.
-5. Complete Sprint 13 documentation and changelog.
+1. Complete governance/status reconciliation after History hardening.
+2. Add remaining dependency-direction tests.
+3. Continue public History query and timeline interfaces from the Sprint 13 plan.
+4. Define explicit import-state evolution only when required by the broader Sprint 13 design.
+5. Continue snapshot comparison and replay foundations without weakening immutable evidence rules.
 
 ## Current quality baseline
 
-The full suite contained 730 passing tests before the latest Sprint 13 atomic-write additions.
+The exact current passing-test count must be taken from the latest local run rather than hard-coded as a permanent project metric.
 
 After every package:
 
@@ -73,8 +81,6 @@ python -m pytest tests\<focused-test>.py -q
 python -m pytest -q
 ```
 
-The exact current count must be taken from the latest local run rather than hard-coded as a permanent project metric.
-
 ## Known architectural priorities
 
 ### Before the next feature-heavy sprint
@@ -82,9 +88,10 @@ The exact current count must be taken from the latest local run rather than hard
 - consistent timezone-aware persistence;
 - safe mutable file writes;
 - tested transaction rollback;
-- explicit partial-failure recovery;
+- explicit partial-failure recovery where transactions cannot provide atomicity;
 - protected dependency direction;
-- documented schema-version ownership.
+- documented schema-version ownership;
+- rebuildable History projections from immutable archive evidence.
 
 ### Improve incrementally
 
@@ -103,8 +110,11 @@ Keep these unless requirements change:
 - append-only manifest;
 - SHA-256 verification;
 - exclusive archive creation;
+- verified bytes are the exact bytes later decoded and parsed;
 - deterministic ranking and recommendation ordering;
 - frozen analytical result models;
 - Review Domain as assembly boundary;
 - CLI as composition boundary;
-- archived JSON as historical source of truth.
+- archived JSON as historical source of truth;
+- SQLite as a rebuildable structured History projection;
+- History-domain repositories own History persistence queries.
