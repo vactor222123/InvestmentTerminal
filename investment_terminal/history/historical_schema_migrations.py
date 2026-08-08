@@ -101,6 +101,60 @@ class HistoricalSchemaMigration:
             )
 
 
+HISTORICAL_SCHEMA_TARGET_VERSION = 2
+
+HISTORICAL_SCHEMA_MIGRATIONS = (
+    HistoricalSchemaMigration(
+        from_version=1,
+        to_version=2,
+        name="add snapshot import state",
+        statements=(
+            """
+            CREATE TABLE historical_import_state (
+                snapshot_id TEXT PRIMARY KEY,
+                status TEXT NOT NULL
+                    CHECK (
+                        status IN (
+                            'METADATA_ONLY',
+                            'VERIFIED',
+                            'IMPORTING',
+                            'IMPORTED',
+                            'FAILED'
+                        )
+                    ),
+                metadata_synchronized_at TEXT NOT NULL,
+                package_verified_at TEXT,
+                details_imported_at TEXT,
+                timeline_built_at TEXT,
+                importer_version TEXT,
+                failure_reason TEXT,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (
+                    snapshot_id
+                )
+                REFERENCES snapshots (
+                    snapshot_id
+                )
+                ON DELETE RESTRICT
+            )
+            """,
+            """
+            CREATE INDEX idx_historical_import_state_status
+            ON historical_import_state (
+                status
+            )
+            """,
+            """
+            CREATE INDEX idx_historical_import_state_updated_at
+            ON historical_import_state (
+                updated_at
+            )
+            """,
+        ),
+    ),
+)
+
+
 class HistoricalSchemaMigrator:
     """
     Upgrade an initialized History database through ordered migrations.
