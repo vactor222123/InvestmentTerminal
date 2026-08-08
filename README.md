@@ -1,272 +1,164 @@
 # Investment Terminal
 
-> Professional Investment Analysis System
+> Professional private investment intelligence system
 
-Version: 1.0.0
+## Overview
 
-Author:
-- Viktor
-- OpenAI
+Investment Terminal is a modular Python application for deterministic investment analysis, portfolio intelligence, structured review generation, immutable history, historical comparison, and safe replay.
 
----
+The system is designed around five non-negotiable properties:
 
-# Overview
+- correctness;
+- determinism;
+- traceability;
+- historical integrity;
+- explicit human decision ownership.
 
-Investment Terminal is a professional portfolio analysis and market research application designed for long-term investing and position trading.
+The Python engine produces structured evidence. AI may interpret that evidence together with current external context, but AI does not replace canonical calculations, archived facts, or the final human decision.
 
-The system automatically downloads market data, calculates technical indicators, analyzes portfolio allocation and generates professional investment reports.
+## Current Product Capabilities
 
-The main goal is to make investment decisions using verified and up-to-date market data instead of assumptions.
+### Current-state intelligence
 
----
+- market-data acquisition and validation;
+- technical and fundamental analysis;
+- ranking and machine recommendations;
+- portfolio holdings and policy;
+- cost-basis and market-value portfolio views;
+- contribution and deployment planning;
+- versioned Review Package generation.
 
-# Main Features
+### History
 
-## Market Data
+Investment Terminal preserves completed Review Packages as immutable historical evidence.
 
-- Finnhub API integration
-- Historical price data
-- Real-time quotes
-- Automatic updates
+Current History capabilities include:
 
----
+- canonical `HistoricalSnapshot`;
+- immutable exact-byte JSON archive;
+- SHA-256 integrity verification;
+- append-only `manifest.jsonl`;
+- SQLite historical projection;
+- controlled schema migrations;
+- explicit snapshot import state;
+- atomic detail import;
+- typed timeline events and timeline queries;
+- snapshot navigation;
+- portfolio-summary, holdings, recommendation, and deployment repositories.
 
-## Technical Analysis
+### Historical comparison
 
-(Current Version)
+Implemented comparison capabilities include:
 
-- RSI (14)
-- SMA20
-- SMA50
-- SMA100
-- SMA200
-- EMA20
-- EMA50
-- EMA200
-- MACD
-- Signal Line
-- MACD Histogram
-- ATR
-- Average Volume
-- 52 Week High
-- 52 Week Low
+- snapshot compatibility assessment;
+- portfolio-summary comparison;
+- holdings comparison by stable key;
+- recommendation comparison by stable key;
+- deployment comparison by stable key;
+- aggregate `SnapshotComparison`.
 
-Future Versions
+Comparison explicitly distinguishes:
 
-- Bollinger Bands
-- ADX
-- VWAP
-- Stochastic RSI
-- Ichimoku Cloud
+- `COMPATIBLE`;
+- `PARTIALLY_COMPATIBLE`;
+- `INCOMPATIBLE`.
 
----
+Source-status changes and missing historical detail remain visible rather than being silently ignored.
 
-## Portfolio Analysis
+### Historical replay
 
-- Current Allocation
-- Target Allocation
-- Profit / Loss
-- Portfolio Performance
-- ETF Allocation
-- Stock Allocation
+Supported replay modes:
 
----
+- `EXACT_ARCHIVED_PACKAGE`;
+- `NORMALIZED_HISTORICAL_VIEW`.
 
-## Market Analysis
+`CURRENT_CODE_RECALCULATION` is defined in the domain contract but intentionally unsupported.
 
-Future Versions
+Exact replay uses verified archived evidence. Normalized replay uses the rebuildable typed SQLite projection.
 
-- Fear & Greed Index
-- VIX
-- US10Y Yield
-- Gold
-- Oil
-- Bitcoin
-- Dollar Index
+## History CLI
 
----
+```powershell
+python -m investment_terminal.cli.import_history
+python -m investment_terminal.cli.query_history snapshots
+python -m investment_terminal.cli.query_history timeline
+python -m investment_terminal.cli.query_history show --snapshot-id <uuid>
 
-## Fundamental Analysis
+python -m investment_terminal.cli.compare_history `
+    --earlier <snapshot-uuid> `
+    --later <snapshot-uuid>
 
-Future Versions
+python -m investment_terminal.cli.replay_history `
+    --snapshot-id <uuid> `
+    --mode exact
 
-- P/E
-- PEG
-- EPS
-- ROE
-- Revenue Growth
-- Debt
-- Free Cash Flow
-- Dividend Yield
-- Market Cap
-
----
-
-## Reports
-
-The application generates:
-
-- Investment_Database.xlsx
-
-Future versions:
-
-- Monthly Report
-- Portfolio Report
-- Market Report
-- Risk Report
-
----
-
-# Project Structure
-
-InvestmentTerminal/
-
-```
-config/
-data/
-logs/
-output/
-src/
-tests/
-
-README.md
-requirements.txt
-Run.bat
+python -m investment_terminal.cli.replay_history `
+    --snapshot-id <uuid> `
+    --mode normalized `
+    --json
 ```
 
----
+All History query/comparison/replay CLIs are read-only inspection boundaries. They do not contain SQL or domain calculations.
 
-# Data Sources
+## Historical Source-of-Truth Rule
 
-Primary
+```text
+Archived Review Package JSON
+    canonical historical evidence
 
-- Finnhub API
+manifest.jsonl
+    append-only navigation index
 
-Backup
-
-- Yahoo Finance
-
-Future
-
-- Financial Modeling Prep
-- Alpha Vantage
-
----
-
-# Project Philosophy
-
-Investment Terminal follows one simple principle:
-
-**Data Quality First**
-
-The application should never generate investment recommendations using outdated or incomplete market data.
-
-Every value should be traceable to its source.
-
----
-
-# Development Rules
-
-The project follows:
-
-- PEP8
-- SOLID Principles
-- Type Hints
-- Docstrings
-- Modular Architecture
-- Exception Handling
-- Logging
-- Unit Testing
-
----
-
-# Version Roadmap
-
-## Version 1.0
-
-- Project Foundation
-- Finnhub API
-- Excel Export
-- Technical Indicators
-
----
-
-## Version 1.1
-
-- News
-- Earnings Calendar
-- Analyst Ratings
-- Insider Transactions
-
----
-
-## Version 2.0
-
-- Investment Score
-- Opportunity Score
-- Buy Score
-- Sell Score
-- Portfolio Score
-
----
-
-## Version 3.0
-
-Investment Dashboard
-
-- Charts
-- Portfolio Analytics
-- AI Assistant
-- One-click Market Update
-
----
-
-# Data Quality
-
-Before generating any report the application verifies:
-
-- API connection
-- Missing values
-- Historical data completeness
-- Indicator calculation
-- Timestamp freshness
-
-If validation fails, the report will not be generated.
-
----
-
-# Logging
-
-Every execution creates log files.
-
-Example
-
-logs/
-
-```
-2026-08-01.log
+history.db
+    rebuildable structured projection
 ```
 
----
+SQLite may be rebuilt. Archived Review Package bytes must not be rewritten.
 
-# License
+## Architecture
 
-Personal Use
+Investment Terminal is a modular monolith with domain-oriented boundaries.
 
-Copyright © Viktor & OpenAI
+Primary domains:
 
----
+- Market Data;
+- Technical Analysis;
+- Fundamental Analysis;
+- Ranking;
+- Recommendation;
+- Portfolio;
+- Decision;
+- Review;
+- History;
+- Historical Intelligence;
+- future Knowledge.
 
-# Disclaimer
+CLI modules construct dependencies and invoke application services. Repositories own History persistence queries. Comparators and replay logic operate through typed domain boundaries.
 
-This software is intended to assist investment research.
+## Testing
 
-It does not provide financial advice.
+Sprint 13 includes a realistic end-to-end History fixture covering:
 
-All investment decisions remain the responsibility of the investor.
+```text
+Review Package
+→ Archive
+→ Manifest
+→ SQLite synchronization
+→ Verified atomic import
+→ Timeline
+→ Query
+→ Comparison
+→ Replay
+```
 
----
+The fixture is deterministic and network-free.
 
-# Mission
+## Project Philosophy
 
-Build one of the most reliable private investment analysis systems using transparent data, automation and disciplined decision making.
+**Data Quality First. Evidence Before Narrative. History Is Immutable.**
+
+The application must never fabricate unavailable data, hide uncertainty, or silently reinterpret historical evidence.
+
+## Disclaimer
+
+Investment Terminal is research and decision-support software. It does not provide financial advice and does not execute trades. The investor remains responsible for every investment decision.

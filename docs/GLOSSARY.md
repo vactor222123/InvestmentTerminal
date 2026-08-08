@@ -1,211 +1,164 @@
-
-# GLOSSARY.md
-
 # Investment Terminal — Glossary
 
-**Status:** Canonical Terminology
+**Status:** Canonical Terminology  
+**Updated after:** Sprint 13 — Historical Comparison and Replay
 
-This glossary defines the official meaning of important terms used throughout
-Investment Terminal. These definitions should be used consistently in code,
-documentation, RFCs and ADRs.
+## Archived Review Package
 
----
+The exact immutable JSON bytes of a completed Review Package preserved by History. This is canonical historical evidence.
 
-## Analysis
+## Canonical Evidence
 
-The deterministic process of transforming validated financial data into
-structured signals.
-
----
-
-## Asset
-
-A financial instrument such as a stock, ETF, bond or cash position.
-
----
+Evidence whose original meaning and bytes are authoritative for historical verification. For History, the archived Review Package is canonical evidence.
 
 ## Canonical Model
 
-The primary data model representing a business concept inside the system.
+The primary typed data model representing one business concept.
 
----
+## Compatibility
 
-## Confidence
+The explicit assessment of whether two historical snapshots can be meaningfully compared.
 
-A measure of the quality, completeness and consistency of the available
-evidence supporting an analysis.
+Statuses:
 
-**Confidence is NOT a prediction of future returns.**
+- `COMPATIBLE`;
+- `PARTIALLY_COMPATIBLE`;
+- `INCOMPATIBLE`.
 
----
+## Comparison Facts
 
-## Contribution Plan
-
-A deterministic allocation proposal for newly available capital based on the
-current portfolio policy.
-
----
-
-## Decision
-
-The final investment action chosen by the investor.
-
-Recommendations support decisions but never replace them.
-
----
-
-## Decision Trace
-
-A structured explanation describing why a recommendation or deployment proposal
-was produced.
-
----
+A minimal typed read model containing only facts required to evaluate snapshot compatibility.
 
 ## Deployment
 
-The proposed allocation of available capital into portfolio sleeves or assets.
-
----
-
-## Domain
-
-A coherent business area with a single responsibility (Portfolio, Review,
-History, Knowledge, etc.).
-
----
+A proposed allocation of available capital into portfolio sleeves or assets.
 
 ## Evidence
 
-Validated information used to support calculations or recommendations.
+Validated information used to support deterministic calculations, recommendations, historical comparisons, or replay.
 
-Evidence may originate from market data, fundamentals, portfolio information or
-historical records.
+## Exact Replay
 
----
+Replay mode that returns the verified archived Review Package payload.
+
+Canonical mode name:
+
+`EXACT_ARCHIVED_PACKAGE`.
+
+## Historical Intelligence
+
+The domain capability that analyzes relationships across verified historical facts.
+
+Sprint 13 implements compatibility, snapshot comparison, and safe replay foundations.
+
+## Historical Replay
+
+A controlled representation of one historical snapshot.
+
+Supported Sprint 13 forms are exact archived evidence and normalized historical view.
 
 ## Historical Snapshot
 
-An immutable record describing the complete state of a review at a specific
-point in time.
-
----
+Canonical immutable metadata describing one archived Review Package.
 
 ## History
 
-The permanent archive of historical snapshots and related metadata.
+The domain responsible for preserving, verifying, indexing, importing, and querying historical evidence.
 
-History is immutable.
+History owns facts. Historical Intelligence owns relationships between facts.
 
----
+## Import State
 
-## Insight
+The explicit persisted workflow state of a historical snapshot import.
 
-A meaningful interpretation derived from multiple pieces of evidence.
+Values:
 
----
-
-## Investment Review Package
-
-The canonical structured output of the Python engine.
-
-It is the primary interface between deterministic analysis and AI-assisted
-interpretation.
-
----
+- `METADATA_ONLY`;
+- `VERIFIED`;
+- `IMPORTING`;
+- `IMPORTED`;
+- `FAILED`.
 
 ## Knowledge
 
-Verified patterns or conclusions derived from accumulated historical evidence.
+Future reusable, traceable patterns or conclusions derived from accumulated historical evidence and Historical Intelligence outputs.
 
----
+Knowledge never rewrites History.
 
-## Market Value
+## Manifest
 
-The calculated value of the current portfolio using available market prices or
-documented fallback rules.
+Append-only JSON Lines index of `HistoricalSnapshot` metadata.
 
----
+The manifest is navigation metadata, not canonical evidence.
 
-## Policy Gap
+## Normalized Historical View
 
-The difference between current allocation and target allocation defined by the
-portfolio policy.
+Replay representation constructed from typed SQLite History repositories.
 
----
+Canonical mode name:
 
-## Portfolio
+`NORMALIZED_HISTORICAL_VIEW`.
 
-The complete collection of holdings, cash, policy and related configuration.
-
----
+It is rebuildable and is not exact archived evidence.
 
 ## Recommendation
 
-A machine-generated assessment derived from deterministic analysis.
+A deterministic machine-generated assessment derived from analysis. It is not investment advice.
 
-A recommendation is not investment advice.
+## Replay Provenance
 
----
+Metadata identifying the historical evidence behind replay, including snapshot ID, package schema version, and archive SHA-256.
 
-## Review
+## Review Package
 
-A complete analysis of the portfolio and supporting evidence for a specific
-execution.
+The canonical versioned structured output assembled by the Review Domain for one analysis run.
 
----
+## Schema Migration
 
-## Schema Version
+Controlled transformation of the History SQLite schema from one supported version to the next.
 
-The version identifier of a serialized format used to maintain compatibility.
+## Snapshot Comparison
 
----
+Typed aggregate result describing changes between two compatible historical snapshots.
 
-## Signal
+## Source Status
 
-A structured output produced by deterministic analysis (for example, technical
-or fundamental signals).
+The provenance state of portfolio values, such as `COST_BASIS_ONLY` or `MARKET_VALUE_CONNECTED`.
 
-Signals are inputs to recommendations.
-
----
-
-## Snapshot
-
-A stored representation of a review or portfolio state.
-
----
+A source-status change is significant historical context and must remain visible.
 
 ## Source of Truth
 
-The canonical location from which a specific type of information is considered
-authoritative.
+The canonical location for one category of information.
 
----
+For historical evidence:
 
-## Traceability
+- archived JSON = canonical evidence;
+- manifest = append-only index;
+- SQLite = rebuildable projection.
 
-The ability to identify the origin of any derived value.
+## Stable Key
 
----
+Persisted identity used to match historical collection items across snapshots.
 
-## Validation
+Examples:
 
-The process of confirming that data satisfies the required business rules before
-it is used.
+- `holding_key`;
+- `recommendation_key`;
+- `deployment_key`.
 
----
+Comparators do not fuzzy-match different stable keys.
 
-# Terminology Rules
+## Timeline Event
 
-- Use terms consistently.
-- Avoid introducing synonyms for canonical concepts.
-- Prefer glossary terms in documentation and code comments.
-- Update this document whenever a new core concept is introduced.
+Typed historical event derived from one normalized snapshot import.
 
----
+## Current-Code Recalculation
 
-# Guiding Statement
+A defined but unsupported replay mode in Sprint 13.
 
-Shared terminology is part of the architecture.
+Canonical mode name:
 
-Consistent language reduces ambiguity and improves long-term maintainability.
+`CURRENT_CODE_RECALCULATION`.
+
+It must not be silently executed.

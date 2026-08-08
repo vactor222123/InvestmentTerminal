@@ -1,763 +1,148 @@
 # Investment Terminal — Product Roadmap
 
 **Status:** Canonical Roadmap  
-**Updated after:** Sprint 12 — Historical Intelligence Foundation  
+**Updated after:** Sprint 13 — Historical Comparison and Replay  
 **Current development branch:** `develop`
 
----
-
-# 1. Purpose
-
-This roadmap defines the intended development direction of Investment Terminal.
-
-It is not a fixed promise of dates.
-
-It establishes:
-
-- product sequencing;
-- architectural priorities;
-- domain maturity;
-- quality gates;
-- expected sprint outcomes;
-- long-term product direction.
-
-The roadmap should be updated when architecture or priorities materially change.
-
----
-
-# 2. Product Vision
-
-Investment Terminal is being developed as a long-term private investment intelligence platform.
-
-The product should be able to:
-
-- collect validated market and company data;
-- model the user's portfolio;
-- calculate deterministic technical and fundamental evidence;
-- rank investment candidates;
-- generate explainable recommendations;
-- support allocation and deployment decisions;
-- assemble structured Review Packages;
-- preserve every meaningful review as immutable evidence;
-- compare present and historical states;
-- derive traceable knowledge from accumulated history;
-- support AI-assisted human judgment.
-
-The user remains responsible for the final investment decision.
-
----
-
-# 3. Development Principles
-
-Every milestone must protect:
-
-1. correctness;
-2. determinism;
-3. historical integrity;
-4. explainability;
-5. maintainability;
-6. backward compatibility;
-7. testability.
-
-No sprint is complete until:
-
-- focused tests pass;
-- the full regression suite passes;
-- documentation is aligned;
-- the working tree is clean;
-- changes are committed and pushed;
-- unfinished integration is removed or explicitly deferred.
-
----
-
-# 4. Product Evolution
+## 1. Product Evolution
 
 ```text
 Foundation
-    ↓
-Current-State Analysis
-    ↓
-Portfolio and Decision Intelligence
-    ↓
-Unified Review Package
-    ↓
-Historical Intelligence Foundation
-    ↓
-Historical Comparison and Replay
-    ↓
-Outcome Analysis and Confidence
-    ↓
-Knowledge Domain
-    ↓
-Evidence-Grounded AI Experience
+→ Current-State Analysis
+→ Portfolio and Decision Intelligence
+→ Unified Review Package
+→ Historical Intelligence Foundation
+→ Historical Comparison and Replay
+→ Outcome Analysis and Confidence
+→ Knowledge Domain
+→ Evidence-Grounded AI Experience
 ```
 
----
+## 2. Completed: Sprint 11
 
-# 5. Completed Foundations
+Architecture and canonical product documentation foundation.
 
-## Early Foundation
+## 3. Completed: Sprint 12 — Historical Intelligence Foundation
 
-Completed capabilities include:
+Delivered:
 
-- Python project structure;
-- configuration;
-- logging;
-- SQLite support;
-- file-based inputs;
-- market-data integration;
-- portfolio loading;
-- test infrastructure;
-- CLI workflows;
-- structured exports.
-
----
-
-## Current-State Analysis Foundation
-
-Implemented capabilities include:
-
-- market-data models;
-- quote providers;
-- technical indicators;
-- stock-analysis data;
-- ranking inputs;
-- machine recommendations;
-- portfolio holdings;
-- portfolio policy;
-- cost-basis snapshots;
-- market-value enrichment;
-- contribution planning;
-- Review Package generation.
-
----
-
-# 6. Sprint 11 — Architecture and Documentation Foundation
-
-**Status:** Completed
-
-Sprint 11 established the canonical product and engineering documentation.
-
-Delivered documents include:
-
-- `PROJECT_VISION.md`;
-- `CONSTITUTION.md`;
-- `ARCHITECTURE.md`;
-- `DATA_MODEL.md`;
-- `INVESTMENT_PHILOSOPHY.md`;
-- `DEVELOPMENT_GUIDELINES.md`;
-- `DESIGN_PRINCIPLES.md`;
-- `QUALITY_ATTRIBUTES.md`;
-- `PRODUCT_VALUES.md`;
-- `GLOSSARY.md`;
-- `DOMAIN_MAP.md`;
-- Architecture Decision Records;
-- `SPRINT_11_REVIEW.md`;
-- `SPRINT_12_PLAN.md`.
-
-Primary outcome:
-
-> Investment Terminal moved from an evolving collection of modules to a documented product architecture with explicit domain boundaries and engineering rules.
-
----
-
-# 7. Sprint 12 — Historical Intelligence Foundation
-
-**Status:** Implementation complete  
-**Documentation status:** Final alignment in progress
-
-Sprint 12 introduced the first complete History Domain.
-
-## Delivered Capabilities
-
-- canonical `HistoricalSnapshot`;
+- `HistoricalSnapshot`;
 - immutable Review Package archive;
-- exact-byte preservation;
 - SHA-256 integrity;
-- safe archive paths;
-- append-only `manifest.jsonl`;
-- snapshot preservation service;
+- append-only manifest;
 - archive CLI;
 - SQLite history schema;
 - snapshot repository;
-- manifest-to-SQLite synchronization;
-- verified archived-package loader;
-- portfolio-summary importer;
-- holdings importer;
-- recommendations importer;
-- deployment importer;
-- timeline-event builder;
-- end-to-end historical import pipeline;
-- History import CLI;
-- Sprint 12 architecture review.
+- manifest synchronization;
+- verified loader;
+- summary/holdings/recommendations/deployment import;
+- timeline builder;
+- import pipeline;
+- import CLI.
 
-## Historical Data Flow
+## 4. Completed Implementation: Sprint 13 — Historical Comparison and Replay
 
-```text
-Review Package
-        ↓
-Immutable Archive
-        ↓
-Append-only Manifest
-        ↓
-Verified Loading
-        ↓
-Structured SQLite Import
-        ↓
-Timeline Events
-```
+Sprint 13 extends History from preservation into safe historical intelligence.
 
-## Sprint 12 Outcome
+Delivered capabilities:
 
-Investment Terminal can now preserve a completed review as:
+### Query foundation
 
-- immutable evidence;
-- verifiable evidence;
-- indexed evidence;
-- normalized historical data;
-- timeline events.
-
-## Deferred from Sprint 12
-
-- direct automatic archival from Review Package generation;
-- public timeline query service;
-- historical replay;
-- snapshot comparison;
-- schema migration framework;
-- explicit import-state model;
-- archive audit and manifest rebuild tools.
-
-These are planned extensions of the implemented foundation.
-
----
-
-# 8. Sprint 12 Closure Checklist
-
-Before Sprint 12 is formally closed:
-
-- run the complete test suite;
-- confirm a clean Git working tree;
-- confirm archive smoke test;
-- confirm import smoke test;
-- align canonical documentation;
-- commit and push all documentation updates;
-- verify that `SPRINT_12_REVIEW.md` reflects the final status.
-
-Recommended validation:
-
-```powershell
-python -m pytest
-git status
-```
-
----
-
-# 9. Sprint 13 — Historical Query and Replay Foundation
-
-**Status:** Planned
-
-## Goal
-
-Make the History Domain usable for structured historical inspection, comparison, and replay.
-
-## Proposed Scope
-
-### 9.1 Timeline Repository
-
-Implement a public query boundary for:
-
-- chronological event listing;
-- filtering by snapshot;
-- filtering by event type;
-- filtering by subject key;
-- filtering by date range;
-- retrieving latest events;
-- deterministic pagination or bounded results.
-
-### 9.2 Snapshot Listing
-
-Add a clean public repository method for:
-
-- listing all snapshots;
-- chronological ordering;
-- latest snapshot;
-- package-lineage history;
-- generated-date filtering.
-
-This removes direct SQL access from CLI code.
-
-### 9.3 Import-State Model
-
-Introduce explicit historical import state.
-
-Potential states:
-
-```text
-METADATA_ONLY
-VERIFIED
-IMPORTING
-IMPORTED
-FAILED
-```
-
-Potential fields:
-
-- snapshot ID;
-- metadata synchronized at;
-- package verified at;
-- details imported at;
-- timeline built at;
-- failure reason;
-- importer version.
-
-### 9.4 Snapshot Comparison Foundation
-
-Implement first comparison models:
-
-- earlier snapshot;
-- later snapshot;
-- compatibility result;
-- portfolio-summary change;
-- holdings added;
-- holdings removed;
-- holdings-value changes;
-- recommendation changes;
-- deployment changes.
-
-### 9.5 Historical Replay
-
-Define replay semantics.
-
-Replay must distinguish:
-
-- exact archived evidence;
-- normalized historical view;
-- recalculation using current code;
-- current external context.
-
-### 9.6 End-to-End History Tests
-
-Use a real generated Review Package fixture to validate:
-
-```text
-Generate
-    ↓
-Archive
-    ↓
-Manifest
-    ↓
-Import
-    ↓
-Timeline
-    ↓
-Query
-```
-
-## Expected Sprint 13 Deliverables
-
+- canonical timeline event model;
 - timeline repository;
-- snapshot list API;
-- import-state schema and repository;
-- snapshot comparison model;
-- first comparison service;
-- replay contract;
-- CLI query commands;
-- complete tests;
-- `SPRINT_13_REVIEW.md`.
+- snapshot navigation queries.
 
----
+### Schema evolution
 
-# 10. Sprint 14 — Historical Portfolio Analytics
+- schema migration foundation;
+- schema target version 2;
+- explicit snapshot import-state table/model/repository;
+- import-state workflow integration;
+- legacy import-state reconciliation.
 
-**Status:** Planned
+### Comparison foundation
 
-## Goal
+- scalar and aggregate comparison models;
+- comparison facts repository;
+- snapshot compatibility service;
+- portfolio-summary read model/repository/comparator;
+- holdings read model/repository/comparator;
+- recommendations read model/repository/comparator;
+- deployment read model/repository/comparator;
+- aggregate snapshot comparison service.
 
-Turn normalized historical portfolio data into useful portfolio-evolution analysis.
+### Replay foundation
 
-## Proposed Scope
+- replay request/result models;
+- exact archived replay;
+- normalized historical replay;
+- explicit rejection of current-code recalculation.
 
-- total portfolio-value timeline;
-- invested-value timeline;
-- cash timeline;
-- sleeve-weight evolution;
-- strategy-weight evolution;
-- holding quantity evolution;
-- holding value evolution;
-- position additions and removals;
-- concentration history;
-- contribution history;
-- policy-gap history.
+### CLI
 
-## Expected Outputs
+- History query CLI;
+- snapshot comparison CLI;
+- historical replay CLI.
 
-```text
-PortfolioEvolutionSeries
-HoldingEvolutionSeries
-AllocationEvolutionSeries
-PolicyGapEvolutionSeries
-```
+### Integration quality
 
-## Quality Requirements
+- deterministic realistic two-snapshot end-to-end fixture;
+- archive → manifest → migration → sync → import → timeline → query → comparison → replay.
 
-- all calculations trace to snapshots;
-- no invented values;
-- explicit cost-basis versus market-value status;
-- deterministic date ordering;
-- compatibility checks between snapshots.
+## 5. Sprint 13 Remaining Closure
 
----
+- canonical documentation reconciliation;
+- Sprint 13 architecture/review document;
+- final Definition of Done verification.
 
-# 11. Sprint 15 — Recommendation and Deployment History
+## 6. Deferred Scope
 
-**Status:** Planned
+Not part of Sprint 13:
 
-## Goal
+- current-code historical recalculation;
+- external-data replay;
+- performance attribution;
+- outcome analysis;
+- recommendation effectiveness scoring;
+- confidence calibration;
+- Knowledge Domain;
+- autonomous portfolio actions.
 
-Analyze how machine recommendations and deployment decisions change over time.
+## 7. Next Product Direction
 
-## Proposed Scope
+After Sprint 13 closure, the next logical layer is outcome-aware Historical Intelligence.
 
-- recommendation transition model;
-- action-change detection;
-- score movement;
-- confidence movement;
-- rationale change;
-- recommendation duration;
-- repeated recommendation stability;
-- deployment allocation history;
-- capital-allocation transitions;
-- recommendation-to-deployment relationship.
+Candidate themes:
 
-## Example Transitions
+- historical recommendation outcome windows;
+- signal duration;
+- ranking movement;
+- decision stability;
+- evidence coverage over time;
+- portfolio evolution;
+- statistically honest confidence calibration.
 
-```text
-WATCH → BUY
-BUY → HOLD
-HOLD → REDUCE
-NOT_CONNECTED → CONNECTED
-```
+These features must build on verified History rather than bypass it.
 
-## Expected Outputs
+## 8. Long-Term Direction
 
-- recommendation transition timeline;
-- per-symbol recommendation history;
-- deployment history;
-- stability indicators;
-- change explanations.
+The Knowledge Domain begins only after historical evidence volume and semantics are mature enough.
 
----
+Knowledge must remain:
 
-# 12. Sprint 16 — Outcome Tracking and Confidence Foundation
+- evidence-linked;
+- sample-size aware;
+- versioned;
+- rebuildable;
+- separate from immutable historical facts.
 
-**Status:** Planned
+## 9. Definition of Done
 
-## Goal
+A milestone is complete only when:
 
-Evaluate what happened after prior recommendations without pretending that historical association proves causation.
-
-## Proposed Scope
-
-- future-price outcome windows;
-- recommendation outcome models;
-- deployment outcome models;
-- benchmark-relative results;
-- drawdown after recommendation;
-- confidence dimensions;
-- evidence completeness;
-- source freshness;
-- signal agreement;
-- historical support;
-- sample-size visibility.
-
-## Confidence Principle
-
-Confidence must not be one unexplained number.
-
-It should expose dimensions such as:
-
-- completeness;
-- freshness;
-- consistency;
-- historical support;
-- sample size;
-- conflict level.
-
-## Expected Outputs
-
-```text
-RecommendationOutcome
-DeploymentOutcome
-ConfidenceResult
-EvidenceCoverage
-```
-
----
-
-# 13. Sprint 17 — Historical Intelligence Services
-
-**Status:** Planned
-
-## Goal
-
-Create higher-level services that answer cross-snapshot questions.
-
-## Proposed Scope
-
-- previous-compatible-snapshot discovery;
-- historical analogues;
-- trend persistence;
-- recurring portfolio imbalances;
-- repeated missed opportunities;
-- repeated recommendation reversals;
-- regime-aware history;
-- stability and transition summaries.
-
-## Example Questions
-
-- How long has this recommendation remained unchanged?
-- When did this holding first appear?
-- How has the portfolio's cash weight changed?
-- Which recommendations frequently reversed?
-- Which deployment plans were repeatedly deferred?
-- Which signals were reliable only in specific regimes?
-
----
-
-# 14. Sprint 18 — Knowledge Domain Foundation
-
-**Status:** Planned
-
-## Goal
-
-Introduce traceable product knowledge derived from verified historical evidence.
-
-## Proposed Scope
-
-- `EvidenceReference`;
-- `KnowledgeEntry`;
-- evidence relationship graph;
-- knowledge calculation version;
-- sample-size requirements;
-- confidence and limitation fields;
-- knowledge supersession;
-- knowledge repository;
-- knowledge rebuild pipeline.
-
-## Knowledge Rules
-
-- knowledge must reference evidence;
-- knowledge must expose sample size;
-- knowledge must be versioned;
-- knowledge must not rewrite history;
-- unsupported inference must remain clearly identified;
-- weak evidence must not be presented as certainty.
-
----
-
-# 15. Later Product Capabilities
-
-## Evidence-Grounded AI
-
-- current Review Package interpretation;
-- historical evidence retrieval;
-- traceable knowledge retrieval;
-- external current-context research;
-- facts versus inference separation;
-- scenario generation;
-- explainable multi-period review.
-
-## Portfolio Risk
-
-- concentration risk;
-- drawdown;
-- volatility;
-- correlations;
-- currency exposure;
-- sector exposure;
-- risk-budget constraints.
-
-## Multi-Account and Broker Integration
-
-- multiple broker accounts;
-- broker instrument mapping;
-- automated portfolio import;
-- transaction history;
-- tax-lot data;
-- reconciliation.
-
-## Reporting and User Experience
-
-- interactive dashboard;
-- portfolio evolution charts;
-- recommendation timeline;
-- audit reports;
-- notifications;
-- scheduled review workflows.
-
----
-
-# 16. Long-Term Possibilities
-
-Potential future capabilities include:
-
-- dividend calendar;
-- tax reporting;
-- multi-broker support;
-- options analysis;
-- selected crypto support;
-- real-estate investment module;
-- macroeconomic dashboard;
-- scenario simulation;
-- portfolio stress testing;
-- personalized evidence search;
-- local-first web interface;
-- automated scheduled reviews.
-
-These possibilities must not weaken the core product principles.
-
----
-
-# 17. Capabilities Not Prioritized
-
-Investment Terminal is not currently prioritizing:
-
-- autonomous trading;
-- high-frequency trading;
-- hidden black-box recommendations;
-- social trading;
-- gamified speculation;
-- unsupported predictive certainty;
-- cloud dependence;
-- rewriting historical facts.
-
----
-
-# 18. Release Strategy
-
-Development flow:
-
-```text
-Focused task
-    ↓
-Focused tests
-    ↓
-Full regression suite
-    ↓
-Documentation update
-    ↓
-Commit to develop
-    ↓
-Architecture review
-    ↓
-Sprint review
-    ↓
-Release candidate
-```
-
-Possible product stages:
-
-```text
-Development
-    ↓
-Alpha
-    ↓
-Beta
-    ↓
-Stable
-```
-
-Release readiness depends on quality, not only feature count.
-
----
-
-# 19. Success Criteria
-
-The product is progressing successfully when it can:
-
-- update and validate current evidence;
-- model the user's portfolio;
-- explain deterministic recommendations;
-- generate a complete Review Package;
-- preserve reviews immutably;
-- verify historical integrity;
-- rebuild structured history;
-- compare portfolio and recommendation states;
-- track historical outcomes honestly;
-- derive knowledge with traceable evidence;
-- support AI interpretation without giving AI ownership of facts;
-- operate without hidden manual data manipulation.
-
----
-
-# 20. Roadmap Review Rules
-
-This document should be reviewed:
-
-- after every completed sprint;
-- after a major architectural decision;
-- when a domain changes maturity;
-- when a planned feature is deferred;
-- when scope is added or removed;
-- before starting a new multi-sprint milestone.
-
-When reality differs from the roadmap, update the roadmap.
-
-Do not preserve outdated plans merely for appearance.
-
----
-
-# 21. Current Next Step
-
-After Sprint 12 documentation is fully aligned, the next formal activity should be:
-
-```text
-Sprint 13 Planning
-```
-
-The recommended Sprint 13 theme is:
-
-> Historical Query, Comparison, and Replay Foundation
-
-Before implementation begins, create:
-
-```text
-docs/SPRINT_13_PLAN.md
-```
-
-The plan should define:
-
-- scope;
-- explicit non-goals;
-- task sequence;
-- schema changes;
-- compatibility requirements;
-- testing strategy;
-- documentation updates;
-- Definition of Done.
-
----
-
-# 22. Final Direction
-
-> Investment Terminal should evolve from current-state analysis into a system that preserves evidence, compares history, evaluates outcomes, and derives knowledge without losing traceability.
-
-The roadmap therefore follows this sequence:
-
-```text
-Evidence
-    ↓
-Decision Support
-    ↓
-Review
-    ↓
-History
-    ↓
-Comparison
-    ↓
-Outcomes
-    ↓
-Knowledge
-    ↓
-Evidence-Grounded AI
-```
+- focused tests pass;
+- full regression suite passes;
+- architecture boundaries remain clean;
+- documentation reflects implementation;
+- deferred scope is explicit;
+- repository is committed and pushed.
