@@ -12,6 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_ROOT = PROJECT_ROOT / "investment_terminal"
 CLI_PACKAGE = PACKAGE_ROOT / "cli"
 HISTORY_PACKAGE = PACKAGE_ROOT / "history"
+REVIEW_PACKAGE = PACKAGE_ROOT / "review"
 
 
 def test_non_cli_modules_do_not_import_cli_package() -> None:
@@ -44,6 +45,26 @@ def test_non_history_modules_do_not_import_history_package() -> None:
         "History is a downstream evidence and query boundary. "
         "Only History itself and the CLI composition layer may "
         "import it:\n"
+        + "\n".join(
+            violations
+        )
+    )
+
+
+def test_upstream_modules_do_not_import_review_package() -> None:
+    violations = _find_forbidden_imports(
+        forbidden_package="investment_terminal.review",
+        excluded_directories=(
+            CLI_PACKAGE,
+            HISTORY_PACKAGE,
+            REVIEW_PACKAGE,
+        ),
+    )
+
+    assert violations == [], (
+        "Review is a downstream assembly boundary. Upstream "
+        "domains must produce their own outputs without importing "
+        "Review:\n"
         + "\n".join(
             violations
         )
