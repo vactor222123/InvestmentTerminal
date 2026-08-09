@@ -1,7 +1,7 @@
 # Investment Terminal — Product Roadmap
 
 **Status:** Canonical Roadmap  
-**Updated after:** Sprint 16 — Statistically Honest Outcome Research Foundation  
+**Updated after:** Sprint 17 — Research Provenance and Population Quality Hardening  
 **Current development branch:** `develop`
 
 ## 1. Product Evolution
@@ -16,6 +16,7 @@ Foundation
 → Outcome-Aware Historical Intelligence
 → Historical Outcome Methodology Hardening
 → Statistically Honest Outcome Research Foundation
+→ Research Provenance and Population Quality Hardening
 → Knowledge Domain
 → Evidence-Grounded AI Experience
 ```
@@ -51,32 +52,18 @@ TRADING_SESSIONS_EXACT_CLOSE@1
 
 ## 7. Completed: Sprint 16 — Statistically Honest Outcome Research Foundation
 
-Sprint 16 implemented the research protocol that Sprint 15 deliberately required before any effectiveness or confidence scoring.
+Sprint 16 delivered the explicit descriptive research protocol required before any effectiveness or confidence scoring.
 
-Delivered:
+Canonical protocol:
 
-- canonical `HistoricalOutcomeResearchProtocol`;
-- `DESCRIPTIVE_OUTCOME_RESEARCH@1`;
-- explicit eligible observation policy;
-- exact cohort grouping by methodology identity and observation-window semantics;
-- visible coverage accounting for `COMPLETE / PARTIAL / UNAVAILABLE / NOT_MATURE`;
-- explicit minimum eligible sample-size assessment;
-- descriptive price-movement statistics;
-- sample standard deviation and standard error;
-- no invented confidence interval without an explicit interval policy;
-- machine-readable descriptive-only claim boundary;
-- protocol-aware research orchestration;
-- population-selection metadata and archived-sample bias warnings;
-- read-only research summary CLI;
-- deterministic multi-observation E2E fixture;
-- no research/outcome persistence;
-- History schema remains version 2.
+```text
+DESCRIPTIVE_OUTCOME_RESEARCH@1
+```
 
-Canonical Sprint 16 research flow:
+It established:
 
 ```text
 methodology-aware observations
-→ explicit research protocol
 → exact cohorts
 → eligibility + coverage
 → sample sufficiency
@@ -84,12 +71,59 @@ methodology-aware observations
 → uncertainty
 → claim boundary
 → population metadata
-→ read-only research result / CLI
 ```
 
-Sprint 16 does **not** claim that positive historical price movement means a recommendation was successful or effective.
+Sprint 16 did not claim that positive historical price movement means a recommendation was successful or effective.
 
-## 8. Stable Research Guardrails
+## 8. Completed: Sprint 17 — Research Provenance and Population Quality Hardening
+
+Sprint 17 strengthened the evidence/population boundary around Sprint 16 research without introducing new inferential or effectiveness semantics.
+
+Delivered:
+
+- explicit research population frame with pre-selection and post-selection denominators;
+- query-selection provenance integrated into the research result;
+- CLI visibility for produced/source, selected, excluded, and eligible populations;
+- non-exclusive selection-reason accounting for recommendation, symbol, action, status, window, methodology, and origin-time filters;
+- canonical source temporal-boundary completeness assessment;
+- explicit `UNKNOWN / PARTIAL / COVERED` completeness semantics;
+- explicit `NOT_ASSESSED` internal continuity when no canonical archive cadence exists;
+- source import-lifecycle quality assessment based on unique origin snapshots;
+- explicit `COMPLETE / PARTIAL / UNKNOWN` import-quality semantics;
+- canonical `HistoricalOutcomeResearchProvenanceSummary`;
+- one provenance envelope for import quality, temporal completeness, population frame, and selection accounting;
+- compatibility-safe Python and serialization migration for pre-provenance callers;
+- production-style provenance E2E using History SQLite and local market SQLite;
+- no new research persistence;
+- History schema remains version 2.
+
+Canonical Sprint 17 provenance flow:
+
+```text
+source snapshots
+→ import lifecycle quality
+→ methodology-aware source observations
+→ temporal completeness
+→ population frame
+→ selection accounting
+→ selected candidates
+→ eligibility + coverage
+→ descriptive research result
+→ provenance envelope
+```
+
+The canonical provenance envelope contains:
+
+```text
+SOURCE_IMPORT_QUALITY
+POPULATION_COMPLETENESS
+POPULATION_FRAME
+SELECTION_ACCOUNTING
+```
+
+`complete_component_set = true` means only that all provenance components are available. It does not mean the population is unbiased, representative, causally valid, or suitable for inferential claims.
+
+## 9. Stable Research Guardrails
 
 The following remain prohibited unless a future explicit methodology justifies them:
 
@@ -113,7 +147,15 @@ effective
 representative of the market
 ```
 
-## 9. Stable Historical Evidence Hierarchy
+`COVERED` means only that observed source timestamps span the explicitly requested temporal boundaries.
+
+It does not establish internal archive continuity.
+
+`COMPLETE` source import quality means only that all unique source snapshots have canonical `IMPORTED` lifecycle state.
+
+It does not establish population representativeness.
+
+## 10. Stable Historical Evidence Hierarchy
 
 ```text
 Archived Review Package JSON
@@ -121,6 +163,9 @@ Archived Review Package JSON
 
 History SQLite
     rebuildable normalized historical projection
+
+Historical import lifecycle
+    source snapshot ingestion provenance
 
 Local market candle database
     persisted historical market-data evidence
@@ -131,13 +176,16 @@ Explicit local session calendar
 Methodology-aware outcome observation
     rebuildable derived result
 
+Research provenance summary
+    rebuildable source/population provenance
+
 Protocol-aware research result
     rebuildable descriptive research result
 ```
 
-Derived outcome and research results remain non-canonical and on demand.
+Derived outcome, provenance, and research results remain non-canonical and on demand.
 
-## 10. Deferred Scope
+## 11. Deferred Scope
 
 Still deferred:
 
@@ -145,9 +193,12 @@ Still deferred:
 - hit-rate/effectiveness scoring;
 - predictive confidence calibration;
 - inferential confidence intervals until an explicit interval policy exists;
+- hypothesis-testing semantics;
 - multiple-comparison inference;
 - factor-effectiveness inference;
 - causal attribution;
+- archive-continuity claims without an explicit expected-cadence contract;
+- market representativeness claims;
 - dividend-adjusted total return;
 - FX-adjusted outcomes;
 - portfolio performance attribution;
@@ -157,14 +208,19 @@ Still deferred:
 - broker execution;
 - Knowledge Domain.
 
-## 11. Next Product Decision Point
+## 12. Next Product Decision Point
 
-The next milestone should decide whether the historical evidence base and product requirements justify moving beyond descriptive research.
+Sprint 17 closes the descriptive evidence/population hardening path proposed after Sprint 16.
 
-Any inferential or effectiveness-oriented milestone must first define its own versioned contracts for:
+A future milestone may choose one of two directions:
+
+1. remain descriptive and improve archive/source contracts further, such as explicit expected archive cadence or population-universe definition; or
+2. define a new versioned inferential/comparative protocol.
+
+Any inferential or effectiveness-oriented milestone must first define its own contracts for:
 
 - target estimand;
-- population assumptions;
+- source and target population assumptions;
 - comparison/control semantics;
 - interval/test methodology;
 - multiple-comparison discipline;
@@ -172,9 +228,9 @@ Any inferential or effectiveness-oriented milestone must first define its own ve
 - methodology compatibility;
 - causal vs non-causal wording.
 
-The existence of Sprint 16 infrastructure alone is not permission to add a hit rate, effectiveness score, or predictive confidence.
+Sprint 17 provenance infrastructure is not permission to add hit rate, effectiveness scores, predictive confidence, or causal language.
 
-## 12. Definition of Done
+## 13. Definition of Done
 
 A milestone is complete only when:
 

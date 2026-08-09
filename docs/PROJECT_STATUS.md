@@ -10,7 +10,7 @@ branch: develop
 ## Current phase
 
 ```text
-Sprint 16 — Statistically Honest Outcome Research Foundation
+Sprint 17 — Research Provenance and Population Quality Hardening
 implementation complete; final documentation/repository verification
 ```
 
@@ -34,142 +34,236 @@ Explicit methodology identity, deterministic market-session semantics, exact-onl
 
 ### Sprint 16
 
+Versioned descriptive research protocol, explicit eligibility/coverage, exact cohorts, sample sufficiency, descriptive statistics, standard error, claim boundaries, population warnings, read-only research CLI, and multi-observation E2E.
+
+### Sprint 17
+
 Delivered:
 
 ```text
-HistoricalOutcomeResearchProtocol
-HistoricalOutcomeEligibilityService
-HistoricalOutcomeCohortService
-HistoricalOutcomeResearchCoverageService
-HistoricalOutcomeSampleSufficiencyService
-HistoricalOutcomeDescriptiveSummaryService
-HistoricalOutcomeUncertaintyService
-HistoricalOutcomeResearchClaimBoundaryService
-HistoricalOutcomeResearchService
-HistoricalOutcomeResearchPopulationMetadataService
-outcome_research CLI
-multi-observation research E2E
+HistoricalOutcomeResearchPopulationFrame
+HistoricalOutcomeResearchPopulationFrameService
+HistoricalOutcomeSelectionReasonCount
+HistoricalOutcomeSelectionAccounting
+HistoricalOutcomeSelectionAccountingService
+HistoricalOutcomePopulationCompletenessAssessment
+HistoricalOutcomePopulationCompletenessService
+HistoricalOutcomeSourceImportQualityAssessment
+HistoricalOutcomeSourceImportQualityService
+HistoricalOutcomeResearchProvenanceSummary
+HistoricalOutcomeResearchProvenanceSummaryService
+research-service provenance integration
+research CLI provenance rendering
+provenance compatibility layer
+production-style provenance E2E
 ```
 
-Canonical protocol:
+## Canonical Research Provenance
+
+Canonical research provenance now uses one envelope:
+
+```text
+HistoricalOutcomeResearchProvenanceSummary
+├── SOURCE_IMPORT_QUALITY
+├── POPULATION_COMPLETENESS
+├── POPULATION_FRAME
+└── SELECTION_ACCOUNTING
+```
+
+The envelope is diagnostic and compositional.
+
+It deliberately does not define a single quality score, pass/fail verdict, representativeness score, or inference-readiness score.
+
+## Source Import Quality
+
+Import quality is assessed over unique `origin_snapshot_id` values rather than raw observation count.
+
+Canonical statuses:
+
+```text
+COMPLETE
+PARTIAL
+UNKNOWN
+```
+
+`COMPLETE` means all unique source snapshots have canonical `IMPORTED` lifecycle state.
+
+`PARTIAL` means at least one source snapshot is non-IMPORTED or has no canonical import state.
+
+This is import-lifecycle provenance only.
+
+It does not establish that the source population is representative or complete in time.
+
+## Temporal Population Completeness
+
+Canonical temporal completeness statuses:
+
+```text
+COVERED
+PARTIAL
+UNKNOWN
+```
+
+The assessment compares observed source origin timestamps against an explicitly requested origin interval.
+
+`COVERED` means the observed source frame spans the requested temporal boundaries.
+
+Internal archive continuity remains:
+
+```text
+NOT_ASSESSED
+```
+
+because no canonical expected snapshot cadence currently exists.
+
+Therefore temporal boundary coverage is not equivalent to “no missing snapshots”.
+
+## Population Frame
+
+The population frame makes the pre-selection denominator explicit:
+
+```text
+source_observation_count
+selected_candidate_count
+excluded_by_selection_count
+selection_fraction
+selection_applied
+```
+
+This distinguishes source population size from query-selected candidate size.
+
+## Selection Accounting
+
+Selection accounting explains why source observations were excluded by the research query.
+
+Canonical reasons include:
+
+```text
+RECOMMENDATION_KEY
+SYMBOL
+ACTION
+STATUS
+WINDOW_KIND
+WINDOW_VALUE
+METHODOLOGY_ID
+METHODOLOGY_VERSION
+ORIGIN_FROM
+ORIGIN_TO
+```
+
+Reasons are not exclusive.
+
+One observation can fail multiple predicates, so:
+
+```text
+total_reason_failures
+```
+
+is diagnostic and is not required to equal:
+
+```text
+excluded_observation_count
+```
+
+## Research Result Boundary
+
+`HistoricalOutcomeResearchCohortResult` now owns canonical:
+
+```text
+provenance
+```
+
+instead of treating import quality, temporal completeness, population frame, and selection accounting as unrelated result concepts.
+
+For compatibility with pre-provenance callers, read-only Python properties and transitional top-level serialization aliases remain available.
+
+Canonical new consumers should use:
+
+```text
+result.provenance
+payload["provenance"]
+```
+
+## Canonical Research Semantics
+
+Sprint 16 research semantics remain unchanged:
 
 ```text
 DESCRIPTIVE_OUTCOME_RESEARCH@1
 eligible statuses: COMPLETE
 uncertainty: SAMPLE_STANDARD_ERROR
 claims: DESCRIPTIVE_ONLY
-minimum sample size: explicit per protocol instance
 ```
 
-## Canonical Research Semantics
-
-Research never silently pools incompatible methodology/window cohorts.
+Sprint 17 did not introduce:
 
 ```text
-METHODOLOGY_IDENTITY
-WINDOW_KIND
-WINDOW_VALUE
-```
-
-are canonical grouping dimensions for descriptive v1.
-
-Coverage keeps incomplete evidence visible:
-
-```text
-COMPLETE
-PARTIAL
-UNAVAILABLE
-NOT_MATURE
-```
-
-Only eligible observations enter descriptive statistics.
-
-Sample sufficiency is explicit:
-
-```text
-SUFFICIENT
-INSUFFICIENT
-```
-
-but sufficiency does not establish statistical significance, prediction, causality, effectiveness, or market representativeness.
-
-## Descriptive Statistics
-
-For eligible outcomes Sprint 16 can report:
-
-```text
-count
-mean_price_change_fraction
-median_price_change_fraction
-minimum_price_change_fraction
-maximum_price_change_fraction
-sample_standard_deviation
-positive_movement_count
-negative_movement_count
-zero_movement_count
-```
-
-These describe historical raw price movement only.
-
-## Uncertainty
-
-Canonical v1:
-
-```text
-SAMPLE_STANDARD_ERROR
-SEM = sample_standard_deviation / sqrt(sample_size)
-```
-
-For one observation, sample standard deviation and SEM are unavailable.
-
-Confidence intervals are not invented because the protocol does not yet specify an interval method or confidence level.
-
-## Claim Boundary
-
-Under:
-
-```text
-DESCRIPTIVE_ONLY
-```
-
-even a sufficient sample does not permit:
-
-```text
-comparative superiority
-predictive claims
-causal claims
-recommendation-effectiveness claims
+hit rate
+win rate
 success probability
+effectiveness
+predictive confidence
+causal inference
+hypothesis tests
+confidence intervals
 ```
-
-An insufficient sample additionally withholds descriptive research conclusions while preserving observations, coverage, and sample shortfall as visible diagnostics.
-
-## Population / Bias Guardrails
-
-Research population metadata records the actual query/filter boundary and candidate count.
-
-Canonical selection basis:
-
-```text
-ARCHIVED_OBSERVATIONS
-```
-
-Outputs warn that archived recommendations are not automatically an unbiased or representative market population.
-
-Prefiltered research additionally states that statistics apply only to the requested subset.
 
 ## Persistence Status
 
-Sprint 16 introduced no outcome/research persistence requirement.
+Sprint 17 introduced no outcome, provenance, or research persistence.
 
 ```text
 History schema target = 2
-outcome observations = on demand
-research results = on demand
-research population metadata = derived
+outcome observations = derived/on demand
+research provenance = derived/on demand
+research results = derived/on demand
 ```
 
 No History schema v3 was introduced.
+
+## Architecture Boundaries
+
+The research service remains persistence-agnostic.
+
+`HistoricalImportStateRepository` is used at the application/CLI boundary to build immutable import-quality assessment data.
+
+Research orchestration receives the assessment rather than opening History SQLite itself.
+
+The CLI remains composition/rendering only and owns no provenance or research mathematics.
+
+## E2E Coverage
+
+Sprint 17 adds a production-style provenance E2E using:
+
+```text
+History SQLite
+local market SQLite
+historical import lifecycle
+methodology-aware observations
+research query
+research provenance
+research result
+```
+
+The fixture verifies a mixed import lifecycle:
+
+```text
+2 IMPORTED
+1 METADATA_ONLY
+```
+
+and confirms:
+
+```text
+source observations = 3
+selected candidates = 1
+source import quality = PARTIAL
+temporal completeness = COVERED
+selection reasons = ORIGIN_FROM + ORIGIN_TO
+eligible research sample = 1
+```
+
+It also verifies the canonical provenance envelope and transitional serialization aliases.
 
 ## Stable Guardrails
 
@@ -184,6 +278,8 @@ No History schema v3 was introduced.
 - no effectiveness scoring;
 - no predictive confidence;
 - no causal inference;
+- no archive-continuity claim without expected cadence;
+- no representativeness claim from provenance completeness;
 - no portfolio-performance wording for raw price movement;
 - explicit population-selection warnings;
 - explicit sample-size boundary;
@@ -191,25 +287,27 @@ No History schema v3 was introduced.
 
 ## Testing Status
 
-Sprint 16 includes focused tests for protocol, eligibility, cohorts, coverage, sufficiency, descriptive statistics, uncertainty, claim boundary, research orchestration, population metadata, CLI, and multi-observation E2E.
-
-The corrected multi-observation E2E fixture avoids overlapping candle timestamps and verifies:
+Sprint 17 includes focused tests for:
 
 ```text
-3 COMPLETE
-1 PARTIAL
-1 NOT_MATURE
+population frame
+selection provenance
+CLI population-frame rendering
+selection-reason accounting
+selection-accounting integration
+temporal completeness
+completeness integration
+source import quality
+import-quality integration
+provenance summary
+provenance integration
+compatibility migration
+provenance E2E
 ```
 
-with deterministic eligible movements:
+The full regression suite was green immediately before the Sprint 17 documentation package.
 
-```text
-+10%
--5%
-0%
-```
-
-Final repository closure still requires the full regression suite after this documentation package is applied.
+Final repository closure requires rerunning the full suite after applying these docs.
 
 ## Deferred Capabilities
 
@@ -220,8 +318,13 @@ Not implemented:
 - recommendation-effectiveness scoring;
 - predictive confidence calibration;
 - inferential confidence intervals;
+- hypothesis tests;
+- multiple-comparison inference;
 - factor-effectiveness inference;
 - causal inference;
+- expected archive cadence;
+- archive-gap inference;
+- population-universe representativeness model;
 - dividend-adjusted total return;
 - FX-adjusted outcomes;
 - portfolio attribution;
@@ -232,6 +335,6 @@ Not implemented:
 
 ## Next Decision
 
-Do not infer that the research foundation itself proves recommendation effectiveness.
+Do not infer that provenance completeness proves recommendation effectiveness or inferential validity.
 
-A future milestone may define inferential or comparative research only after specifying a versioned estimand, comparison semantics, uncertainty/test methodology, population assumptions, multiple-comparison rules, and non-causal/causal interpretation boundaries.
+A future inferential/comparative milestone still requires explicit versioned contracts for estimand, source/target population assumptions, comparison semantics, interval/test methodology, multiple-comparison rules, selection/survivorship treatment, and claim vocabulary.
