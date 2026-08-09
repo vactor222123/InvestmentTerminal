@@ -258,6 +258,7 @@ def main(
             results=filtered,
             protocol=protocol,
             population_query=query,
+            source_observation_count=len(produced),
         )
     except (
         KeyError,
@@ -357,6 +358,9 @@ def _print_human(
         ],
         start=1,
     ):
+        frame = cohort[
+            "population_frame"
+        ]
         coverage = cohort[
             "coverage"
         ]
@@ -385,6 +389,13 @@ def _print_human(
         print(
             "  Identity     : "
             f"{cohort['cohort']['identity_key']}"
+        )
+        print(
+            "  Frame        : "
+            f"{frame['selected_candidate_count']}/"
+            f"{frame['source_observation_count']} selected "
+            f"({frame['selection_fraction']:.2%}); "
+            f"excluded={frame['excluded_by_selection_count']}"
         )
         print(
             "  Population   : "
