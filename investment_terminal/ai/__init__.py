@@ -18,6 +18,10 @@ from investment_terminal.ai.prompt_input import (
     GroundedPromptInput,
     GroundedPromptInputService,
 )
+from investment_terminal.ai.response_parser import (
+    GroundedModelParseResult,
+    GroundedModelResponseParser,
+)
 from investment_terminal.ai.validation import (
     GroundingValidationAssessment,
     GroundingValidationService,
@@ -31,7 +35,9 @@ __all__ = [
     "GroundedContextSelectionService",
     "GroundedKnowledgeCitation",
     "GroundedModelAdapter",
+    "GroundedModelParseResult",
     "GroundedModelResponse",
+    "GroundedModelResponseParser",
     "GroundedPromptContextItem",
     "GroundedPromptInput",
     "GroundedPromptInputService",
