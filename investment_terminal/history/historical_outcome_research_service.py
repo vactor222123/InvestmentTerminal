@@ -53,6 +53,9 @@ from investment_terminal.history.historical_outcome_selection_accounting import 
     HistoricalOutcomeSelectionAccounting,
     HistoricalOutcomeSelectionAccountingService,
 )
+from investment_terminal.history.historical_outcome_source_import_quality import (
+    HistoricalOutcomeSourceImportQualityAssessment,
+)
 from investment_terminal.history.historical_outcome_uncertainty import (
     HistoricalOutcomeUncertaintyService,
     HistoricalOutcomeUncertaintySummary,
@@ -67,6 +70,7 @@ class HistoricalOutcomeResearchCohortResult:
     population_frame: HistoricalOutcomeResearchPopulationFrame
     selection_accounting: HistoricalOutcomeSelectionAccounting | None
     population_completeness: HistoricalOutcomePopulationCompletenessAssessment | None
+    source_import_quality: HistoricalOutcomeSourceImportQualityAssessment | None
     population: HistoricalOutcomeResearchPopulationMetadata
     cohort: HistoricalOutcomeCohortKey
     coverage: HistoricalOutcomeResearchCoverage
@@ -89,6 +93,11 @@ class HistoricalOutcomeResearchCohortResult:
                 if self.population_completeness is None
                 else self.population_completeness.to_dict()
             ),
+            "source_import_quality": (
+                None
+                if self.source_import_quality is None
+                else self.source_import_quality.to_dict()
+            ),
             "population": self.population.to_dict(),
             "cohort": self.cohort.to_dict(),
             "coverage": self.coverage.to_dict(),
@@ -108,7 +117,7 @@ class HistoricalOutcomeResearchCohortResult:
 
 
 class HistoricalOutcomeResearchService:
-    """Compose protocol-aware descriptive research without duplicating policy logic."""
+    """Compose protocol-aware descriptive research without persistence knowledge."""
 
     def __init__(
         self,
@@ -134,9 +143,7 @@ class HistoricalOutcomeResearchService:
         ) = None,
     ) -> None:
         self._cohort_service = (
-            cohort_service
-            if cohort_service is not None
-            else HistoricalOutcomeCohortService()
+            cohort_service if cohort_service is not None else HistoricalOutcomeCohortService()
         )
         self._eligibility_service = (
             eligibility_service
@@ -194,10 +201,7 @@ class HistoricalOutcomeResearchService:
     def analyze(
         self,
         *,
-        results: tuple[
-            HistoricalMethodologyAwareObservationResult,
-            ...,
-        ],
+        results: tuple[HistoricalMethodologyAwareObservationResult, ...],
         protocol: HistoricalOutcomeResearchProtocol,
         population_query: HistoricalOutcomeQuery | None = None,
         source_observation_count: int | None = None,
@@ -205,6 +209,9 @@ class HistoricalOutcomeResearchService:
             HistoricalMethodologyAwareObservationResult,
             ...,
         ] | None = None,
+        source_import_quality: (
+            HistoricalOutcomeSourceImportQualityAssessment | None
+        ) = None,
     ) -> tuple[HistoricalOutcomeResearchCohortResult, ...]:
         if not isinstance(results, tuple):
             raise TypeError("results must be a tuple")
@@ -214,20 +221,25 @@ class HistoricalOutcomeResearchService:
             )
         if (
             population_query is not None
-            and not isinstance(
-                population_query,
-                HistoricalOutcomeQuery,
-            )
+            and not isinstance(population_query, HistoricalOutcomeQuery)
         ):
             raise TypeError(
                 "population_query must be a HistoricalOutcomeQuery or None"
             )
-        if source_results is not None and not isinstance(
-            source_results,
-            tuple,
-        ):
+        if source_results is not None and not isinstance(source_results, tuple):
             raise TypeError(
                 "source_results must be a tuple or None"
+            )
+        if (
+            source_import_quality is not None
+            and not isinstance(
+                source_import_quality,
+                HistoricalOutcomeSourceImportQualityAssessment,
+            )
+        ):
+            raise TypeError(
+                "source_import_quality must be a "
+                "HistoricalOutcomeSourceImportQualityAssessment or None"
             )
 
         effective_query = (
@@ -240,11 +252,9 @@ class HistoricalOutcomeResearchService:
         selection_accounting = None
         population_completeness = None
         if source_results is not None:
-            selection_accounting = (
-                self._selection_accounting_service.assess(
-                    source_results,
-                    query=effective_query,
-                )
+            selection_accounting = self._selection_accounting_service.assess(
+                source_results,
+                query=effective_query,
             )
             if (
                 selection_accounting.selected_candidate_count
@@ -262,9 +272,16 @@ class HistoricalOutcomeResearchService:
                 raise ValueError(
                     "source_observation_count must match len(source_results)"
                 )
-            effective_source_count = (
-                selection_accounting.source_observation_count
-            )
+            if (
+                source_import_quality is not None
+                and source_import_quality.source_observation_count
+                != len(source_results)
+            ):
+                raise ValueError(
+                    "source_import_quality source_observation_count must "
+                    "match len(source_results)"
+                )
+            effective_source_count = selection_accounting.source_observation_count
             population_completeness = (
                 self._population_completeness_service.assess(
                     source_results,
@@ -278,6 +295,15 @@ class HistoricalOutcomeResearchService:
                 if source_observation_count is None
                 else source_observation_count
             )
+            if (
+                source_import_quality is not None
+                and source_import_quality.source_observation_count
+                != effective_source_count
+            ):
+                raise ValueError(
+                    "source_import_quality source_observation_count must "
+                    "match the effective source population"
+                )
 
         population_frame = self._population_frame_service.build(
             source_observation_count=effective_source_count,
@@ -302,6 +328,7 @@ class HistoricalOutcomeResearchService:
                 population_frame=population_frame,
                 selection_accounting=selection_accounting,
                 population_completeness=population_completeness,
+                source_import_quality=source_import_quality,
             )
             for cohort, cohort_results in grouped
         )
@@ -310,15 +337,13 @@ class HistoricalOutcomeResearchService:
         self,
         *,
         cohort: HistoricalOutcomeCohortKey,
-        results: tuple[
-            HistoricalMethodologyAwareObservationResult,
-            ...,
-        ],
+        results: tuple[HistoricalMethodologyAwareObservationResult, ...],
         protocol: HistoricalOutcomeResearchProtocol,
         population: HistoricalOutcomeResearchPopulationMetadata,
         population_frame: HistoricalOutcomeResearchPopulationFrame,
         selection_accounting: HistoricalOutcomeSelectionAccounting | None,
         population_completeness: HistoricalOutcomePopulationCompletenessAssessment | None,
+        source_import_quality: HistoricalOutcomeSourceImportQualityAssessment | None,
     ) -> HistoricalOutcomeResearchCohortResult:
         coverage = self._coverage_service.summarize(
             results=results,
@@ -335,11 +360,7 @@ class HistoricalOutcomeResearchService:
         )
 
         eligible_outcomes = []
-        for result, assessment in zip(
-            results,
-            assessments,
-            strict=True,
-        ):
+        for result, assessment in zip(results, assessments, strict=True):
             if not assessment.eligible:
                 continue
             if result.outcome is None:
@@ -369,6 +390,7 @@ class HistoricalOutcomeResearchService:
             population_frame=population_frame,
             selection_accounting=selection_accounting,
             population_completeness=population_completeness,
+            source_import_quality=source_import_quality,
             population=population,
             cohort=cohort,
             coverage=coverage,

@@ -24,6 +24,9 @@ from investment_terminal.cli.outcome_history import (
 from investment_terminal.history.historical_evidence_selection import (
     HistoricalPriceEvidenceSelectionService,
 )
+from investment_terminal.history.historical_import_state_repository import (
+    HistoricalImportStateRepository,
+)
 from investment_terminal.history.historical_methodology_aware_observation_service import (
     HistoricalMethodologyAwareObservationService,
 )
@@ -49,6 +52,9 @@ from investment_terminal.history.historical_outcome_research_protocol_models imp
 from investment_terminal.history.historical_outcome_research_service import (
     HistoricalOutcomeResearchService,
 )
+from investment_terminal.history.historical_outcome_source_import_quality import (
+    HistoricalOutcomeSourceImportQualityService,
+)
 from investment_terminal.history.historical_recommendation_history_service import (
     HistoricalRecommendationHistoryService,
 )
@@ -73,8 +79,8 @@ def build_argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "Summarize historical recommendation outcomes under an explicit "
-            "research protocol with visible coverage, sample sufficiency, "
-            "uncertainty, and descriptive-only claim boundaries."
+            "research protocol with visible provenance, coverage, sample "
+            "sufficiency, uncertainty, and descriptive-only claim boundaries."
         )
     )
     parser.add_argument("--history-database", type=Path, default=DEFAULT_HISTORY_DATABASE)
@@ -86,15 +92,7 @@ def build_argument_parser() -> argparse.ArgumentParser:
         required=True,
     )
     parser.add_argument("--window-value", type=_positive_int, required=True)
-    parser.add_argument(
-        "--minimum-sample-size",
-        type=_positive_int,
-        required=True,
-        help=(
-            "Explicit minimum number of eligible COMPLETE observations "
-            "required by DESCRIPTIVE_OUTCOME_RESEARCH@1."
-        ),
-    )
+    parser.add_argument("--minimum-sample-size", type=_positive_int, required=True)
     parser.add_argument("--session-calendar", type=Path)
     parser.add_argument("--as-of", type=_parse_datetime, required=True)
     parser.add_argument("--resolution", default="D")
@@ -161,6 +159,9 @@ def main(argv: Sequence[str] | None = None) -> None:
                 history_store
             ),
         )
+        import_quality_service = HistoricalOutcomeSourceImportQualityService(
+            HistoricalImportStateRepository(history_store)
+        )
 
         market_database = _open_market_database(options.market_database)
         raw_provider = HistoricalOutcomePriceEvidenceProvider(
@@ -195,12 +196,16 @@ def main(argv: Sequence[str] | None = None) -> None:
             produced,
             query=query,
         )
+        source_import_quality = import_quality_service.assess(
+            produced
+        )
         research_results = HistoricalOutcomeResearchService().analyze(
             results=filtered,
             protocol=protocol,
             population_query=query,
             source_observation_count=len(produced),
             source_results=produced,
+            source_import_quality=source_import_quality,
         )
     except (
         KeyError,
@@ -265,6 +270,7 @@ def _print_human(report: dict[str, Any]) -> None:
         frame = cohort["population_frame"]
         accounting = cohort.get("selection_accounting")
         completeness = cohort.get("population_completeness")
+        import_quality = cohort.get("source_import_quality")
         coverage = cohort["coverage"]
         sample = cohort["sample_assessment"]
         claims = cohort["claim_assessment"]
@@ -278,6 +284,25 @@ def _print_human(report: dict[str, Any]) -> None:
             "  Identity     : "
             f"{cohort['cohort']['identity_key']}"
         )
+        if import_quality is not None:
+            fraction = import_quality["imported_fraction"]
+            fraction_text = (
+                "n/a"
+                if fraction is None
+                else f"{fraction:.2%}"
+            )
+            print(
+                "  Import       : "
+                f"{import_quality['status']} / "
+                f"{import_quality['imported_snapshot_count']}/"
+                f"{import_quality['unique_snapshot_count']} imported "
+                f"({fraction_text})"
+            )
+            if import_quality["warning"] is not None:
+                print(
+                    "  I-warning    : "
+                    f"{import_quality['warning']}"
+                )
         print(
             "  Frame        : "
             f"{frame['selected_candidate_count']}/"
