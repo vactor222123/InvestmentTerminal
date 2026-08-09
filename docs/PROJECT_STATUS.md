@@ -10,7 +10,7 @@ branch: develop
 ## Current phase
 
 ```text
-Sprint 15 — Historical Outcome Methodology Hardening
+Sprint 16 — Statistically Honest Outcome Research Foundation
 implementation complete; final documentation/repository verification
 ```
 
@@ -18,243 +18,220 @@ implementation complete; final documentation/repository verification
 
 ### Sprint 12
 
-- immutable historical Review Package archive;
-- append-only manifest;
-- SHA-256 integrity;
-- History SQLite projection;
-- verified package loading;
-- typed imports;
-- timeline foundation.
+Immutable historical Review Package archive, integrity, History SQLite projection, typed imports, and timeline foundation.
 
 ### Sprint 13
 
-- historical query/navigation;
-- schema migration foundation;
-- explicit import state;
-- snapshot compatibility;
-- portfolio/holdings/recommendations/deployment comparison;
-- aggregate comparison service;
-- exact archived replay;
-- normalized historical replay;
-- read-only History CLIs;
-- realistic History E2E fixture.
+Historical navigation, compatibility, comparison, replay, read-only History CLIs, migration/import-state foundation, and realistic History E2E.
 
 ### Sprint 14
 
-- canonical historical outcome models;
-- `ELAPSED_DAYS` observation-window policy;
-- historical recommendation transitions;
-- recommendation-history service;
-- exact local candle outcome-evidence adapter;
-- raw close-price outcome calculator;
-- explicit observation maturity/evidence states;
-- on-demand outcome observation service;
-- descriptive aggregation;
-- outcome CLI;
-- realistic outcome E2E fixture;
-- no outcome persistence;
-- History schema target remains version 2.
+Canonical outcome observations, exact local candle evidence, raw close-price movement, explicit observation states, descriptive aggregation, CLI, and outcome E2E.
 
 ### Sprint 15
 
-- `HistoricalOutcomeMethodology`;
-- `HistoricalEndpointPolicy`;
-- `HistoricalEvidenceSelectionPolicy`;
-- `HistoricalMarketSession`;
-- `HistoricalSessionCalendarIdentity`;
-- deterministic `HistoricalLocalSessionCalendar`;
-- `HistoricalTradingSessionWindowPolicy`;
-- `TRADING_SESSIONS` window semantics;
-- `HistoricalSelectedPriceEvidence`;
-- exact-only evidence-selection service;
-- `HistoricalMethodologyAwarePriceEvidence`;
-- methodology-aware price-evidence service;
-- methodology-aware observation service/result;
-- structural methodology compatibility model/service;
-- in-memory outcome query/filter service;
-- methodology-aware aggregation grouped by exact identity;
-- methodology-aware outcome CLI;
-- realistic session-aware Friday/weekend/Monday E2E fixture;
-- explicit no-fallback behavior around missing session-close evidence.
+Explicit methodology identity, deterministic market-session semantics, exact-only evidence selection, methodology-aware observations, filtering, methodology-safe aggregation, CLI, and session-aware E2E.
 
-## Canonical Sprint 15 methodologies
+### Sprint 16
 
-### Sprint 14-compatible methodology
+Delivered:
 
 ```text
-ELAPSED_DAYS_EXACT_CLOSE@1
-window: ELAPSED_DAYS
-endpoint policy: ELAPSED_DURATION_UTC@1
-endpoint evidence: EXACT_TIMESTAMP_CLOSE@1
-price field: CLOSE
+HistoricalOutcomeResearchProtocol
+HistoricalOutcomeEligibilityService
+HistoricalOutcomeCohortService
+HistoricalOutcomeResearchCoverageService
+HistoricalOutcomeSampleSufficiencyService
+HistoricalOutcomeDescriptiveSummaryService
+HistoricalOutcomeUncertaintyService
+HistoricalOutcomeResearchClaimBoundaryService
+HistoricalOutcomeResearchService
+HistoricalOutcomeResearchPopulationMetadataService
+outcome_research CLI
+multi-observation research E2E
 ```
 
-### Session-aware methodology
+Canonical protocol:
 
 ```text
-TRADING_SESSIONS_EXACT_CLOSE@1
-window: TRADING_SESSIONS
-endpoint policy: TRADING_SESSION_CLOSE@1
-endpoint evidence: SESSION_CLOSE_EXACT@1
-price field: CLOSE
-calendar: explicit local HistoricalSessionCalendarIdentity
+DESCRIPTIVE_OUTCOME_RESEARCH@1
+eligible statuses: COMPLETE
+uncertainty: SAMPLE_STANDARD_ERROR
+claims: DESCRIPTIVE_ONLY
+minimum sample size: explicit per protocol instance
 ```
 
-Origin recommendation evidence remains exact at the archived recommendation timestamp through `EXACT_TIMESTAMP_CLOSE@1`.
+## Canonical Research Semantics
 
-## Canonical trading-session semantics
-
-For Sprint 15 v1:
+Research never silently pools incompatible methodology/window cohorts.
 
 ```text
-origin_at
-→ select explicit sessions whose opens_at > origin_at
-→ count N sessions
-→ endpoint session = Nth selected session
-→ endpoint_at = endpoint session closes_at
-→ mature when as_of >= endpoint_at
+METHODOLOGY_IDENTITY
+WINDOW_KIND
+WINDOW_VALUE
 ```
 
-No weekday arithmetic is used.
+are canonical grouping dimensions for descriptive v1.
 
-No implicit holiday model is used.
-
-If the supplied local calendar does not contain enough sessions, endpoint resolution fails explicitly.
-
-## Canonical evidence-selection semantics
-
-Supported:
+Coverage keeps incomplete evidence visible:
 
 ```text
-EXACT_TIMESTAMP_CLOSE@1
-SESSION_CLOSE_EXACT@1
+COMPLETE
+PARTIAL
+UNAVAILABLE
+NOT_MATURE
 ```
 
-Not supported:
+Only eligible observations enter descriptive statistics.
+
+Sample sufficiency is explicit:
 
 ```text
-NEAREST
-PREVIOUS_CLOSE fallback
-NEXT_CLOSE fallback
-current-price fallback
-unbounded date substitution
+SUFFICIENT
+INSUFFICIENT
 ```
 
-Missing exact endpoint evidence remains visible as incomplete evidence rather than being substituted.
+but sufficiency does not establish statistical significance, prediction, causality, effectiveness, or market representativeness.
 
-## Methodology compatibility semantics
+## Descriptive Statistics
 
-Structural only:
+For eligible outcomes Sprint 16 can report:
 
 ```text
-same methodology identity
-→ COMPATIBLE
-
-same window kind and price field,
-but policy/version/identity differs
-→ PARTIALLY_COMPATIBLE
-
-different window kind or price field
-→ INCOMPATIBLE
+count
+mean_price_change_fraction
+median_price_change_fraction
+minimum_price_change_fraction
+maximum_price_change_fraction
+sample_standard_deviation
+positive_movement_count
+negative_movement_count
+zero_movement_count
 ```
 
-This does not establish statistical comparability.
+These describe historical raw price movement only.
 
-## Aggregation rule
+## Uncertainty
 
-Methodology-aware aggregates must not silently mix methodology identities.
+Canonical v1:
 
 ```text
-summarize_one
-→ exactly one methodology.identity_key
-
-summarize_grouped
-→ separate group per exact methodology.identity_key
+SAMPLE_STANDARD_ERROR
+SEM = sample_standard_deviation / sqrt(sample_size)
 ```
 
-Raw mean/median price movement remains descriptive only.
+For one observation, sample standard deviation and SEM are unavailable.
 
-## Stable source-of-truth hierarchy
+Confidence intervals are not invented because the protocol does not yet specify an interval method or confidence level.
+
+## Claim Boundary
+
+Under:
 
 ```text
-Archived Review Package JSON
-    canonical historical Review Package evidence
-
-History SQLite
-    rebuildable normalized historical projection
-
-Local candle database
-    persisted historical market-data evidence
-
-Explicit local session calendar
-    methodology input with source/provenance
-
-Outcome observation
-    rebuildable derived result
-
-Methodology-aware aggregation
-    rebuildable descriptive result
+DESCRIPTIVE_ONLY
 ```
 
-## Persistence status
+even a sufficient sample does not permit:
 
-Sprint 15 introduced no History persistence requirement.
+```text
+comparative superiority
+predictive claims
+causal claims
+recommendation-effectiveness claims
+success probability
+```
+
+An insufficient sample additionally withholds descriptive research conclusions while preserving observations, coverage, and sample shortfall as visible diagnostics.
+
+## Population / Bias Guardrails
+
+Research population metadata records the actual query/filter boundary and candidate count.
+
+Canonical selection basis:
+
+```text
+ARCHIVED_OBSERVATIONS
+```
+
+Outputs warn that archived recommendations are not automatically an unbiased or representative market population.
+
+Prefiltered research additionally states that statistics apply only to the requested subset.
+
+## Persistence Status
+
+Sprint 16 introduced no outcome/research persistence requirement.
 
 ```text
 History schema target = 2
 outcome observations = on demand
-outcome aggregation = on demand
-session calendar = explicit local methodology input
+research results = on demand
+research population metadata = derived
 ```
 
 No History schema v3 was introduced.
 
-## Stable guardrails
+## Stable Guardrails
 
 - no hindsight leakage;
-- no silent present-day fallback;
-- no unbounded nearest-date substitution;
+- no current-price fallback;
+- no hidden nearest-date substitution;
 - no implicit exchange calendar;
-- no network call inside pure outcome calculation;
-- no outcome persistence;
+- no network call inside pure research calculation;
+- no outcome/research persistence;
 - no success/failure scoring;
-- no confidence calibration;
-- no causal claims;
+- no hit rate;
+- no effectiveness scoring;
+- no predictive confidence;
+- no causal inference;
 - no portfolio-performance wording for raw price movement;
-- CLI remains a composition/rendering boundary;
-- Sprint 14 exact behavior remains supported.
+- explicit population-selection warnings;
+- explicit sample-size boundary;
+- CLI remains composition/rendering only.
 
-## Deferred capabilities
+## Testing Status
+
+Sprint 16 includes focused tests for protocol, eligibility, cohorts, coverage, sufficiency, descriptive statistics, uncertainty, claim boundary, research orchestration, population metadata, CLI, and multi-observation E2E.
+
+The corrected multi-observation E2E fixture avoids overlapping candle timestamps and verifies:
+
+```text
+3 COMPLETE
+1 PARTIAL
+1 NOT_MATURE
+```
+
+with deterministic eligible movements:
+
+```text
++10%
+-5%
+0%
+```
+
+Final repository closure still requires the full regression suite after this documentation package is applied.
+
+## Deferred Capabilities
 
 Not implemented:
 
-- recommendation success/failure labels;
-- hit rate;
+- success/failure labels;
+- hit rate / win rate;
 - recommendation-effectiveness scoring;
 - predictive confidence calibration;
+- inferential confidence intervals;
 - factor-effectiveness inference;
 - causal inference;
 - dividend-adjusted total return;
 - FX-adjusted outcomes;
-- portfolio performance attribution;
-- tax-lot performance;
-- outcome persistence/materialization;
+- portfolio attribution;
+- outcome/research persistence;
 - autonomous trading;
 - broker execution;
 - Knowledge Domain.
 
-## Next decision
+## Next Decision
 
-The next milestone should define a statistically honest effectiveness-research protocol before adding effectiveness or confidence metrics.
+Do not infer that the research foundation itself proves recommendation effectiveness.
 
-At minimum it should specify:
-
-- eligible sample;
-- minimum sample size;
-- methodology grouping;
-- missing-evidence handling;
-- multiple-window handling;
-- selection/survivorship safeguards;
-- uncertainty reporting;
-- descriptive vs inferential claims;
-- non-causal interpretation.
+A future milestone may define inferential or comparative research only after specifying a versioned estimand, comparison semantics, uncertainty/test methodology, population assumptions, multiple-comparison rules, and non-causal/causal interpretation boundaries.
