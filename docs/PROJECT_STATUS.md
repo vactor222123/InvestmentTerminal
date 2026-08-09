@@ -10,237 +10,305 @@ branch: develop
 ## Current phase
 
 ```text
-Sprint 19 — Knowledge Domain Foundation
+Sprint 20 — Evidence-Grounded AI Experience Foundation
 implementation complete; final repository verification pending
 ```
 
 ## Completed foundation
 
-### Sprint 12–18
+### Sprint 12–19
 
-Historical Intelligence, comparison/replay, outcome observations, methodology hardening, descriptive research, research provenance/population quality, and explicit archive continuity are complete.
+Historical Intelligence, comparison/replay, outcome observations, methodology hardening, descriptive research, provenance/population quality, explicit archive continuity, and the deterministic Knowledge Domain foundation are complete.
 
-### Sprint 19 — Knowledge Domain Foundation
+### Sprint 20 — Evidence-Grounded AI Experience Foundation
 
 Delivered:
 
 ```text
-KnowledgeEvidenceReference
-KnowledgeRecord
-KnowledgeEvidenceProvenanceService
-KnowledgeProvenanceAssessment
-KnowledgeRecordRepository
-InMemoryKnowledgeRecordRepository
-KnowledgeSQLiteStore
-SQLiteKnowledgeRecordRepository
-HistoricalSnapshotKnowledgeSource
-HistoricalSnapshotKnowledgeProjectionService
-KnowledgeRecordEnvelope
-KnowledgeRecordEnvelopeService
-KnowledgeQueryService
-KnowledgeTemporalComparison
-KnowledgeTemporalComparisonService
-read-only Knowledge CLI
-real Knowledge SQLite E2E
+GroundedKnowledgeCitation
+GroundedAIClaim
+GroundedAIAnswer
+GroundingValidationAssessment
+GroundingValidationService
+GroundedContextSelectionPolicy
+GroundedContextSelection
+GroundedContextSelectionService
+GroundedPromptContextItem
+GroundedPromptInput
+GroundedPromptInputService
+GroundedModelAdapter
+GroundedModelResponse
+StaticGroundedModelAdapter
+GroundedModelParseResult
+GroundedModelResponseParser
+GroundedGenerationResult
+GroundedGenerationService
+GroundedGenerationTrace
+GroundedGenerationTraceService
+read-only Grounded AI reference CLI
+real Knowledge SQLite → grounded reference workflow E2E
 ```
 
-## Knowledge Domain Boundary
+## AI Domain Boundary
 
-Knowledge is a downstream, rebuildable, evidence-grounded domain. It does not import or mutate the History package.
+The AI layer is downstream of Knowledge and consumes immutable `KnowledgeRecordEnvelope` values.
 
 Canonical dependency direction:
 
 ```text
 History / verified evidence
         ↓
-CLI or application composition
+Knowledge
         ↓
-neutral Knowledge source contract
+KnowledgeRecordEnvelope
         ↓
-Knowledge projection
+AI context selection
         ↓
-KnowledgeRecord
+grounded prompt input
         ↓
-Knowledge repository/query/provenance
+model adapter boundary
+        ↓
+raw model response
+        ↓
+strict response parser
+        ↓
+candidate GroundedAIAnswer
+        ↓
+grounding validation
+        ↓
+ADMISSIBLE grounded result
 ```
 
-`investment_terminal.knowledge` must not import `investment_terminal.history`.
+AI must not mutate History or Knowledge.
 
-## Canonical Knowledge Record
+## Canonical Protocols
 
-A Knowledge record is immutable and versioned:
+Sprint 20 introduces two explicit versioned contracts:
 
 ```text
-knowledge_id
-knowledge_type
-version
+EVIDENCE_GROUNDED_PROMPT@1
+EVIDENCE_GROUNDED_ANSWER@1
+```
+
+`GroundedPromptInput` is provider-neutral and contains:
+
+```text
+request_id
+protocol_identity
+user_query
+context
+```
+
+Each context item preserves:
+
+```text
+knowledge_identity
 subject_key
 statement
+provenance_status
 valid_from
 valid_to
-generated_at
-evidence
-status
 ```
 
-Supported v1 knowledge types:
+## Grounded Answer Contract
+
+Every `GroundedAIClaim` must have at least one explicit `GroundedKnowledgeCitation`.
+
+Citation fields:
 
 ```text
-FACT
-RELATIONSHIP
-PATTERN
+knowledge_identity
+statement
+provenance_status
 ```
 
-Supported statuses:
+A citation is not trusted merely because it is present. `GroundingValidationService` must resolve it against supplied `KnowledgeRecordEnvelope` values.
+
+## Grounding Admissibility
+
+`EVIDENCE_GROUNDED_ANSWER@1` v1 requires:
 
 ```text
-ACTIVE
-SUPERSEDED
+exact Knowledge identity resolution
+exact statement match
+exact provenance status match
+Knowledge provenance = COMPLETE
 ```
 
-Knowledge v1 does not encode predictive confidence, success probability, recommendation effectiveness, causal claims, or AI-generated authority.
+`PARTIAL` Knowledge provenance remains traceable but is not admissible grounding for v1.
 
-## Evidence and Provenance
+This rule is a lineage/admissibility rule. It is not a truth score, confidence score, semantic entailment proof, causal proof, or effectiveness assessment.
 
-Canonical snapshot-backed evidence carries:
+## Context Selection
+
+AI context selection is deterministic and explicit.
+
+Supported policy:
 
 ```text
-evidence_type = HISTORICAL_SNAPSHOT
-evidence_id = exact snapshot UUID
-observed_at = exact source timestamp
-checksum_sha256 = exact archive checksum
+subject_keys
+max_items
+required provenance = COMPLETE
 ```
 
-Derived evidence references may be rebuildable and therefore need not be checksum-backed.
-
-Knowledge provenance statuses:
+Canonical presentation order:
 
 ```text
-COMPLETE
-PARTIAL
+subject_key
+→ valid_from
+→ generated_at
+→ knowledge_id
+→ version
 ```
 
-`COMPLETE` means at least one checksum-backed canonical historical snapshot is present in lineage. It does not mean the statement is predictive, causal, representative, or investment-effective.
+No embedding, semantic similarity, relevance score, or model-based ranking exists in Sprint 20.
 
-Evidence timestamps may not be later than `KnowledgeRecord.generated_at`.
+## Model Adapter Boundary
 
-## Persistence
+`GroundedModelAdapter` is provider-independent.
 
-Knowledge has its own SQLite boundary and does not alter History schema.
+The canonical raw response contract is:
 
 ```text
-Knowledge schema version = 1
-knowledge_schema_metadata
-knowledge_records
-knowledge_evidence
+request_id
+provider_identity
+model_identity
+raw_text
 ```
 
-Primary record identity:
+Sprint 20 includes only `StaticGroundedModelAdapter` as a deterministic reference/test adapter.
+
+No real provider SDK, API key handling, HTTP client, endpoint configuration, retry policy, rate-limit handling, or network I/O is implemented.
+
+## Response Parsing
+
+`GroundedModelResponseParser` is JSON-only and fail-closed.
+
+The exact response shape is:
 
 ```text
-(knowledge_id, version)
+answer_id
+protocol_identity
+claims[]
+  text
+  citations[]
+    knowledge_identity
+    statement
+    provenance_status
 ```
 
-Record and evidence insertions are transactional.
+Missing or unsupported fields fail explicitly.
 
-History schema remains version 2 and separate from Knowledge persistence.
+Parsing only establishes structural validity. Grounding admissibility is checked separately.
 
-## Query Contract
+## Orchestration
 
-Canonical repository/query operations:
+`GroundedGenerationService` composes:
 
 ```text
-get
-require
-list_all
-find_by_subject
-find_valid_at
-latest_for_subject
+selection
+→ prompt
+→ adapter
+→ response
+→ parser
+→ grounding validation
 ```
 
-Ordering and temporal validity are deterministic. `find_valid_at` uses inclusive validity boundaries.
+The workflow is fail-closed.
 
-Query results are exposed as:
+Malformed JSON, request-correlation mismatch, unresolved citation, forged statement, forged provenance status, or excluded context cannot become a final grounded answer.
+
+A successful `GroundedGenerationResult` requires:
 
 ```text
-KnowledgeRecordEnvelope
-├── KnowledgeRecord
-└── KnowledgeProvenanceAssessment
+validation.status = ADMISSIBLE
 ```
 
-Provenance is derived on demand and is not duplicated in SQLite.
+## Audit Trace
 
-## Temporal Comparison
-
-Knowledge temporal comparison is descriptive only and reports:
+`GroundedGenerationTrace` provides a compact deterministic lifecycle representation:
 
 ```text
-statement_changed
-status_changed
-validity_changed
-evidence_added
-evidence_removed
-evidence_changed
-any_change
+request_id
+prompt_protocol_identity
+answer_protocol_identity
+provider_identity
+model_identity
+selected_knowledge_identities
+cited_knowledge_identities
+claim_count
+citation_count
+validation_status
 ```
 
-It requires two different versions of the same `knowledge_id` and orders them deterministically by `generated_at`, then `version`.
+Cited Knowledge identities must be a subset of selected context.
 
-It does not score whether a change is better, worse, successful, predictive, or effective.
+The trace deliberately excludes raw model text, full statements, user query text, API credentials, and provider payloads.
 
-## Read-only CLI
+## Read-only Reference CLI
 
-Knowledge CLI commands:
+Sprint 20 provides a reference CLI using the static adapter only.
+
+Inputs include:
 
 ```text
-list
-show
-subject
-valid
-latest
-compare
+--database
+--request-id
+--query
+--response-json
+--subject
+--max-items
+--json
 ```
 
-The CLI composes `KnowledgeSQLiteStore`, `SQLiteKnowledgeRecordRepository`, `KnowledgeQueryService`, and `KnowledgeTemporalComparisonService`. It owns no independent SQL/query semantics.
+The CLI reads Knowledge SQLite, runs the grounded workflow, builds an audit trace, and renders human/JSON output.
 
-Both human and JSON output expose provenance and descriptive temporal changes.
+It does not call a real model or perform network I/O.
 
 ## Stable Guardrails
 
-Sprint 19 preserves these boundaries:
+Sprint 20 preserves these boundaries:
 
-- Knowledge does not import History;
-- History remains canonical historical evidence;
-- Knowledge is rebuildable/versioned;
-- snapshot evidence identity and checksum remain traceable;
-- no network I/O in pure Knowledge calculation;
-- no prediction or recommendation-effectiveness semantics;
+- AI remains downstream of Knowledge;
+- AI does not mutate Knowledge or History;
+- every final claim is explicitly Knowledge-cited;
+- v1 grounding requires COMPLETE Knowledge provenance;
+- raw model output is never trusted directly;
+- strict parsing happens before grounding validation;
+- grounding validation is separate from semantic entailment;
+- context selection is deterministic and non-semantic;
+- no embeddings/vector ranking;
+- no confidence/truth score;
+- no predictive success probability;
+- no recommendation-effectiveness semantics;
 - no causal inference;
-- no success/failure or win-rate semantics;
-- no hidden AI authority field;
-- no mutation of History from Knowledge;
+- no autonomous trading or broker execution;
+- no real provider SDK or network integration;
+- no AI persistence schema is introduced;
 - CLI remains read-only composition/rendering.
 
 ## E2E Coverage
 
-Sprint 19 covers:
+Sprint 20 covers:
 
 ```text
-neutral snapshot evidence input
-→ deterministic Knowledge projection
-→ provenance validation
-→ Knowledge SQLite persistence
-→ deterministic repository/query service
-→ provenance envelope
-→ temporal comparison
+real Knowledge SQLite
+→ Knowledge query/envelopes
+→ deterministic context selection
+→ grounded prompt
+→ static reference model response
+→ strict parser
+→ grounding validation
+→ ADMISSIBLE generation result
+→ audit trace
 → JSON/human CLI
 ```
 
-The E2E also verifies that Knowledge persistence does not create or modify a History database.
+The E2E also verifies that the reference AI workflow creates neither History persistence nor AI persistence and exposes no network/provider configuration.
 
 ## Testing Status
 
-Focused Sprint 19 tests are implemented.
+Focused Sprint 20 tests are implemented.
 
 Final closure requires:
 
@@ -254,22 +322,29 @@ to pass after applying this package.
 
 Still deferred:
 
-- automatic History-to-Knowledge ingestion workflow;
-- projection from snapshot comparison/replay/outcome research;
-- knowledge deduplication across semantically equivalent statements;
-- relationship graph traversal;
-- richer temporal conflict/supersession rules;
-- Knowledge schema migration beyond v1;
-- natural-language retrieval/ranking;
-- embeddings/vector search;
-- LLM-generated Knowledge records;
+- real OpenAI/Anthropic/other provider adapters;
+- API key/secret management;
+- HTTP/network transport;
+- retries, rate limits, timeout policy, streaming;
+- structured-output provider configuration;
+- semantic entailment verification;
+- claim-level contradiction detection;
+- relevance ranking or embeddings;
+- vector retrieval;
+- grounded answer persistence/history;
+- human feedback capture;
+- prompt-template/version governance beyond the current protocol contracts;
+- model/provider allowlists;
+- cost/token accounting;
+- automatic History-to-Knowledge ingestion;
 - predictive confidence;
 - recommendation effectiveness;
 - causal inference;
-- autonomous trading or broker execution.
+- autonomous portfolio actions;
+- broker execution.
 
 ## Next Decision
 
-Sprint 19 establishes the deterministic Knowledge Domain foundation required before any evidence-grounded AI experience.
+Sprint 20 establishes a deterministic, provider-neutral, fail-closed Evidence-Grounded AI foundation.
 
-A future AI milestone must consume traceable Knowledge records and provenance without turning derived statements into unqualified authority or introducing unsupported predictive/causal semantics.
+A future provider-integration milestone may attach a real model only through `GroundedModelAdapter` and must preserve the existing prompt, parser, grounding-validation, audit, and domain-boundary contracts.

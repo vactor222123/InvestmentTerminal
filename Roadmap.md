@@ -1,94 +1,101 @@
-﻿# Investment Terminal вЂ” Product Roadmap
+# Investment Terminal — Product Roadmap
 
 **Status:** Canonical Roadmap
-**Updated after:** Sprint 19 вЂ” Knowledge Domain Foundation
+**Updated after:** Sprint 20 — Evidence-Grounded AI Experience Foundation
 **Current development branch:** `develop`
 
 ## 1. Product Evolution
 
 ```text
 Foundation
-в†’ Current-State Analysis
-в†’ Portfolio and Decision Intelligence
-в†’ Unified Review Package
-в†’ Historical Intelligence Foundation
-в†’ Historical Comparison and Replay
-в†’ Outcome-Aware Historical Intelligence
-в†’ Historical Outcome Methodology Hardening
-в†’ Statistically Honest Outcome Research Foundation
-в†’ Research Provenance and Population Quality Hardening
-в†’ Explicit Historical Archive Continuity
-в†’ Knowledge Domain Foundation
-в†’ Evidence-Grounded AI Experience
+→ Current-State Analysis
+→ Portfolio and Decision Intelligence
+→ Unified Review Package
+→ Historical Intelligence Foundation
+→ Historical Comparison and Replay
+→ Outcome-Aware Historical Intelligence
+→ Historical Outcome Methodology Hardening
+→ Statistically Honest Outcome Research Foundation
+→ Research Provenance and Population Quality Hardening
+→ Explicit Historical Archive Continuity
+→ Knowledge Domain Foundation
+→ Evidence-Grounded AI Experience Foundation
+→ Provider Integration and Operational AI Controls
 ```
 
 ## 2. Completed Milestones
 
-### Sprint 11 вЂ” Foundation
+### Sprint 11 — Foundation
 
 Architecture and canonical product documentation foundation.
 
-### Sprint 12 вЂ” Historical Intelligence Foundation
+### Sprint 12 — Historical Intelligence Foundation
 
 Immutable Review Package history, integrity verification, History SQLite, typed imports, and timeline foundation.
 
-### Sprint 13 вЂ” Historical Comparison and Replay
+### Sprint 13 — Historical Comparison and Replay
 
 Historical navigation, comparison, compatibility, replay, read-only CLIs, migrations/import state, and realistic E2E coverage.
 
-### Sprint 14 вЂ” Outcome-Aware Historical Intelligence
+### Sprint 14 — Outcome-Aware Historical Intelligence
 
 Canonical outcome observations, exact local price evidence, raw price movement, descriptive aggregation, CLI, and E2E.
 
-### Sprint 15 вЂ” Historical Outcome Methodology Hardening
+### Sprint 15 — Historical Outcome Methodology Hardening
 
 Explicit methodology identities, deterministic session semantics, exact-only evidence, methodology-aware observations, and CLI/E2E.
 
-### Sprint 16 вЂ” Statistically Honest Outcome Research Foundation
+### Sprint 16 — Statistically Honest Outcome Research Foundation
 
 `DESCRIPTIVE_OUTCOME_RESEARCH@1`, exact cohorts, eligibility/coverage, sample sufficiency, descriptive statistics, uncertainty, and claim boundaries.
 
-### Sprint 17 вЂ” Research Provenance and Population Quality Hardening
+### Sprint 17 — Research Provenance and Population Quality Hardening
 
 Population frame, selection accounting, boundary completeness, source import quality, canonical research provenance, compatibility migration, and E2E.
 
-### Sprint 18 вЂ” Explicit Historical Archive Continuity
+### Sprint 18 — Explicit Historical Archive Continuity
 
 `FIXED_INTERVAL_ARCHIVE_CADENCE@1`, expected timestamp generation, exact archive-gap assessment, repository composition, internal continuity, optional archive-gap provenance, CLI, and E2E.
 
-### Sprint 19 вЂ” Knowledge Domain Foundation
+### Sprint 19 — Knowledge Domain Foundation
+
+Immutable/versioned Knowledge records, traceable evidence references, Knowledge provenance, separate Knowledge SQLite schema, deterministic projection/query/comparison, read-only CLI, and real E2E.
+
+### Sprint 20 — Evidence-Grounded AI Experience Foundation
 
 Delivered:
 
-- immutable versioned `KnowledgeRecord`;
-- traceable `KnowledgeEvidenceReference`;
-- checksum-aware evidence provenance;
-- persistence-agnostic repository contract;
-- separate Knowledge SQLite schema v1;
-- deterministic snapshot-evidence projection through a neutral Knowledge-side source contract;
-- canonical record + provenance envelope;
-- deterministic query service;
-- descriptive temporal comparison;
-- read-only Knowledge CLI;
-- real SQLite в†’ query в†’ provenance в†’ comparison в†’ CLI E2E.
+- versioned `EVIDENCE_GROUNDED_PROMPT@1` contract;
+- versioned `EVIDENCE_GROUNDED_ANSWER@1` contract;
+- explicit Knowledge citations for every AI claim;
+- exact Knowledge-lineage grounding validation;
+- conservative COMPLETE-only v1 grounding admissibility;
+- deterministic context selection;
+- provider-neutral prompt input;
+- provider-independent model adapter boundary;
+- static deterministic reference adapter;
+- strict JSON response parser;
+- fail-closed generation orchestration;
+- compact grounded generation audit trace;
+- read-only reference CLI;
+- real Knowledge SQLite → grounded workflow → CLI E2E.
 
-Canonical Knowledge flow:
+Canonical grounded AI flow:
 
 ```text
-verified evidence
-в†’ application/CLI composition
-в†’ neutral Knowledge source
-в†’ deterministic projection
-в†’ KnowledgeRecord
-в†’ Knowledge SQLite
-в†’ KnowledgeQueryService
-в†’ KnowledgeRecordEnvelope
-в†’ temporal comparison / read-only CLI
+KnowledgeRecordEnvelope
+→ deterministic context selection
+→ EVIDENCE_GROUNDED_PROMPT@1
+→ GroundedModelAdapter
+→ raw response
+→ strict JSON parser
+→ EVIDENCE_GROUNDED_ANSWER@1 candidate
+→ exact Knowledge grounding validation
+→ ADMISSIBLE result
+→ audit trace / read-only CLI
 ```
 
-Knowledge never imports or mutates History directly.
-
-## 3. Canonical Evidence Hierarchy
+## 3. Evidence and Authority Hierarchy
 
 ```text
 Archived Review Package JSON
@@ -103,67 +110,117 @@ Historical outcome/research layers
 KnowledgeRecord
     versioned, rebuildable, traceable knowledge statement
 
-KnowledgeProvenanceAssessment
-    rebuildable lineage-quality view
+KnowledgeRecordEnvelope
+    Knowledge record + rebuildable provenance assessment
 
-Knowledge SQLite
-    Knowledge-owned query persistence, separate from History
+GroundedPromptInput
+    deterministic provider-neutral AI input
+
+GroundedModelResponse
+    untrusted raw provider output
+
+GroundedAIAnswer candidate
+    structurally parsed but not yet trusted
+
+GroundingValidationAssessment
+    exact citation/Knowledge admissibility check
+
+ADMISSIBLE GroundedGenerationResult
+    final v1 grounded result
 ```
 
-## 4. Stable Knowledge Guardrails
+Raw model output never outranks Knowledge evidence.
 
-Knowledge v1 is descriptive and traceable. It does not establish:
+## 4. Stable AI Guardrails
+
+Sprint 20 does not establish:
 
 ```text
+truth scoring
+semantic entailment proof
+confidence
 prediction
 recommendation effectiveness
 success probability
 causal validity
-market representativeness
-AI authority
+model authority
+autonomous action
 ```
 
-A provenance status of `COMPLETE` describes lineage to checksum-backed canonical snapshot evidence; it is not a confidence or truth score.
+`COMPLETE` Knowledge provenance means checksum-backed canonical snapshot lineage exists. It is not a model-confidence or truth score.
 
-Temporal comparison reports factual field/evidence changes only and does not classify better/worse outcomes.
+`ADMISSIBLE` means the answer citations exactly resolve to supplied COMPLETE Knowledge context. It does not prove the natural-language claim is semantically entailed or universally true.
 
-## 5. Persistence Status
+## 5. Provider Boundary Status
+
+Current implementation:
+
+```text
+GroundedModelAdapter = abstract provider boundary
+StaticGroundedModelAdapter = deterministic reference/test implementation
+real provider adapter = deferred
+```
+
+Not implemented in Sprint 20:
+
+```text
+OpenAI SDK
+Anthropic SDK
+other provider SDKs
+HTTP/network transport
+API keys/secrets
+streaming
+retry/rate-limit logic
+model/provider allowlists
+cost/token accounting
+```
+
+## 6. Audit and Persistence Status
 
 ```text
 History schema target = 2
 Knowledge schema target = 1
-Knowledge provenance = derived/on demand
-Knowledge comparison = derived/on demand
+AI persistence schema = none
+AI trace = derived/on demand
 ```
 
-History and Knowledge databases remain separate ownership boundaries.
+Grounded generation audit traces are compact derived views and are not persisted in Sprint 20.
 
-## 6. Deferred Scope
+## 7. Deferred Scope
 
 Still deferred:
 
-- automatic History-to-Knowledge ingestion;
-- comparison/replay/research projection into Knowledge;
-- semantic deduplication and conflict resolution;
-- relationship graph traversal;
-- Knowledge migrations beyond schema v1;
+- real model/provider integration;
+- provider credentials and transport policy;
+- structured-output provider configuration;
+- semantic entailment validation;
+- contradiction detection;
+- relevance/semantic ranking;
 - embeddings/vector retrieval;
-- LLM-generated knowledge;
-- evidence-grounded AI synthesis;
-- predictive confidence or effectiveness scoring;
+- grounded answer history/persistence;
+- model/version governance;
+- cost/token accounting;
+- human feedback workflows;
+- automatic History-to-Knowledge ingestion;
+- predictive confidence/effectiveness scoring;
 - causal inference;
 - autonomous portfolio actions;
 - broker execution.
 
-## 7. Next Product Decision Point
+## 8. Next Product Decision Point
 
-Sprint 19 completes the deterministic Knowledge Domain foundation.
+Sprint 20 completes the provider-neutral Evidence-Grounded AI foundation.
 
-The next milestone can begin **Evidence-Grounded AI Experience** only if AI remains downstream of immutable evidence, historical intelligence, and traceable Knowledge provenance.
+The next milestone may introduce a real provider adapter only if:
 
-The AI layer must not bypass provenance, invent source authority, or reintroduce prohibited predictive/effectiveness claims without a new explicit methodology and governance contract.
+- all provider calls remain behind `GroundedModelAdapter`;
+- prompt/answer protocol contracts remain explicit;
+- raw responses remain untrusted until strict parsing and grounding validation;
+- audit trace remains available;
+- secrets/network concerns stay outside domain contracts;
+- provider integration does not bypass Knowledge provenance.
 
-## 8. Definition of Done
+## 9. Definition of Done
 
 A milestone is complete only when:
 
