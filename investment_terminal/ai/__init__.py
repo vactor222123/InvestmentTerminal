@@ -3,6 +3,11 @@ from investment_terminal.ai.context_selection import (
     GroundedContextSelectionPolicy,
     GroundedContextSelectionService,
 )
+from investment_terminal.ai.model_adapter import (
+    GroundedModelAdapter,
+    GroundedModelResponse,
+    StaticGroundedModelAdapter,
+)
 from investment_terminal.ai.models import (
     GroundedAIAnswer,
     GroundedAIClaim,
@@ -25,9 +30,12 @@ __all__ = [
     "GroundedContextSelectionPolicy",
     "GroundedContextSelectionService",
     "GroundedKnowledgeCitation",
+    "GroundedModelAdapter",
+    "GroundedModelResponse",
     "GroundedPromptContextItem",
     "GroundedPromptInput",
     "GroundedPromptInputService",
     "GroundingValidationAssessment",
     "GroundingValidationService",
+    "StaticGroundedModelAdapter",
 ]
