@@ -10,8 +10,8 @@ branch: develop
 ## Current phase
 
 ```text
-Sprint 17 — Research Provenance and Population Quality Hardening
-implementation complete; final documentation/repository verification
+Sprint 18 — Explicit Historical Archive Continuity
+implementation complete; final repository verification pending
 ```
 
 ## Completed historical-intelligence foundation
@@ -38,29 +38,112 @@ Versioned descriptive research protocol, explicit eligibility/coverage, exact co
 
 ### Sprint 17
 
+Research population frame, selection accounting, temporal boundary completeness, source import quality, canonical provenance summary, compatibility migration, and provenance E2E.
+
+### Sprint 18
+
 Delivered:
 
 ```text
-HistoricalOutcomeResearchPopulationFrame
-HistoricalOutcomeResearchPopulationFrameService
-HistoricalOutcomeSelectionReasonCount
-HistoricalOutcomeSelectionAccounting
-HistoricalOutcomeSelectionAccountingService
-HistoricalOutcomePopulationCompletenessAssessment
-HistoricalOutcomePopulationCompletenessService
-HistoricalOutcomeSourceImportQualityAssessment
-HistoricalOutcomeSourceImportQualityService
-HistoricalOutcomeResearchProvenanceSummary
-HistoricalOutcomeResearchProvenanceSummaryService
-research-service provenance integration
-research CLI provenance rendering
-provenance compatibility layer
-production-style provenance E2E
+HistoricalArchiveCadencePolicy
+HistoricalArchiveExpectedTimestampService
+HistoricalArchiveGapAssessment
+HistoricalArchiveGapAssessmentService
+HistoricalArchiveRepositoryGapService
+explicit archive-continuity integration into population completeness
+research-service continuity wiring
+CLI cadence opt-in
+repository-backed continuity E2E
+canonical optional ARCHIVE_GAP_ASSESSMENT provenance extension
+CLI continuity/provenance compatibility contracts
 ```
+
+## Canonical Archive Continuity
+
+Archive continuity is assessed only from an explicit cadence contract.
+
+Canonical cadence identity:
+
+```text
+FIXED_INTERVAL_ARCHIVE_CADENCE@1
+```
+
+Version 1 uses:
+
+```text
+timestamp basis = GENERATED_AT
+anchor_at = explicit timezone-aware timestamp
+interval_seconds = explicit positive interval
+```
+
+It deliberately does not infer:
+
+```text
+business days
+exchange sessions
+holidays
+retry schedules
+operational downtime
+```
+
+Expected timestamps are generated from the explicit cadence and compared exactly with repository snapshot `generated_at` values.
+
+Canonical gap statuses:
+
+```text
+COMPLETE
+GAPS
+NO_EXPECTATION
+```
+
+`COMPLETE` means every expected timestamp in the assessed interval is present.
+
+`GAPS` means at least one expected timestamp is missing.
+
+`NO_EXPECTATION` means the assessed cadence/interval produced no expected timestamps; it is not treated as proof of continuity.
+
+Unexpected off-grid observed snapshots remain visible diagnostics and do not silently alter the expected cadence.
+
+## Temporal Population Completeness
+
+Boundary coverage and internal archive continuity remain independent dimensions.
+
+Boundary statuses:
+
+```text
+COVERED
+PARTIAL
+UNKNOWN
+```
+
+Internal continuity statuses:
+
+```text
+NOT_ASSESSED
+COMPLETE
+GAPS
+```
+
+Examples:
+
+```text
+boundary=COVERED / internal=GAPS
+boundary=PARTIAL / internal=COMPLETE
+```
+
+are valid because spanning the requested source interval and satisfying the expected archive cadence are different questions.
+
+Without an explicit archive gap assessment, internal continuity remains:
+
+```text
+NOT_ASSESSED
+```
+
+No cadence is inferred from observed snapshots.
 
 ## Canonical Research Provenance
 
-Canonical research provenance now uses one envelope:
+The four core provenance components remain:
 
 ```text
 HistoricalOutcomeResearchProvenanceSummary
@@ -70,150 +153,118 @@ HistoricalOutcomeResearchProvenanceSummary
 └── SELECTION_ACCOUNTING
 ```
 
-The envelope is diagnostic and compositional.
-
-It deliberately does not define a single quality score, pass/fail verdict, representativeness score, or inference-readiness score.
-
-## Source Import Quality
-
-Import quality is assessed over unique `origin_snapshot_id` values rather than raw observation count.
-
-Canonical statuses:
+Sprint 18 adds:
 
 ```text
-COMPLETE
-PARTIAL
-UNKNOWN
+optional provenance extensions
+└── ARCHIVE_GAP_ASSESSMENT
 ```
 
-`COMPLETE` means all unique source snapshots have canonical `IMPORTED` lifecycle state.
+The optional archive-gap component contains detailed expected/missing/unexpected timestamp diagnostics.
 
-`PARTIAL` means at least one source snapshot is non-IMPORTED or has no canonical import state.
-
-This is import-lifecycle provenance only.
-
-It does not establish that the source population is representative or complete in time.
-
-## Temporal Population Completeness
-
-Canonical temporal completeness statuses:
+It does not change the legacy/core provenance completeness denominator:
 
 ```text
-COVERED
-PARTIAL
-UNKNOWN
+4/4 components
 ```
 
-The assessment compares observed source origin timestamps against an explicitly requested origin interval.
+Therefore absence of explicit cadence does not make an otherwise complete Sprint 17 provenance envelope incomplete.
 
-`COVERED` means the observed source frame spans the requested temporal boundaries.
-
-Internal archive continuity remains:
+When an archive gap assessment is present, provenance validates consistency between:
 
 ```text
-NOT_ASSESSED
+archive gap COMPLETE     ↔ internal continuity COMPLETE
+archive gap GAPS         ↔ internal continuity GAPS
+archive gap NO_EXPECTATION ↔ internal continuity NOT_ASSESSED
 ```
 
-because no canonical expected snapshot cadence currently exists.
+## Research and CLI Boundaries
 
-Therefore temporal boundary coverage is not equivalent to “no missing snapshots”.
+`HistoricalOutcomeResearchService` remains persistence-agnostic.
 
-## Population Frame
+It receives immutable `HistoricalArchiveGapAssessment` data and does not open History SQLite or infer cadence.
 
-The population frame makes the pre-selection denominator explicit:
+Repository-backed composition remains at the application/CLI boundary:
 
 ```text
-source_observation_count
-selected_candidate_count
-excluded_by_selection_count
-selection_fraction
-selection_applied
+explicit cadence
+→ expected GENERATED_AT timestamps
+→ HistoricalSnapshotRepository
+→ repository gap assessment
+→ research service
+→ population completeness
+→ research provenance
 ```
 
-This distinguishes source population size from query-selected candidate size.
-
-## Selection Accounting
-
-Selection accounting explains why source observations were excluded by the research query.
-
-Canonical reasons include:
+CLI cadence assessment is opt-in through:
 
 ```text
-RECOMMENDATION_KEY
-SYMBOL
-ACTION
-STATUS
-WINDOW_KIND
-WINDOW_VALUE
-METHODOLOGY_ID
-METHODOLOGY_VERSION
-ORIGIN_FROM
-ORIGIN_TO
+--archive-cadence-anchor
+--archive-cadence-interval-seconds
 ```
 
-Reasons are not exclusive.
+Both options must be supplied together.
 
-One observation can fail multiple predicates, so:
+Cadence assessment also requires explicit:
 
 ```text
-total_reason_failures
+--origin-from
+--origin-to
 ```
 
-is diagnostic and is not required to equal:
+Without cadence options, CLI behavior remains backward-compatible and internal continuity remains `NOT_ASSESSED`.
+
+## CLI Output Contract
+
+Human output preserves the core provenance denominator:
 
 ```text
-excluded_observation_count
+Provenance   : 4/4 components; complete=True
 ```
 
-## Research Result Boundary
-
-`HistoricalOutcomeResearchCohortResult` now owns canonical:
+When cadence is supplied, continuity diagnostics may additionally show:
 
 ```text
-provenance
+Completeness : COVERED / internal=GAPS
+Archive gaps : GAPS / missing=1 / unexpected=0
 ```
 
-instead of treating import quality, temporal completeness, population frame, and selection accounting as unrelated result concepts.
+JSON output exposes cadence and gap diagnostics while canonical cohort provenance carries the optional `archive_gap_assessment` extension.
 
-For compatibility with pre-provenance callers, read-only Python properties and transitional top-level serialization aliases remain available.
+## Stable Research Guardrails
 
-Canonical new consumers should use:
+Sprint 18 preserves all prior research claim boundaries:
 
-```text
-result.provenance
-payload["provenance"]
-```
+- no hindsight leakage;
+- no current-price fallback;
+- no hidden nearest-date substitution;
+- no implicit exchange calendar;
+- no implicit archive cadence;
+- no network call inside pure research calculation;
+- no outcome/research persistence;
+- no success/failure scoring;
+- no hit rate or win rate;
+- no recommendation-effectiveness scoring;
+- no predictive confidence;
+- no causal inference;
+- no representativeness claim from boundary coverage or archive continuity;
+- no portfolio-performance wording for raw price movement;
+- explicit population-selection warnings;
+- explicit sample-size boundary;
+- CLI remains composition/rendering only.
 
-## Canonical Research Semantics
+Archive continuity proves only agreement with the supplied expected-cadence contract for the assessed interval.
 
-Sprint 16 research semantics remain unchanged:
-
-```text
-DESCRIPTIVE_OUTCOME_RESEARCH@1
-eligible statuses: COMPLETE
-uncertainty: SAMPLE_STANDARD_ERROR
-claims: DESCRIPTIVE_ONLY
-```
-
-Sprint 17 did not introduce:
-
-```text
-hit rate
-win rate
-success probability
-effectiveness
-predictive confidence
-causal inference
-hypothesis tests
-confidence intervals
-```
+It does not prove that the cadence itself is operationally correct, that the population is unbiased, or that research conclusions are inferentially valid.
 
 ## Persistence Status
 
-Sprint 17 introduced no outcome, provenance, or research persistence.
+Sprint 18 introduces no new persistence.
 
 ```text
 History schema target = 2
+archive cadence policy = runtime/versioned contract
+archive gap assessment = derived/on demand
 outcome observations = derived/on demand
 research provenance = derived/on demand
 research results = derived/on demand
@@ -221,99 +272,46 @@ research results = derived/on demand
 
 No History schema v3 was introduced.
 
-## Architecture Boundaries
-
-The research service remains persistence-agnostic.
-
-`HistoricalImportStateRepository` is used at the application/CLI boundary to build immutable import-quality assessment data.
-
-Research orchestration receives the assessment rather than opening History SQLite itself.
-
-The CLI remains composition/rendering only and owns no provenance or research mathematics.
-
 ## E2E Coverage
 
-Sprint 17 adds a production-style provenance E2E using:
+Sprint 18 covers:
 
 ```text
-History SQLite
-local market SQLite
-historical import lifecycle
-methodology-aware observations
-research query
-research provenance
-research result
+cadence validation
+expected timestamp generation
+exact gap assessment
+repository-backed gap composition
+population-completeness integration
+research continuity wiring
+real History SQLite COMPLETE/GAPS paths
+JSON and human CLI continuity rendering
+optional provenance extension compatibility
+legacy 4/4 provenance denominator
 ```
-
-The fixture verifies a mixed import lifecycle:
-
-```text
-2 IMPORTED
-1 METADATA_ONLY
-```
-
-and confirms:
-
-```text
-source observations = 3
-selected candidates = 1
-source import quality = PARTIAL
-temporal completeness = COVERED
-selection reasons = ORIGIN_FROM + ORIGIN_TO
-eligible research sample = 1
-```
-
-It also verifies the canonical provenance envelope and transitional serialization aliases.
-
-## Stable Guardrails
-
-- no hindsight leakage;
-- no current-price fallback;
-- no hidden nearest-date substitution;
-- no implicit exchange calendar;
-- no network call inside pure research calculation;
-- no outcome/research persistence;
-- no success/failure scoring;
-- no hit rate;
-- no effectiveness scoring;
-- no predictive confidence;
-- no causal inference;
-- no archive-continuity claim without expected cadence;
-- no representativeness claim from provenance completeness;
-- no portfolio-performance wording for raw price movement;
-- explicit population-selection warnings;
-- explicit sample-size boundary;
-- CLI remains composition/rendering only.
 
 ## Testing Status
 
-Sprint 17 includes focused tests for:
+Focused Sprint 18 tests are implemented.
+
+Final repository closure requires:
 
 ```text
-population frame
-selection provenance
-CLI population-frame rendering
-selection-reason accounting
-selection-accounting integration
-temporal completeness
-completeness integration
-source import quality
-import-quality integration
-provenance summary
-provenance integration
-compatibility migration
-provenance E2E
+python -m pytest -q
 ```
 
-The full regression suite was green immediately before the Sprint 17 documentation package.
-
-Final repository closure requires rerunning the full suite after applying these docs.
+to pass after applying this documentation package.
 
 ## Deferred Capabilities
 
-Not implemented:
+Still not implemented:
 
-- success/failure labels;
+- business-day archive cadence;
+- exchange-session archive cadence;
+- holiday-aware archive cadence;
+- operational retry/downtime cadence semantics;
+- automatic cadence discovery;
+- population-universe representativeness model;
+- recommendation success/failure labels;
 - hit rate / win rate;
 - recommendation-effectiveness scoring;
 - predictive confidence calibration;
@@ -322,9 +320,6 @@ Not implemented:
 - multiple-comparison inference;
 - factor-effectiveness inference;
 - causal inference;
-- expected archive cadence;
-- archive-gap inference;
-- population-universe representativeness model;
 - dividend-adjusted total return;
 - FX-adjusted outcomes;
 - portfolio attribution;
@@ -335,6 +330,8 @@ Not implemented:
 
 ## Next Decision
 
-Do not infer that provenance completeness proves recommendation effectiveness or inferential validity.
+Sprint 18 closes the explicit archive-continuity hardening path selected after Sprint 17.
 
-A future inferential/comparative milestone still requires explicit versioned contracts for estimand, source/target population assumptions, comparison semantics, interval/test methodology, multiple-comparison rules, selection/survivorship treatment, and claim vocabulary.
+The next milestone should not add inferential or effectiveness claims merely because archive continuity is now measurable.
+
+A future milestone can either define richer source/population contracts or move to the deferred Knowledge Domain, but any new semantics must remain explicit, versioned, deterministic, and evidence-grounded.
