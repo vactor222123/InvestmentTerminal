@@ -345,6 +345,9 @@ def _print_human(report: dict[str, Any]) -> None:
                 "source_import_quality": cohort.get(
                     "source_import_quality"
                 ),
+                "archive_gap_assessment": cohort.get(
+                    "archive_gap_assessment"
+                ),
             }
             available_components = []
             if provenance["source_import_quality"] is not None:
@@ -374,6 +377,7 @@ def _print_human(report: dict[str, Any]) -> None:
         accounting = provenance.get("selection_accounting")
         completeness = provenance.get("population_completeness")
         import_quality = provenance.get("source_import_quality")
+        archive_gap = provenance.get("archive_gap_assessment")
         coverage = cohort["coverage"]
         sample = cohort["sample_assessment"]
         claims = cohort["claim_assessment"]
@@ -437,6 +441,13 @@ def _print_human(report: dict[str, Any]) -> None:
                 f"{completeness['status']} / "
                 f"internal={completeness['internal_continuity_status']}"
             )
+            if archive_gap is not None:
+                print(
+                    "  Archive gaps : "
+                    f"{archive_gap['status']} / "
+                    f"missing={archive_gap['missing_count']} / "
+                    f"unexpected={archive_gap['unexpected_observed_count']}"
+                )
             print(
                 "  C-warning    : "
                 f"{completeness['warning']}"

@@ -367,6 +367,7 @@ class HistoricalOutcomeResearchService:
             selection_accounting=selection_accounting,
             population_completeness=population_completeness,
             source_import_quality=source_import_quality,
+            archive_gap_assessment=archive_gap_assessment,
         )
         population = self._population_service.build(
             query=effective_query,
