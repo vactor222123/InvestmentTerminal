@@ -1,3 +1,7 @@
+from investment_terminal.knowledge.comparison import (
+    KnowledgeTemporalComparison,
+    KnowledgeTemporalComparisonService,
+)
 from investment_terminal.knowledge.envelope import (
     KnowledgeRecordEnvelope,
     KnowledgeRecordEnvelopeService,
@@ -41,5 +45,7 @@ __all__ = [
     "KnowledgeRecordEnvelopeService",
     "KnowledgeRecordRepository",
     "KnowledgeSQLiteStore",
+    "KnowledgeTemporalComparison",
+    "KnowledgeTemporalComparisonService",
     "SQLiteKnowledgeRecordRepository",
 ]
