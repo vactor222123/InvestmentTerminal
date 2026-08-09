@@ -1,3 +1,7 @@
+from investment_terminal.ai.audit import (
+    GroundedGenerationTrace,
+    GroundedGenerationTraceService,
+)
 from investment_terminal.ai.context_selection import (
     GroundedContextSelection,
     GroundedContextSelectionPolicy,
@@ -39,6 +43,8 @@ __all__ = [
     "GroundedContextSelectionService",
     "GroundedGenerationResult",
     "GroundedGenerationService",
+    "GroundedGenerationTrace",
+    "GroundedGenerationTraceService",
     "GroundedKnowledgeCitation",
     "GroundedModelAdapter",
     "GroundedModelParseResult",
