@@ -1,7 +1,7 @@
 # Investment Terminal — Product Roadmap
 
 **Status:** Canonical Roadmap  
-**Updated after:** Sprint 14 — Outcome-Aware Historical Intelligence  
+**Updated after:** Sprint 15 — Historical Outcome Methodology Hardening  
 **Current development branch:** `develop`
 
 ## 1. Product Evolution
@@ -63,59 +63,101 @@ Delivered:
 - descriptive in-memory aggregation;
 - read-only outcome CLI;
 - deterministic realistic outcome E2E fixture;
-- explicit decision to keep outcomes on demand and History schema at version 2.
+- outcomes remain on demand;
+- History schema remains version 2.
 
 Sprint 14 deliberately did not implement recommendation-effectiveness scoring or confidence calibration.
 
-## 6. Current: Sprint 15 — Historical Outcome Methodology Hardening
+## 6. Completed: Sprint 15 — Historical Outcome Methodology Hardening
 
-Sprint 15 should make outcome observation semantics realistic enough for exchange-traded instruments without weakening evidence discipline.
+Delivered:
 
-Primary themes:
+- immutable outcome methodology identity/version contracts;
+- explicit endpoint-policy and evidence-selection-policy identities;
+- explicit market-session and session-calendar models;
+- deterministic local read-only session-calendar boundary;
+- `TRADING_SESSIONS` observation-window semantics;
+- session-close endpoint resolution;
+- exact-only `EXACT_TIMESTAMP_CLOSE@1`;
+- exact-only `SESSION_CLOSE_EXACT@1`;
+- methodology-aware price-evidence provenance;
+- methodology-aware outcome observation orchestration;
+- structural methodology compatibility assessment;
+- read-only outcome query filters;
+- methodology-safe descriptive aggregation;
+- methodology-aware CLI;
+- deterministic Friday → weekend → Monday session-aware E2E coverage;
+- explicit preservation of Sprint 14 `ELAPSED_DAYS_EXACT_CLOSE@1`;
+- no outcome persistence;
+- History schema remains version 2.
 
-- explicit trading-session observation windows;
-- explicit endpoint/evidence selection policy;
-- market-session/calendar boundary;
-- methodology identity/version contracts;
-- deterministic session-aware local evidence lookup;
-- broader read-only outcome querying/filtering;
-- methodology-aware CLI output;
-- realistic E2E coverage across weekends/holidays/session gaps.
+Sprint 15 deliberately did not add generic nearest-date fallback, success labels, effectiveness scoring, predictive confidence, causal inference, or portfolio-performance attribution.
 
-Sprint 15 should not introduce predictive confidence or success scoring.
+## 7. Current Product Decision Point
 
-## 7. Deferred Scope
+The system now has sufficiently explicit historical outcome methodology to begin designing a **statistically honest effectiveness research protocol**.
 
-Not part of Sprint 15 unless explicitly re-approved after methodology work:
+The next milestone should not immediately introduce a confidence model.
+
+It should first define:
+
+- research population and eligible historical observations;
+- exact methodology grouping rules;
+- minimum sample sizes;
+- treatment of `PARTIAL`, `UNAVAILABLE`, and `NOT_MATURE`;
+- multiple observation-window handling;
+- methodology-version comparability;
+- symbol/action grouping rules;
+- survivorship and selection-bias safeguards;
+- uncertainty and interval reporting;
+- descriptive-vs-inferential metric boundaries;
+- explicit non-causal interpretation.
+
+Only after those contracts are stable should recommendation-effectiveness metrics be considered.
+
+## 8. Deferred Scope
+
+Still deferred:
 
 - recommendation success/failure labels;
 - hit-rate/effectiveness scoring;
-- confidence calibration;
+- predictive confidence calibration;
 - factor-effectiveness inference;
 - causal attribution;
+- dividend-adjusted total return;
+- FX-adjusted outcomes;
 - portfolio performance attribution;
 - tax-lot performance;
+- outcome persistence/materialization;
 - autonomous portfolio actions;
+- broker execution;
 - Knowledge Domain.
 
-## 8. Next Product Direction
+## 9. Stable Historical Evidence Hierarchy
 
-After Sprint 15, the next decision should be whether the available historical sample and methodology quality are sufficient for **statistically honest effectiveness research**.
+```text
+Archived Review Package JSON
+    canonical historical Review Package evidence
 
-Before any confidence model, define:
+History SQLite
+    rebuildable normalized historical projection
 
-- minimum sample sizes;
-- grouping dimensions;
-- survivorship rules;
-- missing-evidence treatment;
-- multiple-window handling;
-- methodology-version comparability;
-- uncertainty reporting;
-- explicit non-causal interpretation.
+Local market candle database
+    persisted historical market-data evidence
 
-## 9. Knowledge Domain Boundary
+Explicit local session calendar
+    session/calendar evidence supplied to methodology
 
-The Knowledge Domain begins only after historical evidence volume and semantics are mature enough.
+Outcome observation
+    rebuildable derived result
+
+Outcome aggregation
+    rebuildable descriptive summary grouped by exact methodology
+```
+
+## 10. Knowledge Domain Boundary
+
+The Knowledge Domain begins only after historical evidence volume, methodology, and research semantics are mature enough.
 
 Knowledge must remain:
 
@@ -123,9 +165,10 @@ Knowledge must remain:
 - sample-size aware;
 - methodology-version aware;
 - rebuildable;
+- uncertainty aware;
 - separate from immutable historical facts.
 
-## 10. Definition of Done
+## 11. Definition of Done
 
 A milestone is complete only when:
 
