@@ -16,6 +16,9 @@ from investment_terminal.history.historical_outcome_descriptive_summary import (
     HistoricalOutcomeDescriptiveSummary,
     HistoricalOutcomeDescriptiveSummaryService,
 )
+from investment_terminal.history.historical_outcome_query import (
+    HistoricalOutcomeQuery,
+)
 from investment_terminal.history.historical_outcome_research_claim_boundary import (
     HistoricalOutcomeResearchClaimAssessment,
     HistoricalOutcomeResearchClaimBoundaryService,
@@ -26,6 +29,10 @@ from investment_terminal.history.historical_outcome_research_coverage import (
 )
 from investment_terminal.history.historical_outcome_research_eligibility import (
     HistoricalOutcomeEligibilityService,
+)
+from investment_terminal.history.historical_outcome_research_population import (
+    HistoricalOutcomeResearchPopulationMetadata,
+    HistoricalOutcomeResearchPopulationMetadataService,
 )
 from investment_terminal.history.historical_outcome_research_protocol_models import (
     HistoricalOutcomeResearchProtocol,
@@ -45,6 +52,7 @@ class HistoricalOutcomeResearchCohortResult:
     """One complete protocol-aware research result for an exact cohort."""
 
     protocol_identity: str
+    population: HistoricalOutcomeResearchPopulationMetadata
     cohort: HistoricalOutcomeCohortKey
     coverage: HistoricalOutcomeResearchCoverage
     sample_assessment: HistoricalOutcomeSampleAssessment
@@ -55,6 +63,7 @@ class HistoricalOutcomeResearchCohortResult:
     def to_dict(self) -> dict[str, Any]:
         return {
             "protocol_identity": self.protocol_identity,
+            "population": self.population.to_dict(),
             "cohort": self.cohort.to_dict(),
             "coverage": self.coverage.to_dict(),
             "sample_assessment": self.sample_assessment.to_dict(),
@@ -78,7 +87,8 @@ class HistoricalOutcomeResearchService:
 
     The service groups exact cohorts, preserves coverage for all candidates,
     assesses sufficiency, summarizes eligible COMPLETE outcomes descriptively,
-    reports uncertainty, and applies the explicit claim boundary.
+    reports uncertainty, carries population-selection metadata, and applies the
+    explicit claim boundary.
     """
 
     def __init__(
@@ -91,6 +101,9 @@ class HistoricalOutcomeResearchService:
         descriptive_service: HistoricalOutcomeDescriptiveSummaryService | None = None,
         uncertainty_service: HistoricalOutcomeUncertaintyService | None = None,
         claim_service: HistoricalOutcomeResearchClaimBoundaryService | None = None,
+        population_service: (
+            HistoricalOutcomeResearchPopulationMetadataService | None
+        ) = None,
     ) -> None:
         self._cohort_service = (
             cohort_service
@@ -129,6 +142,11 @@ class HistoricalOutcomeResearchService:
             if claim_service is not None
             else HistoricalOutcomeResearchClaimBoundaryService()
         )
+        self._population_service = (
+            population_service
+            if population_service is not None
+            else HistoricalOutcomeResearchPopulationMetadataService()
+        )
 
     def analyze(
         self,
@@ -138,6 +156,7 @@ class HistoricalOutcomeResearchService:
             ...,
         ],
         protocol: HistoricalOutcomeResearchProtocol,
+        population_query: HistoricalOutcomeQuery | None = None,
     ) -> tuple[HistoricalOutcomeResearchCohortResult, ...]:
         if not isinstance(results, tuple):
             raise TypeError(
@@ -150,6 +169,26 @@ class HistoricalOutcomeResearchService:
             raise TypeError(
                 "protocol must be a HistoricalOutcomeResearchProtocol"
             )
+        if (
+            population_query is not None
+            and not isinstance(
+                population_query,
+                HistoricalOutcomeQuery,
+            )
+        ):
+            raise TypeError(
+                "population_query must be a HistoricalOutcomeQuery or None"
+            )
+
+        effective_query = (
+            HistoricalOutcomeQuery()
+            if population_query is None
+            else population_query
+        )
+        population = self._population_service.build(
+            query=effective_query,
+            candidate_count=len(results),
+        )
 
         grouped = self._cohort_service.group(
             results=results,
@@ -161,6 +200,7 @@ class HistoricalOutcomeResearchService:
                 cohort=cohort,
                 results=cohort_results,
                 protocol=protocol,
+                population=population,
             )
             for cohort, cohort_results in grouped
         )
@@ -174,6 +214,7 @@ class HistoricalOutcomeResearchService:
             ...,
         ],
         protocol: HistoricalOutcomeResearchProtocol,
+        population: HistoricalOutcomeResearchPopulationMetadata,
     ) -> HistoricalOutcomeResearchCohortResult:
         coverage = self._coverage_service.summarize(
             results=results,
@@ -225,6 +266,7 @@ class HistoricalOutcomeResearchService:
 
         return HistoricalOutcomeResearchCohortResult(
             protocol_identity=protocol.identity_key,
+            population=population,
             cohort=cohort,
             coverage=coverage,
             sample_assessment=sample_assessment,
