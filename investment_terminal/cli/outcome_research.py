@@ -21,6 +21,12 @@ from investment_terminal.cli.outcome_history import (
     _parse_datetime,
     _positive_int,
 )
+from investment_terminal.history.historical_archive_cadence import (
+    HistoricalArchiveCadencePolicy,
+)
+from investment_terminal.history.historical_archive_repository_gap import (
+    HistoricalArchiveRepositoryGapService,
+)
 from investment_terminal.history.historical_evidence_selection import (
     HistoricalPriceEvidenceSelectionService,
 )
@@ -100,6 +106,11 @@ def build_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument("--action")
     parser.add_argument("--origin-from", type=_parse_datetime)
     parser.add_argument("--origin-to", type=_parse_datetime)
+    parser.add_argument("--archive-cadence-anchor", type=_parse_datetime)
+    parser.add_argument(
+        "--archive-cadence-interval-seconds",
+        type=_positive_int,
+    )
     parser.add_argument("--json", action="store_true")
     return parser
 
@@ -140,6 +151,36 @@ def main(argv: Sequence[str] | None = None) -> None:
             allowed_methodology_identities=(methodology.identity_key,),
             minimum_complete_sample_size=options.minimum_sample_size,
         )
+
+        cadence_requested = (
+            options.archive_cadence_anchor is not None
+            or options.archive_cadence_interval_seconds is not None
+        )
+        if cadence_requested and (
+            options.archive_cadence_anchor is None
+            or options.archive_cadence_interval_seconds is None
+        ):
+            raise ValueError(
+                "--archive-cadence-anchor and "
+                "--archive-cadence-interval-seconds must be provided together"
+            )
+        if cadence_requested and (
+            options.origin_from is None
+            or options.origin_to is None
+        ):
+            raise ValueError(
+                "--origin-from and --origin-to are required when "
+                "archive cadence assessment is requested"
+            )
+
+        archive_cadence = (
+            None
+            if not cadence_requested
+            else HistoricalArchiveCadencePolicy.fixed_interval_v1(
+                anchor_at=options.archive_cadence_anchor,
+                interval_seconds=options.archive_cadence_interval_seconds,
+            )
+        )
     except (
         OSError,
         KeyError,
@@ -153,8 +194,11 @@ def main(argv: Sequence[str] | None = None) -> None:
 
     try:
         history_store = HistoricalSQLiteStore(options.history_database)
+        snapshot_repository = HistoricalSnapshotRepository(
+            history_store
+        )
         history_service = HistoricalRecommendationHistoryService(
-            snapshot_repository=HistoricalSnapshotRepository(history_store),
+            snapshot_repository=snapshot_repository,
             recommendations_repository=HistoricalRecommendationsRepository(
                 history_store
             ),
@@ -199,6 +243,17 @@ def main(argv: Sequence[str] | None = None) -> None:
         source_import_quality = import_quality_service.assess(
             produced
         )
+        archive_gap_assessment = (
+            None
+            if archive_cadence is None
+            else HistoricalArchiveRepositoryGapService(
+                snapshot_repository=snapshot_repository
+            ).assess(
+                policy=archive_cadence,
+                start_at=options.origin_from,
+                end_at=options.origin_to,
+            )
+        )
         research_results = HistoricalOutcomeResearchService().analyze(
             results=filtered,
             protocol=protocol,
@@ -206,6 +261,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             source_observation_count=len(produced),
             source_results=produced,
             source_import_quality=source_import_quality,
+            archive_gap_assessment=archive_gap_assessment,
         )
     except (
         KeyError,
@@ -234,6 +290,16 @@ def main(argv: Sequence[str] | None = None) -> None:
         "as_of": options.as_of.astimezone(timezone.utc).isoformat(),
         "resolution": str(options.resolution).strip().upper(),
         "query": query.to_dict(),
+        "archive_cadence": (
+            None
+            if archive_cadence is None
+            else archive_cadence.to_dict()
+        ),
+        "archive_gap_assessment": (
+            None
+            if archive_gap_assessment is None
+            else archive_gap_assessment.to_dict()
+        ),
         "produced_observation_count": len(produced),
         "candidate_count": len(filtered),
         "cohort_count": len(research_results),

@@ -5,6 +5,9 @@ Protocol-aware orchestration for historical outcome research.
 from dataclasses import dataclass
 from typing import Any
 
+from investment_terminal.history.historical_archive_gap_assessment import (
+    HistoricalArchiveGapAssessment,
+)
 from investment_terminal.history.historical_methodology_aware_observation_service import (
     HistoricalMethodologyAwareObservationResult,
 )
@@ -249,6 +252,7 @@ class HistoricalOutcomeResearchService:
         source_import_quality: (
             HistoricalOutcomeSourceImportQualityAssessment | None
         ) = None,
+        archive_gap_assessment: HistoricalArchiveGapAssessment | None = None,
     ) -> tuple[HistoricalOutcomeResearchCohortResult, ...]:
         if not isinstance(results, tuple):
             raise TypeError("results must be a tuple")
@@ -277,6 +281,17 @@ class HistoricalOutcomeResearchService:
             raise TypeError(
                 "source_import_quality must be a "
                 "HistoricalOutcomeSourceImportQualityAssessment or None"
+            )
+        if (
+            archive_gap_assessment is not None
+            and not isinstance(
+                archive_gap_assessment,
+                HistoricalArchiveGapAssessment,
+            )
+        ):
+            raise TypeError(
+                "archive_gap_assessment must be a "
+                "HistoricalArchiveGapAssessment or None"
             )
 
         effective_query = (
@@ -324,6 +339,7 @@ class HistoricalOutcomeResearchService:
                     source_results,
                     requested_origin_start=effective_query.origin_from,
                     requested_origin_end=effective_query.origin_to,
+                    archive_gap_assessment=archive_gap_assessment,
                 )
             )
         else:
