@@ -10,328 +10,266 @@ branch: develop
 ## Current phase
 
 ```text
-Sprint 18 — Explicit Historical Archive Continuity
+Sprint 19 — Knowledge Domain Foundation
 implementation complete; final repository verification pending
 ```
 
-## Completed historical-intelligence foundation
+## Completed foundation
 
-### Sprint 12
+### Sprint 12–18
 
-Immutable historical Review Package archive, integrity, History SQLite projection, typed imports, and timeline foundation.
+Historical Intelligence, comparison/replay, outcome observations, methodology hardening, descriptive research, research provenance/population quality, and explicit archive continuity are complete.
 
-### Sprint 13
-
-Historical navigation, compatibility, comparison, replay, read-only History CLIs, migration/import-state foundation, and realistic History E2E.
-
-### Sprint 14
-
-Canonical outcome observations, exact local candle evidence, raw close-price movement, explicit observation states, descriptive aggregation, CLI, and outcome E2E.
-
-### Sprint 15
-
-Explicit methodology identity, deterministic market-session semantics, exact-only evidence selection, methodology-aware observations, filtering, methodology-safe aggregation, CLI, and session-aware E2E.
-
-### Sprint 16
-
-Versioned descriptive research protocol, explicit eligibility/coverage, exact cohorts, sample sufficiency, descriptive statistics, standard error, claim boundaries, population warnings, read-only research CLI, and multi-observation E2E.
-
-### Sprint 17
-
-Research population frame, selection accounting, temporal boundary completeness, source import quality, canonical provenance summary, compatibility migration, and provenance E2E.
-
-### Sprint 18
+### Sprint 19 — Knowledge Domain Foundation
 
 Delivered:
 
 ```text
-HistoricalArchiveCadencePolicy
-HistoricalArchiveExpectedTimestampService
-HistoricalArchiveGapAssessment
-HistoricalArchiveGapAssessmentService
-HistoricalArchiveRepositoryGapService
-explicit archive-continuity integration into population completeness
-research-service continuity wiring
-CLI cadence opt-in
-repository-backed continuity E2E
-canonical optional ARCHIVE_GAP_ASSESSMENT provenance extension
-CLI continuity/provenance compatibility contracts
+KnowledgeEvidenceReference
+KnowledgeRecord
+KnowledgeEvidenceProvenanceService
+KnowledgeProvenanceAssessment
+KnowledgeRecordRepository
+InMemoryKnowledgeRecordRepository
+KnowledgeSQLiteStore
+SQLiteKnowledgeRecordRepository
+HistoricalSnapshotKnowledgeSource
+HistoricalSnapshotKnowledgeProjectionService
+KnowledgeRecordEnvelope
+KnowledgeRecordEnvelopeService
+KnowledgeQueryService
+KnowledgeTemporalComparison
+KnowledgeTemporalComparisonService
+read-only Knowledge CLI
+real Knowledge SQLite E2E
 ```
 
-## Canonical Archive Continuity
+## Knowledge Domain Boundary
 
-Archive continuity is assessed only from an explicit cadence contract.
+Knowledge is a downstream, rebuildable, evidence-grounded domain. It does not import or mutate the History package.
 
-Canonical cadence identity:
+Canonical dependency direction:
 
 ```text
-FIXED_INTERVAL_ARCHIVE_CADENCE@1
+History / verified evidence
+        ↓
+CLI or application composition
+        ↓
+neutral Knowledge source contract
+        ↓
+Knowledge projection
+        ↓
+KnowledgeRecord
+        ↓
+Knowledge repository/query/provenance
 ```
 
-Version 1 uses:
+`investment_terminal.knowledge` must not import `investment_terminal.history`.
+
+## Canonical Knowledge Record
+
+A Knowledge record is immutable and versioned:
 
 ```text
-timestamp basis = GENERATED_AT
-anchor_at = explicit timezone-aware timestamp
-interval_seconds = explicit positive interval
+knowledge_id
+knowledge_type
+version
+subject_key
+statement
+valid_from
+valid_to
+generated_at
+evidence
+status
 ```
 
-It deliberately does not infer:
+Supported v1 knowledge types:
 
 ```text
-business days
-exchange sessions
-holidays
-retry schedules
-operational downtime
+FACT
+RELATIONSHIP
+PATTERN
 ```
 
-Expected timestamps are generated from the explicit cadence and compared exactly with repository snapshot `generated_at` values.
+Supported statuses:
 
-Canonical gap statuses:
+```text
+ACTIVE
+SUPERSEDED
+```
+
+Knowledge v1 does not encode predictive confidence, success probability, recommendation effectiveness, causal claims, or AI-generated authority.
+
+## Evidence and Provenance
+
+Canonical snapshot-backed evidence carries:
+
+```text
+evidence_type = HISTORICAL_SNAPSHOT
+evidence_id = exact snapshot UUID
+observed_at = exact source timestamp
+checksum_sha256 = exact archive checksum
+```
+
+Derived evidence references may be rebuildable and therefore need not be checksum-backed.
+
+Knowledge provenance statuses:
 
 ```text
 COMPLETE
-GAPS
-NO_EXPECTATION
-```
-
-`COMPLETE` means every expected timestamp in the assessed interval is present.
-
-`GAPS` means at least one expected timestamp is missing.
-
-`NO_EXPECTATION` means the assessed cadence/interval produced no expected timestamps; it is not treated as proof of continuity.
-
-Unexpected off-grid observed snapshots remain visible diagnostics and do not silently alter the expected cadence.
-
-## Temporal Population Completeness
-
-Boundary coverage and internal archive continuity remain independent dimensions.
-
-Boundary statuses:
-
-```text
-COVERED
 PARTIAL
-UNKNOWN
 ```
 
-Internal continuity statuses:
+`COMPLETE` means at least one checksum-backed canonical historical snapshot is present in lineage. It does not mean the statement is predictive, causal, representative, or investment-effective.
+
+Evidence timestamps may not be later than `KnowledgeRecord.generated_at`.
+
+## Persistence
+
+Knowledge has its own SQLite boundary and does not alter History schema.
 
 ```text
-NOT_ASSESSED
-COMPLETE
-GAPS
+Knowledge schema version = 1
+knowledge_schema_metadata
+knowledge_records
+knowledge_evidence
 ```
 
-Examples:
+Primary record identity:
 
 ```text
-boundary=COVERED / internal=GAPS
-boundary=PARTIAL / internal=COMPLETE
+(knowledge_id, version)
 ```
 
-are valid because spanning the requested source interval and satisfying the expected archive cadence are different questions.
+Record and evidence insertions are transactional.
 
-Without an explicit archive gap assessment, internal continuity remains:
+History schema remains version 2 and separate from Knowledge persistence.
+
+## Query Contract
+
+Canonical repository/query operations:
 
 ```text
-NOT_ASSESSED
+get
+require
+list_all
+find_by_subject
+find_valid_at
+latest_for_subject
 ```
 
-No cadence is inferred from observed snapshots.
+Ordering and temporal validity are deterministic. `find_valid_at` uses inclusive validity boundaries.
 
-## Canonical Research Provenance
-
-The four core provenance components remain:
+Query results are exposed as:
 
 ```text
-HistoricalOutcomeResearchProvenanceSummary
-├── SOURCE_IMPORT_QUALITY
-├── POPULATION_COMPLETENESS
-├── POPULATION_FRAME
-└── SELECTION_ACCOUNTING
+KnowledgeRecordEnvelope
+├── KnowledgeRecord
+└── KnowledgeProvenanceAssessment
 ```
 
-Sprint 18 adds:
+Provenance is derived on demand and is not duplicated in SQLite.
+
+## Temporal Comparison
+
+Knowledge temporal comparison is descriptive only and reports:
 
 ```text
-optional provenance extensions
-└── ARCHIVE_GAP_ASSESSMENT
+statement_changed
+status_changed
+validity_changed
+evidence_added
+evidence_removed
+evidence_changed
+any_change
 ```
 
-The optional archive-gap component contains detailed expected/missing/unexpected timestamp diagnostics.
+It requires two different versions of the same `knowledge_id` and orders them deterministically by `generated_at`, then `version`.
 
-It does not change the legacy/core provenance completeness denominator:
+It does not score whether a change is better, worse, successful, predictive, or effective.
+
+## Read-only CLI
+
+Knowledge CLI commands:
 
 ```text
-4/4 components
+list
+show
+subject
+valid
+latest
+compare
 ```
 
-Therefore absence of explicit cadence does not make an otherwise complete Sprint 17 provenance envelope incomplete.
+The CLI composes `KnowledgeSQLiteStore`, `SQLiteKnowledgeRecordRepository`, `KnowledgeQueryService`, and `KnowledgeTemporalComparisonService`. It owns no independent SQL/query semantics.
 
-When an archive gap assessment is present, provenance validates consistency between:
+Both human and JSON output expose provenance and descriptive temporal changes.
 
-```text
-archive gap COMPLETE     ↔ internal continuity COMPLETE
-archive gap GAPS         ↔ internal continuity GAPS
-archive gap NO_EXPECTATION ↔ internal continuity NOT_ASSESSED
-```
+## Stable Guardrails
 
-## Research and CLI Boundaries
+Sprint 19 preserves these boundaries:
 
-`HistoricalOutcomeResearchService` remains persistence-agnostic.
-
-It receives immutable `HistoricalArchiveGapAssessment` data and does not open History SQLite or infer cadence.
-
-Repository-backed composition remains at the application/CLI boundary:
-
-```text
-explicit cadence
-→ expected GENERATED_AT timestamps
-→ HistoricalSnapshotRepository
-→ repository gap assessment
-→ research service
-→ population completeness
-→ research provenance
-```
-
-CLI cadence assessment is opt-in through:
-
-```text
---archive-cadence-anchor
---archive-cadence-interval-seconds
-```
-
-Both options must be supplied together.
-
-Cadence assessment also requires explicit:
-
-```text
---origin-from
---origin-to
-```
-
-Without cadence options, CLI behavior remains backward-compatible and internal continuity remains `NOT_ASSESSED`.
-
-## CLI Output Contract
-
-Human output preserves the core provenance denominator:
-
-```text
-Provenance   : 4/4 components; complete=True
-```
-
-When cadence is supplied, continuity diagnostics may additionally show:
-
-```text
-Completeness : COVERED / internal=GAPS
-Archive gaps : GAPS / missing=1 / unexpected=0
-```
-
-JSON output exposes cadence and gap diagnostics while canonical cohort provenance carries the optional `archive_gap_assessment` extension.
-
-## Stable Research Guardrails
-
-Sprint 18 preserves all prior research claim boundaries:
-
-- no hindsight leakage;
-- no current-price fallback;
-- no hidden nearest-date substitution;
-- no implicit exchange calendar;
-- no implicit archive cadence;
-- no network call inside pure research calculation;
-- no outcome/research persistence;
-- no success/failure scoring;
-- no hit rate or win rate;
-- no recommendation-effectiveness scoring;
-- no predictive confidence;
+- Knowledge does not import History;
+- History remains canonical historical evidence;
+- Knowledge is rebuildable/versioned;
+- snapshot evidence identity and checksum remain traceable;
+- no network I/O in pure Knowledge calculation;
+- no prediction or recommendation-effectiveness semantics;
 - no causal inference;
-- no representativeness claim from boundary coverage or archive continuity;
-- no portfolio-performance wording for raw price movement;
-- explicit population-selection warnings;
-- explicit sample-size boundary;
-- CLI remains composition/rendering only.
-
-Archive continuity proves only agreement with the supplied expected-cadence contract for the assessed interval.
-
-It does not prove that the cadence itself is operationally correct, that the population is unbiased, or that research conclusions are inferentially valid.
-
-## Persistence Status
-
-Sprint 18 introduces no new persistence.
-
-```text
-History schema target = 2
-archive cadence policy = runtime/versioned contract
-archive gap assessment = derived/on demand
-outcome observations = derived/on demand
-research provenance = derived/on demand
-research results = derived/on demand
-```
-
-No History schema v3 was introduced.
+- no success/failure or win-rate semantics;
+- no hidden AI authority field;
+- no mutation of History from Knowledge;
+- CLI remains read-only composition/rendering.
 
 ## E2E Coverage
 
-Sprint 18 covers:
+Sprint 19 covers:
 
 ```text
-cadence validation
-expected timestamp generation
-exact gap assessment
-repository-backed gap composition
-population-completeness integration
-research continuity wiring
-real History SQLite COMPLETE/GAPS paths
-JSON and human CLI continuity rendering
-optional provenance extension compatibility
-legacy 4/4 provenance denominator
+neutral snapshot evidence input
+→ deterministic Knowledge projection
+→ provenance validation
+→ Knowledge SQLite persistence
+→ deterministic repository/query service
+→ provenance envelope
+→ temporal comparison
+→ JSON/human CLI
 ```
+
+The E2E also verifies that Knowledge persistence does not create or modify a History database.
 
 ## Testing Status
 
-Focused Sprint 18 tests are implemented.
+Focused Sprint 19 tests are implemented.
 
-Final repository closure requires:
+Final closure requires:
 
 ```text
 python -m pytest -q
 ```
 
-to pass after applying this documentation package.
+to pass after applying this package.
 
 ## Deferred Capabilities
 
-Still not implemented:
+Still deferred:
 
-- business-day archive cadence;
-- exchange-session archive cadence;
-- holiday-aware archive cadence;
-- operational retry/downtime cadence semantics;
-- automatic cadence discovery;
-- population-universe representativeness model;
-- recommendation success/failure labels;
-- hit rate / win rate;
-- recommendation-effectiveness scoring;
-- predictive confidence calibration;
-- inferential confidence intervals;
-- hypothesis tests;
-- multiple-comparison inference;
-- factor-effectiveness inference;
+- automatic History-to-Knowledge ingestion workflow;
+- projection from snapshot comparison/replay/outcome research;
+- knowledge deduplication across semantically equivalent statements;
+- relationship graph traversal;
+- richer temporal conflict/supersession rules;
+- Knowledge schema migration beyond v1;
+- natural-language retrieval/ranking;
+- embeddings/vector search;
+- LLM-generated Knowledge records;
+- predictive confidence;
+- recommendation effectiveness;
 - causal inference;
-- dividend-adjusted total return;
-- FX-adjusted outcomes;
-- portfolio attribution;
-- outcome/research persistence;
-- autonomous trading;
-- broker execution;
-- Knowledge Domain.
+- autonomous trading or broker execution.
 
 ## Next Decision
 
-Sprint 18 closes the explicit archive-continuity hardening path selected after Sprint 17.
+Sprint 19 establishes the deterministic Knowledge Domain foundation required before any evidence-grounded AI experience.
 
-The next milestone should not add inferential or effectiveness claims merely because archive continuity is now measurable.
-
-A future milestone can either define richer source/population contracts or move to the deferred Knowledge Domain, but any new semantics must remain explicit, versioned, deterministic, and evidence-grounded.
+A future AI milestone must consume traceable Knowledge records and provenance without turning derived statements into unqualified authority or introducing unsupported predictive/causal semantics.
