@@ -6,6 +6,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, ClassVar, Iterable
 
+from investment_terminal.history.historical_archive_gap_assessment import (
+    HistoricalArchiveGapAssessment,
+)
 from investment_terminal.history.historical_methodology_aware_observation_service import (
     HistoricalMethodologyAwareObservationResult,
 )
@@ -17,11 +20,10 @@ from investment_terminal.utils.validation import (
 @dataclass(frozen=True, slots=True)
 class HistoricalOutcomePopulationCompletenessAssessment:
     """
-    Describe whether observed source timestamps cover an explicit research range.
+    Describe temporal boundary coverage and optional internal archive continuity.
 
-    This contract assesses only temporal boundary coverage. It does not infer
-    that snapshots should exist at any cadence and therefore does not claim
-    that the archive has no internal gaps.
+    Boundary coverage and internal continuity remain distinct semantics.
+    Continuity is assessed only when an explicit archive gap assessment exists.
     """
 
     status: str
@@ -38,7 +40,16 @@ class HistoricalOutcomePopulationCompletenessAssessment:
     UNKNOWN: ClassVar[str] = "UNKNOWN"
     PARTIAL: ClassVar[str] = "PARTIAL"
     COVERED: ClassVar[str] = "COVERED"
+
     NOT_ASSESSED: ClassVar[str] = "NOT_ASSESSED"
+    CONTINUITY_COMPLETE: ClassVar[str] = "COMPLETE"
+    CONTINUITY_GAPS: ClassVar[str] = "GAPS"
+
+    SUPPORTED_CONTINUITY_STATUSES: ClassVar[tuple[str, ...]] = (
+        NOT_ASSESSED,
+        CONTINUITY_COMPLETE,
+        CONTINUITY_GAPS,
+    )
 
     def __post_init__(self) -> None:
         if self.status not in {
@@ -49,6 +60,7 @@ class HistoricalOutcomePopulationCompletenessAssessment:
             raise ValueError(
                 f"unsupported completeness status: {self.status}"
             )
+
         if (
             isinstance(self.source_observation_count, bool)
             or not isinstance(self.source_observation_count, int)
@@ -98,10 +110,14 @@ class HistoricalOutcomePopulationCompletenessAssessment:
                     f"{field_name} must be a bool or None"
                 )
 
-        if self.internal_continuity_status != self.NOT_ASSESSED:
+        if self.internal_continuity_status not in self.SUPPORTED_CONTINUITY_STATUSES:
             raise ValueError(
-                "internal_continuity_status must be NOT_ASSESSED"
+                "internal_continuity_status must be one of: "
+                + ", ".join(
+                    self.SUPPORTED_CONTINUITY_STATUSES
+                )
             )
+
         if not isinstance(self.warning, str) or not self.warning.strip():
             raise ValueError(
                 "warning must be a non-empty string"
@@ -167,16 +183,22 @@ class HistoricalOutcomePopulationCompletenessAssessment:
 
 
 class HistoricalOutcomePopulationCompletenessService:
-    """
-    Assess only source temporal boundary coverage.
+    """Assess temporal boundary coverage plus optional explicit continuity."""
 
-    Internal archive continuity is intentionally not inferred because the
-    product has no canonical expected snapshot cadence.
-    """
-
-    WARNING = (
+    WARNING_NOT_ASSESSED = (
         "Temporal boundary coverage only; internal archive continuity is not "
-        "assessed because no canonical expected snapshot cadence is defined"
+        "assessed because no canonical expected snapshot cadence is available "
+        "to this assessment and no explicit archive gap assessment was provided"
+    )
+    WARNING_COMPLETE = (
+        "Temporal boundary coverage is reported separately from internal "
+        "continuity; explicit cadence assessment found no missing expected "
+        "archive timestamps"
+    )
+    WARNING_GAPS = (
+        "Temporal boundary coverage is reported separately from internal "
+        "continuity; explicit cadence assessment found missing expected "
+        "archive timestamps"
     )
 
     def assess(
@@ -185,6 +207,7 @@ class HistoricalOutcomePopulationCompletenessService:
         *,
         requested_origin_start: datetime | None = None,
         requested_origin_end: datetime | None = None,
+        archive_gap_assessment: HistoricalArchiveGapAssessment | None = None,
     ) -> HistoricalOutcomePopulationCompletenessAssessment:
         if requested_origin_start is not None:
             validate_aware_datetime(
@@ -203,6 +226,18 @@ class HistoricalOutcomePopulationCompletenessService:
         ):
             raise ValueError(
                 "requested_origin_start must not be later than requested_origin_end"
+            )
+
+        if (
+            archive_gap_assessment is not None
+            and not isinstance(
+                archive_gap_assessment,
+                HistoricalArchiveGapAssessment,
+            )
+        ):
+            raise TypeError(
+                "archive_gap_assessment must be a "
+                "HistoricalArchiveGapAssessment or None"
             )
 
         materialized = tuple(results)
@@ -263,6 +298,10 @@ class HistoricalOutcomePopulationCompletenessService:
                 else HistoricalOutcomePopulationCompletenessAssessment.PARTIAL
             )
 
+        continuity_status, warning = self._continuity(
+            archive_gap_assessment
+        )
+
         return HistoricalOutcomePopulationCompletenessAssessment(
             status=status,
             source_observation_count=len(materialized),
@@ -272,8 +311,33 @@ class HistoricalOutcomePopulationCompletenessService:
             requested_origin_end=requested_origin_end,
             covers_requested_start=covers_start,
             covers_requested_end=covers_end,
-            internal_continuity_status=(
-                HistoricalOutcomePopulationCompletenessAssessment.NOT_ASSESSED
-            ),
-            warning=self.WARNING,
+            internal_continuity_status=continuity_status,
+            warning=warning,
+        )
+
+    @classmethod
+    def _continuity(
+        cls,
+        assessment: HistoricalArchiveGapAssessment | None,
+    ) -> tuple[str, str]:
+        if assessment is None or assessment.status == "NO_EXPECTATION":
+            return (
+                HistoricalOutcomePopulationCompletenessAssessment.NOT_ASSESSED,
+                cls.WARNING_NOT_ASSESSED,
+            )
+
+        if assessment.status == "COMPLETE":
+            return (
+                HistoricalOutcomePopulationCompletenessAssessment.CONTINUITY_COMPLETE,
+                cls.WARNING_COMPLETE,
+            )
+
+        if assessment.status == "GAPS":
+            return (
+                HistoricalOutcomePopulationCompletenessAssessment.CONTINUITY_GAPS,
+                cls.WARNING_GAPS,
+            )
+
+        raise ValueError(
+            f"unsupported archive gap status: {assessment.status}"
         )
