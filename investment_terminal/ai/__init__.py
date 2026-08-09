@@ -13,6 +13,10 @@ from investment_terminal.ai.models import (
     GroundedAIClaim,
     GroundedKnowledgeCitation,
 )
+from investment_terminal.ai.orchestration import (
+    GroundedGenerationResult,
+    GroundedGenerationService,
+)
 from investment_terminal.ai.prompt_input import (
     GroundedPromptContextItem,
     GroundedPromptInput,
@@ -33,6 +37,8 @@ __all__ = [
     "GroundedContextSelection",
     "GroundedContextSelectionPolicy",
     "GroundedContextSelectionService",
+    "GroundedGenerationResult",
+    "GroundedGenerationService",
     "GroundedKnowledgeCitation",
     "GroundedModelAdapter",
     "GroundedModelParseResult",
