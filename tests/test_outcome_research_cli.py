@@ -124,6 +124,16 @@ def test_json_ready_report_shape_preserves_research_semantics() -> None:
         "cohorts": [
             {
                 "protocol_identity": "DESCRIPTIVE_OUTCOME_RESEARCH@1",
+                "population_frame": {
+                    "frame_basis": (
+                        "ARCHIVED_METHODOLOGY_AWARE_OBSERVATIONS"
+                    ),
+                    "source_observation_count": 4,
+                    "selected_candidate_count": 3,
+                    "excluded_by_selection_count": 1,
+                    "selection_fraction": 0.75,
+                    "selection_applied": True,
+                },
                 "population": {
                     "selection_basis": "ARCHIVED_OBSERVATIONS",
                     "candidate_count": 3,
@@ -180,6 +190,12 @@ def test_json_ready_report_shape_preserves_research_semantics() -> None:
     assert decoded["protocol"]["identity_key"] == (
         "DESCRIPTIVE_OUTCOME_RESEARCH@1"
     )
+    assert decoded["cohorts"][0]["population_frame"][
+        "source_observation_count"
+    ] == 4
+    assert decoded["cohorts"][0]["population_frame"][
+        "selected_candidate_count"
+    ] == 3
     assert decoded["cohorts"][0]["sample_assessment"]["status"] == (
         "INSUFFICIENT"
     )
@@ -212,6 +228,16 @@ def test_human_output_exposes_claim_and_population_warnings(
             {
                 "cohort": {
                     "identity_key": "cohort-1",
+                },
+                "population_frame": {
+                    "frame_basis": (
+                        "ARCHIVED_METHODOLOGY_AWARE_OBSERVATIONS"
+                    ),
+                    "source_observation_count": 3,
+                    "selected_candidate_count": 2,
+                    "excluded_by_selection_count": 1,
+                    "selection_fraction": 2 / 3,
+                    "selection_applied": True,
                 },
                 "population": {
                     "selection_basis": "ARCHIVED_OBSERVATIONS",
@@ -259,6 +285,7 @@ def test_human_output_exposes_claim_and_population_warnings(
     output = capsys.readouterr().out
 
     assert "DESCRIPTIVE_OUTCOME_RESEARCH@1" in output
+    assert "Frame        : 2/3 selected" in output
     assert "INSUFFICIENT" in output
     assert "DESCRIPTIVE_ONLY" in output
     assert "insufficient sample" in output
