@@ -8,6 +8,11 @@ from investment_terminal.ai.models import (
     GroundedAIClaim,
     GroundedKnowledgeCitation,
 )
+from investment_terminal.ai.prompt_input import (
+    GroundedPromptContextItem,
+    GroundedPromptInput,
+    GroundedPromptInputService,
+)
 from investment_terminal.ai.validation import (
     GroundingValidationAssessment,
     GroundingValidationService,
@@ -20,6 +25,9 @@ __all__ = [
     "GroundedContextSelectionPolicy",
     "GroundedContextSelectionService",
     "GroundedKnowledgeCitation",
+    "GroundedPromptContextItem",
+    "GroundedPromptInput",
+    "GroundedPromptInputService",
     "GroundingValidationAssessment",
     "GroundingValidationService",
 ]
