@@ -264,6 +264,7 @@ def _print_human(report: dict[str, Any]) -> None:
     for index, cohort in enumerate(report["cohorts"], start=1):
         frame = cohort["population_frame"]
         accounting = cohort.get("selection_accounting")
+        completeness = cohort.get("population_completeness")
         coverage = cohort["coverage"]
         sample = cohort["sample_assessment"]
         claims = cohort["claim_assessment"]
@@ -296,6 +297,16 @@ def _print_human(report: dict[str, Any]) -> None:
                 "  Selection    : "
                 f"{reasons}; "
                 f"reason_failures={accounting['total_reason_failures']}"
+            )
+        if completeness is not None:
+            print(
+                "  Completeness : "
+                f"{completeness['status']} / "
+                f"internal={completeness['internal_continuity_status']}"
+            )
+            print(
+                "  C-warning    : "
+                f"{completeness['warning']}"
             )
         print(
             "  Population   : "

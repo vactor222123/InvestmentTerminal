@@ -19,6 +19,10 @@ from investment_terminal.history.historical_outcome_descriptive_summary import (
 from investment_terminal.history.historical_outcome_query import (
     HistoricalOutcomeQuery,
 )
+from investment_terminal.history.historical_outcome_population_completeness import (
+    HistoricalOutcomePopulationCompletenessAssessment,
+    HistoricalOutcomePopulationCompletenessService,
+)
 from investment_terminal.history.historical_outcome_research_claim_boundary import (
     HistoricalOutcomeResearchClaimAssessment,
     HistoricalOutcomeResearchClaimBoundaryService,
@@ -62,6 +66,7 @@ class HistoricalOutcomeResearchCohortResult:
     protocol_identity: str
     population_frame: HistoricalOutcomeResearchPopulationFrame
     selection_accounting: HistoricalOutcomeSelectionAccounting | None
+    population_completeness: HistoricalOutcomePopulationCompletenessAssessment | None
     population: HistoricalOutcomeResearchPopulationMetadata
     cohort: HistoricalOutcomeCohortKey
     coverage: HistoricalOutcomeResearchCoverage
@@ -78,6 +83,11 @@ class HistoricalOutcomeResearchCohortResult:
                 None
                 if self.selection_accounting is None
                 else self.selection_accounting.to_dict()
+            ),
+            "population_completeness": (
+                None
+                if self.population_completeness is None
+                else self.population_completeness.to_dict()
             ),
             "population": self.population.to_dict(),
             "cohort": self.cohort.to_dict(),
@@ -118,6 +128,9 @@ class HistoricalOutcomeResearchService:
         ) = None,
         selection_accounting_service: (
             HistoricalOutcomeSelectionAccountingService | None
+        ) = None,
+        population_completeness_service: (
+            HistoricalOutcomePopulationCompletenessService | None
         ) = None,
     ) -> None:
         self._cohort_service = (
@@ -172,6 +185,11 @@ class HistoricalOutcomeResearchService:
             if selection_accounting_service is not None
             else HistoricalOutcomeSelectionAccountingService()
         )
+        self._population_completeness_service = (
+            population_completeness_service
+            if population_completeness_service is not None
+            else HistoricalOutcomePopulationCompletenessService()
+        )
 
     def analyze(
         self,
@@ -220,6 +238,7 @@ class HistoricalOutcomeResearchService:
         selected_candidate_count = len(results)
 
         selection_accounting = None
+        population_completeness = None
         if source_results is not None:
             selection_accounting = (
                 self._selection_accounting_service.assess(
@@ -245,6 +264,13 @@ class HistoricalOutcomeResearchService:
                 )
             effective_source_count = (
                 selection_accounting.source_observation_count
+            )
+            population_completeness = (
+                self._population_completeness_service.assess(
+                    source_results,
+                    requested_origin_start=effective_query.origin_from,
+                    requested_origin_end=effective_query.origin_to,
+                )
             )
         else:
             effective_source_count = (
@@ -275,6 +301,7 @@ class HistoricalOutcomeResearchService:
                 population=population,
                 population_frame=population_frame,
                 selection_accounting=selection_accounting,
+                population_completeness=population_completeness,
             )
             for cohort, cohort_results in grouped
         )
@@ -291,6 +318,7 @@ class HistoricalOutcomeResearchService:
         population: HistoricalOutcomeResearchPopulationMetadata,
         population_frame: HistoricalOutcomeResearchPopulationFrame,
         selection_accounting: HistoricalOutcomeSelectionAccounting | None,
+        population_completeness: HistoricalOutcomePopulationCompletenessAssessment | None,
     ) -> HistoricalOutcomeResearchCohortResult:
         coverage = self._coverage_service.summarize(
             results=results,
@@ -340,6 +368,7 @@ class HistoricalOutcomeResearchService:
             protocol_identity=protocol.identity_key,
             population_frame=population_frame,
             selection_accounting=selection_accounting,
+            population_completeness=population_completeness,
             population=population,
             cohort=cohort,
             coverage=coverage,
