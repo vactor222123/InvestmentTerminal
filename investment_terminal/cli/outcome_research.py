@@ -267,10 +267,47 @@ def _print_human(report: dict[str, Any]) -> None:
     print(f"Cohorts        : {report['cohort_count']}")
 
     for index, cohort in enumerate(report["cohorts"], start=1):
-        frame = cohort["population_frame"]
-        accounting = cohort.get("selection_accounting")
-        completeness = cohort.get("population_completeness")
-        import_quality = cohort.get("source_import_quality")
+        provenance = cohort.get("provenance")
+        if provenance is None:
+            # Backward-compatible rendering for legacy test/report fixtures.
+            provenance = {
+                "population_frame": cohort.get("population_frame"),
+                "selection_accounting": cohort.get("selection_accounting"),
+                "population_completeness": cohort.get(
+                    "population_completeness"
+                ),
+                "source_import_quality": cohort.get(
+                    "source_import_quality"
+                ),
+            }
+            available_components = []
+            if provenance["source_import_quality"] is not None:
+                available_components.append("SOURCE_IMPORT_QUALITY")
+            if provenance["population_completeness"] is not None:
+                available_components.append("POPULATION_COMPLETENESS")
+            if provenance["population_frame"] is not None:
+                available_components.append("POPULATION_FRAME")
+            if provenance["selection_accounting"] is not None:
+                available_components.append("SELECTION_ACCOUNTING")
+            provenance["available_components"] = available_components
+            provenance["missing_components"] = [
+                component
+                for component in (
+                    "SOURCE_IMPORT_QUALITY",
+                    "POPULATION_COMPLETENESS",
+                    "POPULATION_FRAME",
+                    "SELECTION_ACCOUNTING",
+                )
+                if component not in available_components
+            ]
+            provenance["complete_component_set"] = (
+                len(available_components) == 4
+            )
+
+        frame = provenance["population_frame"]
+        accounting = provenance.get("selection_accounting")
+        completeness = provenance.get("population_completeness")
+        import_quality = provenance.get("source_import_quality")
         coverage = cohort["coverage"]
         sample = cohort["sample_assessment"]
         claims = cohort["claim_assessment"]
@@ -283,6 +320,11 @@ def _print_human(report: dict[str, Any]) -> None:
         print(
             "  Identity     : "
             f"{cohort['cohort']['identity_key']}"
+        )
+        print(
+            "  Provenance   : "
+            f"{len(provenance['available_components'])}/4 components; "
+            f"complete={provenance['complete_component_set']}"
         )
         if import_quality is not None:
             fraction = import_quality["imported_fraction"]

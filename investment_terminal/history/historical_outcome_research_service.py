@@ -45,6 +45,10 @@ from investment_terminal.history.historical_outcome_research_population_frame im
 from investment_terminal.history.historical_outcome_research_protocol_models import (
     HistoricalOutcomeResearchProtocol,
 )
+from investment_terminal.history.historical_outcome_research_provenance import (
+    HistoricalOutcomeResearchProvenanceSummary,
+    HistoricalOutcomeResearchProvenanceSummaryService,
+)
 from investment_terminal.history.historical_outcome_sample_sufficiency import (
     HistoricalOutcomeSampleAssessment,
     HistoricalOutcomeSampleSufficiencyService,
@@ -67,10 +71,7 @@ class HistoricalOutcomeResearchCohortResult:
     """One complete protocol-aware research result for an exact cohort."""
 
     protocol_identity: str
-    population_frame: HistoricalOutcomeResearchPopulationFrame
-    selection_accounting: HistoricalOutcomeSelectionAccounting | None
-    population_completeness: HistoricalOutcomePopulationCompletenessAssessment | None
-    source_import_quality: HistoricalOutcomeSourceImportQualityAssessment | None
+    provenance: HistoricalOutcomeResearchProvenanceSummary
     population: HistoricalOutcomeResearchPopulationMetadata
     cohort: HistoricalOutcomeCohortKey
     coverage: HistoricalOutcomeResearchCoverage
@@ -79,9 +80,37 @@ class HistoricalOutcomeResearchCohortResult:
     uncertainty: HistoricalOutcomeUncertaintySummary | None
     claim_assessment: HistoricalOutcomeResearchClaimAssessment
 
+    @property
+    def population_frame(self) -> HistoricalOutcomeResearchPopulationFrame:
+        """Backward-compatible read-only access to canonical provenance."""
+        return self.provenance.population_frame
+
+    @property
+    def selection_accounting(self) -> HistoricalOutcomeSelectionAccounting | None:
+        """Backward-compatible read-only access to canonical provenance."""
+        return self.provenance.selection_accounting
+
+    @property
+    def population_completeness(
+        self,
+    ) -> HistoricalOutcomePopulationCompletenessAssessment | None:
+        """Backward-compatible read-only access to canonical provenance."""
+        return self.provenance.population_completeness
+
+    @property
+    def source_import_quality(
+        self,
+    ) -> HistoricalOutcomeSourceImportQualityAssessment | None:
+        """Backward-compatible read-only access to canonical provenance."""
+        return self.provenance.source_import_quality
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "protocol_identity": self.protocol_identity,
+            "provenance": self.provenance.to_dict(),
+            # Transitional serialization aliases for pre-provenance callers.
+            # `provenance` is canonical; remove these only in a dedicated
+            # breaking-contract migration.
             "population_frame": self.population_frame.to_dict(),
             "selection_accounting": (
                 None
@@ -141,6 +170,9 @@ class HistoricalOutcomeResearchService:
         population_completeness_service: (
             HistoricalOutcomePopulationCompletenessService | None
         ) = None,
+        provenance_service: (
+            HistoricalOutcomeResearchProvenanceSummaryService | None
+        ) = None,
     ) -> None:
         self._cohort_service = (
             cohort_service if cohort_service is not None else HistoricalOutcomeCohortService()
@@ -196,6 +228,11 @@ class HistoricalOutcomeResearchService:
             population_completeness_service
             if population_completeness_service is not None
             else HistoricalOutcomePopulationCompletenessService()
+        )
+        self._provenance_service = (
+            provenance_service
+            if provenance_service is not None
+            else HistoricalOutcomeResearchProvenanceSummaryService()
         )
 
     def analyze(
@@ -309,6 +346,12 @@ class HistoricalOutcomeResearchService:
             source_observation_count=effective_source_count,
             selected_candidate_count=selected_candidate_count,
         )
+        provenance = self._provenance_service.build(
+            population_frame=population_frame,
+            selection_accounting=selection_accounting,
+            population_completeness=population_completeness,
+            source_import_quality=source_import_quality,
+        )
         population = self._population_service.build(
             query=effective_query,
             candidate_count=selected_candidate_count,
@@ -325,10 +368,7 @@ class HistoricalOutcomeResearchService:
                 results=cohort_results,
                 protocol=protocol,
                 population=population,
-                population_frame=population_frame,
-                selection_accounting=selection_accounting,
-                population_completeness=population_completeness,
-                source_import_quality=source_import_quality,
+                provenance=provenance,
             )
             for cohort, cohort_results in grouped
         )
@@ -340,10 +380,7 @@ class HistoricalOutcomeResearchService:
         results: tuple[HistoricalMethodologyAwareObservationResult, ...],
         protocol: HistoricalOutcomeResearchProtocol,
         population: HistoricalOutcomeResearchPopulationMetadata,
-        population_frame: HistoricalOutcomeResearchPopulationFrame,
-        selection_accounting: HistoricalOutcomeSelectionAccounting | None,
-        population_completeness: HistoricalOutcomePopulationCompletenessAssessment | None,
-        source_import_quality: HistoricalOutcomeSourceImportQualityAssessment | None,
+        provenance: HistoricalOutcomeResearchProvenanceSummary,
     ) -> HistoricalOutcomeResearchCohortResult:
         coverage = self._coverage_service.summarize(
             results=results,
@@ -387,10 +424,7 @@ class HistoricalOutcomeResearchService:
 
         return HistoricalOutcomeResearchCohortResult(
             protocol_identity=protocol.identity_key,
-            population_frame=population_frame,
-            selection_accounting=selection_accounting,
-            population_completeness=population_completeness,
-            source_import_quality=source_import_quality,
+            provenance=provenance,
             population=population,
             cohort=cohort,
             coverage=coverage,
