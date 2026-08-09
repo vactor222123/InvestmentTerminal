@@ -77,33 +77,15 @@ def build_argument_parser() -> argparse.ArgumentParser:
             "uncertainty, and descriptive-only claim boundaries."
         )
     )
-    parser.add_argument(
-        "--history-database",
-        type=Path,
-        default=DEFAULT_HISTORY_DATABASE,
-    )
-    parser.add_argument(
-        "--market-database",
-        type=Path,
-        default=DEFAULT_MARKET_DATABASE,
-    )
-    parser.add_argument(
-        "--recommendation-key",
-        required=True,
-    )
+    parser.add_argument("--history-database", type=Path, default=DEFAULT_HISTORY_DATABASE)
+    parser.add_argument("--market-database", type=Path, default=DEFAULT_MARKET_DATABASE)
+    parser.add_argument("--recommendation-key", required=True)
     parser.add_argument(
         "--methodology",
-        choices=(
-            ELAPSED_METHODOLOGY,
-            SESSION_METHODOLOGY,
-        ),
+        choices=(ELAPSED_METHODOLOGY, SESSION_METHODOLOGY),
         required=True,
     )
-    parser.add_argument(
-        "--window-value",
-        type=_positive_int,
-        required=True,
-    )
+    parser.add_argument("--window-value", type=_positive_int, required=True)
     parser.add_argument(
         "--minimum-sample-size",
         type=_positive_int,
@@ -113,43 +95,18 @@ def build_argument_parser() -> argparse.ArgumentParser:
             "required by DESCRIPTIVE_OUTCOME_RESEARCH@1."
         ),
     )
-    parser.add_argument(
-        "--session-calendar",
-        type=Path,
-    )
-    parser.add_argument(
-        "--as-of",
-        type=_parse_datetime,
-        required=True,
-    )
-    parser.add_argument(
-        "--resolution",
-        default="D",
-    )
-    parser.add_argument(
-        "--symbol",
-    )
-    parser.add_argument(
-        "--action",
-    )
-    parser.add_argument(
-        "--origin-from",
-        type=_parse_datetime,
-    )
-    parser.add_argument(
-        "--origin-to",
-        type=_parse_datetime,
-    )
-    parser.add_argument(
-        "--json",
-        action="store_true",
-    )
+    parser.add_argument("--session-calendar", type=Path)
+    parser.add_argument("--as-of", type=_parse_datetime, required=True)
+    parser.add_argument("--resolution", default="D")
+    parser.add_argument("--symbol")
+    parser.add_argument("--action")
+    parser.add_argument("--origin-from", type=_parse_datetime)
+    parser.add_argument("--origin-to", type=_parse_datetime)
+    parser.add_argument("--json", action="store_true")
     return parser
 
 
-def main(
-    argv: Sequence[str] | None = None,
-) -> None:
+def main(argv: Sequence[str] | None = None) -> None:
     parser = build_argument_parser()
     options = parser.parse_args(argv)
 
@@ -182,9 +139,7 @@ def main(
             origin_to=options.origin_to,
         )
         protocol = HistoricalOutcomeResearchProtocol.descriptive_v1(
-            allowed_methodology_identities=(
-                methodology.identity_key,
-            ),
+            allowed_methodology_identities=(methodology.identity_key,),
             minimum_complete_sample_size=options.minimum_sample_size,
         )
     except (
@@ -199,33 +154,21 @@ def main(
     market_database = None
 
     try:
-        history_store = HistoricalSQLiteStore(
-            options.history_database
-        )
+        history_store = HistoricalSQLiteStore(options.history_database)
         history_service = HistoricalRecommendationHistoryService(
-            snapshot_repository=HistoricalSnapshotRepository(
-                history_store
-            ),
+            snapshot_repository=HistoricalSnapshotRepository(history_store),
             recommendations_repository=HistoricalRecommendationsRepository(
                 history_store
             ),
         )
 
-        market_database = _open_market_database(
-            options.market_database
-        )
+        market_database = _open_market_database(options.market_database)
         raw_provider = HistoricalOutcomePriceEvidenceProvider(
-            CandleRepository(
-                market_database
-            )
+            CandleRepository(market_database)
         )
-        selection_service = HistoricalPriceEvidenceSelectionService(
-            raw_provider
-        )
+        selection_service = HistoricalPriceEvidenceSelectionService(raw_provider)
         methodology_evidence_service = (
-            HistoricalMethodologyAwarePriceEvidenceService(
-                selection_service
-            )
+            HistoricalMethodologyAwarePriceEvidenceService(selection_service)
         )
         observation_service = HistoricalMethodologyAwareObservationService(
             elapsed_window_policy=HistoricalObservationWindowPolicy(),
@@ -237,9 +180,7 @@ def main(
             calculator=HistoricalRecommendationOutcomeCalculator(),
         )
 
-        states = history_service.states_for(
-            options.recommendation_key
-        )
+        states = history_service.states_for(options.recommendation_key)
         produced = tuple(
             observation_service.observe(
                 state=state,
@@ -259,6 +200,7 @@ def main(
             protocol=protocol,
             population_query=query,
             source_observation_count=len(produced),
+            source_results=produced,
         )
     except (
         KeyError,
@@ -284,108 +226,53 @@ def main(
             if options.methodology == ELAPSED_METHODOLOGY
             else calendar.identity.to_dict()
         ),
-        "as_of": options.as_of.astimezone(
-            timezone.utc
-        ).isoformat(),
-        "resolution": str(
-            options.resolution
-        ).strip().upper(),
+        "as_of": options.as_of.astimezone(timezone.utc).isoformat(),
+        "resolution": str(options.resolution).strip().upper(),
         "query": query.to_dict(),
         "produced_observation_count": len(produced),
         "candidate_count": len(filtered),
         "cohort_count": len(research_results),
-        "cohorts": [
-            result.to_dict()
-            for result in research_results
-        ],
+        "cohorts": [result.to_dict() for result in research_results],
     }
 
     if options.json:
-        print(
-            json.dumps(
-                report,
-                indent=2,
-                allow_nan=False,
-            )
-        )
+        print(json.dumps(report, indent=2, allow_nan=False))
         return
 
-    _print_human(
-        report
-    )
+    _print_human(report)
 
 
-def _print_human(
-    report: dict[str, Any],
-) -> None:
-    print(
-        "Historical outcome research"
-    )
-    print(
-        f"Recommendation : {report['recommendation_key']}"
-    )
-    print(
-        "Protocol       : "
-        f"{report['protocol']['identity_key']}"
-    )
-    print(
-        "Methodology    : "
-        f"{report['methodology']['identity_key']}"
-    )
+def _print_human(report: dict[str, Any]) -> None:
+    print("Historical outcome research")
+    print(f"Recommendation : {report['recommendation_key']}")
+    print("Protocol       : " f"{report['protocol']['identity_key']}")
+    print("Methodology    : " f"{report['methodology']['identity_key']}")
     print(
         "Window         : "
         f"{report['window']['value']} "
         f"{report['window']['kind']}"
     )
-    print(
-        f"As of          : {report['as_of']}"
-    )
-    print(
-        f"Resolution     : {report['resolution']}"
-    )
+    print(f"As of          : {report['as_of']}")
+    print(f"Resolution     : {report['resolution']}")
     print(
         "Candidates     : "
         f"{report['candidate_count']} "
         f"(from {report['produced_observation_count']} produced)"
     )
-    print(
-        f"Cohorts        : {report['cohort_count']}"
-    )
+    print(f"Cohorts        : {report['cohort_count']}")
 
-    for index, cohort in enumerate(
-        report[
-            "cohorts"
-        ],
-        start=1,
-    ):
-        frame = cohort[
-            "population_frame"
-        ]
-        coverage = cohort[
-            "coverage"
-        ]
-        sample = cohort[
-            "sample_assessment"
-        ]
-        claims = cohort[
-            "claim_assessment"
-        ]
-        population = cohort[
-            "population"
-        ]
-        descriptive = cohort[
-            "descriptive_summary"
-        ]
-        uncertainty = cohort[
-            "uncertainty"
-        ]
+    for index, cohort in enumerate(report["cohorts"], start=1):
+        frame = cohort["population_frame"]
+        accounting = cohort.get("selection_accounting")
+        coverage = cohort["coverage"]
+        sample = cohort["sample_assessment"]
+        claims = cohort["claim_assessment"]
+        population = cohort["population"]
+        descriptive = cohort["descriptive_summary"]
+        uncertainty = cohort["uncertainty"]
 
-        print(
-            ""
-        )
-        print(
-            f"Cohort {index}"
-        )
+        print("")
+        print(f"Cohort {index}")
         print(
             "  Identity     : "
             f"{cohort['cohort']['identity_key']}"
@@ -397,14 +284,23 @@ def _print_human(
             f"({frame['selection_fraction']:.2%}); "
             f"excluded={frame['excluded_by_selection_count']}"
         )
+        if accounting is not None:
+            if accounting["reason_counts"]:
+                reasons = ", ".join(
+                    f"{item['reason']}={item['count']}"
+                    for item in accounting["reason_counts"]
+                )
+            else:
+                reasons = "none"
+            print(
+                "  Selection    : "
+                f"{reasons}; "
+                f"reason_failures={accounting['total_reason_failures']}"
+            )
         print(
             "  Population   : "
             f"{population['selection_basis']}"
-            + (
-                " (prefiltered)"
-                if population["prefiltered"]
-                else ""
-            )
+            + (" (prefiltered)" if population["prefiltered"] else "")
         )
         print(
             "  Coverage     : "
@@ -428,9 +324,7 @@ def _print_human(
         )
 
         if descriptive is None:
-            print(
-                "  Movement     : unavailable"
-            )
+            print("  Movement     : unavailable")
         else:
             print(
                 "  Movement     : "
@@ -440,13 +334,9 @@ def _print_human(
             )
 
         if uncertainty is None:
-            print(
-                "  Uncertainty  : unavailable"
-            )
+            print("  Uncertainty  : unavailable")
         else:
-            sem = uncertainty[
-                "standard_error_of_mean"
-            ]
+            sem = uncertainty["standard_error_of_mean"]
             print(
                 "  Uncertainty  : "
                 + (
@@ -455,9 +345,7 @@ def _print_human(
                     else f"SEM={sem:.6g}"
                 )
             )
-            if uncertainty[
-                "warning"
-            ] is not None:
+            if uncertainty["warning"] is not None:
                 print(
                     "  U-warning    : "
                     f"{uncertainty['warning']}"
@@ -472,9 +360,7 @@ def _print_human(
             "  Warning      : "
             f"{claims['warning']}"
         )
-        for warning in population[
-            "warnings"
-        ]:
+        for warning in population["warnings"]:
             print(
                 "  Population   : "
                 f"{warning}"

@@ -45,6 +45,10 @@ from investment_terminal.history.historical_outcome_sample_sufficiency import (
     HistoricalOutcomeSampleAssessment,
     HistoricalOutcomeSampleSufficiencyService,
 )
+from investment_terminal.history.historical_outcome_selection_accounting import (
+    HistoricalOutcomeSelectionAccounting,
+    HistoricalOutcomeSelectionAccountingService,
+)
 from investment_terminal.history.historical_outcome_uncertainty import (
     HistoricalOutcomeUncertaintyService,
     HistoricalOutcomeUncertaintySummary,
@@ -57,6 +61,7 @@ class HistoricalOutcomeResearchCohortResult:
 
     protocol_identity: str
     population_frame: HistoricalOutcomeResearchPopulationFrame
+    selection_accounting: HistoricalOutcomeSelectionAccounting | None
     population: HistoricalOutcomeResearchPopulationMetadata
     cohort: HistoricalOutcomeCohortKey
     coverage: HistoricalOutcomeResearchCoverage
@@ -69,6 +74,11 @@ class HistoricalOutcomeResearchCohortResult:
         return {
             "protocol_identity": self.protocol_identity,
             "population_frame": self.population_frame.to_dict(),
+            "selection_accounting": (
+                None
+                if self.selection_accounting is None
+                else self.selection_accounting.to_dict()
+            ),
             "population": self.population.to_dict(),
             "cohort": self.cohort.to_dict(),
             "coverage": self.coverage.to_dict(),
@@ -88,15 +98,7 @@ class HistoricalOutcomeResearchCohortResult:
 
 
 class HistoricalOutcomeResearchService:
-    """
-    Compose research policies without duplicating their logic.
-
-    The service groups exact cohorts, preserves coverage for all selected
-    candidates, records pre-selection population provenance, assesses
-    sufficiency, summarizes eligible COMPLETE outcomes descriptively, reports
-    uncertainty, carries population-selection metadata, and applies the explicit
-    claim boundary.
-    """
+    """Compose protocol-aware descriptive research without duplicating policy logic."""
 
     def __init__(
         self,
@@ -113,6 +115,9 @@ class HistoricalOutcomeResearchService:
         ) = None,
         population_frame_service: (
             HistoricalOutcomeResearchPopulationFrameService | None
+        ) = None,
+        selection_accounting_service: (
+            HistoricalOutcomeSelectionAccountingService | None
         ) = None,
     ) -> None:
         self._cohort_service = (
@@ -162,6 +167,11 @@ class HistoricalOutcomeResearchService:
             if population_frame_service is not None
             else HistoricalOutcomeResearchPopulationFrameService()
         )
+        self._selection_accounting_service = (
+            selection_accounting_service
+            if selection_accounting_service is not None
+            else HistoricalOutcomeSelectionAccountingService()
+        )
 
     def analyze(
         self,
@@ -173,15 +183,14 @@ class HistoricalOutcomeResearchService:
         protocol: HistoricalOutcomeResearchProtocol,
         population_query: HistoricalOutcomeQuery | None = None,
         source_observation_count: int | None = None,
+        source_results: tuple[
+            HistoricalMethodologyAwareObservationResult,
+            ...,
+        ] | None = None,
     ) -> tuple[HistoricalOutcomeResearchCohortResult, ...]:
         if not isinstance(results, tuple):
-            raise TypeError(
-                "results must be a tuple"
-            )
-        if not isinstance(
-            protocol,
-            HistoricalOutcomeResearchProtocol,
-        ):
+            raise TypeError("results must be a tuple")
+        if not isinstance(protocol, HistoricalOutcomeResearchProtocol):
             raise TypeError(
                 "protocol must be a HistoricalOutcomeResearchProtocol"
             )
@@ -195,22 +204,58 @@ class HistoricalOutcomeResearchService:
             raise TypeError(
                 "population_query must be a HistoricalOutcomeQuery or None"
             )
-
-        selected_candidate_count = len(results)
-        effective_source_count = (
-            selected_candidate_count
-            if source_observation_count is None
-            else source_observation_count
-        )
-        population_frame = self._population_frame_service.build(
-            source_observation_count=effective_source_count,
-            selected_candidate_count=selected_candidate_count,
-        )
+        if source_results is not None and not isinstance(
+            source_results,
+            tuple,
+        ):
+            raise TypeError(
+                "source_results must be a tuple or None"
+            )
 
         effective_query = (
             HistoricalOutcomeQuery()
             if population_query is None
             else population_query
+        )
+        selected_candidate_count = len(results)
+
+        selection_accounting = None
+        if source_results is not None:
+            selection_accounting = (
+                self._selection_accounting_service.assess(
+                    source_results,
+                    query=effective_query,
+                )
+            )
+            if (
+                selection_accounting.selected_candidate_count
+                != selected_candidate_count
+            ):
+                raise ValueError(
+                    "source_results filtered by population_query must produce "
+                    "the same selected candidate count as results"
+                )
+            if (
+                source_observation_count is not None
+                and source_observation_count
+                != selection_accounting.source_observation_count
+            ):
+                raise ValueError(
+                    "source_observation_count must match len(source_results)"
+                )
+            effective_source_count = (
+                selection_accounting.source_observation_count
+            )
+        else:
+            effective_source_count = (
+                selected_candidate_count
+                if source_observation_count is None
+                else source_observation_count
+            )
+
+        population_frame = self._population_frame_service.build(
+            source_observation_count=effective_source_count,
+            selected_candidate_count=selected_candidate_count,
         )
         population = self._population_service.build(
             query=effective_query,
@@ -229,6 +274,7 @@ class HistoricalOutcomeResearchService:
                 protocol=protocol,
                 population=population,
                 population_frame=population_frame,
+                selection_accounting=selection_accounting,
             )
             for cohort, cohort_results in grouped
         )
@@ -244,6 +290,7 @@ class HistoricalOutcomeResearchService:
         protocol: HistoricalOutcomeResearchProtocol,
         population: HistoricalOutcomeResearchPopulationMetadata,
         population_frame: HistoricalOutcomeResearchPopulationFrame,
+        selection_accounting: HistoricalOutcomeSelectionAccounting | None,
     ) -> HistoricalOutcomeResearchCohortResult:
         coverage = self._coverage_service.summarize(
             results=results,
@@ -271,14 +318,10 @@ class HistoricalOutcomeResearchService:
                 raise ValueError(
                     "eligible observation must contain a calculated outcome"
                 )
-            eligible_outcomes.append(
-                result.outcome
-            )
+            eligible_outcomes.append(result.outcome)
 
         descriptive_summary = self._descriptive_service.summarize(
-            outcomes=tuple(
-                eligible_outcomes
-            ),
+            outcomes=tuple(eligible_outcomes),
         )
         uncertainty = (
             None
@@ -296,6 +339,7 @@ class HistoricalOutcomeResearchService:
         return HistoricalOutcomeResearchCohortResult(
             protocol_identity=protocol.identity_key,
             population_frame=population_frame,
+            selection_accounting=selection_accounting,
             population=population,
             cohort=cohort,
             coverage=coverage,
