@@ -14,6 +14,9 @@ from investment_terminal.knowledge.provenance import (
     KnowledgeEvidenceProvenanceService,
     KnowledgeProvenanceAssessment,
 )
+from investment_terminal.knowledge.query_service import (
+    KnowledgeQueryService,
+)
 from investment_terminal.knowledge.repository import (
     InMemoryKnowledgeRecordRepository,
     KnowledgeRecordRepository,
@@ -32,6 +35,7 @@ __all__ = [
     "KnowledgeEvidenceProvenanceService",
     "KnowledgeEvidenceReference",
     "KnowledgeProvenanceAssessment",
+    "KnowledgeQueryService",
     "KnowledgeRecord",
     "KnowledgeRecordEnvelope",
     "KnowledgeRecordEnvelopeService",
