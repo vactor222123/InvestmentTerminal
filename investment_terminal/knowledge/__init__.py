@@ -10,6 +10,12 @@ from investment_terminal.knowledge.repository import (
     InMemoryKnowledgeRecordRepository,
     KnowledgeRecordRepository,
 )
+from investment_terminal.knowledge.sqlite_repository import (
+    SQLiteKnowledgeRecordRepository,
+)
+from investment_terminal.knowledge.sqlite_store import (
+    KnowledgeSQLiteStore,
+)
 
 __all__ = [
     "InMemoryKnowledgeRecordRepository",
@@ -18,4 +24,6 @@ __all__ = [
     "KnowledgeProvenanceAssessment",
     "KnowledgeRecord",
     "KnowledgeRecordRepository",
+    "KnowledgeSQLiteStore",
+    "SQLiteKnowledgeRecordRepository",
 ]
