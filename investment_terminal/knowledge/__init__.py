@@ -2,6 +2,10 @@ from investment_terminal.knowledge.models import (
     KnowledgeEvidenceReference,
     KnowledgeRecord,
 )
+from investment_terminal.knowledge.projection import (
+    HistoricalSnapshotKnowledgeProjectionService,
+    HistoricalSnapshotKnowledgeSource,
+)
 from investment_terminal.knowledge.provenance import (
     KnowledgeEvidenceProvenanceService,
     KnowledgeProvenanceAssessment,
@@ -18,6 +22,8 @@ from investment_terminal.knowledge.sqlite_store import (
 )
 
 __all__ = [
+    "HistoricalSnapshotKnowledgeProjectionService",
+    "HistoricalSnapshotKnowledgeSource",
     "InMemoryKnowledgeRecordRepository",
     "KnowledgeEvidenceProvenanceService",
     "KnowledgeEvidenceReference",
