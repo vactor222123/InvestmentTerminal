@@ -1,3 +1,7 @@
+from investment_terminal.knowledge.envelope import (
+    KnowledgeRecordEnvelope,
+    KnowledgeRecordEnvelopeService,
+)
 from investment_terminal.knowledge.models import (
     KnowledgeEvidenceReference,
     KnowledgeRecord,
@@ -29,6 +33,8 @@ __all__ = [
     "KnowledgeEvidenceReference",
     "KnowledgeProvenanceAssessment",
     "KnowledgeRecord",
+    "KnowledgeRecordEnvelope",
+    "KnowledgeRecordEnvelopeService",
     "KnowledgeRecordRepository",
     "KnowledgeSQLiteStore",
     "SQLiteKnowledgeRecordRepository",
