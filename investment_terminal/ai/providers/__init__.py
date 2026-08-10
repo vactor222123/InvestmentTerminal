@@ -14,6 +14,11 @@ from investment_terminal.ai.providers.execution import (
     GroundedProviderExecutionResult,
     GroundedProviderExecutionService,
 )
+from investment_terminal.ai.providers.governance import (
+    GroundedProviderGovernanceAssessment,
+    GroundedProviderGovernancePolicy,
+    GroundedProviderModelAllowance,
+)
 from investment_terminal.ai.providers.http_transport import (
     UrllibGroundedProviderTransport,
 )
@@ -35,6 +40,9 @@ __all__ = [
     "GroundedProviderCredentialSource",
     "GroundedProviderExecutionResult",
     "GroundedProviderExecutionService",
+    "GroundedProviderGovernanceAssessment",
+    "GroundedProviderGovernancePolicy",
+    "GroundedProviderModelAllowance",
     "GroundedProviderTransport",
     "GroundedProviderTransportFailure",
     "GroundedProviderTransportRequest",
