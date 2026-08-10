@@ -8,6 +8,10 @@ from investment_terminal.ai.providers.composition import (
     DEFAULT_OPENAI_API_KEY_ENV,
     build_openai_grounded_generation_service,
 )
+from investment_terminal.ai.providers.governance import (
+    GroundedProviderGovernancePolicy,
+    GroundedProviderModelAllowance,
+)
 from investment_terminal.ai.providers.transport import (
     GroundedProviderTransport,
     GroundedProviderTransportResponse,
@@ -39,6 +43,19 @@ def dt(day: int) -> datetime:
         12,
         0,
         tzinfo=timezone.utc,
+    )
+
+
+def openai_policy(
+    model_identity: str = "gpt-test",
+) -> GroundedProviderGovernancePolicy:
+    return GroundedProviderGovernancePolicy(
+        allowed_models=(
+            GroundedProviderModelAllowance(
+                provider_identity="OPENAI",
+                model_identity=model_identity,
+            ),
+        )
     )
 
 
@@ -143,6 +160,7 @@ def test_composition_uses_environment_credentials_and_injected_transport(
         model_identity="gpt-test",
         timeout_seconds=10,
         max_retries=1,
+        governance_policy=openai_policy(),
         transport=transport,
     )
 
@@ -162,6 +180,7 @@ def test_composed_service_runs_offline_with_fake_transport(
         model_identity="gpt-test",
         timeout_seconds=10,
         max_retries=1,
+        governance_policy=openai_policy(),
         transport=transport,
     )
 

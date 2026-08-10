@@ -17,6 +17,9 @@ from investment_terminal.ai.providers.environment import (
 from investment_terminal.ai.providers.execution import (
     GroundedProviderExecutionService,
 )
+from investment_terminal.ai.providers.governance import (
+    GroundedProviderGovernancePolicy,
+)
 from investment_terminal.ai.providers.http_transport import (
     UrllibGroundedProviderTransport,
 )
@@ -41,12 +44,14 @@ def build_openai_grounded_generation_service(
     model_identity: str,
     timeout_seconds: float,
     max_retries: int,
+    governance_policy: GroundedProviderGovernancePolicy,
     api_key_environment_variable: str = DEFAULT_OPENAI_API_KEY_ENV,
     transport: GroundedProviderTransport | None = None,
 ) -> GroundedGenerationService:
     """
     Build the live-ready OpenAI grounded generation service.
 
+    Governance is enforced before credential-source and transport construction.
     transport is injectable for offline tests. Production defaults to the real
     urllib-backed HTTP transport.
     """
@@ -55,6 +60,21 @@ def build_openai_grounded_generation_service(
         model_identity,
         field_name="model_identity",
     )
+
+    if not isinstance(
+        governance_policy,
+        GroundedProviderGovernancePolicy,
+    ):
+        raise TypeError(
+            "governance_policy must be a "
+            "GroundedProviderGovernancePolicy"
+        )
+
+    governance_policy.require_allowed(
+        provider_identity="OPENAI",
+        model_identity=model,
+    )
+
     variable = normalize_required_text(
         api_key_environment_variable,
         field_name="api_key_environment_variable",

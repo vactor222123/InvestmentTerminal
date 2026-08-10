@@ -8,6 +8,10 @@ from investment_terminal.ai.providers.composition import (
     DEFAULT_OPENAI_API_KEY_ENV,
     build_openai_grounded_generation_service,
 )
+from investment_terminal.ai.providers.governance import (
+    GroundedProviderGovernancePolicy,
+    GroundedProviderModelAllowance,
+)
 from investment_terminal.ai.providers.transport import (
     GroundedProviderTransport,
     GroundedProviderTransportFailure,
@@ -39,6 +43,19 @@ def dt(day: int) -> datetime:
         12,
         0,
         tzinfo=timezone.utc,
+    )
+
+
+def openai_policy(
+    model_identity: str = "gpt-test",
+) -> GroundedProviderGovernancePolicy:
+    return GroundedProviderGovernancePolicy(
+        allowed_models=(
+            GroundedProviderModelAllowance(
+                provider_identity="OPENAI",
+                model_identity=model_identity,
+            ),
+        )
     )
 
 
@@ -172,6 +189,7 @@ def test_real_knowledge_to_openai_composition_e2e_without_network(
         model_identity="gpt-test",
         timeout_seconds=15,
         max_retries=2,
+        governance_policy=openai_policy(),
         transport=transport,
     )
 
@@ -245,6 +263,7 @@ def test_provider_e2e_preserves_secret_and_transport_output_boundary(
         model_identity="gpt-test",
         timeout_seconds=15,
         max_retries=2,
+        governance_policy=openai_policy(),
         transport=transport,
     )
 
@@ -304,6 +323,7 @@ def test_provider_e2e_creates_no_history_or_ai_persistence(
         model_identity="gpt-test",
         timeout_seconds=15,
         max_retries=2,
+        governance_policy=openai_policy(),
         transport=RetryThenSuccessOpenAITransport(),
     )
 
