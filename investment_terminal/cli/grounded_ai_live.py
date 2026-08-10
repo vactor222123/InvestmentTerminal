@@ -229,6 +229,28 @@ def _print_human(
     print(
         f"Model        : {trace['model_identity']}"
     )
+
+    provider_operation = trace.get(
+        "provider_operation"
+    )
+    if provider_operation is not None:
+        print(
+            "Attempts     : "
+            f"{provider_operation['attempt_count']}"
+        )
+        print(
+            "Retries      : "
+            f"{provider_operation['retry_count']}"
+        )
+        print(
+            "HTTP Status  : "
+            f"{provider_operation['transport_status_code']}"
+        )
+        print(
+            "Transport    : "
+            f"{provider_operation['transport_outcome']}"
+        )
+
     print(
         f"Validation   : {trace['validation_status']}"
     )
