@@ -9,12 +9,45 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
 
-from investment_terminal.ai.prompt_input import (
-    GroundedPromptInput,
-)
-from investment_terminal.utils.validation import (
-    normalize_required_text,
-)
+from investment_terminal.ai.prompt_input import GroundedPromptInput
+from investment_terminal.utils.validation import normalize_required_text
+
+
+@dataclass(frozen=True, slots=True)
+class GroundedProviderUsage:
+    """Provider-neutral token usage totals for one completed model response."""
+
+    input_tokens: int
+    output_tokens: int
+    total_tokens: int
+
+    def __post_init__(self) -> None:
+        for field_name in (
+            "input_tokens",
+            "output_tokens",
+            "total_tokens",
+        ):
+            value = getattr(self, field_name)
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, int)
+                or value < 0
+            ):
+                raise ValueError(
+                    f"{field_name} must be a non-negative integer"
+                )
+
+        if self.total_tokens != self.input_tokens + self.output_tokens:
+            raise ValueError(
+                "total_tokens must equal input_tokens + output_tokens"
+            )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "input_tokens": self.input_tokens,
+            "output_tokens": self.output_tokens,
+            "total_tokens": self.total_tokens,
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,14 +60,8 @@ class GroundedProviderOperationalMetadata:
     transport_outcome: str = "SUCCESS"
 
     def __post_init__(self) -> None:
-        for field_name in (
-            "attempt_count",
-            "retry_count",
-        ):
-            value = getattr(
-                self,
-                field_name,
-            )
+        for field_name in ("attempt_count", "retry_count"):
+            value = getattr(self, field_name)
             if (
                 isinstance(value, bool)
                 or not isinstance(value, int)
@@ -45,9 +72,7 @@ class GroundedProviderOperationalMetadata:
                 )
 
         if self.attempt_count < 1:
-            raise ValueError(
-                "attempt_count must be at least 1"
-            )
+            raise ValueError("attempt_count must be at least 1")
         if self.retry_count != self.attempt_count - 1:
             raise ValueError(
                 "retry_count must equal attempt_count - 1"
@@ -55,10 +80,7 @@ class GroundedProviderOperationalMetadata:
 
         if (
             isinstance(self.transport_status_code, bool)
-            or not isinstance(
-                self.transport_status_code,
-                int,
-            )
+            or not isinstance(self.transport_status_code, int)
             or not 100 <= self.transport_status_code <= 599
         ):
             raise ValueError(
@@ -98,6 +120,7 @@ class GroundedModelResponse:
     model_identity: str
     raw_text: str
     operational_metadata: GroundedProviderOperationalMetadata | None = None
+    usage: GroundedProviderUsage | None = None
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -127,6 +150,14 @@ class GroundedModelResponse:
                 "GroundedProviderOperationalMetadata or None"
             )
 
+        if self.usage is not None and not isinstance(
+            self.usage,
+            GroundedProviderUsage,
+        ):
+            raise TypeError(
+                "usage must be a GroundedProviderUsage or None"
+            )
+
     def to_dict(self) -> dict[str, Any]:
         data: dict[str, Any] = {
             "request_id": self.request_id,
@@ -135,9 +166,11 @@ class GroundedModelResponse:
             "raw_text": self.raw_text,
         }
         if self.operational_metadata is not None:
-            data[
-                "operational_metadata"
-            ] = self.operational_metadata.to_dict()
+            data["operational_metadata"] = (
+                self.operational_metadata.to_dict()
+            )
+        if self.usage is not None:
+            data["usage"] = self.usage.to_dict()
         return data
 
 
@@ -152,14 +185,8 @@ class GroundedModelAdapter(ABC):
         """Generate one raw response for one grounded prompt input."""
 
 
-class StaticGroundedModelAdapter(
-    GroundedModelAdapter
-):
-    """
-    Deterministic in-memory reference adapter for contract tests.
-
-    This is not a real model integration.
-    """
+class StaticGroundedModelAdapter(GroundedModelAdapter):
+    """Deterministic in-memory reference adapter for contract tests."""
 
     def __init__(
         self,
@@ -185,10 +212,7 @@ class StaticGroundedModelAdapter(
         self,
         prompt: GroundedPromptInput,
     ) -> GroundedModelResponse:
-        if not isinstance(
-            prompt,
-            GroundedPromptInput,
-        ):
+        if not isinstance(prompt, GroundedPromptInput):
             raise TypeError(
                 "prompt must be a GroundedPromptInput"
             )

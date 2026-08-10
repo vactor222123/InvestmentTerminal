@@ -1,9 +1,5 @@
 """
 OpenAI Responses API adapter for Evidence-Grounded AI.
-
-The adapter is provider-specific, while credential retrieval, HTTP transport,
-and bounded retry execution remain delegated to their existing boundaries.
-No OpenAI SDK is required.
 """
 
 import json
@@ -13,10 +9,9 @@ from investment_terminal.ai.model_adapter import (
     GroundedModelAdapter,
     GroundedModelResponse,
     GroundedProviderOperationalMetadata,
+    GroundedProviderUsage,
 )
-from investment_terminal.ai.prompt_input import (
-    GroundedPromptInput,
-)
+from investment_terminal.ai.prompt_input import GroundedPromptInput
 from investment_terminal.ai.providers.contracts import (
     GroundedProviderConfig,
     GroundedProviderCredentialSource,
@@ -29,11 +24,7 @@ from investment_terminal.ai.providers.transport import (
 )
 
 
-class OpenAIGroundedModelAdapter(
-    GroundedModelAdapter
-):
-    """Concrete OpenAI Responses API adapter using canonical provider boundaries."""
-
+class OpenAIGroundedModelAdapter(GroundedModelAdapter):
     PROVIDER_IDENTITY = "OPENAI"
     RESPONSES_URL = "https://api.openai.com/v1/responses"
 
@@ -44,10 +35,7 @@ class OpenAIGroundedModelAdapter(
         credentials: GroundedProviderCredentialSource,
         execution: GroundedProviderExecutionService,
     ) -> None:
-        if not isinstance(
-            config,
-            GroundedProviderConfig,
-        ):
+        if not isinstance(config, GroundedProviderConfig):
             raise TypeError(
                 "config must be a GroundedProviderConfig"
             )
@@ -69,7 +57,6 @@ class OpenAIGroundedModelAdapter(
             raise TypeError(
                 "execution must be a GroundedProviderExecutionService"
             )
-
         self._config = config
         self._credentials = credentials
         self._execution = execution
@@ -78,10 +65,7 @@ class OpenAIGroundedModelAdapter(
         self,
         prompt: GroundedPromptInput,
     ) -> GroundedModelResponse:
-        if not isinstance(
-            prompt,
-            GroundedPromptInput,
-        ):
+        if not isinstance(prompt, GroundedPromptInput):
             raise TypeError(
                 "prompt must be a GroundedPromptInput"
             )
@@ -89,42 +73,35 @@ class OpenAIGroundedModelAdapter(
         api_key = self._credentials.get_api_key(
             provider_identity=self.PROVIDER_IDENTITY,
         )
-
         transport_request = GroundedProviderTransportRequest(
             request_id=prompt.request_id,
             method="POST",
             url=self.RESPONSES_URL,
             headers=(
-                (
-                    "Authorization",
-                    f"Bearer {api_key}",
-                ),
-                (
-                    "Content-Type",
-                    "application/json",
-                ),
-                (
-                    "X-Client-Request-Id",
-                    prompt.request_id,
-                ),
+                ("Authorization", f"Bearer {api_key}"),
+                ("Content-Type", "application/json"),
+                ("X-Client-Request-Id", prompt.request_id),
             ),
             body=json.dumps(
-                self._request_payload(
-                    prompt
-                ),
+                self._request_payload(prompt),
                 separators=(",", ":"),
                 sort_keys=True,
             ),
             timeout_seconds=self._config.timeout_seconds,
         )
-
         execution_result = self._execution.execute(
             request=transport_request,
             config=self._config,
         )
 
-        raw_text = self._extract_output_text(
+        payload = self._parse_completed_response(
             execution_result.response.body
+        )
+        raw_text = self._extract_output_text_from_payload(
+            payload
+        )
+        usage = self._extract_usage_from_payload(
+            payload
         )
 
         return GroundedModelResponse(
@@ -140,6 +117,7 @@ class OpenAIGroundedModelAdapter(
                 ),
                 transport_outcome="SUCCESS",
             ),
+            usage=usage,
         )
 
     def _request_payload(
@@ -175,14 +153,10 @@ class OpenAIGroundedModelAdapter(
             "type": "object",
             "additionalProperties": False,
             "properties": {
-                "answer_id": {
-                    "type": "string",
-                },
+                "answer_id": {"type": "string"},
                 "protocol_identity": {
                     "type": "string",
-                    "enum": [
-                        "EVIDENCE_GROUNDED_ANSWER@1"
-                    ],
+                    "enum": ["EVIDENCE_GROUNDED_ANSWER@1"],
                 },
                 "claims": {
                     "type": "array",
@@ -191,9 +165,7 @@ class OpenAIGroundedModelAdapter(
                         "type": "object",
                         "additionalProperties": False,
                         "properties": {
-                            "text": {
-                                "type": "string",
-                            },
+                            "text": {"type": "string"},
                             "citations": {
                                 "type": "array",
                                 "minItems": 1,
@@ -202,13 +174,13 @@ class OpenAIGroundedModelAdapter(
                                     "additionalProperties": False,
                                     "properties": {
                                         "knowledge_identity": {
-                                            "type": "string",
+                                            "type": "string"
                                         },
                                         "statement": {
-                                            "type": "string",
+                                            "type": "string"
                                         },
                                         "provenance_status": {
-                                            "type": "string",
+                                            "type": "string"
                                         },
                                     },
                                     "required": [
@@ -219,10 +191,7 @@ class OpenAIGroundedModelAdapter(
                                 },
                             },
                         },
-                        "required": [
-                            "text",
-                            "citations",
-                        ],
+                        "required": ["text", "citations"],
                     },
                 },
             },
@@ -234,93 +203,98 @@ class OpenAIGroundedModelAdapter(
         }
 
     @staticmethod
-    def _extract_output_text(
+    def _parse_completed_response(
         response_body: str,
-    ) -> str:
+    ) -> dict[str, Any]:
         try:
-            payload = json.loads(
-                response_body
-            )
+            payload = json.loads(response_body)
         except json.JSONDecodeError as exc:
             raise ValueError(
                 "OpenAI response body must be valid JSON"
             ) from exc
-
-        if not isinstance(
-            payload,
-            dict,
-        ):
+        if not isinstance(payload, dict):
             raise ValueError(
                 "OpenAI response body must be a JSON object"
             )
-
-        status = payload.get(
-            "status"
-        )
-        if status != "completed":
+        if payload.get("status") != "completed":
             raise ValueError(
                 "OpenAI response status must be completed"
             )
+        return payload
 
-        output = payload.get(
-            "output"
-        )
-        if not isinstance(
-            output,
-            list,
-        ):
+    @staticmethod
+    def _extract_output_text_from_payload(
+        payload: dict[str, Any],
+    ) -> str:
+        output = payload.get("output")
+        if not isinstance(output, list):
             raise ValueError(
                 "OpenAI response output must be an array"
             )
 
         parts: list[str] = []
         for item in output:
-            if not isinstance(
-                item,
-                dict,
-            ):
+            if not isinstance(item, dict):
                 continue
-            if item.get(
-                "type"
-            ) != "message":
+            if item.get("type") != "message":
                 continue
-
-            content = item.get(
-                "content"
-            )
-            if not isinstance(
-                content,
-                list,
-            ):
+            content = item.get("content")
+            if not isinstance(content, list):
                 continue
-
             for part in content:
-                if not isinstance(
-                    part,
-                    dict,
-                ):
+                if not isinstance(part, dict):
                     continue
-                if part.get(
-                    "type"
-                ) != "output_text":
+                if part.get("type") != "output_text":
                     continue
-
-                text = part.get(
-                    "text"
-                )
-                if isinstance(
-                    text,
-                    str,
-                ) and text.strip():
-                    parts.append(
-                        text
-                    )
+                text = part.get("text")
+                if isinstance(text, str) and text.strip():
+                    parts.append(text)
 
         if not parts:
             raise ValueError(
                 "OpenAI response contains no output_text"
             )
+        return "".join(parts)
 
-        return "".join(
-            parts
+    @staticmethod
+    def _extract_usage_from_payload(
+        payload: dict[str, Any],
+    ) -> GroundedProviderUsage | None:
+        raw_usage = payload.get("usage")
+        if raw_usage is None:
+            return None
+        if not isinstance(raw_usage, dict):
+            raise ValueError(
+                "OpenAI response usage must be an object or null"
+            )
+
+        fields = {}
+        for key in (
+            "input_tokens",
+            "output_tokens",
+            "total_tokens",
+        ):
+            value = raw_usage.get(key)
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, int)
+                or value < 0
+            ):
+                raise ValueError(
+                    f"OpenAI response usage.{key} must be "
+                    "a non-negative integer"
+                )
+            fields[key] = value
+
+        return GroundedProviderUsage(**fields)
+
+    @staticmethod
+    def _extract_output_text(
+        response_body: str,
+    ) -> str:
+        payload = OpenAIGroundedModelAdapter._parse_completed_response(
+            response_body
+        )
+        return OpenAIGroundedModelAdapter._extract_output_text_from_payload(
+            payload
         )
