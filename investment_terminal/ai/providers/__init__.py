@@ -1,3 +1,7 @@
+from investment_terminal.ai.providers.composition import (
+    DEFAULT_OPENAI_API_KEY_ENV,
+    build_openai_grounded_generation_service,
+)
 from investment_terminal.ai.providers.contracts import (
     GroundedProviderConfig,
     GroundedProviderCredentialSource,
@@ -25,6 +29,7 @@ from investment_terminal.ai.providers.transport import (
 )
 
 __all__ = [
+    "DEFAULT_OPENAI_API_KEY_ENV",
     "EnvironmentGroundedProviderCredentialSource",
     "GroundedProviderConfig",
     "GroundedProviderCredentialSource",
@@ -38,4 +43,5 @@ __all__ = [
     "StaticGroundedProviderCredentialSource",
     "StaticGroundedProviderTransport",
     "UrllibGroundedProviderTransport",
+    "build_openai_grounded_generation_service",
 ]
