@@ -6,6 +6,10 @@ from investment_terminal.ai.providers.contracts import (
 from investment_terminal.ai.providers.environment import (
     EnvironmentGroundedProviderCredentialSource,
 )
+from investment_terminal.ai.providers.execution import (
+    GroundedProviderExecutionResult,
+    GroundedProviderExecutionService,
+)
 from investment_terminal.ai.providers.transport import (
     GroundedProviderTransport,
     GroundedProviderTransportFailure,
@@ -18,6 +22,8 @@ __all__ = [
     "EnvironmentGroundedProviderCredentialSource",
     "GroundedProviderConfig",
     "GroundedProviderCredentialSource",
+    "GroundedProviderExecutionResult",
+    "GroundedProviderExecutionService",
     "GroundedProviderTransport",
     "GroundedProviderTransportFailure",
     "GroundedProviderTransportRequest",
