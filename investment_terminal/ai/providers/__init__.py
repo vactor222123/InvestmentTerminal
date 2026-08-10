@@ -10,6 +10,9 @@ from investment_terminal.ai.providers.execution import (
     GroundedProviderExecutionResult,
     GroundedProviderExecutionService,
 )
+from investment_terminal.ai.providers.http_transport import (
+    UrllibGroundedProviderTransport,
+)
 from investment_terminal.ai.providers.transport import (
     GroundedProviderTransport,
     GroundedProviderTransportFailure,
@@ -30,4 +33,5 @@ __all__ = [
     "GroundedProviderTransportResponse",
     "StaticGroundedProviderCredentialSource",
     "StaticGroundedProviderTransport",
+    "UrllibGroundedProviderTransport",
 ]
