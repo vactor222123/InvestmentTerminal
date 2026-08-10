@@ -24,32 +24,17 @@ from investment_terminal.knowledge.query_service import KnowledgeQueryService
 from investment_terminal.knowledge.sqlite_repository import SQLiteKnowledgeRecordRepository
 from investment_terminal.knowledge.sqlite_store import KnowledgeSQLiteStore
 
-
 DEFAULT_DATABASE = Path("data") / "knowledge" / "knowledge.db"
 
-
 def build_argument_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description=(
-            "Run the read-only grounded AI workflow through the live OpenAI "
-            "provider path."
-        )
-    )
+    parser = argparse.ArgumentParser()
     parser.add_argument("--live", action="store_true")
     parser.add_argument("--database", type=Path, default=DEFAULT_DATABASE)
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--request-id", required=True)
     parser.add_argument("--query", required=True)
     parser.add_argument("--model", required=True)
-    parser.add_argument(
-        "--allow-model",
-        action="append",
-        default=[],
-        help=(
-            "Explicit OpenAI model identity allowed for this invocation. "
-            "Repeat to allow multiple models. The requested --model must appear."
-        ),
-    )
+    parser.add_argument("--allow-model", action="append", default=[])
     parser.add_argument("--api-key-env", default=DEFAULT_OPENAI_API_KEY_ENV)
     parser.add_argument("--timeout-seconds", type=_positive_float, default=30.0)
     parser.add_argument("--max-retries", type=_non_negative_int, default=2)
@@ -57,10 +42,7 @@ def build_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-items", type=_positive_int, default=None)
     return parser
 
-
-def _governance_policy(
-    allowed_models: tuple[str, ...],
-) -> GroundedProviderGovernancePolicy:
+def _governance_policy(allowed_models: tuple[str, ...]) -> GroundedProviderGovernancePolicy:
     return GroundedProviderGovernancePolicy(
         allowed_models=tuple(
             GroundedProviderModelAllowance(
@@ -71,23 +53,18 @@ def _governance_policy(
         )
     )
 
-
 def main(argv: Sequence[str] | None = None) -> None:
     parser = build_argument_parser()
     options = parser.parse_args(argv)
-
     if not options.live:
         parser.error("live OpenAI execution requires explicit --live")
-
     if not options.database.is_file():
         parser.error(f"Knowledge database does not exist: {options.database}")
-
     query = KnowledgeQueryService(
         repository=SQLiteKnowledgeRecordRepository(
             KnowledgeSQLiteStore(options.database)
         )
     )
-
     try:
         report = _run_live(
             query=query,
@@ -103,12 +80,10 @@ def main(argv: Sequence[str] | None = None) -> None:
         )
     except (KeyError, TypeError, ValueError, RuntimeError, PermissionError) as exc:
         parser.error(str(exc))
-
     if options.json:
         print(json.dumps(report, indent=2, allow_nan=False))
         return
     _print_human(report)
-
 
 def _run_live(
     *,
@@ -138,7 +113,6 @@ def _run_live(
         )
     else:
         service = generation_service
-
     knowledge = query.list_all()
     generation = service.generate(
         request_id=request_id,
@@ -151,7 +125,6 @@ def _run_live(
     )
     trace = GroundedGenerationTraceService().build(generation)
     return {"generation": generation.to_dict(), "trace": trace.to_dict()}
-
 
 def _print_human(report: dict[str, Any]) -> None:
     trace = report["trace"]
@@ -166,6 +139,11 @@ def _print_human(report: dict[str, Any]) -> None:
         print(f"Retries      : {provider_operation['retry_count']}")
         print(f"HTTP Status  : {provider_operation['transport_status_code']}")
         print(f"Transport    : {provider_operation['transport_outcome']}")
+    provider_usage = trace.get("provider_usage")
+    if provider_usage is not None:
+        print(f"Input Tokens : {provider_usage['input_tokens']:,}")
+        print(f"Output Tokens: {provider_usage['output_tokens']:,}")
+        print(f"Total Tokens : {provider_usage['total_tokens']:,}")
     print(f"Validation   : {trace['validation_status']}")
     print(f"Context      : {len(trace['selected_knowledge_identities'])}")
     print(f"Claims       : {trace['claim_count']}")
@@ -179,7 +157,6 @@ def _print_human(report: dict[str, Any]) -> None:
                 f"provenance={citation['provenance_status']}"
             )
 
-
 def _positive_int(value: str) -> int:
     try:
         parsed = int(value)
@@ -188,7 +165,6 @@ def _positive_int(value: str) -> int:
     if parsed <= 0:
         raise argparse.ArgumentTypeError("value must be a positive integer")
     return parsed
-
 
 def _non_negative_int(value: str) -> int:
     try:
@@ -199,7 +175,6 @@ def _non_negative_int(value: str) -> int:
         raise argparse.ArgumentTypeError("value must be a non-negative integer")
     return parsed
 
-
 def _positive_float(value: str) -> float:
     try:
         parsed = float(value)
@@ -208,7 +183,6 @@ def _positive_float(value: str) -> float:
     if parsed <= 0:
         raise argparse.ArgumentTypeError("value must be a positive number")
     return parsed
-
 
 if __name__ == "__main__":
     main()
