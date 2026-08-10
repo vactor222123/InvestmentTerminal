@@ -18,6 +18,78 @@ from investment_terminal.utils.validation import (
 
 
 @dataclass(frozen=True, slots=True)
+class GroundedProviderOperationalMetadata:
+    """Safe provider execution metadata with no headers, bodies, or secrets."""
+
+    attempt_count: int
+    retry_count: int
+    transport_status_code: int
+    transport_outcome: str = "SUCCESS"
+
+    def __post_init__(self) -> None:
+        for field_name in (
+            "attempt_count",
+            "retry_count",
+        ):
+            value = getattr(
+                self,
+                field_name,
+            )
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, int)
+                or value < 0
+            ):
+                raise ValueError(
+                    f"{field_name} must be a non-negative integer"
+                )
+
+        if self.attempt_count < 1:
+            raise ValueError(
+                "attempt_count must be at least 1"
+            )
+        if self.retry_count != self.attempt_count - 1:
+            raise ValueError(
+                "retry_count must equal attempt_count - 1"
+            )
+
+        if (
+            isinstance(self.transport_status_code, bool)
+            or not isinstance(
+                self.transport_status_code,
+                int,
+            )
+            or not 100 <= self.transport_status_code <= 599
+        ):
+            raise ValueError(
+                "transport_status_code must be an HTTP status code"
+            )
+
+        object.__setattr__(
+            self,
+            "transport_outcome",
+            normalize_required_text(
+                self.transport_outcome,
+                field_name="transport_outcome",
+                uppercase=True,
+            ),
+        )
+        if self.transport_outcome != "SUCCESS":
+            raise ValueError(
+                "successful model response operational metadata "
+                "requires transport_outcome SUCCESS"
+            )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "attempt_count": self.attempt_count,
+            "retry_count": self.retry_count,
+            "transport_status_code": self.transport_status_code,
+            "transport_outcome": self.transport_outcome,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class GroundedModelResponse:
     """Immutable raw generation result correlated to one grounded prompt."""
 
@@ -25,6 +97,7 @@ class GroundedModelResponse:
     provider_identity: str
     model_identity: str
     raw_text: str
+    operational_metadata: GroundedProviderOperationalMetadata | None = None
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -42,13 +115,30 @@ class GroundedModelResponse:
                 ),
             )
 
+        if (
+            self.operational_metadata is not None
+            and not isinstance(
+                self.operational_metadata,
+                GroundedProviderOperationalMetadata,
+            )
+        ):
+            raise TypeError(
+                "operational_metadata must be a "
+                "GroundedProviderOperationalMetadata or None"
+            )
+
     def to_dict(self) -> dict[str, Any]:
-        return {
+        data: dict[str, Any] = {
             "request_id": self.request_id,
             "provider_identity": self.provider_identity,
             "model_identity": self.model_identity,
             "raw_text": self.raw_text,
         }
+        if self.operational_metadata is not None:
+            data[
+                "operational_metadata"
+            ] = self.operational_metadata.to_dict()
+        return data
 
 
 class GroundedModelAdapter(ABC):

@@ -12,6 +12,7 @@ from typing import Any
 from investment_terminal.ai.model_adapter import (
     GroundedModelAdapter,
     GroundedModelResponse,
+    GroundedProviderOperationalMetadata,
 )
 from investment_terminal.ai.prompt_input import (
     GroundedPromptInput,
@@ -131,6 +132,14 @@ class OpenAIGroundedModelAdapter(
             provider_identity=self.PROVIDER_IDENTITY,
             model_identity=self._config.model_identity,
             raw_text=raw_text,
+            operational_metadata=GroundedProviderOperationalMetadata(
+                attempt_count=execution_result.attempt_count,
+                retry_count=execution_result.retry_count,
+                transport_status_code=(
+                    execution_result.response.status_code
+                ),
+                transport_outcome="SUCCESS",
+            ),
         )
 
     def _request_payload(

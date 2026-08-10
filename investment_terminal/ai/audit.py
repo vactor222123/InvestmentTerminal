@@ -27,6 +27,10 @@ class GroundedGenerationTrace:
     claim_count: int
     citation_count: int
     validation_status: str
+    provider_attempt_count: int | None = None
+    provider_retry_count: int | None = None
+    provider_transport_status_code: int | None = None
+    provider_transport_outcome: str | None = None
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -102,8 +106,50 @@ class GroundedGenerationTrace:
                 "cited Knowledge identities must be a subset of selected context"
             )
 
+        operational_values = (
+            self.provider_attempt_count,
+            self.provider_retry_count,
+            self.provider_transport_status_code,
+            self.provider_transport_outcome,
+        )
+        if any(
+            value is not None
+            for value in operational_values
+        ) and not all(
+            value is not None
+            for value in operational_values
+        ):
+            raise ValueError(
+                "provider operational trace fields must be all present or all absent"
+            )
+
+        if self.provider_attempt_count is not None:
+            assert self.provider_retry_count is not None
+            assert self.provider_transport_status_code is not None
+            assert self.provider_transport_outcome is not None
+
+            if self.provider_attempt_count < 1:
+                raise ValueError(
+                    "provider_attempt_count must be at least 1"
+                )
+            if (
+                self.provider_retry_count
+                != self.provider_attempt_count - 1
+            ):
+                raise ValueError(
+                    "provider_retry_count must equal provider_attempt_count - 1"
+                )
+            if not 100 <= self.provider_transport_status_code <= 599:
+                raise ValueError(
+                    "provider_transport_status_code must be an HTTP status code"
+                )
+            if self.provider_transport_outcome != "SUCCESS":
+                raise ValueError(
+                    "successful generation trace requires provider transport SUCCESS"
+                )
+
     def to_dict(self) -> dict[str, Any]:
-        return {
+        data: dict[str, Any] = {
             "request_id": self.request_id,
             "prompt_protocol_identity": self.prompt_protocol_identity,
             "answer_protocol_identity": self.answer_protocol_identity,
@@ -119,6 +165,14 @@ class GroundedGenerationTrace:
             "citation_count": self.citation_count,
             "validation_status": self.validation_status,
         }
+        if self.provider_attempt_count is not None:
+            data["provider_operation"] = {
+                "attempt_count": self.provider_attempt_count,
+                "retry_count": self.provider_retry_count,
+                "transport_status_code": self.provider_transport_status_code,
+                "transport_outcome": self.provider_transport_outcome,
+            }
+        return data
 
 
 class GroundedGenerationTraceService:
@@ -141,6 +195,8 @@ class GroundedGenerationTraceService:
             for claim in result.answer.claims
         )
 
+        operational = result.response.operational_metadata
+
         return GroundedGenerationTrace(
             request_id=result.prompt.request_id,
             prompt_protocol_identity=result.prompt.protocol_identity,
@@ -158,4 +214,24 @@ class GroundedGenerationTraceService:
             ),
             citation_count=citation_count,
             validation_status=result.validation.status,
+            provider_attempt_count=(
+                None
+                if operational is None
+                else operational.attempt_count
+            ),
+            provider_retry_count=(
+                None
+                if operational is None
+                else operational.retry_count
+            ),
+            provider_transport_status_code=(
+                None
+                if operational is None
+                else operational.transport_status_code
+            ),
+            provider_transport_outcome=(
+                None
+                if operational is None
+                else operational.transport_outcome
+            ),
         )
