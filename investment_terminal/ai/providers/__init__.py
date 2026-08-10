@@ -13,6 +13,9 @@ from investment_terminal.ai.providers.execution import (
 from investment_terminal.ai.providers.http_transport import (
     UrllibGroundedProviderTransport,
 )
+from investment_terminal.ai.providers.openai_adapter import (
+    OpenAIGroundedModelAdapter,
+)
 from investment_terminal.ai.providers.transport import (
     GroundedProviderTransport,
     GroundedProviderTransportFailure,
@@ -31,6 +34,7 @@ __all__ = [
     "GroundedProviderTransportFailure",
     "GroundedProviderTransportRequest",
     "GroundedProviderTransportResponse",
+    "OpenAIGroundedModelAdapter",
     "StaticGroundedProviderCredentialSource",
     "StaticGroundedProviderTransport",
     "UrllibGroundedProviderTransport",
