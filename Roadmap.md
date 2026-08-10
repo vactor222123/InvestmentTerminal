@@ -1,7 +1,7 @@
 # Investment Terminal — Product Roadmap
 
 **Status:** Canonical Roadmap
-**Updated after:** Sprint 20 — Evidence-Grounded AI Experience Foundation
+**Updated after:** Sprint 21 — Provider Integration and Operational AI Controls
 **Current development branch:** `develop`
 
 ## 1. Product Evolution
@@ -63,36 +63,41 @@ Immutable/versioned Knowledge records, traceable evidence references, Knowledge 
 
 ### Sprint 20 — Evidence-Grounded AI Experience Foundation
 
+Provider-neutral grounded prompt/answer protocols, exact Knowledge citations, deterministic context selection, strict parsing, fail-closed grounding validation, provider-independent adapter boundary, static reference adapter, audit trace, read-only CLI, and real Knowledge SQLite E2E.
+
+### Sprint 21 — Provider Integration and Operational AI Controls
+
 Delivered:
 
-- versioned `EVIDENCE_GROUNDED_PROMPT@1` contract;
-- versioned `EVIDENCE_GROUNDED_ANSWER@1` contract;
-- explicit Knowledge citations for every AI claim;
-- exact Knowledge-lineage grounding validation;
-- conservative COMPLETE-only v1 grounding admissibility;
-- deterministic context selection;
-- provider-neutral prompt input;
-- provider-independent model adapter boundary;
-- static deterministic reference adapter;
-- strict JSON response parser;
-- fail-closed generation orchestration;
-- compact grounded generation audit trace;
-- read-only reference CLI;
-- real Knowledge SQLite → grounded workflow → CLI E2E.
+- typed provider configuration and credential-source contracts;
+- environment-backed OpenAI credential resolution;
+- provider-neutral transport request/response/failure contracts;
+- bounded retry execution with explicit attempt semantics;
+- real standard-library HTTP transport;
+- OpenAI Responses API adapter with strict structured output;
+- production OpenAI composition root;
+- separate explicit-opt-in live CLI;
+- safe provider operational metadata;
+- operational audit trace and CLI exposure;
+- offline-realistic provider integration E2E.
 
-Canonical grounded AI flow:
+Canonical live provider flow:
 
 ```text
 KnowledgeRecordEnvelope
 → deterministic context selection
 → EVIDENCE_GROUNDED_PROMPT@1
-→ GroundedModelAdapter
-→ raw response
+→ OpenAIGroundedModelAdapter
+→ credential source
+→ bounded execution
+→ provider-neutral HTTP transport
+→ OpenAI Responses API
+→ GroundedModelResponse
 → strict JSON parser
 → EVIDENCE_GROUNDED_ANSWER@1 candidate
 → exact Knowledge grounding validation
 → ADMISSIBLE result
-→ audit trace / read-only CLI
+→ safe operational audit trace
 ```
 
 ## 3. Evidence and Authority Hierarchy
@@ -117,7 +122,7 @@ GroundedPromptInput
     deterministic provider-neutral AI input
 
 GroundedModelResponse
-    untrusted raw provider output
+    untrusted provider output + optional safe operational metadata
 
 GroundedAIAnswer candidate
     structurally parsed but not yet trusted
@@ -129,11 +134,11 @@ ADMISSIBLE GroundedGenerationResult
     final v1 grounded result
 ```
 
-Raw model output never outranks Knowledge evidence.
+Provider integration does not change the authority hierarchy. Raw model output never outranks Knowledge evidence.
 
 ## 4. Stable AI Guardrails
 
-Sprint 20 does not establish:
+Sprint 21 still does not establish:
 
 ```text
 truth scoring
@@ -156,26 +161,65 @@ autonomous action
 Current implementation:
 
 ```text
-GroundedModelAdapter = abstract provider boundary
-StaticGroundedModelAdapter = deterministic reference/test implementation
-real provider adapter = deferred
+GroundedModelAdapter
+    provider-neutral model boundary
+
+OpenAIGroundedModelAdapter
+    concrete OpenAI Responses API adapter
+
+GroundedProviderCredentialSource
+    credential boundary
+
+EnvironmentGroundedProviderCredentialSource
+    production environment-backed credential source
+
+GroundedProviderTransport
+    provider-neutral transport boundary
+
+UrllibGroundedProviderTransport
+    real synchronous HTTP implementation
+
+GroundedProviderExecutionService
+    bounded retry orchestration
 ```
 
-Not implemented in Sprint 20:
+Production OpenAI composition remains isolated from Knowledge/History persistence.
+
+## 6. Operational Controls
+
+Current controls:
 
 ```text
-OpenAI SDK
-Anthropic SDK
-other provider SDKs
-HTTP/network transport
-API keys/secrets
-streaming
-retry/rate-limit logic
-model/provider allowlists
-cost/token accounting
+explicit provider/model configuration
+explicit environment credential mapping
+timeout_seconds
+max_retries
+typed transport failures
+bounded retry count
+explicit --live CLI opt-in
+request correlation
+safe operational trace
 ```
 
-## 6. Audit and Persistence Status
+Retry classification:
+
+```text
+TIMEOUT    → retryable
+RETRYABLE  → retryable
+TERMINAL   → stop
+```
+
+Current HTTP policy:
+
+```text
+408 / 425 / 429 → RETRYABLE
+5xx             → RETRYABLE
+other 4xx       → TERMINAL
+```
+
+No delay/backoff/jitter or `Retry-After` scheduling is implemented yet.
+
+## 7. Audit and Persistence Status
 
 ```text
 History schema target = 2
@@ -184,22 +228,51 @@ AI persistence schema = none
 AI trace = derived/on demand
 ```
 
-Grounded generation audit traces are compact derived views and are not persisted in Sprint 20.
+Safe provider operation metadata may include:
 
-## 7. Deferred Scope
+```text
+attempt_count
+retry_count
+transport_status_code
+transport_outcome
+```
+
+Audit/report output excludes credentials, Authorization headers, raw HTTP bodies, raw provider headers, provider URL, and raw model text.
+
+## 8. CLI Status
+
+Two read-only AI CLI paths now exist:
+
+```text
+grounded_ai
+    static/reference provider path
+    no network
+
+grounded_ai_live
+    OpenAI production composition
+    explicit --live required
+```
+
+The live CLI accepts an environment-variable name for credential lookup; it does not accept the API key value directly.
+
+## 9. Deferred Scope
 
 Still deferred:
 
-- real model/provider integration;
-- provider credentials and transport policy;
-- structured-output provider configuration;
+- streaming provider responses;
+- retry delay/backoff/jitter;
+- `Retry-After` handling;
+- rate-limit scheduling;
+- Anthropic/other provider adapters;
+- model/provider allowlists;
+- token/cost accounting;
+- provider request/response persistence;
 - semantic entailment validation;
 - contradiction detection;
 - relevance/semantic ranking;
 - embeddings/vector retrieval;
 - grounded answer history/persistence;
-- model/version governance;
-- cost/token accounting;
+- prompt-template/version governance beyond current protocol contracts;
 - human feedback workflows;
 - automatic History-to-Knowledge ingestion;
 - predictive confidence/effectiveness scoring;
@@ -207,20 +280,13 @@ Still deferred:
 - autonomous portfolio actions;
 - broker execution.
 
-## 8. Next Product Decision Point
+## 10. Next Product Decision Point
 
-Sprint 20 completes the provider-neutral Evidence-Grounded AI foundation.
+Sprint 21 completes the first real-provider integration while preserving the fail-closed Evidence-Grounded AI authority boundary.
 
-The next milestone may introduce a real provider adapter only if:
+The next milestone should choose among operational governance, token/cost observability, additional provider support, or controlled streaming without weakening Knowledge provenance, parsing, grounding validation, or secret isolation.
 
-- all provider calls remain behind `GroundedModelAdapter`;
-- prompt/answer protocol contracts remain explicit;
-- raw responses remain untrusted until strict parsing and grounding validation;
-- audit trace remains available;
-- secrets/network concerns stay outside domain contracts;
-- provider integration does not bypass Knowledge provenance.
-
-## 9. Definition of Done
+## 11. Definition of Done
 
 A milestone is complete only when:
 

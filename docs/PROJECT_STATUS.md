@@ -10,305 +10,267 @@ branch: develop
 ## Current phase
 
 ```text
-Sprint 20 — Evidence-Grounded AI Experience Foundation
+Sprint 21 — Provider Integration and Operational AI Controls
 implementation complete; final repository verification pending
 ```
 
 ## Completed foundation
 
-### Sprint 12–19
+### Sprint 12–20
 
-Historical Intelligence, comparison/replay, outcome observations, methodology hardening, descriptive research, provenance/population quality, explicit archive continuity, and the deterministic Knowledge Domain foundation are complete.
+Historical Intelligence, comparison/replay, outcome observations, methodology hardening, descriptive research, provenance/population quality, explicit archive continuity, the deterministic Knowledge Domain foundation, and the provider-neutral Evidence-Grounded AI foundation are complete.
 
-### Sprint 20 — Evidence-Grounded AI Experience Foundation
+### Sprint 21 — Provider Integration and Operational AI Controls
 
 Delivered:
 
 ```text
-GroundedKnowledgeCitation
-GroundedAIClaim
-GroundedAIAnswer
-GroundingValidationAssessment
-GroundingValidationService
-GroundedContextSelectionPolicy
-GroundedContextSelection
-GroundedContextSelectionService
-GroundedPromptContextItem
-GroundedPromptInput
-GroundedPromptInputService
-GroundedModelAdapter
-GroundedModelResponse
-StaticGroundedModelAdapter
-GroundedModelParseResult
-GroundedModelResponseParser
-GroundedGenerationResult
-GroundedGenerationService
-GroundedGenerationTrace
-GroundedGenerationTraceService
-read-only Grounded AI reference CLI
-real Knowledge SQLite → grounded reference workflow E2E
+GroundedProviderConfig
+GroundedProviderCredentialSource
+StaticGroundedProviderCredentialSource
+EnvironmentGroundedProviderCredentialSource
+GroundedProviderTransportRequest
+GroundedProviderTransportResponse
+GroundedProviderTransportFailure
+GroundedProviderTransport
+StaticGroundedProviderTransport
+GroundedProviderExecutionResult
+GroundedProviderExecutionService
+UrllibGroundedProviderTransport
+OpenAIGroundedModelAdapter
+OpenAI production composition root
+live-ready read-only OpenAI CLI
+GroundedProviderOperationalMetadata
+provider operational audit trace extension
+offline-realistic provider integration E2E
 ```
 
-## AI Domain Boundary
+## Provider Integration Boundary
 
-The AI layer is downstream of Knowledge and consumes immutable `KnowledgeRecordEnvelope` values.
+The provider stack remains downstream of canonical grounded prompt construction and upstream of strict parsing and grounding validation.
 
-Canonical dependency direction:
+Canonical live flow:
 
 ```text
-History / verified evidence
+Knowledge / KnowledgeRecordEnvelope
         ↓
-Knowledge
+deterministic context selection
         ↓
-KnowledgeRecordEnvelope
+EVIDENCE_GROUNDED_PROMPT@1
         ↓
-AI context selection
+OpenAIGroundedModelAdapter
         ↓
-grounded prompt input
+environment credential source
         ↓
-model adapter boundary
+bounded provider execution
         ↓
-raw model response
+provider-neutral HTTP transport
         ↓
-strict response parser
+OpenAI Responses API
         ↓
-candidate GroundedAIAnswer
+GroundedModelResponse
         ↓
-grounding validation
+strict JSON parser
+        ↓
+EVIDENCE_GROUNDED_ANSWER@1 candidate
+        ↓
+exact Knowledge grounding validation
         ↓
 ADMISSIBLE grounded result
+        ↓
+safe operational audit trace
 ```
 
-AI must not mutate History or Knowledge.
+Raw provider output remains untrusted until parsing and grounding validation succeed.
 
-## Canonical Protocols
+## Provider Configuration and Credentials
 
-Sprint 20 introduces two explicit versioned contracts:
-
-```text
-EVIDENCE_GROUNDED_PROMPT@1
-EVIDENCE_GROUNDED_ANSWER@1
-```
-
-`GroundedPromptInput` is provider-neutral and contains:
+`GroundedProviderConfig` defines:
 
 ```text
-request_id
-protocol_identity
-user_query
-context
-```
-
-Each context item preserves:
-
-```text
-knowledge_identity
-subject_key
-statement
-provenance_status
-valid_from
-valid_to
-```
-
-## Grounded Answer Contract
-
-Every `GroundedAIClaim` must have at least one explicit `GroundedKnowledgeCitation`.
-
-Citation fields:
-
-```text
-knowledge_identity
-statement
-provenance_status
-```
-
-A citation is not trusted merely because it is present. `GroundingValidationService` must resolve it against supplied `KnowledgeRecordEnvelope` values.
-
-## Grounding Admissibility
-
-`EVIDENCE_GROUNDED_ANSWER@1` v1 requires:
-
-```text
-exact Knowledge identity resolution
-exact statement match
-exact provenance status match
-Knowledge provenance = COMPLETE
-```
-
-`PARTIAL` Knowledge provenance remains traceable but is not admissible grounding for v1.
-
-This rule is a lineage/admissibility rule. It is not a truth score, confidence score, semantic entailment proof, causal proof, or effectiveness assessment.
-
-## Context Selection
-
-AI context selection is deterministic and explicit.
-
-Supported policy:
-
-```text
-subject_keys
-max_items
-required provenance = COMPLETE
-```
-
-Canonical presentation order:
-
-```text
-subject_key
-→ valid_from
-→ generated_at
-→ knowledge_id
-→ version
-```
-
-No embedding, semantic similarity, relevance score, or model-based ranking exists in Sprint 20.
-
-## Model Adapter Boundary
-
-`GroundedModelAdapter` is provider-independent.
-
-The canonical raw response contract is:
-
-```text
-request_id
 provider_identity
 model_identity
-raw_text
+timeout_seconds
+max_retries
 ```
 
-Sprint 20 includes only `StaticGroundedModelAdapter` as a deterministic reference/test adapter.
+Credentials are resolved through `GroundedProviderCredentialSource`.
 
-No real provider SDK, API key handling, HTTP client, endpoint configuration, retry policy, rate-limit handling, or network I/O is implemented.
-
-## Response Parsing
-
-`GroundedModelResponseParser` is JSON-only and fail-closed.
-
-The exact response shape is:
+The production OpenAI composition uses `EnvironmentGroundedProviderCredentialSource` with an explicitly mapped environment variable:
 
 ```text
-answer_id
-protocol_identity
-claims[]
-  text
-  citations[]
-    knowledge_identity
-    statement
-    provenance_status
+INVESTMENT_TERMINAL_OPENAI_API_KEY
 ```
 
-Missing or unsupported fields fail explicitly.
+The live CLI accepts an environment-variable name, not an API-key value.
 
-Parsing only establishes structural validity. Grounding admissibility is checked separately.
+Secrets are not persisted, logged, included in audit traces, or accepted as direct CLI secret arguments.
 
-## Orchestration
+## Transport and Retry Semantics
 
-`GroundedGenerationService` composes:
+`GroundedProviderTransport` is provider-neutral.
+
+The production implementation is:
 
 ```text
-selection
-→ prompt
-→ adapter
-→ response
-→ parser
-→ grounding validation
+UrllibGroundedProviderTransport
 ```
 
-The workflow is fail-closed.
+using Python standard-library HTTP transport.
 
-Malformed JSON, request-correlation mismatch, unresolved citation, forged statement, forged provenance status, or excluded context cannot become a final grounded answer.
-
-A successful `GroundedGenerationResult` requires:
+Canonical failure classes:
 
 ```text
-validation.status = ADMISSIBLE
+TIMEOUT
+RETRYABLE
+TERMINAL
 ```
 
-## Audit Trace
-
-`GroundedGenerationTrace` provides a compact deterministic lifecycle representation:
+Retry semantics are bounded:
 
 ```text
-request_id
-prompt_protocol_identity
-answer_protocol_identity
-provider_identity
-model_identity
-selected_knowledge_identities
-cited_knowledge_identities
-claim_count
-citation_count
-validation_status
+maximum attempts = 1 + max_retries
 ```
 
-Cited Knowledge identities must be a subset of selected context.
+Only typed retryable failures are retried. Terminal failures stop immediately.
 
-The trace deliberately excludes raw model text, full statements, user query text, API credentials, and provider payloads.
-
-## Read-only Reference CLI
-
-Sprint 20 provides a reference CLI using the static adapter only.
-
-Inputs include:
+Current HTTP classification:
 
 ```text
---database
---request-id
---query
---response-json
---subject
---max-items
---json
+408 / 425 / 429 → RETRYABLE
+5xx             → RETRYABLE
+other 4xx       → TERMINAL
+timeout         → TIMEOUT
+network URL err → RETRYABLE
 ```
 
-The CLI reads Knowledge SQLite, runs the grounded workflow, builds an audit trace, and renders human/JSON output.
+No sleep/backoff/jitter/rate-limit delay policy is introduced in Sprint 21.
 
-It does not call a real model or perform network I/O.
+## OpenAI Adapter
+
+`OpenAIGroundedModelAdapter` implements the existing provider-neutral `GroundedModelAdapter` contract.
+
+It uses the OpenAI Responses API through the transport boundary and requests strict structured JSON matching `EVIDENCE_GROUNDED_ANSWER@1`.
+
+The adapter owns provider-specific request/response mapping only.
+
+It does not own:
+
+```text
+retry loops
+HTTP implementation
+environment loading
+grounding validation
+Knowledge mutation
+History mutation
+AI persistence
+```
+
+## Operational Audit
+
+Successful live provider responses may carry:
+
+```text
+attempt_count
+retry_count
+transport_status_code
+transport_outcome
+```
+
+`GroundedGenerationTrace` exposes these values as the optional `provider_operation` extension.
+
+Operational audit deliberately excludes:
+
+```text
+API keys
+Authorization headers
+raw HTTP headers
+raw HTTP bodies
+provider URL
+raw model text
+```
+
+Static/reference generation remains backward-compatible and does not require operational metadata.
+
+## Live CLI
+
+Sprint 21 adds a separate live-ready read-only CLI.
+
+A real provider/network call requires explicit:
+
+```text
+--live
+```
+
+The CLI also requires explicit model identity and request/query inputs.
+
+Human output exposes safe operational metadata:
+
+```text
+Provider
+Model
+Attempts
+Retries
+HTTP Status
+Transport
+Validation
+```
+
+JSON output uses the canonical trace representation.
+
+The Sprint 20 static/reference CLI remains available and does not perform network I/O.
 
 ## Stable Guardrails
 
-Sprint 20 preserves these boundaries:
+Sprint 21 preserves these boundaries:
 
 - AI remains downstream of Knowledge;
-- AI does not mutate Knowledge or History;
-- every final claim is explicitly Knowledge-cited;
-- v1 grounding requires COMPLETE Knowledge provenance;
-- raw model output is never trusted directly;
-- strict parsing happens before grounding validation;
-- grounding validation is separate from semantic entailment;
-- context selection is deterministic and non-semantic;
+- provider integration does not mutate Knowledge or History;
+- every final claim remains explicitly Knowledge-cited;
+- v1 grounding still requires COMPLETE Knowledge provenance;
+- raw provider output is never trusted directly;
+- strict parsing still precedes grounding validation;
+- provider transport and retry policy stay outside domain grounding contracts;
+- credentials stay behind an explicit credential-source boundary;
+- secrets are excluded from audit/report output;
+- live network execution requires explicit CLI opt-in;
+- tests do not require a real API key or real network access;
 - no embeddings/vector ranking;
 - no confidence/truth score;
 - no predictive success probability;
 - no recommendation-effectiveness semantics;
 - no causal inference;
 - no autonomous trading or broker execution;
-- no real provider SDK or network integration;
-- no AI persistence schema is introduced;
-- CLI remains read-only composition/rendering.
+- no AI persistence schema is introduced.
 
 ## E2E Coverage
 
-Sprint 20 covers:
+Sprint 21 provider integration E2E covers:
 
 ```text
 real Knowledge SQLite
 → Knowledge query/envelopes
 → deterministic context selection
 → grounded prompt
-→ static reference model response
+→ OpenAI provider composition
+→ environment credential lookup
+→ bounded retry execution
+→ provider transport request
+→ offline-realistic Responses API response
+→ GroundedModelResponse
 → strict parser
-→ grounding validation
-→ ADMISSIBLE generation result
-→ audit trace
-→ JSON/human CLI
+→ exact Knowledge grounding validation
+→ ADMISSIBLE generation
+→ safe operational trace
 ```
 
-The E2E also verifies that the reference AI workflow creates neither History persistence nor AI persistence and exposes no network/provider configuration.
+The E2E uses an injected transport and therefore performs no real network request.
+
+It verifies retry propagation, request correlation, provider/model identity, secret-output isolation, and absence of History/AI persistence.
 
 ## Testing Status
 
-Focused Sprint 20 tests are implemented.
+Focused Sprint 21 tests are implemented.
 
 Final closure requires:
 
@@ -322,20 +284,21 @@ to pass after applying this package.
 
 Still deferred:
 
-- real OpenAI/Anthropic/other provider adapters;
-- API key/secret management;
-- HTTP/network transport;
-- retries, rate limits, timeout policy, streaming;
-- structured-output provider configuration;
+- streaming provider responses;
+- retry delay/backoff/jitter policy;
+- `Retry-After` interpretation;
+- provider rate-limit scheduling;
+- Anthropic/other provider adapters;
+- provider/model allowlists;
+- token/cost accounting;
+- provider request/response persistence;
 - semantic entailment verification;
 - claim-level contradiction detection;
 - relevance ranking or embeddings;
 - vector retrieval;
 - grounded answer persistence/history;
 - human feedback capture;
-- prompt-template/version governance beyond the current protocol contracts;
-- model/provider allowlists;
-- cost/token accounting;
+- prompt-template/version governance beyond current protocol contracts;
 - automatic History-to-Knowledge ingestion;
 - predictive confidence;
 - recommendation effectiveness;
@@ -345,6 +308,6 @@ Still deferred:
 
 ## Next Decision
 
-Sprint 20 establishes a deterministic, provider-neutral, fail-closed Evidence-Grounded AI foundation.
+Sprint 21 makes the Evidence-Grounded AI path live-provider-ready while preserving the Sprint 20 fail-closed grounding boundary.
 
-A future provider-integration milestone may attach a real model only through `GroundedModelAdapter` and must preserve the existing prompt, parser, grounding-validation, audit, and domain-boundary contracts.
+A future milestone may add provider governance, cost/token observability, additional providers, or controlled streaming, but must not bypass canonical Knowledge provenance, strict parsing, or grounding validation.
