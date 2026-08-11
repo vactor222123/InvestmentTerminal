@@ -5,229 +5,268 @@
 ```text
 vactor222123/InvestmentTerminal
 branch: develop
+baseline: 700205d
 ```
 
 ## Current phase
 
 ```text
-Sprint 22 — Provider Governance and Usage Controls
-implementation complete; final repository verification pending
+Sprint 23 — Provider Resilience and Rate-Limit Controls
+implementation complete
+full regression green
+ready for closure commit
 ```
 
 ## Completed foundation
 
-### Sprint 12–21
+### Sprint 12–22
 
-Historical Intelligence, comparison/replay, outcome observations, methodology hardening, descriptive research, provenance/population quality, archive continuity, Knowledge Domain, Evidence-Grounded AI, and the first real OpenAI provider integration are complete.
+Historical Intelligence, comparison/replay, outcome observations, methodology hardening, descriptive research, provenance/population quality, archive continuity, Knowledge Domain, Evidence-Grounded AI, real OpenAI provider integration, governance, usage, pricing, and budget controls are complete.
 
-### Sprint 22 — Provider Governance and Usage Controls
+### Sprint 23 — Provider Resilience and Rate-Limit Controls
 
 Delivered:
 
 ```text
-GroundedProviderModelAllowance
-GroundedProviderGovernanceAssessment
-GroundedProviderGovernancePolicy
-mandatory governance enforcement in production composition
-explicit live CLI model allowlist
-GroundedProviderUsage
-provider usage extraction from OpenAI Responses API
-provider_usage audit and CLI exposure
-GroundedProviderPricingEntry
-GroundedProviderPricingPolicy
-GroundedProviderCost
-deterministic Decimal cost accounting
-GroundedProviderCostTraceService
-explicit live CLI pricing configuration
-GroundedProviderBudgetPolicy
-request-side max_output_tokens support
-pre-execution output-token budget enforcement
-post-execution token budget enforcement
-post-execution cost budget enforcement
-Sprint 22 control-path E2E
+GroundedProviderRetryDelayPolicy
+GroundedProviderRetryDelayDecision
+GroundedProviderRetryDelayService
+GroundedProviderSleeper
+TimeGroundedProviderSleeper
+explicit retry delay composition
+live CLI retry delay configuration
+GroundedProviderTransportFailure.retry_after_seconds
+Retry-After delta-seconds parsing
+Retry-After HTTP-date parsing
+GroundedProviderClock
+SystemGroundedProviderClock
+provider/local delay precedence
+applied retry-delay execution metadata
+retry-delay audit projection
+JSON/human CLI retry-delay visibility
+Sprint 23 resilience E2E
 ```
 
-## Canonical Live Control Flow
+## Canonical Resilient Live Flow
 
 ```text
 requested provider/model
         ↓
 explicit governance allowlist
         ↓
-ALLOWED / DENIED
+pre-execution budget guard
         ↓
-pre-execution output-token budget
+OpenAI provider request
         ↓
-GroundedProviderConfig.max_output_tokens
+retryable failure?
+        ↓ yes
+Retry-After metadata
         ↓
-OpenAI Responses API request
+deterministic bounded local backoff
         ↓
-actual provider usage
+effective delay = max(local, provider)
         ↓
-GroundedProviderUsage
+sleeper
         ↓
-explicit pricing policy
+bounded retry
         ↓
-GroundedProviderCost
+provider success
         ↓
-post-execution token/cost budget validation
+usage + pricing + post-execution budget validation
         ↓
-safe audit trace
+strict parsing / grounding validation
+        ↓
+safe operational trace
         ↓
 JSON / human CLI
 ```
 
-## Governance
+## Retry Delay Policy
 
-Production provider composition is fail-closed.
-
-A provider/model pair must be explicitly present in `GroundedProviderGovernancePolicy` before the production composition path is constructed.
-
-The live CLI has separate concepts:
+The local policy is deterministic:
 
 ```text
---model
-    requested model
-
---allow-model
-    explicitly allowed model
+retry 1 = initial_delay
+retry 2 = initial_delay × multiplier
+retry 3 = initial_delay × multiplier²
+...
+capped by retry_maximum_delay_seconds
 ```
 
-An empty allowlist denies live provider execution.
+The implementation uses `Decimal` for deterministic calculation.
 
-Governance runs before credential lookup and before provider/network execution.
+There is no jitter in Sprint 23.
 
-## Usage Accounting
+## Retry-After Handling
 
-Provider-neutral usage:
+Supported forms:
 
 ```text
-input_tokens
-output_tokens
-total_tokens
+Retry-After: <delta-seconds>
+Retry-After: <HTTP-date>
 ```
 
-OpenAI-specific usage JSON is translated inside the adapter boundary.
+HTTP-date parsing uses an injectable UTC clock.
 
-`GroundedModelResponse` may carry optional `GroundedProviderUsage`.
+Malformed `Retry-After` values are ignored.
 
-`GroundedGenerationTrace` exposes optional `provider_usage`.
+Past HTTP-date values become zero delay.
 
-Static/reference generation remains backward-compatible and does not require usage.
+Provider-requested delay is preserved as provider-neutral `retry_after_seconds` metadata.
 
-## Pricing and Cost Accounting
+## Delay Precedence
 
-Pricing is explicit configuration, not hardcoded provider knowledge.
-
-A pricing entry contains:
+The effective delay is:
 
 ```text
-provider_identity
-model_identity
-currency
-input_cost_per_million_tokens
-output_cost_per_million_tokens
+max(local policy delay, provider retry_after_seconds)
 ```
 
-Cost accounting uses deterministic `Decimal` arithmetic.
+This guarantees that execution does not retry earlier than either the local backoff policy or the provider-requested delay.
 
-Unknown provider/model pricing fails closed.
+The local maximum caps only local backoff.
 
-The live CLI accepts explicit pricing inputs and does not contain a default OpenAI price catalog.
+It does not truncate a longer provider `Retry-After`.
 
-## Budget Guardrails
-
-Budget policy supports:
+## Execution Semantics
 
 ```text
-max_output_tokens
-max_total_tokens
-max_total_cost
-currency
+terminal failure
+→ fail immediately
+→ no sleep
+
+retryable failure with retries remaining
+→ calculate effective delay
+→ sleep
+→ retry
+
+retryable failure on final attempt
+→ fail
+→ no extra sleep
 ```
 
-Pre-execution control:
+Retry policy and sleeper must be configured together.
+
+Without retry-delay configuration, the previous zero-delay behavior remains backward-compatible.
+
+## Clock and Sleeper Boundaries
+
+Production:
 
 ```text
-requested max_output_tokens
-→ policy check
-→ real OpenAI request max_output_tokens cap
+SystemGroundedProviderClock
+TimeGroundedProviderSleeper
 ```
 
-Post-execution controls:
+Tests:
 
 ```text
-actual usage
-→ max_output_tokens / max_total_tokens validation
-
-actual estimated cost
-→ max_total_cost / currency validation
+fixed/injected clock
+recording/fake sleeper
 ```
 
-Exact total token usage and exact estimated cost are not misrepresented as pre-flight guarantees because they depend on completed provider usage.
+This keeps time-dependent tests deterministic and fast.
 
-A post-execution budget violation fails closed and no successful report is returned.
+## Safe Resilience Audit
 
-## Security and Authority Boundaries
+Successful provider operational metadata may expose:
 
-Sprint 22 preserves:
+```text
+attempt_count
+retry_count
+transport_status_code
+transport_outcome
+retry_delay_seconds
+```
 
-- AI remains downstream of Knowledge;
-- raw provider output remains untrusted until parsing and grounding validation;
-- provider/model governance cannot be bypassed through a default allowlist;
-- API keys remain outside CLI values and audit output;
-- Authorization headers, raw HTTP bodies, provider URLs, and raw model text remain excluded from safe traces;
-- pricing does not live in the OpenAI adapter;
-- budget logic does not live in the Knowledge or grounding domain;
-- provider controls do not mutate Knowledge or History;
-- no AI persistence schema is introduced;
-- no autonomous trading or broker execution is introduced.
+`retry_delay_seconds` is included only when delays were actually applied.
+
+Older exact serialized structures remain unchanged when no delay sequence exists.
+
+Safe audit does not include:
+
+```text
+Retry-After header
+raw HTTP headers
+raw HTTP body
+provider failure message
+provider URL
+Authorization header
+API key
+raw model text
+```
+
+## Live CLI
+
+Retry configuration:
+
+```text
+--retry-initial-delay-seconds
+--retry-delay-multiplier
+--retry-maximum-delay-seconds
+```
+
+Human output may show:
+
+```text
+Attempts     : 2
+Retries      : 1
+Retry Delays : 5 s
+HTTP Status  : 200
+Transport    : SUCCESS
+```
+
+JSON output receives the same safe retry-delay metadata through the canonical trace.
 
 ## E2E Coverage
 
-Sprint 22 E2E covers:
+Sprint 23 E2E covers:
 
 ```text
 real Knowledge SQLite
-→ governance
-→ pre-execution budget
-→ provider composition
-→ real request max_output_tokens
-→ offline-realistic OpenAI response
-→ provider usage
+→ rate-limit-like retryable failure
+→ provider retry delay
+→ local/provider delay precedence
+→ deterministic fake sleeper
+→ retry
+→ successful OpenAI-shaped response
 → grounding validation
-→ explicit pricing
-→ deterministic cost
-→ post-execution token validation
-→ post-execution cost validation
-→ safe report
+→ provider usage
+→ safe operational audit
+→ human CLI output
 ```
 
-Negative E2E cases verify:
-
-- pre-execution budget denial occurs before query/provider execution;
-- observed total-token budget overflow fails closed;
-- observed cost overflow fails closed.
-
-No real API key or network access is required for tests.
+The E2E explicitly verifies that secrets, raw provider headers, raw rate-limit body text, Authorization data, and `Retry-After` header names do not leak into report or human output.
 
 ## Testing Status
 
-Final closure requires:
+Full regression at Sprint 23 closure:
 
 ```text
-python -m pytest -q
+1819 passed, 3 skipped in 8.76s
 ```
 
-to pass after applying this package.
+## Security and Authority Boundaries
+
+Sprint 23 preserves:
+
+- AI remains downstream of Knowledge;
+- provider retries cannot change evidence authority;
+- provider output remains untrusted until strict parsing and grounding validation;
+- API keys remain outside audit/CLI output;
+- retry metadata is sanitized before reaching audit surfaces;
+- provider resilience logic remains outside Knowledge and History;
+- no AI persistence schema is introduced;
+- no autonomous portfolio mutation is introduced;
+- no broker execution is introduced.
 
 ## Deferred Capabilities
 
 Still deferred:
 
-- retry delay/backoff/jitter;
-- `Retry-After` handling;
-- provider rate-limit scheduling;
+- retry jitter;
+- proactive provider rate-limit scheduling;
+- concurrency-aware throttling;
 - streaming responses;
 - additional provider adapters;
 - provider pricing catalog synchronization;
@@ -246,6 +285,6 @@ Still deferred:
 
 ## Next Decision
 
-Sprint 22 completes fail-closed provider governance plus usage, pricing, and budget controls.
+Sprint 23 completes deterministic provider resilience and server-directed retry timing.
 
-The next milestone should focus on transport resilience and rate-limit behavior or move upward into application/API productization without weakening the existing evidence and governance boundaries.
+The next milestone should either productize the existing system behind an application/API boundary or add a concurrency-aware provider rate-limit scheduler, without weakening the current evidence, governance, budget, and audit boundaries.

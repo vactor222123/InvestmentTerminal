@@ -1,7 +1,7 @@
 # Investment Terminal — Product Roadmap
 
 **Status:** Canonical Roadmap
-**Updated after:** Sprint 22 — Provider Governance and Usage Controls
+**Updated after:** Sprint 23 — Provider Resilience and Rate-Limit Controls
 **Current development branch:** `develop`
 
 ## 1. Product Evolution
@@ -22,6 +22,7 @@ Foundation
 → Evidence-Grounded AI Experience Foundation
 → Provider Integration and Operational AI Controls
 → Provider Governance and Usage Controls
+→ Provider Resilience and Rate-Limit Controls
 ```
 
 ## 2. Completed Milestones
@@ -58,21 +59,40 @@ Delivered:
 - post-execution estimated-cost enforcement;
 - Sprint 22 end-to-end control-path coverage.
 
-Canonical controlled live flow:
+### Sprint 23 — Provider Resilience and Rate-Limit Controls
+
+Delivered:
+
+- deterministic retry-delay policy;
+- explicit initial delay, multiplier, and maximum local delay;
+- bounded exponential local backoff;
+- injectable sleeper boundary;
+- production time-based sleeper composition;
+- live CLI retry-delay configuration;
+- provider-neutral `retry_after_seconds` transport metadata;
+- `Retry-After` delta-seconds parsing at the HTTP boundary;
+- conservative `max(local backoff, provider Retry-After)` precedence;
+- HTTP-date `Retry-After` parsing;
+- injectable UTC clock for deterministic time-based tests;
+- applied retry-delay operational metadata;
+- safe retry-delay audit projection;
+- JSON and human CLI retry-delay visibility;
+- deterministic resilience E2E covering rate-limit retry, delay precedence, successful recovery, audit, and CLI output.
+
+Canonical resilient provider flow:
 
 ```text
-Knowledge
-→ grounded prompt
-→ provider/model governance
-→ pre-execution budget guard
-→ OpenAI request with output cap
-→ provider response
-→ token usage
+provider request
+→ retryable transport failure
+→ Retry-After metadata
+→ deterministic bounded local backoff
+→ effective delay = max(local delay, provider delay)
+→ sleeper
+→ bounded retry
+→ provider success
 → strict parsing / grounding validation
-→ explicit pricing
-→ deterministic cost
-→ post-execution token/cost guardrails
-→ safe audit / CLI
+→ safe operational audit
+→ JSON / human CLI
 ```
 
 ## 3. Stable Authority Hierarchy
@@ -88,11 +108,11 @@ Archived Review Package
 → ADMISSIBLE GroundedGenerationResult
 ```
 
-Governance, pricing, and budgets do not change evidence authority.
+Provider resilience changes execution timing only. It does not change evidence authority.
 
 ## 4. Provider Governance Status
 
-Live production execution is fail-closed:
+Live production execution remains fail-closed:
 
 ```text
 explicit provider/model pair
@@ -125,9 +145,7 @@ output_cost
 total_cost
 ```
 
-Pricing is explicit and external to the OpenAI adapter.
-
-No hardcoded current provider-price catalog exists.
+Pricing remains explicit and external to the OpenAI adapter.
 
 ## 6. Budget Status
 
@@ -144,9 +162,38 @@ currency
 
 Actual usage and estimated cost are validated after provider completion.
 
-Budget overflow is fail-closed.
+Budget overflow remains fail-closed.
 
-## 7. Operational Security
+## 7. Resilience Status
+
+Current retry controls:
+
+```text
+max_retries
+retry_initial_delay_seconds
+retry_delay_multiplier
+retry_maximum_delay_seconds
+Retry-After delta-seconds
+Retry-After HTTP-date
+injectable sleeper
+injectable UTC clock
+```
+
+Local retry delay is bounded by the configured maximum.
+
+Provider-requested `Retry-After` is not truncated by the local maximum.
+
+Effective retry delay is:
+
+```text
+max(local policy delay, provider Retry-After)
+```
+
+Terminal failures are never delayed or retried.
+
+No delay is applied after the final exhausted attempt.
+
+## 8. Operational Security
 
 The live path continues to exclude from safe reports:
 
@@ -156,44 +203,84 @@ Authorization headers
 raw HTTP headers
 raw HTTP bodies
 provider URLs
+raw provider failure messages
 raw model text
 ```
 
-No provider control introduced by Sprint 22 mutates Knowledge, History, or portfolio state.
+Safe resilience audit data may include:
 
-## 8. Deferred Scope
+```text
+attempt_count
+retry_count
+transport_status_code
+transport_outcome
+retry_delay_seconds
+```
+
+No provider resilience control mutates Knowledge, History, or portfolio state.
+
+## 9. Testing Status
+
+Sprint 23 closure regression:
+
+```text
+1819 passed, 3 skipped
+```
+
+The resilience E2E verifies:
+
+```text
+real Knowledge SQLite
+→ retryable 429-like provider failure
+→ provider retry delay
+→ local/provider delay precedence
+→ deterministic fake sleeper
+→ successful retry
+→ grounded admissible answer
+→ safe operational trace
+→ human CLI retry-delay output
+```
+
+No real API key, real sleep, or network access is required for the resilience E2E.
+
+## 10. Deferred Scope
 
 Still deferred:
 
-- transport backoff/jitter;
-- `Retry-After`;
-- rate-limit scheduling;
-- streaming;
-- additional providers;
-- synchronized provider pricing catalogs;
+- retry jitter;
+- proactive provider rate-limit scheduling;
+- concurrency-aware throttling;
+- streaming responses;
+- additional provider adapters;
+- provider pricing catalog synchronization;
+- cached-token/reasoning-token pricing differentiation;
 - persistent usage/cost ledger;
 - provider request/response persistence;
-- semantic entailment;
+- semantic entailment validation;
 - contradiction detection;
-- embeddings/vector retrieval;
-- grounded answer persistence;
+- vector retrieval/embeddings;
+- grounded answer persistence/history;
 - automatic History-to-Knowledge ingestion;
+- predictive confidence/effectiveness scoring;
+- causal inference;
 - autonomous portfolio actions;
 - broker execution.
 
-## 9. Next Product Decision Point
+## 11. Next Product Decision Point
 
-After Sprint 22, the strongest next candidates are:
+After Sprint 23, the provider execution path has governance, budgets, usage/cost accounting, deterministic retries, and server-directed retry timing.
+
+The strongest next candidates are:
 
 ```text
-A. Provider resilience / rate-limit controls
-B. Application/API productization
+A. Application/API productization
+B. Provider concurrency/rate-limit scheduler
 C. Automatic Knowledge lifecycle expansion
 ```
 
-The next milestone should not weaken fail-closed grounding, governance, secret isolation, or budget enforcement.
+The next milestone must preserve fail-closed grounding, governance, secret isolation, budget enforcement, and safe audit boundaries.
 
-## 10. Definition of Done
+## 12. Definition of Done
 
 A milestone is complete only when:
 
