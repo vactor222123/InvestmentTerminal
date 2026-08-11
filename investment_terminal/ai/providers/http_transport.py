@@ -5,6 +5,7 @@ This module is provider-neutral. It maps HTTP/network failures into the
 canonical GroundedProviderTransportFailure taxonomy.
 """
 
+from decimal import Decimal, InvalidOperation
 import socket
 from urllib import error, request as urllib_request
 
@@ -19,8 +20,6 @@ from investment_terminal.ai.providers.transport import (
 class UrllibGroundedProviderTransport(
     GroundedProviderTransport
 ):
-    """Synchronous real HTTP transport backed by urllib.request."""
-
     RETRYABLE_STATUS_CODES = {
         408,
         425,
@@ -41,9 +40,7 @@ class UrllibGroundedProviderTransport(
 
         raw_request = urllib_request.Request(
             url=request.url,
-            data=request.body.encode(
-                "utf-8"
-            ),
+            data=request.body.encode("utf-8"),
             headers={
                 name: value
                 for name, value in request.headers
@@ -75,9 +72,17 @@ class UrllibGroundedProviderTransport(
                 "utf-8",
                 errors="replace",
             )
+            retry_after_seconds = (
+                self._parse_retry_after_delta_seconds(
+                    exc.headers.get("Retry-After")
+                    if exc.headers is not None
+                    else None
+                )
+            )
             self._raise_for_http_status(
                 status_code=exc.code,
                 body=body,
+                retry_after_seconds=retry_after_seconds,
             )
             raise RuntimeError(
                 "unreachable HTTP error classification"
@@ -117,6 +122,7 @@ class UrllibGroundedProviderTransport(
         self._raise_for_http_status(
             status_code=status_code,
             body=body,
+            retry_after_seconds=None,
         )
 
         return GroundedProviderTransportResponse(
@@ -126,12 +132,30 @@ class UrllibGroundedProviderTransport(
             body=body,
         )
 
+    @staticmethod
+    def _parse_retry_after_delta_seconds(
+        value: str | None,
+    ) -> Decimal | None:
+        if value is None:
+            return None
+        stripped = value.strip()
+        if not stripped:
+            return None
+        try:
+            parsed = Decimal(stripped)
+        except InvalidOperation:
+            return None
+        if not parsed.is_finite() or parsed < 0:
+            return None
+        return parsed
+
     @classmethod
     def _raise_for_http_status(
         cls,
         *,
         status_code: int,
         body: str,
+        retry_after_seconds: Decimal | None = None,
     ) -> None:
         if 200 <= status_code <= 299:
             return
@@ -146,14 +170,14 @@ class UrllibGroundedProviderTransport(
             )
 
         if (
-            status_code
-            in cls.RETRYABLE_STATUS_CODES
+            status_code in cls.RETRYABLE_STATUS_CODES
             or 500 <= status_code <= 599
         ):
             raise GroundedProviderTransportFailure(
                 kind="RETRYABLE",
                 message=message,
                 retryable=True,
+                retry_after_seconds=retry_after_seconds,
             )
 
         raise GroundedProviderTransportFailure(

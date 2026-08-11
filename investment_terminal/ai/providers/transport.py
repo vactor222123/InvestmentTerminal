@@ -7,6 +7,7 @@ classification only. It performs no real network I/O.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import Any
 
 from investment_terminal.utils.validation import (
@@ -16,8 +17,6 @@ from investment_terminal.utils.validation import (
 
 @dataclass(frozen=True, slots=True)
 class GroundedProviderTransportRequest:
-    """Immutable provider-neutral HTTP-like request envelope."""
-
     request_id: str
     method: str
     url: str
@@ -40,42 +39,30 @@ class GroundedProviderTransportRequest:
                     field_name=field_name,
                 ),
             )
-
         object.__setattr__(
             self,
             "method",
             self.method.upper(),
         )
-
-        if not isinstance(
-            self.headers,
-            tuple,
-        ):
-            raise TypeError(
-                "headers must be a tuple"
-            )
+        if not isinstance(self.headers, tuple):
+            raise TypeError("headers must be a tuple")
 
         normalized_headers = []
         for item in self.headers:
-            if (
-                not isinstance(item, tuple)
-                or len(item) != 2
-            ):
+            if not isinstance(item, tuple) or len(item) != 2:
                 raise TypeError(
                     "headers must contain (name, value) tuples"
                 )
-            name = normalize_required_text(
-                item[0],
-                field_name="header_name",
-            )
-            value = normalize_required_text(
-                item[1],
-                field_name="header_value",
-            )
             normalized_headers.append(
                 (
-                    name,
-                    value,
+                    normalize_required_text(
+                        item[0],
+                        field_name="header_name",
+                    ),
+                    normalize_required_text(
+                        item[1],
+                        field_name="header_value",
+                    ),
                 )
             )
 
@@ -87,21 +74,15 @@ class GroundedProviderTransportRequest:
             raise ValueError(
                 "header names must be unique case-insensitively"
             )
-
         object.__setattr__(
             self,
             "headers",
-            tuple(
-                normalized_headers
-            ),
+            tuple(normalized_headers),
         )
 
         if (
             isinstance(self.timeout_seconds, bool)
-            or not isinstance(
-                self.timeout_seconds,
-                (int, float),
-            )
+            or not isinstance(self.timeout_seconds, (int, float))
             or self.timeout_seconds <= 0
         ):
             raise ValueError(
@@ -110,9 +91,7 @@ class GroundedProviderTransportRequest:
         object.__setattr__(
             self,
             "timeout_seconds",
-            float(
-                self.timeout_seconds
-            ),
+            float(self.timeout_seconds),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -121,10 +100,7 @@ class GroundedProviderTransportRequest:
             "method": self.method,
             "url": self.url,
             "headers": [
-                {
-                    "name": name,
-                    "value": value,
-                }
+                {"name": name, "value": value}
                 for name, value in self.headers
             ],
             "body": self.body,
@@ -134,8 +110,6 @@ class GroundedProviderTransportRequest:
 
 @dataclass(frozen=True, slots=True)
 class GroundedProviderTransportResponse:
-    """Immutable provider-neutral transport response."""
-
     request_id: str
     status_code: int
     headers: tuple[tuple[str, str], ...]
@@ -158,36 +132,23 @@ class GroundedProviderTransportResponse:
                 field_name="body",
             ),
         )
-
         if (
             isinstance(self.status_code, bool)
-            or not isinstance(
-                self.status_code,
-                int,
-            )
+            or not isinstance(self.status_code, int)
             or not 100 <= self.status_code <= 599
         ):
             raise ValueError(
                 "status_code must be an HTTP status code"
             )
-
-        if not isinstance(
-            self.headers,
-            tuple,
-        ):
-            raise TypeError(
-                "headers must be a tuple"
-            )
+        if not isinstance(self.headers, tuple):
+            raise TypeError("headers must be a tuple")
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "request_id": self.request_id,
             "status_code": self.status_code,
             "headers": [
-                {
-                    "name": name,
-                    "value": value,
-                }
+                {"name": name, "value": value}
                 for name, value in self.headers
             ],
             "body": self.body,
@@ -201,6 +162,7 @@ class GroundedProviderTransportFailure(Exception):
     kind: str
     message: str
     retryable: bool
+    retry_after_seconds: Decimal | None = None
 
     TIMEOUT = "TIMEOUT"
     RETRYABLE = "RETRYABLE"
@@ -225,16 +187,40 @@ class GroundedProviderTransportFailure(Exception):
             ),
         )
 
-        expected_retryable = (
-            self.kind
-            in (
-                self.TIMEOUT,
-                self.RETRYABLE,
-            )
+        expected_retryable = self.kind in (
+            self.TIMEOUT,
+            self.RETRYABLE,
         )
         if self.retryable is not expected_retryable:
             raise ValueError(
                 "retryable flag must match failure kind"
+            )
+
+        if self.retry_after_seconds is not None:
+            if not self.retryable:
+                raise ValueError(
+                    "retry_after_seconds requires a retryable failure"
+                )
+            if isinstance(self.retry_after_seconds, bool):
+                raise TypeError(
+                    "retry_after_seconds must be Decimal-compatible"
+                )
+            try:
+                parsed = Decimal(
+                    str(self.retry_after_seconds)
+                )
+            except Exception as exc:
+                raise TypeError(
+                    "retry_after_seconds must be Decimal-compatible"
+                ) from exc
+            if not parsed.is_finite() or parsed < 0:
+                raise ValueError(
+                    "retry_after_seconds must be finite and non-negative"
+                )
+            object.__setattr__(
+                self,
+                "retry_after_seconds",
+                parsed,
             )
 
         Exception.__init__(
@@ -243,50 +229,44 @@ class GroundedProviderTransportFailure(Exception):
         )
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        data = {
             "kind": self.kind,
             "message": self.message,
             "retryable": self.retryable,
         }
+        if self.retry_after_seconds is not None:
+            data["retry_after_seconds"] = str(
+                self.retry_after_seconds
+            )
+        return data
 
 
 class GroundedProviderTransport(ABC):
-    """Abstract provider-neutral transport boundary."""
-
     @abstractmethod
     def send(
         self,
         request: GroundedProviderTransportRequest,
     ) -> GroundedProviderTransportResponse:
-        """Send one provider request or raise GroundedProviderTransportFailure."""
+        ...
 
 
 class StaticGroundedProviderTransport(
     GroundedProviderTransport
 ):
-    """Deterministic test/reference transport with no network I/O."""
-
     def __init__(
         self,
         *,
         response: GroundedProviderTransportResponse | None = None,
         failure: GroundedProviderTransportFailure | None = None,
     ) -> None:
-        if (
-            response is None
-            and failure is None
-        ):
+        if response is None and failure is None:
             raise ValueError(
                 "response or failure must be provided"
             )
-        if (
-            response is not None
-            and failure is not None
-        ):
+        if response is not None and failure is not None:
             raise ValueError(
                 "response and failure are mutually exclusive"
             )
-
         self._response = response
         self._failure = failure
 
@@ -307,12 +287,8 @@ class StaticGroundedProviderTransport(
 
         assert self._response is not None
 
-        if (
-            self._response.request_id
-            != request.request_id
-        ):
+        if self._response.request_id != request.request_id:
             raise ValueError(
                 "transport response request_id must match request request_id"
             )
-
         return self._response
