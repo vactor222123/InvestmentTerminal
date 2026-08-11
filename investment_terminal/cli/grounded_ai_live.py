@@ -2,7 +2,7 @@
 Live-ready read-only CLI for Evidence-Grounded AI through OpenAI.
 
 A real network call is allowed only when --live is explicitly supplied.
-Pricing and budget controls are explicit per invocation.
+Pricing, budget, and retry-delay controls are explicit per invocation.
 """
 
 import argparse
@@ -51,6 +51,20 @@ def build_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument("--api-key-env", default=DEFAULT_OPENAI_API_KEY_ENV)
     parser.add_argument("--timeout-seconds", type=_positive_float, default=30.0)
     parser.add_argument("--max-retries", type=_non_negative_int, default=2)
+
+    parser.add_argument(
+        "--retry-initial-delay-seconds",
+        type=_non_negative_decimal,
+    )
+    parser.add_argument(
+        "--retry-delay-multiplier",
+        type=_decimal_at_least_one,
+    )
+    parser.add_argument(
+        "--retry-maximum-delay-seconds",
+        type=_non_negative_decimal,
+    )
+
     parser.add_argument("--subject", action="append", default=[])
     parser.add_argument("--max-items", type=_positive_int, default=None)
 
@@ -185,6 +199,9 @@ def main(argv: Sequence[str] | None = None) -> None:
             api_key_environment_variable=options.api_key_env,
             timeout_seconds=options.timeout_seconds,
             max_retries=options.max_retries,
+            retry_initial_delay_seconds=options.retry_initial_delay_seconds,
+            retry_delay_multiplier=options.retry_delay_multiplier,
+            retry_maximum_delay_seconds=options.retry_maximum_delay_seconds,
             subjects=tuple(options.subject),
             max_items=options.max_items,
             governance_policy=_governance_policy(tuple(options.allow_model)),
@@ -217,6 +234,9 @@ def _run_live(
     api_key_environment_variable: str,
     timeout_seconds: float,
     max_retries: int,
+    retry_initial_delay_seconds: Decimal | None = None,
+    retry_delay_multiplier: Decimal | None = None,
+    retry_maximum_delay_seconds: Decimal | None = None,
     subjects: tuple[str, ...],
     max_items: int | None,
     governance_policy: GroundedProviderGovernancePolicy | None = None,
@@ -241,6 +261,9 @@ def _run_live(
             max_retries=max_retries,
             governance_policy=governance_policy,
             max_output_tokens=requested_max_output_tokens,
+            retry_initial_delay_seconds=retry_initial_delay_seconds,
+            retry_delay_multiplier=retry_delay_multiplier,
+            retry_maximum_delay_seconds=retry_maximum_delay_seconds,
             api_key_environment_variable=api_key_environment_variable,
         )
     else:
@@ -407,6 +430,15 @@ def _non_negative_decimal(value: str) -> Decimal:
     if not parsed.is_finite() or parsed < 0:
         raise argparse.ArgumentTypeError(
             "value must be a non-negative decimal"
+        )
+    return parsed
+
+
+def _decimal_at_least_one(value: str) -> Decimal:
+    parsed = _non_negative_decimal(value)
+    if parsed < Decimal("1"):
+        raise argparse.ArgumentTypeError(
+            "value must be at least 1"
         )
     return parsed
 
