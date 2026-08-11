@@ -2,7 +2,7 @@
 Live-ready read-only CLI for Evidence-Grounded AI through OpenAI.
 
 A real network call is allowed only when --live is explicitly supplied.
-Pricing is explicit per invocation; no provider pricing catalog is hardcoded.
+Pricing and budget controls are explicit per invocation.
 """
 
 import argparse
@@ -24,6 +24,9 @@ from investment_terminal.ai.providers.cost_audit import (
 from investment_terminal.ai.providers.governance import (
     GroundedProviderGovernancePolicy,
     GroundedProviderModelAllowance,
+)
+from investment_terminal.ai.providers.guardrails import (
+    GroundedProviderBudgetPolicy,
 )
 from investment_terminal.ai.providers.pricing import (
     GroundedProviderPricingEntry,
@@ -50,6 +53,12 @@ def build_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-retries", type=_non_negative_int, default=2)
     parser.add_argument("--subject", action="append", default=[])
     parser.add_argument("--max-items", type=_positive_int, default=None)
+
+    parser.add_argument("--max-output-tokens", type=_positive_int)
+    parser.add_argument("--max-total-tokens", type=_positive_int)
+    parser.add_argument("--max-total-cost", type=_non_negative_decimal)
+    parser.add_argument("--budget-currency")
+
     parser.add_argument("--pricing-currency")
     parser.add_argument("--input-cost-per-million", type=_non_negative_decimal)
     parser.add_argument("--output-cost-per-million", type=_non_negative_decimal)
@@ -107,6 +116,29 @@ def _pricing_policy(
     )
 
 
+def _budget_policy(
+    *,
+    max_output_tokens: int | None,
+    max_total_tokens: int | None,
+    max_total_cost: Decimal | None,
+    currency: str | None,
+) -> GroundedProviderBudgetPolicy | None:
+    supplied = (
+        max_output_tokens is not None,
+        max_total_tokens is not None,
+        max_total_cost is not None,
+        currency is not None,
+    )
+    if not any(supplied):
+        return None
+    return GroundedProviderBudgetPolicy(
+        max_output_tokens=max_output_tokens,
+        max_total_tokens=max_total_tokens,
+        max_total_cost=max_total_cost,
+        currency=currency,
+    )
+
+
 def main(argv: Sequence[str] | None = None) -> None:
     parser = build_argument_parser()
     options = parser.parse_args(argv)
@@ -129,6 +161,22 @@ def main(argv: Sequence[str] | None = None) -> None:
             input_cost_per_million=options.input_cost_per_million,
             output_cost_per_million=options.output_cost_per_million,
         )
+        budget_policy = _budget_policy(
+            max_output_tokens=options.max_output_tokens,
+            max_total_tokens=options.max_total_tokens,
+            max_total_cost=options.max_total_cost,
+            currency=options.budget_currency,
+        )
+
+        if (
+            budget_policy is not None
+            and budget_policy.max_total_cost is not None
+            and pricing_policy is None
+        ):
+            raise ValueError(
+                "max total cost budget requires explicit pricing configuration"
+            )
+
         report = _run_live(
             query=query,
             request_id=options.request_id,
@@ -141,6 +189,8 @@ def main(argv: Sequence[str] | None = None) -> None:
             max_items=options.max_items,
             governance_policy=_governance_policy(tuple(options.allow_model)),
             pricing_policy=pricing_policy,
+            budget_policy=budget_policy,
+            requested_max_output_tokens=options.max_output_tokens,
         )
     except (
         KeyError,
@@ -171,8 +221,15 @@ def _run_live(
     max_items: int | None,
     governance_policy: GroundedProviderGovernancePolicy | None = None,
     pricing_policy: GroundedProviderPricingPolicy | None = None,
+    budget_policy: GroundedProviderBudgetPolicy | None = None,
+    requested_max_output_tokens: int | None = None,
     generation_service=None,
 ) -> dict[str, Any]:
+    if budget_policy is not None:
+        budget_policy.require_request_allowed(
+            requested_max_output_tokens=requested_max_output_tokens
+        )
+
     if generation_service is None:
         if governance_policy is None:
             raise PermissionError(
@@ -183,6 +240,7 @@ def _run_live(
             timeout_seconds=timeout_seconds,
             max_retries=max_retries,
             governance_policy=governance_policy,
+            max_output_tokens=requested_max_output_tokens,
             api_key_environment_variable=api_key_environment_variable,
         )
     else:
@@ -198,14 +256,46 @@ def _run_live(
             max_items=max_items,
         ),
     )
-    trace = GroundedGenerationTraceService().build(generation)
 
+    if (
+        budget_policy is not None
+        and generation.response.usage is not None
+    ):
+        budget_policy.require_observed_usage_allowed(
+            usage=generation.response.usage
+        )
+
+    trace = GroundedGenerationTraceService().build(generation)
     trace_data = trace.to_dict()
+
     if pricing_policy is not None:
         trace_data = GroundedProviderCostTraceService().build(
             trace=trace,
             pricing_policy=pricing_policy,
         )
+
+        if (
+            budget_policy is not None
+            and budget_policy.max_total_cost is not None
+        ):
+            provider_cost = trace_data.get("provider_cost")
+            if provider_cost is None:
+                raise RuntimeError(
+                    "provider cost is unavailable for configured cost budget"
+                )
+            from investment_terminal.ai.providers.pricing import (
+                GroundedProviderCost,
+            )
+            budget_policy.require_observed_cost_allowed(
+                cost=GroundedProviderCost(
+                    provider_identity=provider_cost["provider_identity"],
+                    model_identity=provider_cost["model_identity"],
+                    currency=provider_cost["currency"],
+                    input_cost=Decimal(provider_cost["input_cost"]),
+                    output_cost=Decimal(provider_cost["output_cost"]),
+                    total_cost=Decimal(provider_cost["total_cost"]),
+                )
+            )
 
     return {
         "generation": generation.to_dict(),
