@@ -1,8 +1,7 @@
-"""
-Bounded provider transport execution with deterministic retry delays.
-"""
+"""Bounded provider transport execution with deterministic retry delays."""
 
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import Any
 
 from investment_terminal.ai.providers.contracts import GroundedProviderConfig
@@ -26,6 +25,7 @@ class GroundedProviderExecutionResult:
     response: GroundedProviderTransportResponse
     attempt_count: int
     retry_count: int
+    retry_delay_seconds: tuple[Decimal, ...] = ()
 
     def __post_init__(self) -> None:
         if not isinstance(
@@ -59,13 +59,54 @@ class GroundedProviderExecutionResult:
             raise ValueError(
                 "retry_count must equal attempt_count - 1"
             )
+        if not isinstance(
+            self.retry_delay_seconds,
+            tuple,
+        ):
+            raise TypeError(
+                "retry_delay_seconds must be a tuple"
+            )
+        if len(self.retry_delay_seconds) > self.retry_count:
+            raise ValueError(
+                "retry delay count cannot exceed retry_count"
+            )
+
+        normalized = []
+        for value in self.retry_delay_seconds:
+            if isinstance(value, bool):
+                raise TypeError(
+                    "retry delays must be Decimal-compatible"
+                )
+            try:
+                parsed = Decimal(str(value))
+            except Exception as exc:
+                raise TypeError(
+                    "retry delays must be Decimal-compatible"
+                ) from exc
+            if not parsed.is_finite() or parsed < 0:
+                raise ValueError(
+                    "retry delays must be finite and non-negative"
+                )
+            normalized.append(parsed)
+
+        object.__setattr__(
+            self,
+            "retry_delay_seconds",
+            tuple(normalized),
+        )
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        data = {
             "response": self.response.to_dict(),
             "attempt_count": self.attempt_count,
             "retry_count": self.retry_count,
         }
+        if self.retry_delay_seconds:
+            data["retry_delay_seconds"] = [
+                str(value)
+                for value in self.retry_delay_seconds
+            ]
+        return data
 
 
 class GroundedProviderExecutionService:
@@ -154,6 +195,7 @@ class GroundedProviderExecutionService:
             )
 
         maximum_attempts = 1 + config.max_retries
+        applied_retry_delays: list[Decimal] = []
 
         for attempt_number in range(
             1,
@@ -170,18 +212,25 @@ class GroundedProviderExecutionService:
                 ):
                     raise
 
-                self._apply_retry_delay(
+                delay = self._apply_retry_delay(
                     retry_number=attempt_number,
                     provider_retry_after_seconds=(
                         exc.retry_after_seconds
                     ),
                 )
+                if delay is not None:
+                    applied_retry_delays.append(
+                        delay
+                    )
                 continue
 
             return GroundedProviderExecutionResult(
                 response=response,
                 attempt_count=attempt_number,
                 retry_count=attempt_number - 1,
+                retry_delay_seconds=tuple(
+                    applied_retry_delays
+                ),
             )
 
         raise RuntimeError(
@@ -193,9 +242,9 @@ class GroundedProviderExecutionService:
         *,
         retry_number: int,
         provider_retry_after_seconds=None,
-    ) -> None:
+    ) -> Decimal | None:
         if self._retry_delay_policy is None:
-            return
+            return None
 
         assert self._sleeper is not None
 
@@ -213,3 +262,4 @@ class GroundedProviderExecutionService:
                 decision.effective_delay_seconds
             )
         )
+        return decision.effective_delay_seconds

@@ -7,6 +7,7 @@ text-generation provider. It imports no provider SDK and performs no network I/O
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import Any
 
 from investment_terminal.ai.prompt_input import GroundedPromptInput
@@ -58,6 +59,7 @@ class GroundedProviderOperationalMetadata:
     retry_count: int
     transport_status_code: int
     transport_outcome: str = "SUCCESS"
+    retry_delay_seconds: tuple[Decimal, ...] = ()
 
     def __post_init__(self) -> None:
         for field_name in ("attempt_count", "retry_count"):
@@ -102,13 +104,53 @@ class GroundedProviderOperationalMetadata:
                 "requires transport_outcome SUCCESS"
             )
 
+        if not isinstance(
+            self.retry_delay_seconds,
+            tuple,
+        ):
+            raise TypeError(
+                "retry_delay_seconds must be a tuple"
+            )
+        if len(self.retry_delay_seconds) > self.retry_count:
+            raise ValueError(
+                "retry delay count cannot exceed retry_count"
+            )
+        normalized = []
+        for value in self.retry_delay_seconds:
+            if isinstance(value, bool):
+                raise TypeError(
+                    "retry delays must be Decimal-compatible"
+                )
+            try:
+                parsed = Decimal(str(value))
+            except Exception as exc:
+                raise TypeError(
+                    "retry delays must be Decimal-compatible"
+                ) from exc
+            if not parsed.is_finite() or parsed < 0:
+                raise ValueError(
+                    "retry delays must be finite and non-negative"
+                )
+            normalized.append(parsed)
+        object.__setattr__(
+            self,
+            "retry_delay_seconds",
+            tuple(normalized),
+        )
+
     def to_dict(self) -> dict[str, Any]:
-        return {
+        data = {
             "attempt_count": self.attempt_count,
             "retry_count": self.retry_count,
             "transport_status_code": self.transport_status_code,
             "transport_outcome": self.transport_outcome,
         }
+        if self.retry_delay_seconds:
+            data["retry_delay_seconds"] = [
+                str(value)
+                for value in self.retry_delay_seconds
+            ]
+        return data
 
 
 @dataclass(frozen=True, slots=True)

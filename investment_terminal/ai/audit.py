@@ -3,6 +3,7 @@ Deterministic audit/trace representation for grounded generation.
 """
 
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import Any
 
 from investment_terminal.ai.orchestration import GroundedGenerationResult
@@ -24,6 +25,7 @@ class GroundedGenerationTrace:
     provider_retry_count: int | None = None
     provider_transport_status_code: int | None = None
     provider_transport_outcome: str | None = None
+    provider_retry_delay_seconds: tuple[Decimal, ...] = ()
     provider_input_tokens: int | None = None
     provider_output_tokens: int | None = None
     provider_total_tokens: int | None = None
@@ -85,6 +87,51 @@ class GroundedGenerationTrace:
                 "provider operational trace fields must be all present or all absent"
             )
 
+        if not isinstance(
+            self.provider_retry_delay_seconds,
+            tuple,
+        ):
+            raise TypeError(
+                "provider_retry_delay_seconds must be a tuple"
+            )
+        if (
+            self.provider_retry_delay_seconds
+            and self.provider_retry_count is None
+        ):
+            raise ValueError(
+                "provider retry delays require provider operational metadata"
+            )
+        if (
+            self.provider_retry_count is not None
+            and len(self.provider_retry_delay_seconds)
+            > self.provider_retry_count
+        ):
+            raise ValueError(
+                "provider retry delay count cannot exceed retry count"
+            )
+        normalized_delays = []
+        for value in self.provider_retry_delay_seconds:
+            if isinstance(value, bool):
+                raise TypeError(
+                    "provider retry delays must be Decimal-compatible"
+                )
+            try:
+                parsed = Decimal(str(value))
+            except Exception as exc:
+                raise TypeError(
+                    "provider retry delays must be Decimal-compatible"
+                ) from exc
+            if not parsed.is_finite() or parsed < 0:
+                raise ValueError(
+                    "provider retry delays must be finite and non-negative"
+                )
+            normalized_delays.append(parsed)
+        object.__setattr__(
+            self,
+            "provider_retry_delay_seconds",
+            tuple(normalized_delays),
+        )
+
         usage_values = (
             self.provider_input_tokens,
             self.provider_output_tokens,
@@ -140,12 +187,18 @@ class GroundedGenerationTrace:
             "validation_status": self.validation_status,
         }
         if self.provider_attempt_count is not None:
-            data["provider_operation"] = {
+            provider_operation = {
                 "attempt_count": self.provider_attempt_count,
                 "retry_count": self.provider_retry_count,
                 "transport_status_code": self.provider_transport_status_code,
                 "transport_outcome": self.provider_transport_outcome,
             }
+            if self.provider_retry_delay_seconds:
+                provider_operation["retry_delay_seconds"] = [
+                    str(value)
+                    for value in self.provider_retry_delay_seconds
+                ]
+            data["provider_operation"] = provider_operation
         if self.provider_input_tokens is not None:
             data["provider_usage"] = {
                 "input_tokens": self.provider_input_tokens,
@@ -202,6 +255,11 @@ class GroundedGenerationTraceService:
                 None
                 if operational is None
                 else operational.transport_outcome
+            ),
+            provider_retry_delay_seconds=(
+                ()
+                if operational is None
+                else operational.retry_delay_seconds
             ),
             provider_input_tokens=(
                 None if usage is None else usage.input_tokens

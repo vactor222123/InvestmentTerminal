@@ -110,6 +110,9 @@ class OpenAIGroundedModelAdapter(GroundedModelAdapter):
                 retry_count=execution_result.retry_count,
                 transport_status_code=execution_result.response.status_code,
                 transport_outcome="SUCCESS",
+                retry_delay_seconds=(
+                    execution_result.retry_delay_seconds
+                ),
             ),
             usage=usage,
         )
