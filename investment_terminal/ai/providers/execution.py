@@ -1,9 +1,5 @@
 """
-Bounded provider transport execution with optional deterministic retry delays.
-
-max_retries means retries after the initial attempt. Retry classification stays
-owned by transport failures. Delay calculation and sleeping are explicit,
-provider-neutral collaborators.
+Bounded provider transport execution with deterministic retry delays.
 """
 
 from dataclasses import dataclass
@@ -123,9 +119,7 @@ class GroundedProviderExecutionService:
             )
 
         self._transport = transport
-        self._retry_delay_policy = (
-            retry_delay_policy
-        )
+        self._retry_delay_policy = retry_delay_policy
         self._sleeper = sleeper
         self._retry_delay_service = (
             GroundedProviderRetryDelayService()
@@ -159,9 +153,7 @@ class GroundedProviderExecutionService:
                 "request timeout_seconds must match provider config"
             )
 
-        maximum_attempts = (
-            1 + config.max_retries
-        )
+        maximum_attempts = 1 + config.max_retries
 
         for attempt_number in range(
             1,
@@ -179,7 +171,10 @@ class GroundedProviderExecutionService:
                     raise
 
                 self._apply_retry_delay(
-                    retry_number=attempt_number
+                    retry_number=attempt_number,
+                    provider_retry_after_seconds=(
+                        exc.retry_after_seconds
+                    ),
                 )
                 continue
 
@@ -197,6 +192,7 @@ class GroundedProviderExecutionService:
         self,
         *,
         retry_number: int,
+        provider_retry_after_seconds=None,
     ) -> None:
         if self._retry_delay_policy is None:
             return
@@ -207,8 +203,13 @@ class GroundedProviderExecutionService:
             self._retry_delay_service.decide(
                 policy=self._retry_delay_policy,
                 retry_number=retry_number,
+                provider_retry_after_seconds=(
+                    provider_retry_after_seconds
+                ),
             )
         )
         self._sleeper.sleep(
-            delay_seconds=decision.delay_seconds
+            delay_seconds=(
+                decision.effective_delay_seconds
+            )
         )

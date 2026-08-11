@@ -1,8 +1,14 @@
 """
-Provider-neutral deterministic retry delay policy.
+Provider-neutral deterministic retry delay policy and precedence.
 
-This module calculates retry delays only. It performs no sleeping, clock access,
-transport I/O, Retry-After parsing, jitter, or provider-specific behavior.
+Policy backoff is calculated locally. If a retryable transport failure carries
+provider-requested retry_after_seconds, the effective delay is the greater of
+the local policy delay and the provider-requested delay.
+
+Backward compatibility:
+- decision.delay_seconds remains the public effective-delay attribute;
+- decision.to_dict() preserves the original two-key serialization contract.
+Detailed precedence fields remain available as attributes.
 """
 
 from dataclasses import dataclass
@@ -34,13 +40,6 @@ def _non_negative_decimal(
 
 @dataclass(frozen=True, slots=True)
 class GroundedProviderRetryDelayPolicy:
-    """
-    Deterministic bounded exponential retry delay policy.
-
-    retry_number is one-based and refers to the retry about to happen:
-    retry_number=1 is the delay after the initial failed attempt.
-    """
-
     initial_delay_seconds: Decimal
     multiplier: Decimal
     maximum_delay_seconds: Decimal
@@ -119,10 +118,10 @@ class GroundedProviderRetryDelayPolicy:
 
 @dataclass(frozen=True, slots=True)
 class GroundedProviderRetryDelayDecision:
-    """One deterministic retry-delay decision."""
-
     retry_number: int
-    delay_seconds: Decimal
+    policy_delay_seconds: Decimal
+    provider_retry_after_seconds: Decimal | None
+    effective_delay_seconds: Decimal
 
     def __post_init__(self) -> None:
         if (
@@ -133,32 +132,71 @@ class GroundedProviderRetryDelayDecision:
             raise ValueError(
                 "retry_number must be a positive integer"
             )
-        object.__setattr__(
-            self,
-            "delay_seconds",
-            _non_negative_decimal(
-                self.delay_seconds,
-                field_name="delay_seconds",
-            ),
-        )
+
+        for field_name in (
+            "policy_delay_seconds",
+            "effective_delay_seconds",
+        ):
+            object.__setattr__(
+                self,
+                field_name,
+                _non_negative_decimal(
+                    getattr(self, field_name),
+                    field_name=field_name,
+                ),
+            )
+
+        if self.provider_retry_after_seconds is not None:
+            object.__setattr__(
+                self,
+                "provider_retry_after_seconds",
+                _non_negative_decimal(
+                    self.provider_retry_after_seconds,
+                    field_name="provider_retry_after_seconds",
+                ),
+            )
+
+        expected = self.policy_delay_seconds
+        if self.provider_retry_after_seconds is not None:
+            expected = max(
+                expected,
+                self.provider_retry_after_seconds,
+            )
+
+        if self.effective_delay_seconds != expected:
+            raise ValueError(
+                "effective_delay_seconds must equal max("
+                "policy_delay_seconds, provider_retry_after_seconds)"
+            )
+
+    @property
+    def delay_seconds(self) -> Decimal:
+        """Backward-compatible alias for the effective retry delay."""
+        return self.effective_delay_seconds
 
     def to_dict(self) -> dict[str, Any]:
+        """
+        Preserve the original public serialization contract.
+
+        Detailed precedence information is intentionally available only through
+        typed attributes so existing callers comparing serialized dictionaries
+        remain stable.
+        """
         return {
             "retry_number": self.retry_number,
             "delay_seconds": str(
-                self.delay_seconds
+                self.effective_delay_seconds
             ),
         }
 
 
 class GroundedProviderRetryDelayService:
-    """Pure calculator for one retry delay decision."""
-
     def decide(
         self,
         *,
         policy: GroundedProviderRetryDelayPolicy,
         retry_number: int,
+        provider_retry_after_seconds: Decimal | None = None,
     ) -> GroundedProviderRetryDelayDecision:
         if not isinstance(
             policy,
@@ -168,9 +206,24 @@ class GroundedProviderRetryDelayService:
                 "policy must be a GroundedProviderRetryDelayPolicy"
             )
 
+        policy_delay = policy.delay_for_retry(
+            retry_number=retry_number
+        )
+        effective_delay = policy_delay
+
+        if provider_retry_after_seconds is not None:
+            provider_delay = _non_negative_decimal(
+                provider_retry_after_seconds,
+                field_name="provider_retry_after_seconds",
+            )
+            effective_delay = max(
+                policy_delay,
+                provider_delay,
+            )
+
         return GroundedProviderRetryDelayDecision(
             retry_number=retry_number,
-            delay_seconds=policy.delay_for_retry(
-                retry_number=retry_number
-            ),
+            policy_delay_seconds=policy_delay,
+            provider_retry_after_seconds=provider_retry_after_seconds,
+            effective_delay_seconds=effective_delay,
         )
