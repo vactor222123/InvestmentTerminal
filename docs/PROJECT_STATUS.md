@@ -10,267 +10,208 @@ branch: develop
 ## Current phase
 
 ```text
-Sprint 21 — Provider Integration and Operational AI Controls
+Sprint 22 — Provider Governance and Usage Controls
 implementation complete; final repository verification pending
 ```
 
 ## Completed foundation
 
-### Sprint 12–20
+### Sprint 12–21
 
-Historical Intelligence, comparison/replay, outcome observations, methodology hardening, descriptive research, provenance/population quality, explicit archive continuity, the deterministic Knowledge Domain foundation, and the provider-neutral Evidence-Grounded AI foundation are complete.
+Historical Intelligence, comparison/replay, outcome observations, methodology hardening, descriptive research, provenance/population quality, archive continuity, Knowledge Domain, Evidence-Grounded AI, and the first real OpenAI provider integration are complete.
 
-### Sprint 21 — Provider Integration and Operational AI Controls
+### Sprint 22 — Provider Governance and Usage Controls
 
 Delivered:
 
 ```text
-GroundedProviderConfig
-GroundedProviderCredentialSource
-StaticGroundedProviderCredentialSource
-EnvironmentGroundedProviderCredentialSource
-GroundedProviderTransportRequest
-GroundedProviderTransportResponse
-GroundedProviderTransportFailure
-GroundedProviderTransport
-StaticGroundedProviderTransport
-GroundedProviderExecutionResult
-GroundedProviderExecutionService
-UrllibGroundedProviderTransport
-OpenAIGroundedModelAdapter
-OpenAI production composition root
-live-ready read-only OpenAI CLI
-GroundedProviderOperationalMetadata
-provider operational audit trace extension
-offline-realistic provider integration E2E
+GroundedProviderModelAllowance
+GroundedProviderGovernanceAssessment
+GroundedProviderGovernancePolicy
+mandatory governance enforcement in production composition
+explicit live CLI model allowlist
+GroundedProviderUsage
+provider usage extraction from OpenAI Responses API
+provider_usage audit and CLI exposure
+GroundedProviderPricingEntry
+GroundedProviderPricingPolicy
+GroundedProviderCost
+deterministic Decimal cost accounting
+GroundedProviderCostTraceService
+explicit live CLI pricing configuration
+GroundedProviderBudgetPolicy
+request-side max_output_tokens support
+pre-execution output-token budget enforcement
+post-execution token budget enforcement
+post-execution cost budget enforcement
+Sprint 22 control-path E2E
 ```
 
-## Provider Integration Boundary
-
-The provider stack remains downstream of canonical grounded prompt construction and upstream of strict parsing and grounding validation.
-
-Canonical live flow:
+## Canonical Live Control Flow
 
 ```text
-Knowledge / KnowledgeRecordEnvelope
+requested provider/model
         ↓
-deterministic context selection
+explicit governance allowlist
         ↓
-EVIDENCE_GROUNDED_PROMPT@1
+ALLOWED / DENIED
         ↓
-OpenAIGroundedModelAdapter
+pre-execution output-token budget
         ↓
-environment credential source
+GroundedProviderConfig.max_output_tokens
         ↓
-bounded provider execution
+OpenAI Responses API request
         ↓
-provider-neutral HTTP transport
+actual provider usage
         ↓
-OpenAI Responses API
+GroundedProviderUsage
         ↓
-GroundedModelResponse
+explicit pricing policy
         ↓
-strict JSON parser
+GroundedProviderCost
         ↓
-EVIDENCE_GROUNDED_ANSWER@1 candidate
+post-execution token/cost budget validation
         ↓
-exact Knowledge grounding validation
+safe audit trace
         ↓
-ADMISSIBLE grounded result
-        ↓
-safe operational audit trace
+JSON / human CLI
 ```
 
-Raw provider output remains untrusted until parsing and grounding validation succeed.
+## Governance
 
-## Provider Configuration and Credentials
+Production provider composition is fail-closed.
 
-`GroundedProviderConfig` defines:
+A provider/model pair must be explicitly present in `GroundedProviderGovernancePolicy` before the production composition path is constructed.
+
+The live CLI has separate concepts:
+
+```text
+--model
+    requested model
+
+--allow-model
+    explicitly allowed model
+```
+
+An empty allowlist denies live provider execution.
+
+Governance runs before credential lookup and before provider/network execution.
+
+## Usage Accounting
+
+Provider-neutral usage:
+
+```text
+input_tokens
+output_tokens
+total_tokens
+```
+
+OpenAI-specific usage JSON is translated inside the adapter boundary.
+
+`GroundedModelResponse` may carry optional `GroundedProviderUsage`.
+
+`GroundedGenerationTrace` exposes optional `provider_usage`.
+
+Static/reference generation remains backward-compatible and does not require usage.
+
+## Pricing and Cost Accounting
+
+Pricing is explicit configuration, not hardcoded provider knowledge.
+
+A pricing entry contains:
 
 ```text
 provider_identity
 model_identity
-timeout_seconds
-max_retries
+currency
+input_cost_per_million_tokens
+output_cost_per_million_tokens
 ```
 
-Credentials are resolved through `GroundedProviderCredentialSource`.
+Cost accounting uses deterministic `Decimal` arithmetic.
 
-The production OpenAI composition uses `EnvironmentGroundedProviderCredentialSource` with an explicitly mapped environment variable:
+Unknown provider/model pricing fails closed.
+
+The live CLI accepts explicit pricing inputs and does not contain a default OpenAI price catalog.
+
+## Budget Guardrails
+
+Budget policy supports:
 
 ```text
-INVESTMENT_TERMINAL_OPENAI_API_KEY
+max_output_tokens
+max_total_tokens
+max_total_cost
+currency
 ```
 
-The live CLI accepts an environment-variable name, not an API-key value.
-
-Secrets are not persisted, logged, included in audit traces, or accepted as direct CLI secret arguments.
-
-## Transport and Retry Semantics
-
-`GroundedProviderTransport` is provider-neutral.
-
-The production implementation is:
+Pre-execution control:
 
 ```text
-UrllibGroundedProviderTransport
+requested max_output_tokens
+→ policy check
+→ real OpenAI request max_output_tokens cap
 ```
 
-using Python standard-library HTTP transport.
-
-Canonical failure classes:
+Post-execution controls:
 
 ```text
-TIMEOUT
-RETRYABLE
-TERMINAL
+actual usage
+→ max_output_tokens / max_total_tokens validation
+
+actual estimated cost
+→ max_total_cost / currency validation
 ```
 
-Retry semantics are bounded:
+Exact total token usage and exact estimated cost are not misrepresented as pre-flight guarantees because they depend on completed provider usage.
 
-```text
-maximum attempts = 1 + max_retries
-```
+A post-execution budget violation fails closed and no successful report is returned.
 
-Only typed retryable failures are retried. Terminal failures stop immediately.
+## Security and Authority Boundaries
 
-Current HTTP classification:
-
-```text
-408 / 425 / 429 → RETRYABLE
-5xx             → RETRYABLE
-other 4xx       → TERMINAL
-timeout         → TIMEOUT
-network URL err → RETRYABLE
-```
-
-No sleep/backoff/jitter/rate-limit delay policy is introduced in Sprint 21.
-
-## OpenAI Adapter
-
-`OpenAIGroundedModelAdapter` implements the existing provider-neutral `GroundedModelAdapter` contract.
-
-It uses the OpenAI Responses API through the transport boundary and requests strict structured JSON matching `EVIDENCE_GROUNDED_ANSWER@1`.
-
-The adapter owns provider-specific request/response mapping only.
-
-It does not own:
-
-```text
-retry loops
-HTTP implementation
-environment loading
-grounding validation
-Knowledge mutation
-History mutation
-AI persistence
-```
-
-## Operational Audit
-
-Successful live provider responses may carry:
-
-```text
-attempt_count
-retry_count
-transport_status_code
-transport_outcome
-```
-
-`GroundedGenerationTrace` exposes these values as the optional `provider_operation` extension.
-
-Operational audit deliberately excludes:
-
-```text
-API keys
-Authorization headers
-raw HTTP headers
-raw HTTP bodies
-provider URL
-raw model text
-```
-
-Static/reference generation remains backward-compatible and does not require operational metadata.
-
-## Live CLI
-
-Sprint 21 adds a separate live-ready read-only CLI.
-
-A real provider/network call requires explicit:
-
-```text
---live
-```
-
-The CLI also requires explicit model identity and request/query inputs.
-
-Human output exposes safe operational metadata:
-
-```text
-Provider
-Model
-Attempts
-Retries
-HTTP Status
-Transport
-Validation
-```
-
-JSON output uses the canonical trace representation.
-
-The Sprint 20 static/reference CLI remains available and does not perform network I/O.
-
-## Stable Guardrails
-
-Sprint 21 preserves these boundaries:
+Sprint 22 preserves:
 
 - AI remains downstream of Knowledge;
-- provider integration does not mutate Knowledge or History;
-- every final claim remains explicitly Knowledge-cited;
-- v1 grounding still requires COMPLETE Knowledge provenance;
-- raw provider output is never trusted directly;
-- strict parsing still precedes grounding validation;
-- provider transport and retry policy stay outside domain grounding contracts;
-- credentials stay behind an explicit credential-source boundary;
-- secrets are excluded from audit/report output;
-- live network execution requires explicit CLI opt-in;
-- tests do not require a real API key or real network access;
-- no embeddings/vector ranking;
-- no confidence/truth score;
-- no predictive success probability;
-- no recommendation-effectiveness semantics;
-- no causal inference;
-- no autonomous trading or broker execution;
-- no AI persistence schema is introduced.
+- raw provider output remains untrusted until parsing and grounding validation;
+- provider/model governance cannot be bypassed through a default allowlist;
+- API keys remain outside CLI values and audit output;
+- Authorization headers, raw HTTP bodies, provider URLs, and raw model text remain excluded from safe traces;
+- pricing does not live in the OpenAI adapter;
+- budget logic does not live in the Knowledge or grounding domain;
+- provider controls do not mutate Knowledge or History;
+- no AI persistence schema is introduced;
+- no autonomous trading or broker execution is introduced.
 
 ## E2E Coverage
 
-Sprint 21 provider integration E2E covers:
+Sprint 22 E2E covers:
 
 ```text
 real Knowledge SQLite
-→ Knowledge query/envelopes
-→ deterministic context selection
-→ grounded prompt
-→ OpenAI provider composition
-→ environment credential lookup
-→ bounded retry execution
-→ provider transport request
-→ offline-realistic Responses API response
-→ GroundedModelResponse
-→ strict parser
-→ exact Knowledge grounding validation
-→ ADMISSIBLE generation
-→ safe operational trace
+→ governance
+→ pre-execution budget
+→ provider composition
+→ real request max_output_tokens
+→ offline-realistic OpenAI response
+→ provider usage
+→ grounding validation
+→ explicit pricing
+→ deterministic cost
+→ post-execution token validation
+→ post-execution cost validation
+→ safe report
 ```
 
-The E2E uses an injected transport and therefore performs no real network request.
+Negative E2E cases verify:
 
-It verifies retry propagation, request correlation, provider/model identity, secret-output isolation, and absence of History/AI persistence.
+- pre-execution budget denial occurs before query/provider execution;
+- observed total-token budget overflow fails closed;
+- observed cost overflow fails closed.
+
+No real API key or network access is required for tests.
 
 ## Testing Status
-
-Focused Sprint 21 tests are implemented.
 
 Final closure requires:
 
@@ -284,30 +225,27 @@ to pass after applying this package.
 
 Still deferred:
 
-- streaming provider responses;
-- retry delay/backoff/jitter policy;
-- `Retry-After` interpretation;
+- retry delay/backoff/jitter;
+- `Retry-After` handling;
 - provider rate-limit scheduling;
-- Anthropic/other provider adapters;
-- provider/model allowlists;
-- token/cost accounting;
+- streaming responses;
+- additional provider adapters;
+- provider pricing catalog synchronization;
+- cached-token/reasoning-token pricing differentiation;
+- persistent usage/cost ledger;
 - provider request/response persistence;
-- semantic entailment verification;
-- claim-level contradiction detection;
-- relevance ranking or embeddings;
-- vector retrieval;
+- semantic entailment validation;
+- contradiction detection;
+- vector retrieval/embeddings;
 - grounded answer persistence/history;
-- human feedback capture;
-- prompt-template/version governance beyond current protocol contracts;
 - automatic History-to-Knowledge ingestion;
-- predictive confidence;
-- recommendation effectiveness;
+- predictive confidence/effectiveness scoring;
 - causal inference;
 - autonomous portfolio actions;
 - broker execution.
 
 ## Next Decision
 
-Sprint 21 makes the Evidence-Grounded AI path live-provider-ready while preserving the Sprint 20 fail-closed grounding boundary.
+Sprint 22 completes fail-closed provider governance plus usage, pricing, and budget controls.
 
-A future milestone may add provider governance, cost/token observability, additional providers, or controlled streaming, but must not bypass canonical Knowledge provenance, strict parsing, or grounding validation.
+The next milestone should focus on transport resilience and rate-limit behavior or move upward into application/API productization without weakening the existing evidence and governance boundaries.

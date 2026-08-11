@@ -1,7 +1,7 @@
 # Investment Terminal — Product Roadmap
 
 **Status:** Canonical Roadmap
-**Updated after:** Sprint 21 — Provider Integration and Operational AI Controls
+**Updated after:** Sprint 22 — Provider Governance and Usage Controls
 **Current development branch:** `develop`
 
 ## 1. Product Evolution
@@ -21,272 +21,179 @@ Foundation
 → Knowledge Domain Foundation
 → Evidence-Grounded AI Experience Foundation
 → Provider Integration and Operational AI Controls
+→ Provider Governance and Usage Controls
 ```
 
 ## 2. Completed Milestones
 
-### Sprint 11 — Foundation
-
-Architecture and canonical product documentation foundation.
-
-### Sprint 12 — Historical Intelligence Foundation
-
-Immutable Review Package history, integrity verification, History SQLite, typed imports, and timeline foundation.
-
-### Sprint 13 — Historical Comparison and Replay
-
-Historical navigation, comparison, compatibility, replay, read-only CLIs, migrations/import state, and realistic E2E coverage.
-
-### Sprint 14 — Outcome-Aware Historical Intelligence
-
-Canonical outcome observations, exact local price evidence, raw price movement, descriptive aggregation, CLI, and E2E.
-
-### Sprint 15 — Historical Outcome Methodology Hardening
-
-Explicit methodology identities, deterministic session semantics, exact-only evidence, methodology-aware observations, and CLI/E2E.
-
-### Sprint 16 — Statistically Honest Outcome Research Foundation
-
-`DESCRIPTIVE_OUTCOME_RESEARCH@1`, exact cohorts, eligibility/coverage, sample sufficiency, descriptive statistics, uncertainty, and claim boundaries.
-
-### Sprint 17 — Research Provenance and Population Quality Hardening
-
-Population frame, selection accounting, boundary completeness, source import quality, canonical research provenance, compatibility migration, and E2E.
-
-### Sprint 18 — Explicit Historical Archive Continuity
-
-`FIXED_INTERVAL_ARCHIVE_CADENCE@1`, expected timestamp generation, exact archive-gap assessment, repository composition, internal continuity, optional archive-gap provenance, CLI, and E2E.
-
 ### Sprint 19 — Knowledge Domain Foundation
 
-Immutable/versioned Knowledge records, traceable evidence references, Knowledge provenance, separate Knowledge SQLite schema, deterministic projection/query/comparison, read-only CLI, and real E2E.
+Immutable/versioned Knowledge records, traceable evidence references, provenance assessment, deterministic projection/query/comparison, read-only CLI, and real E2E.
 
 ### Sprint 20 — Evidence-Grounded AI Experience Foundation
 
-Provider-neutral grounded prompt/answer protocols, exact Knowledge citations, deterministic context selection, strict parsing, fail-closed grounding validation, provider-independent adapter boundary, static reference adapter, audit trace, read-only CLI, and real Knowledge SQLite E2E.
+Provider-neutral grounded prompt/answer protocols, exact Knowledge citations, deterministic context selection, strict parsing, fail-closed grounding validation, provider-independent adapter boundary, audit trace, CLI, and real Knowledge SQLite E2E.
 
 ### Sprint 21 — Provider Integration and Operational AI Controls
 
+Real OpenAI Responses API integration through provider-neutral transport and bounded retry execution, environment credential source, production composition root, live opt-in CLI, operational audit metadata, and offline-realistic provider E2E.
+
+### Sprint 22 — Provider Governance and Usage Controls
+
 Delivered:
 
-- typed provider configuration and credential-source contracts;
-- environment-backed OpenAI credential resolution;
-- provider-neutral transport request/response/failure contracts;
-- bounded retry execution with explicit attempt semantics;
-- real standard-library HTTP transport;
-- OpenAI Responses API adapter with strict structured output;
-- production OpenAI composition root;
-- separate explicit-opt-in live CLI;
-- safe provider operational metadata;
-- operational audit trace and CLI exposure;
-- offline-realistic provider integration E2E.
+- explicit provider/model allowlist policy;
+- mandatory governance gate before credentials/network execution;
+- live CLI governance wiring;
+- provider-neutral token usage accounting;
+- safe usage audit/CLI exposure;
+- explicit provider/model pricing policy;
+- deterministic Decimal cost accounting;
+- cost audit projection;
+- explicit live CLI pricing configuration;
+- provider budget policy;
+- real request-side `max_output_tokens`;
+- pre-execution output budget enforcement;
+- post-execution token budget enforcement;
+- post-execution estimated-cost enforcement;
+- Sprint 22 end-to-end control-path coverage.
 
-Canonical live provider flow:
-
-```text
-KnowledgeRecordEnvelope
-→ deterministic context selection
-→ EVIDENCE_GROUNDED_PROMPT@1
-→ OpenAIGroundedModelAdapter
-→ credential source
-→ bounded execution
-→ provider-neutral HTTP transport
-→ OpenAI Responses API
-→ GroundedModelResponse
-→ strict JSON parser
-→ EVIDENCE_GROUNDED_ANSWER@1 candidate
-→ exact Knowledge grounding validation
-→ ADMISSIBLE result
-→ safe operational audit trace
-```
-
-## 3. Evidence and Authority Hierarchy
+Canonical controlled live flow:
 
 ```text
-Archived Review Package JSON
-    canonical historical source evidence
-
-History SQLite
-    rebuildable normalized historical projection
-
-Historical outcome/research layers
-    rebuildable descriptive historical intelligence
-
-KnowledgeRecord
-    versioned, rebuildable, traceable knowledge statement
-
-KnowledgeRecordEnvelope
-    Knowledge record + rebuildable provenance assessment
-
-GroundedPromptInput
-    deterministic provider-neutral AI input
-
-GroundedModelResponse
-    untrusted provider output + optional safe operational metadata
-
-GroundedAIAnswer candidate
-    structurally parsed but not yet trusted
-
-GroundingValidationAssessment
-    exact citation/Knowledge admissibility check
-
-ADMISSIBLE GroundedGenerationResult
-    final v1 grounded result
+Knowledge
+→ grounded prompt
+→ provider/model governance
+→ pre-execution budget guard
+→ OpenAI request with output cap
+→ provider response
+→ token usage
+→ strict parsing / grounding validation
+→ explicit pricing
+→ deterministic cost
+→ post-execution token/cost guardrails
+→ safe audit / CLI
 ```
 
-Provider integration does not change the authority hierarchy. Raw model output never outranks Knowledge evidence.
-
-## 4. Stable AI Guardrails
-
-Sprint 21 still does not establish:
+## 3. Stable Authority Hierarchy
 
 ```text
-truth scoring
-semantic entailment proof
-confidence
-prediction
-recommendation effectiveness
-success probability
-causal validity
-model authority
-autonomous action
+Archived Review Package
+→ History
+→ Knowledge
+→ GroundedPromptInput
+→ untrusted GroundedModelResponse
+→ strict parser
+→ grounding validation
+→ ADMISSIBLE GroundedGenerationResult
 ```
 
-`COMPLETE` Knowledge provenance means checksum-backed canonical snapshot lineage exists. It is not a model-confidence or truth score.
+Governance, pricing, and budgets do not change evidence authority.
 
-`ADMISSIBLE` means the answer citations exactly resolve to supplied COMPLETE Knowledge context. It does not prove the natural-language claim is semantically entailed or universally true.
+## 4. Provider Governance Status
 
-## 5. Provider Boundary Status
-
-Current implementation:
+Live production execution is fail-closed:
 
 ```text
-GroundedModelAdapter
-    provider-neutral model boundary
+explicit provider/model pair
+→ ALLOWED
 
-OpenAIGroundedModelAdapter
-    concrete OpenAI Responses API adapter
-
-GroundedProviderCredentialSource
-    credential boundary
-
-EnvironmentGroundedProviderCredentialSource
-    production environment-backed credential source
-
-GroundedProviderTransport
-    provider-neutral transport boundary
-
-UrllibGroundedProviderTransport
-    real synchronous HTTP implementation
-
-GroundedProviderExecutionService
-    bounded retry orchestration
+unknown provider/model
+→ DENIED
 ```
 
-Production OpenAI composition remains isolated from Knowledge/History persistence.
+There is no compatibility default that silently allows models.
 
-## 6. Operational Controls
+## 5. Usage and Cost Status
+
+Canonical usage:
+
+```text
+input_tokens
+output_tokens
+total_tokens
+```
+
+Canonical estimated cost:
+
+```text
+provider_identity
+model_identity
+currency
+input_cost
+output_cost
+total_cost
+```
+
+Pricing is explicit and external to the OpenAI adapter.
+
+No hardcoded current provider-price catalog exists.
+
+## 6. Budget Status
 
 Current controls:
 
 ```text
-explicit provider/model configuration
-explicit environment credential mapping
-timeout_seconds
-max_retries
-typed transport failures
-bounded retry count
-explicit --live CLI opt-in
-request correlation
-safe operational trace
+max_output_tokens
+max_total_tokens
+max_total_cost
+currency
 ```
 
-Retry classification:
+`max_output_tokens` is enforced before execution and sent as a real provider request cap.
+
+Actual usage and estimated cost are validated after provider completion.
+
+Budget overflow is fail-closed.
+
+## 7. Operational Security
+
+The live path continues to exclude from safe reports:
 
 ```text
-TIMEOUT    → retryable
-RETRYABLE  → retryable
-TERMINAL   → stop
+API keys
+Authorization headers
+raw HTTP headers
+raw HTTP bodies
+provider URLs
+raw model text
 ```
 
-Current HTTP policy:
+No provider control introduced by Sprint 22 mutates Knowledge, History, or portfolio state.
 
-```text
-408 / 425 / 429 → RETRYABLE
-5xx             → RETRYABLE
-other 4xx       → TERMINAL
-```
-
-No delay/backoff/jitter or `Retry-After` scheduling is implemented yet.
-
-## 7. Audit and Persistence Status
-
-```text
-History schema target = 2
-Knowledge schema target = 1
-AI persistence schema = none
-AI trace = derived/on demand
-```
-
-Safe provider operation metadata may include:
-
-```text
-attempt_count
-retry_count
-transport_status_code
-transport_outcome
-```
-
-Audit/report output excludes credentials, Authorization headers, raw HTTP bodies, raw provider headers, provider URL, and raw model text.
-
-## 8. CLI Status
-
-Two read-only AI CLI paths now exist:
-
-```text
-grounded_ai
-    static/reference provider path
-    no network
-
-grounded_ai_live
-    OpenAI production composition
-    explicit --live required
-```
-
-The live CLI accepts an environment-variable name for credential lookup; it does not accept the API key value directly.
-
-## 9. Deferred Scope
+## 8. Deferred Scope
 
 Still deferred:
 
-- streaming provider responses;
-- retry delay/backoff/jitter;
-- `Retry-After` handling;
+- transport backoff/jitter;
+- `Retry-After`;
 - rate-limit scheduling;
-- Anthropic/other provider adapters;
-- model/provider allowlists;
-- token/cost accounting;
+- streaming;
+- additional providers;
+- synchronized provider pricing catalogs;
+- persistent usage/cost ledger;
 - provider request/response persistence;
-- semantic entailment validation;
+- semantic entailment;
 - contradiction detection;
-- relevance/semantic ranking;
 - embeddings/vector retrieval;
-- grounded answer history/persistence;
-- prompt-template/version governance beyond current protocol contracts;
-- human feedback workflows;
+- grounded answer persistence;
 - automatic History-to-Knowledge ingestion;
-- predictive confidence/effectiveness scoring;
-- causal inference;
 - autonomous portfolio actions;
 - broker execution.
 
-## 10. Next Product Decision Point
+## 9. Next Product Decision Point
 
-Sprint 21 completes the first real-provider integration while preserving the fail-closed Evidence-Grounded AI authority boundary.
+After Sprint 22, the strongest next candidates are:
 
-The next milestone should choose among operational governance, token/cost observability, additional provider support, or controlled streaming without weakening Knowledge provenance, parsing, grounding validation, or secret isolation.
+```text
+A. Provider resilience / rate-limit controls
+B. Application/API productization
+C. Automatic Knowledge lifecycle expansion
+```
 
-## 11. Definition of Done
+The next milestone should not weaken fail-closed grounding, governance, secret isolation, or budget enforcement.
+
+## 10. Definition of Done
 
 A milestone is complete only when:
 
