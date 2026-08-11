@@ -4,7 +4,8 @@ Live-ready read-only CLI for Evidence-Grounded AI through OpenAI.
 A real network call is allowed only when --live is explicitly supplied.
 Pricing, budget, and retry-delay controls are explicit per invocation.
 
-The CLI is a thin adapter over the grounded AI application service.
+The CLI is a thin input/output adapter over the application composition and
+application service boundaries.
 """
 
 import argparse
@@ -29,6 +30,9 @@ from investment_terminal.ai.providers.pricing import (
     GroundedProviderPricingEntry,
     GroundedProviderPricingPolicy,
 )
+from investment_terminal.application.composition import (
+    build_live_grounded_ai_application,
+)
 from investment_terminal.application.grounded_ai import (
     GroundedAIApplicationRequest,
 )
@@ -37,12 +41,6 @@ from investment_terminal.application.live_grounded_ai import (
 )
 from investment_terminal.knowledge.query_service import (
     KnowledgeQueryService,
-)
-from investment_terminal.knowledge.sqlite_repository import (
-    SQLiteKnowledgeRecordRepository,
-)
-from investment_terminal.knowledge.sqlite_store import (
-    KnowledgeSQLiteStore,
 )
 
 DEFAULT_DATABASE = Path("data") / "knowledge" / "knowledge.db"
@@ -168,14 +166,6 @@ def main(argv: Sequence[str] | None = None) -> None:
 
     if not options.live:
         parser.error("live OpenAI execution requires explicit --live")
-    if not options.database.is_file():
-        parser.error(f"Knowledge database does not exist: {options.database}")
-
-    query = KnowledgeQueryService(
-        repository=SQLiteKnowledgeRecordRepository(
-            KnowledgeSQLiteStore(options.database)
-        )
-    )
 
     try:
         pricing_policy = _pricing_policy(
@@ -200,24 +190,38 @@ def main(argv: Sequence[str] | None = None) -> None:
                 "max total cost budget requires explicit pricing configuration"
             )
 
-        report = _run_live(
-            query=query,
-            request_id=options.request_id,
-            user_query=options.query,
+        application = build_live_grounded_ai_application(
+            database=options.database,
             model_identity=options.model,
-            api_key_environment_variable=options.api_key_env,
             timeout_seconds=options.timeout_seconds,
             max_retries=options.max_retries,
-            retry_initial_delay_seconds=options.retry_initial_delay_seconds,
-            retry_delay_multiplier=options.retry_delay_multiplier,
-            retry_maximum_delay_seconds=options.retry_maximum_delay_seconds,
-            subjects=tuple(options.subject),
-            max_items=options.max_items,
-            governance_policy=_governance_policy(tuple(options.allow_model)),
+            governance_policy=_governance_policy(
+                tuple(options.allow_model)
+            ),
+            requested_max_output_tokens=options.max_output_tokens,
+            retry_initial_delay_seconds=(
+                options.retry_initial_delay_seconds
+            ),
+            retry_delay_multiplier=(
+                options.retry_delay_multiplier
+            ),
+            retry_maximum_delay_seconds=(
+                options.retry_maximum_delay_seconds
+            ),
+            api_key_environment_variable=options.api_key_env,
             pricing_policy=pricing_policy,
             budget_policy=budget_policy,
-            requested_max_output_tokens=options.max_output_tokens,
         )
+
+        report = application.execute(
+            GroundedAIApplicationRequest(
+                request_id=options.request_id,
+                user_query=options.query,
+                subject_keys=tuple(options.subject),
+                max_items=options.max_items,
+            )
+        ).to_dict()
+
     except (
         KeyError,
         TypeError,
@@ -254,6 +258,11 @@ def _run_live(
     requested_max_output_tokens: int | None = None,
     generation_service=None,
 ) -> dict[str, Any]:
+    """
+    Backward-compatible programmatic seam retained for existing tests/callers.
+
+    The command-line entry point no longer uses this function.
+    """
     if generation_service is None:
         if governance_policy is None:
             raise PermissionError(
@@ -281,15 +290,14 @@ def _run_live(
         requested_max_output_tokens=requested_max_output_tokens,
     )
 
-    result = application.execute(
+    return application.execute(
         GroundedAIApplicationRequest(
             request_id=request_id,
             user_query=user_query,
             subject_keys=subjects,
             max_items=max_items,
         )
-    )
-    return result.to_dict()
+    ).to_dict()
 
 
 def _print_human(report: dict[str, Any]) -> None:
@@ -305,9 +313,7 @@ def _print_human(report: dict[str, Any]) -> None:
     if provider_operation is not None:
         print(f"Attempts     : {provider_operation['attempt_count']}")
         print(f"Retries      : {provider_operation['retry_count']}")
-        retry_delays = provider_operation.get(
-            "retry_delay_seconds"
-        )
+        retry_delays = provider_operation.get("retry_delay_seconds")
         if retry_delays:
             print(
                 "Retry Delays : "
