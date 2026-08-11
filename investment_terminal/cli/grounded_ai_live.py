@@ -3,6 +3,8 @@ Live-ready read-only CLI for Evidence-Grounded AI through OpenAI.
 
 A real network call is allowed only when --live is explicitly supplied.
 Pricing, budget, and retry-delay controls are explicit per invocation.
+
+The CLI is a thin adapter over the grounded AI application service.
 """
 
 import argparse
@@ -12,14 +14,9 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
-from investment_terminal.ai.audit import GroundedGenerationTraceService
-from investment_terminal.ai.context_selection import GroundedContextSelectionPolicy
 from investment_terminal.ai.providers.composition import (
     DEFAULT_OPENAI_API_KEY_ENV,
     build_openai_grounded_generation_service,
-)
-from investment_terminal.ai.providers.cost_audit import (
-    GroundedProviderCostTraceService,
 )
 from investment_terminal.ai.providers.governance import (
     GroundedProviderGovernancePolicy,
@@ -32,9 +29,21 @@ from investment_terminal.ai.providers.pricing import (
     GroundedProviderPricingEntry,
     GroundedProviderPricingPolicy,
 )
-from investment_terminal.knowledge.query_service import KnowledgeQueryService
-from investment_terminal.knowledge.sqlite_repository import SQLiteKnowledgeRecordRepository
-from investment_terminal.knowledge.sqlite_store import KnowledgeSQLiteStore
+from investment_terminal.application.grounded_ai import (
+    GroundedAIApplicationRequest,
+)
+from investment_terminal.application.live_grounded_ai import (
+    LiveGroundedAIApplicationService,
+)
+from investment_terminal.knowledge.query_service import (
+    KnowledgeQueryService,
+)
+from investment_terminal.knowledge.sqlite_repository import (
+    SQLiteKnowledgeRecordRepository,
+)
+from investment_terminal.knowledge.sqlite_store import (
+    KnowledgeSQLiteStore,
+)
 
 DEFAULT_DATABASE = Path("data") / "knowledge" / "knowledge.db"
 
@@ -245,11 +254,6 @@ def _run_live(
     requested_max_output_tokens: int | None = None,
     generation_service=None,
 ) -> dict[str, Any]:
-    if budget_policy is not None:
-        budget_policy.require_request_allowed(
-            requested_max_output_tokens=requested_max_output_tokens
-        )
-
     if generation_service is None:
         if governance_policy is None:
             raise PermissionError(
@@ -269,61 +273,23 @@ def _run_live(
     else:
         service = generation_service
 
-    knowledge = query.list_all()
-    generation = service.generate(
-        request_id=request_id,
-        user_query=user_query,
-        knowledge=knowledge,
-        policy=GroundedContextSelectionPolicy(
-            subject_keys=subjects,
-            max_items=max_items,
-        ),
+    application = LiveGroundedAIApplicationService(
+        query=query,
+        generation_service=service,
+        pricing_policy=pricing_policy,
+        budget_policy=budget_policy,
+        requested_max_output_tokens=requested_max_output_tokens,
     )
 
-    if (
-        budget_policy is not None
-        and generation.response.usage is not None
-    ):
-        budget_policy.require_observed_usage_allowed(
-            usage=generation.response.usage
+    result = application.execute(
+        GroundedAIApplicationRequest(
+            request_id=request_id,
+            user_query=user_query,
+            subject_keys=subjects,
+            max_items=max_items,
         )
-
-    trace = GroundedGenerationTraceService().build(generation)
-    trace_data = trace.to_dict()
-
-    if pricing_policy is not None:
-        trace_data = GroundedProviderCostTraceService().build(
-            trace=trace,
-            pricing_policy=pricing_policy,
-        )
-
-        if (
-            budget_policy is not None
-            and budget_policy.max_total_cost is not None
-        ):
-            provider_cost = trace_data.get("provider_cost")
-            if provider_cost is None:
-                raise RuntimeError(
-                    "provider cost is unavailable for configured cost budget"
-                )
-            from investment_terminal.ai.providers.pricing import (
-                GroundedProviderCost,
-            )
-            budget_policy.require_observed_cost_allowed(
-                cost=GroundedProviderCost(
-                    provider_identity=provider_cost["provider_identity"],
-                    model_identity=provider_cost["model_identity"],
-                    currency=provider_cost["currency"],
-                    input_cost=Decimal(provider_cost["input_cost"]),
-                    output_cost=Decimal(provider_cost["output_cost"]),
-                    total_cost=Decimal(provider_cost["total_cost"]),
-                )
-            )
-
-    return {
-        "generation": generation.to_dict(),
-        "trace": trace_data,
-    }
+    )
+    return result.to_dict()
 
 
 def _print_human(report: dict[str, Any]) -> None:

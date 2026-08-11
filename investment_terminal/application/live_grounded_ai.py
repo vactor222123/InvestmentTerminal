@@ -8,15 +8,13 @@ credential lookup, or database construction.
 """
 
 from decimal import Decimal
+from typing import Any
 
 from investment_terminal.ai.audit import (
     GroundedGenerationTraceService,
 )
 from investment_terminal.ai.context_selection import (
     GroundedContextSelectionPolicy,
-)
-from investment_terminal.ai.orchestration import (
-    GroundedGenerationService,
 )
 from investment_terminal.ai.providers.cost_audit import (
     GroundedProviderCostTraceService,
@@ -33,9 +31,23 @@ from investment_terminal.application.grounded_ai import (
     GroundedAIApplicationResult,
     GroundedAIApplicationService,
 )
-from investment_terminal.knowledge.query_service import (
-    KnowledgeQueryService,
-)
+
+
+def _require_callable(
+    dependency: Any,
+    *,
+    method_name: str,
+    dependency_name: str,
+) -> None:
+    method = getattr(
+        dependency,
+        method_name,
+        None,
+    )
+    if not callable(method):
+        raise TypeError(
+            f"{dependency_name} must provide callable {method_name}()"
+        )
 
 
 class LiveGroundedAIApplicationService(
@@ -46,26 +58,23 @@ class LiveGroundedAIApplicationService(
     def __init__(
         self,
         *,
-        query: KnowledgeQueryService,
-        generation_service: GroundedGenerationService,
+        query: Any,
+        generation_service: Any,
         pricing_policy: GroundedProviderPricingPolicy | None = None,
         budget_policy: GroundedProviderBudgetPolicy | None = None,
         requested_max_output_tokens: int | None = None,
     ) -> None:
-        if not isinstance(
+        _require_callable(
             query,
-            KnowledgeQueryService,
-        ):
-            raise TypeError(
-                "query must be a KnowledgeQueryService"
-            )
-        if not isinstance(
+            method_name="list_all",
+            dependency_name="query",
+        )
+        _require_callable(
             generation_service,
-            GroundedGenerationService,
-        ):
-            raise TypeError(
-                "generation_service must be a GroundedGenerationService"
-            )
+            method_name="generate",
+            dependency_name="generation_service",
+        )
+
         if (
             pricing_policy is not None
             and not isinstance(
@@ -135,6 +144,9 @@ class LiveGroundedAIApplicationService(
                 "request must be a GroundedAIApplicationRequest"
             )
 
+        # This check intentionally happens before query.list_all() or
+        # generation_service.generate(). Existing fail-fast semantics depend
+        # on request-side budget denial occurring before lower-layer work.
         if self._budget_policy is not None:
             self._budget_policy.require_request_allowed(
                 requested_max_output_tokens=(
