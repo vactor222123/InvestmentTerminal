@@ -1,17 +1,12 @@
 """
 Provider operational contracts for real model integration.
-
-This module defines configuration and credential boundaries only. It does not
-import provider SDKs, perform network I/O, or persist secrets.
 """
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
 
-from investment_terminal.utils.validation import (
-    normalize_required_text,
-)
+from investment_terminal.utils.validation import normalize_required_text
 
 
 @dataclass(frozen=True, slots=True)
@@ -22,12 +17,10 @@ class GroundedProviderConfig:
     model_identity: str
     timeout_seconds: float
     max_retries: int
+    max_output_tokens: int | None = None
 
     def __post_init__(self) -> None:
-        for field_name in (
-            "provider_identity",
-            "model_identity",
-        ):
+        for field_name in ("provider_identity", "model_identity"):
             object.__setattr__(
                 self,
                 field_name,
@@ -39,10 +32,7 @@ class GroundedProviderConfig:
 
         if (
             isinstance(self.timeout_seconds, bool)
-            or not isinstance(
-                self.timeout_seconds,
-                (int, float),
-            )
+            or not isinstance(self.timeout_seconds, (int, float))
             or self.timeout_seconds <= 0
         ):
             raise ValueError(
@@ -51,40 +41,40 @@ class GroundedProviderConfig:
         object.__setattr__(
             self,
             "timeout_seconds",
-            float(
-                self.timeout_seconds
-            ),
+            float(self.timeout_seconds),
         )
 
         if (
             isinstance(self.max_retries, bool)
-            or not isinstance(
-                self.max_retries,
-                int,
-            )
+            or not isinstance(self.max_retries, int)
             or self.max_retries < 0
         ):
             raise ValueError(
                 "max_retries must be a non-negative integer"
             )
 
+        if self.max_output_tokens is not None and (
+            isinstance(self.max_output_tokens, bool)
+            or not isinstance(self.max_output_tokens, int)
+            or self.max_output_tokens <= 0
+        ):
+            raise ValueError(
+                "max_output_tokens must be a positive integer or None"
+            )
+
     def to_dict(self) -> dict[str, Any]:
-        return {
+        data = {
             "provider_identity": self.provider_identity,
             "model_identity": self.model_identity,
             "timeout_seconds": self.timeout_seconds,
             "max_retries": self.max_retries,
         }
+        if self.max_output_tokens is not None:
+            data["max_output_tokens"] = self.max_output_tokens
+        return data
 
 
 class GroundedProviderCredentialSource(ABC):
-    """
-    Abstract secret source.
-
-    Secret material is intentionally unavailable through serialization and is
-    requested only by the concrete provider adapter when needed.
-    """
-
     @abstractmethod
     def get_api_key(
         self,
@@ -97,12 +87,6 @@ class GroundedProviderCredentialSource(ABC):
 class StaticGroundedProviderCredentialSource(
     GroundedProviderCredentialSource
 ):
-    """
-    Deterministic in-memory credential source for tests only.
-
-    This is not intended for production secret management.
-    """
-
     def __init__(
         self,
         *,

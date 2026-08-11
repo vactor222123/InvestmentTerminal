@@ -97,12 +97,8 @@ class OpenAIGroundedModelAdapter(GroundedModelAdapter):
         payload = self._parse_completed_response(
             execution_result.response.body
         )
-        raw_text = self._extract_output_text_from_payload(
-            payload
-        )
-        usage = self._extract_usage_from_payload(
-            payload
-        )
+        raw_text = self._extract_output_text_from_payload(payload)
+        usage = self._extract_usage_from_payload(payload)
 
         return GroundedModelResponse(
             request_id=prompt.request_id,
@@ -112,9 +108,7 @@ class OpenAIGroundedModelAdapter(GroundedModelAdapter):
             operational_metadata=GroundedProviderOperationalMetadata(
                 attempt_count=execution_result.attempt_count,
                 retry_count=execution_result.retry_count,
-                transport_status_code=(
-                    execution_result.response.status_code
-                ),
+                transport_status_code=execution_result.response.status_code,
                 transport_outcome="SUCCESS",
             ),
             usage=usage,
@@ -124,7 +118,7 @@ class OpenAIGroundedModelAdapter(GroundedModelAdapter):
         self,
         prompt: GroundedPromptInput,
     ) -> dict[str, Any]:
-        return {
+        payload: dict[str, Any] = {
             "model": self._config.model_identity,
             "instructions": (
                 "Answer only from the supplied Evidence-Grounded AI context. "
@@ -146,6 +140,11 @@ class OpenAIGroundedModelAdapter(GroundedModelAdapter):
                 }
             },
         }
+        if self._config.max_output_tokens is not None:
+            payload["max_output_tokens"] = (
+                self._config.max_output_tokens
+            )
+        return payload
 
     @staticmethod
     def _answer_schema() -> dict[str, Any]:
@@ -173,15 +172,9 @@ class OpenAIGroundedModelAdapter(GroundedModelAdapter):
                                     "type": "object",
                                     "additionalProperties": False,
                                     "properties": {
-                                        "knowledge_identity": {
-                                            "type": "string"
-                                        },
-                                        "statement": {
-                                            "type": "string"
-                                        },
-                                        "provenance_status": {
-                                            "type": "string"
-                                        },
+                                        "knowledge_identity": {"type": "string"},
+                                        "statement": {"type": "string"},
+                                        "provenance_status": {"type": "string"},
                                     },
                                     "required": [
                                         "knowledge_identity",
@@ -195,11 +188,7 @@ class OpenAIGroundedModelAdapter(GroundedModelAdapter):
                     },
                 },
             },
-            "required": [
-                "answer_id",
-                "protocol_identity",
-                "claims",
-            ],
+            "required": ["answer_id", "protocol_identity", "claims"],
         }
 
     @staticmethod
@@ -231,25 +220,19 @@ class OpenAIGroundedModelAdapter(GroundedModelAdapter):
             raise ValueError(
                 "OpenAI response output must be an array"
             )
-
         parts: list[str] = []
         for item in output:
-            if not isinstance(item, dict):
-                continue
-            if item.get("type") != "message":
+            if not isinstance(item, dict) or item.get("type") != "message":
                 continue
             content = item.get("content")
             if not isinstance(content, list):
                 continue
             for part in content:
-                if not isinstance(part, dict):
-                    continue
-                if part.get("type") != "output_text":
+                if not isinstance(part, dict) or part.get("type") != "output_text":
                     continue
                 text = part.get("text")
                 if isinstance(text, str) and text.strip():
                     parts.append(text)
-
         if not parts:
             raise ValueError(
                 "OpenAI response contains no output_text"
@@ -267,13 +250,8 @@ class OpenAIGroundedModelAdapter(GroundedModelAdapter):
             raise ValueError(
                 "OpenAI response usage must be an object or null"
             )
-
         fields = {}
-        for key in (
-            "input_tokens",
-            "output_tokens",
-            "total_tokens",
-        ):
+        for key in ("input_tokens", "output_tokens", "total_tokens"):
             value = raw_usage.get(key)
             if (
                 isinstance(value, bool)
@@ -281,11 +259,9 @@ class OpenAIGroundedModelAdapter(GroundedModelAdapter):
                 or value < 0
             ):
                 raise ValueError(
-                    f"OpenAI response usage.{key} must be "
-                    "a non-negative integer"
+                    f"OpenAI response usage.{key} must be a non-negative integer"
                 )
             fields[key] = value
-
         return GroundedProviderUsage(**fields)
 
     @staticmethod
