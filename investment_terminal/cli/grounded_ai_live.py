@@ -33,6 +33,9 @@ from investment_terminal.ai.providers.pricing import (
 from investment_terminal.application.composition import (
     build_live_grounded_ai_application,
 )
+from investment_terminal.application.errors import (
+    GroundedAIApplicationError,
+)
 from investment_terminal.application.grounded_ai import (
     GroundedAIApplicationRequest,
 )
@@ -222,6 +225,8 @@ def main(argv: Sequence[str] | None = None) -> None:
             )
         ).to_dict()
 
+    except GroundedAIApplicationError as exc:
+        parser.error(str(exc))
     except (
         KeyError,
         TypeError,
@@ -290,14 +295,32 @@ def _run_live(
         requested_max_output_tokens=requested_max_output_tokens,
     )
 
-    return application.execute(
-        GroundedAIApplicationRequest(
-            request_id=request_id,
-            user_query=user_query,
-            subject_keys=subjects,
-            max_items=max_items,
+    try:
+        result = application.execute(
+            GroundedAIApplicationRequest(
+                request_id=request_id,
+                user_query=user_query,
+                subject_keys=subjects,
+                max_items=max_items,
+            )
         )
-    ).to_dict()
+    except GroundedAIApplicationError as exc:
+        cause = exc.__cause__
+        if isinstance(
+            cause,
+            (
+                KeyError,
+                TypeError,
+                ValueError,
+                RuntimeError,
+                PermissionError,
+                LookupError,
+            ),
+        ):
+            raise cause
+        raise
+
+    return result.to_dict()
 
 
 def _print_human(report: dict[str, Any]) -> None:

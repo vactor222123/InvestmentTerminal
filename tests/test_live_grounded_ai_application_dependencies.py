@@ -3,6 +3,9 @@ import pytest
 from investment_terminal.ai.providers.guardrails import (
     GroundedProviderBudgetPolicy,
 )
+from investment_terminal.application.errors import (
+    GroundedAIApplicationError,
+)
 from investment_terminal.application.grounded_ai import (
     GroundedAIApplicationRequest,
 )
@@ -34,15 +37,24 @@ def test_request_budget_denial_precedes_query_and_generation() -> None:
     )
 
     with pytest.raises(
-        PermissionError,
-        match="requested output token limit",
-    ):
+        GroundedAIApplicationError,
+    ) as caught:
         application.execute(
             GroundedAIApplicationRequest(
                 request_id="request-1",
                 user_query="Question",
             )
         )
+
+    assert caught.value.category == "POLICY_DENIED"
+    assert caught.value.code == "APPLICATION_POLICY_DENIED"
+    assert "requested output token limit" in str(
+        caught.value
+    )
+    assert isinstance(
+        caught.value.__cause__,
+        PermissionError,
+    )
 
 
 def test_structural_query_dependency_requires_list_all() -> None:

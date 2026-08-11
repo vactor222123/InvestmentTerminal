@@ -26,6 +26,10 @@ from investment_terminal.ai.providers.pricing import (
     GroundedProviderCost,
     GroundedProviderPricingPolicy,
 )
+from investment_terminal.application.errors import (
+    GroundedAIApplicationError,
+    map_application_failure,
+)
 from investment_terminal.application.grounded_ai import (
     GroundedAIApplicationRequest,
     GroundedAIApplicationResult,
@@ -136,6 +140,22 @@ class LiveGroundedAIApplicationService(
         self,
         request: GroundedAIApplicationRequest,
     ) -> GroundedAIApplicationResult:
+        try:
+            return self._execute(
+                request
+            )
+        except GroundedAIApplicationError:
+            raise
+        except Exception as exc:
+            mapped = map_application_failure(
+                exc
+            )
+            raise mapped from exc
+
+    def _execute(
+        self,
+        request: GroundedAIApplicationRequest,
+    ) -> GroundedAIApplicationResult:
         if not isinstance(
             request,
             GroundedAIApplicationRequest,
@@ -144,9 +164,6 @@ class LiveGroundedAIApplicationService(
                 "request must be a GroundedAIApplicationRequest"
             )
 
-        # This check intentionally happens before query.list_all() or
-        # generation_service.generate(). Existing fail-fast semantics depend
-        # on request-side budget denial occurring before lower-layer work.
         if self._budget_policy is not None:
             self._budget_policy.require_request_allowed(
                 requested_max_output_tokens=(
