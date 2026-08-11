@@ -5,13 +5,13 @@
 ```text
 vactor222123/InvestmentTerminal
 branch: develop
-baseline: 700205d
+baseline: 85eb416
 ```
 
 ## Current phase
 
 ```text
-Sprint 23 — Provider Resilience and Rate-Limit Controls
+Sprint 24 — Application/API Productization Foundation
 implementation complete
 full regression green
 ready for closure commit
@@ -19,243 +19,266 @@ ready for closure commit
 
 ## Completed foundation
 
-### Sprint 12–22
+### Sprint 12–23
 
-Historical Intelligence, comparison/replay, outcome observations, methodology hardening, descriptive research, provenance/population quality, archive continuity, Knowledge Domain, Evidence-Grounded AI, real OpenAI provider integration, governance, usage, pricing, and budget controls are complete.
+Historical Intelligence, comparison/replay, outcome observations, methodology hardening, descriptive research, provenance/population quality, archive continuity, Knowledge Domain, Evidence-Grounded AI, real OpenAI provider integration, governance, usage, pricing, budget controls, and provider resilience are complete.
 
-### Sprint 23 — Provider Resilience and Rate-Limit Controls
+### Sprint 24 — Application/API Productization Foundation
 
 Delivered:
 
 ```text
-GroundedProviderRetryDelayPolicy
-GroundedProviderRetryDelayDecision
-GroundedProviderRetryDelayService
-GroundedProviderSleeper
-TimeGroundedProviderSleeper
-explicit retry delay composition
-live CLI retry delay configuration
-GroundedProviderTransportFailure.retry_after_seconds
-Retry-After delta-seconds parsing
-Retry-After HTTP-date parsing
-GroundedProviderClock
-SystemGroundedProviderClock
-provider/local delay precedence
-applied retry-delay execution metadata
-retry-delay audit projection
-JSON/human CLI retry-delay visibility
-Sprint 23 resilience E2E
+GroundedAIApplicationRequest
+GroundedAIApplicationResult
+GroundedAIApplicationService
+LiveGroundedAIApplicationService
+build_live_grounded_ai_application()
+GroundedAIApplicationFailureDetails
+GroundedAIApplicationError
+GroundedAIAPIRequest
+GroundedAIAPIResponse
+GroundedAIAPIAdapter
+GroundedAIHTTPResponse
+GroundedAIHTTPStatusMapper
+GroundedAIHTTPHandler
+build_live_grounded_ai_http_handler()
 ```
 
-## Canonical Resilient Live Flow
+## Canonical Productization Flow
 
 ```text
-requested provider/model
+future server/runtime adapter
         ↓
-explicit governance allowlist
+API composition
         ↓
-pre-execution budget guard
+GroundedAIHTTPHandler
         ↓
-OpenAI provider request
+GroundedAIAPIRequest
         ↓
-retryable failure?
-        ↓ yes
-Retry-After metadata
+GroundedAIAPIAdapter
         ↓
-deterministic bounded local backoff
+GroundedAIApplicationService
         ↓
-effective delay = max(local, provider)
+Knowledge / GroundedGeneration / provider stack
         ↓
-sleeper
+GroundedAIApplicationResult
         ↓
-bounded retry
+GroundedAIAPIResponse
         ↓
-provider success
+HTTP status mapping
         ↓
-usage + pricing + post-execution budget validation
-        ↓
-strict parsing / grounding validation
-        ↓
-safe operational trace
-        ↓
-JSON / human CLI
+GroundedAIHTTPResponse
 ```
 
-## Retry Delay Policy
+## Application Contract
 
-The local policy is deterministic:
+Request:
 
 ```text
-retry 1 = initial_delay
-retry 2 = initial_delay × multiplier
-retry 3 = initial_delay × multiplier²
-...
-capped by retry_maximum_delay_seconds
+request_id
+user_query
+subject_keys
+max_items
 ```
 
-The implementation uses `Decimal` for deterministic calculation.
-
-There is no jitter in Sprint 23.
-
-## Retry-After Handling
-
-Supported forms:
+Result:
 
 ```text
-Retry-After: <delta-seconds>
-Retry-After: <HTTP-date>
+generation
+trace
 ```
 
-HTTP-date parsing uses an injectable UTC clock.
+The application boundary owns use-case orchestration, not CLI parsing, HTTP framework integration, database construction, provider composition, credential lookup, or persistence.
 
-Malformed `Retry-After` values are ignored.
+## Application Error Contract
 
-Past HTTP-date values become zero delay.
-
-Provider-requested delay is preserved as provider-neutral `retry_after_seconds` metadata.
-
-## Delay Precedence
-
-The effective delay is:
+Stable categories:
 
 ```text
-max(local policy delay, provider retry_after_seconds)
+POLICY_DENIED
+INVALID_REQUEST
+EXECUTION_FAILED
+INTERNAL_ERROR
 ```
 
-This guarantees that execution does not retry earlier than either the local backoff policy or the provider-requested delay.
-
-The local maximum caps only local backoff.
-
-It does not truncate a longer provider `Retry-After`.
-
-## Execution Semantics
+Stable codes:
 
 ```text
-terminal failure
-→ fail immediately
-→ no sleep
-
-retryable failure with retries remaining
-→ calculate effective delay
-→ sleep
-→ retry
-
-retryable failure on final attempt
-→ fail
-→ no extra sleep
+APPLICATION_POLICY_DENIED
+APPLICATION_INVALID_REQUEST
+APPLICATION_EXECUTION_FAILED
+APPLICATION_INTERNAL_ERROR
 ```
 
-Retry policy and sleeper must be configured together.
+Known lower-level exceptions are mapped to stable application errors.
 
-Without retry-delay configuration, the previous zero-delay behavior remains backward-compatible.
+The original exception remains available internally as `__cause__`.
 
-## Clock and Sleeper Boundaries
+Unknown internal failures return a sanitized application error message.
 
-Production:
+## Application Composition
+
+`build_live_grounded_ai_application()` owns:
 
 ```text
-SystemGroundedProviderClock
-TimeGroundedProviderSleeper
+Knowledge SQLite store
+→ Knowledge repository
+→ Knowledge query service
+
+provider composition
+→ Grounded generation service
+
+both
+→ LiveGroundedAIApplicationService
 ```
 
-Tests:
+This removes Knowledge/provider construction from external adapters.
+
+## CLI Status
+
+The CLI now:
 
 ```text
-fixed/injected clock
-recording/fake sleeper
+parses input
+→ builds governance/pricing/budget policy values
+→ calls application composition
+→ creates GroundedAIApplicationRequest
+→ renders GroundedAIApplicationResult
 ```
 
-This keeps time-dependent tests deterministic and fast.
+It no longer directly constructs the Knowledge SQLite stack or primary provider/application orchestration path.
 
-## Safe Resilience Audit
+Legacy `_run_live()` is retained for backward-compatible programmatic tests/callers.
 
-Successful provider operational metadata may expose:
+## API Contract
+
+Request:
 
 ```text
-attempt_count
-retry_count
-transport_status_code
-transport_outcome
-retry_delay_seconds
+request_id
+query
+subjects
+max_items
 ```
 
-`retry_delay_seconds` is included only when delays were actually applied.
+Unknown fields are rejected.
 
-Older exact serialized structures remain unchanged when no delay sequence exists.
-
-Safe audit does not include:
+Success:
 
 ```text
-Retry-After header
-raw HTTP headers
-raw HTTP body
-provider failure message
-provider URL
-Authorization header
-API key
-raw model text
+status = SUCCESS
+request_id
+data = {
+  generation,
+  trace
+}
 ```
 
-## Live CLI
-
-Retry configuration:
+Error:
 
 ```text
---retry-initial-delay-seconds
---retry-delay-multiplier
---retry-maximum-delay-seconds
+status = ERROR
+request_id
+error = {
+  category,
+  code,
+  message
+}
 ```
 
-Human output may show:
+## HTTP Mapping
 
 ```text
-Attempts     : 2
-Retries      : 1
-Retry Delays : 5 s
-HTTP Status  : 200
-Transport    : SUCCESS
+SUCCESS          → 200
+INVALID_REQUEST  → 400
+POLICY_DENIED    → 403
+EXECUTION_FAILED → 503
+INTERNAL_ERROR   → 500
+unknown category → 500
 ```
 
-JSON output receives the same safe retry-delay metadata through the canonical trace.
+Unknown failure categories fail closed to HTTP 500.
 
-## E2E Coverage
+## Framework-Neutral HTTP Handler
 
-Sprint 23 E2E covers:
+The handler accepts an already-decoded payload and owns:
 
 ```text
-real Knowledge SQLite
-→ rate-limit-like retryable failure
-→ provider retry delay
-→ local/provider delay precedence
-→ deterministic fake sleeper
-→ retry
-→ successful OpenAI-shaped response
-→ grounding validation
-→ provider usage
-→ safe operational audit
-→ human CLI output
+payload validation
+→ API request mapping
+→ application execution
+→ API response mapping
+→ HTTP status mapping
 ```
 
-The E2E explicitly verifies that secrets, raw provider headers, raw rate-limit body text, Authorization data, and `Retry-After` header names do not leak into report or human output.
+Malformed payloads become stable HTTP 400 responses.
+
+If no valid client request id exists, the error response uses `UNKNOWN` rather than inventing a new identity.
+
+## API Composition
+
+`build_live_grounded_ai_http_handler()` owns:
+
+```text
+build_live_grounded_ai_application()
+→ GroundedAIHTTPHandler
+```
+
+A future FastAPI/Flask/other server adapter can depend on this one composition boundary.
+
+## Current Non-Goals
+
+Sprint 24 intentionally does not provide:
+
+```text
+running HTTP server
+route registration
+FastAPI/Flask dependency
+authentication middleware
+authorization middleware
+OpenAPI schema publication
+health/readiness route
+deployment container/runtime
+```
+
+Those belong to the next productization stage.
 
 ## Testing Status
 
-Full regression at Sprint 23 closure:
+Full regression at Sprint 24 closure:
 
 ```text
-1819 passed, 3 skipped in 8.76s
+1865 passed, 3 skipped in 9.04s
+```
+
+Focused Sprint 24 tests cover:
+
+```text
+application boundary
+application orchestration
+fail-fast budget ordering
+CLI migration
+application composition
+CLI composition migration
+application error contract
+API contract
+HTTP status mapping
+HTTP handler
+API composition
 ```
 
 ## Security and Authority Boundaries
 
-Sprint 23 preserves:
+Sprint 24 preserves:
 
 - AI remains downstream of Knowledge;
-- provider retries cannot change evidence authority;
-- provider output remains untrusted until strict parsing and grounding validation;
-- API keys remain outside audit/CLI output;
-- retry metadata is sanitized before reaching audit surfaces;
-- provider resilience logic remains outside Knowledge and History;
+- no API adapter can bypass grounding validation;
+- provider/model governance remains fail-closed;
+- provider credentials remain outside API/application contracts;
+- raw transport data remains outside API responses;
+- policy denials are explicit and stable;
+- unknown internal failures are sanitized;
+- no API/HTTP path mutates Knowledge or History;
 - no AI persistence schema is introduced;
 - no autonomous portfolio mutation is introduced;
 - no broker execution is introduced.
@@ -264,6 +287,13 @@ Sprint 23 preserves:
 
 Still deferred:
 
+- concrete web-framework runtime;
+- server routes/startup;
+- authentication and authorization;
+- API schema publication/OpenAPI;
+- health/readiness endpoints;
+- deployment/runtime packaging;
+- inbound API rate limiting;
 - retry jitter;
 - proactive provider rate-limit scheduling;
 - concurrency-aware throttling;
@@ -285,6 +315,6 @@ Still deferred:
 
 ## Next Decision
 
-Sprint 23 completes deterministic provider resilience and server-directed retry timing.
+Sprint 24 completes the framework-neutral application/API productization foundation.
 
-The next milestone should either productize the existing system behind an application/API boundary or add a concurrency-aware provider rate-limit scheduler, without weakening the current evidence, governance, budget, and audit boundaries.
+The next milestone should add a real server/runtime adapter over the existing API composition boundary, with authentication and deployment concerns introduced incrementally rather than embedded into the application layer.
