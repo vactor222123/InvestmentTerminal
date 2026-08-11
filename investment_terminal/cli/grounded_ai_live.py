@@ -339,6 +339,15 @@ def _print_human(report: dict[str, Any]) -> None:
     if provider_operation is not None:
         print(f"Attempts     : {provider_operation['attempt_count']}")
         print(f"Retries      : {provider_operation['retry_count']}")
+        retry_delays = provider_operation.get(
+            "retry_delay_seconds"
+        )
+        if retry_delays:
+            print(
+                "Retry Delays : "
+                + ", ".join(retry_delays)
+                + " s"
+            )
         print(f"HTTP Status  : {provider_operation['transport_status_code']}")
         print(f"Transport    : {provider_operation['transport_outcome']}")
 
