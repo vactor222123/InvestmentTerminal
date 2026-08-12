@@ -13,6 +13,9 @@ from investment_terminal.api.http_handler import (
 from investment_terminal.server.authentication import (
     GroundedAIServerAPIKeyAuthenticator,
 )
+from investment_terminal.server.error_boundary import (
+    GroundedAIServerInternalErrorResponse,
+)
 from investment_terminal.server.readiness import (
     GroundedAIServerReadinessService,
 )
@@ -60,6 +63,19 @@ def create_grounded_ai_fastapi_app(
         title="Investment Terminal API",
         version="1",
     )
+
+    @app.exception_handler(Exception)
+    async def unhandled_exception_handler(
+        request: Request,
+        exc: Exception,
+    ) -> JSONResponse:
+        # Intentionally do not serialize repr(exc), str(exc), traceback,
+        # request body, headers, credentials, provider details, or paths.
+        body = GroundedAIServerInternalErrorResponse().to_dict()
+        return JSONResponse(
+            status_code=500,
+            content=body,
+        )
 
     @app.get("/health", response_class=JSONResponse)
     def health() -> JSONResponse:
