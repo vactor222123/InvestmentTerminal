@@ -1,14 +1,10 @@
 """
 FastAPI runtime adapter for grounded AI.
-
-The server layer owns HTTP framework integration only. It delegates decoded
-request payloads to the existing framework-neutral GroundedAIHTTPHandler and
-returns its status/body unchanged.
 """
 
-from typing import Any
+import json
 
-from fastapi import Body, FastAPI, Header
+from fastapi import FastAPI, Header, Request
 from fastapi.responses import JSONResponse
 
 from investment_terminal.api.http_handler import (
@@ -20,6 +16,10 @@ from investment_terminal.server.authentication import (
 from investment_terminal.server.readiness import (
     GroundedAIServerReadinessService,
 )
+from investment_terminal.server.request_limits import (
+    GroundedAIServerRequestLimitPolicy,
+    GroundedAIServerRequestTooLargeError,
+)
 
 
 def create_grounded_ai_fastapi_app(
@@ -27,58 +27,48 @@ def create_grounded_ai_fastapi_app(
     handler: GroundedAIHTTPHandler,
     readiness_service: GroundedAIServerReadinessService | None = None,
     authenticator: GroundedAIServerAPIKeyAuthenticator | None = None,
+    request_limit_policy: GroundedAIServerRequestLimitPolicy | None = None,
 ) -> FastAPI:
-    if not isinstance(
-        handler,
-        GroundedAIHTTPHandler,
+    if not isinstance(handler, GroundedAIHTTPHandler):
+        raise TypeError("handler must be a GroundedAIHTTPHandler")
+    if readiness_service is not None and not isinstance(
+        readiness_service, GroundedAIServerReadinessService
     ):
         raise TypeError(
-            "handler must be a GroundedAIHTTPHandler"
+            "readiness_service must be a GroundedAIServerReadinessService or None"
         )
-    if (
-        readiness_service is not None
-        and not isinstance(
-            readiness_service,
-            GroundedAIServerReadinessService,
-        )
+    if authenticator is not None and not isinstance(
+        authenticator, GroundedAIServerAPIKeyAuthenticator
     ):
         raise TypeError(
-            "readiness_service must be a "
-            "GroundedAIServerReadinessService or None"
+            "authenticator must be a GroundedAIServerAPIKeyAuthenticator or None"
         )
-    if (
-        authenticator is not None
-        and not isinstance(
-            authenticator,
-            GroundedAIServerAPIKeyAuthenticator,
-        )
+    if request_limit_policy is not None and not isinstance(
+        request_limit_policy, GroundedAIServerRequestLimitPolicy
     ):
         raise TypeError(
-            "authenticator must be a "
-            "GroundedAIServerAPIKeyAuthenticator or None"
+            "request_limit_policy must be a GroundedAIServerRequestLimitPolicy or None"
         )
+
+    active_limit_policy = (
+        request_limit_policy
+        if request_limit_policy is not None
+        else GroundedAIServerRequestLimitPolicy()
+    )
 
     app = FastAPI(
         title="Investment Terminal API",
         version="1",
     )
 
-    @app.get(
-        "/health",
-        response_class=JSONResponse,
-    )
+    @app.get("/health", response_class=JSONResponse)
     def health() -> JSONResponse:
         return JSONResponse(
             status_code=200,
-            content={
-                "status": "OK",
-            },
+            content={"status": "OK"},
         )
 
-    @app.get(
-        "/ready",
-        response_class=JSONResponse,
-    )
+    @app.get("/ready", response_class=JSONResponse)
     def ready() -> JSONResponse:
         if readiness_service is None:
             return JSONResponse(
@@ -91,30 +81,22 @@ def create_grounded_ai_fastapi_app(
 
         assessment = readiness_service.check()
         return JSONResponse(
-            status_code=(
-                200
-                if assessment.ready
-                else 503
-            ),
+            status_code=200 if assessment.ready else 503,
             content=assessment.to_dict(),
         )
 
-    @app.post(
-        "/v1/grounded-ai",
-        response_class=JSONResponse,
-    )
-    def grounded_ai(
-        payload: Any = Body(...),
+    @app.post("/v1/grounded-ai", response_class=JSONResponse)
+    async def grounded_ai(
+        request: Request,
         api_key: str | None = Header(
             default=None,
             alias="X-API-Key",
         ),
     ) -> JSONResponse:
+        # Authentication intentionally precedes body reading and decoding.
         if (
             authenticator is None
-            or not authenticator.authenticate(
-                api_key
-            )
+            or not authenticator.authenticate(api_key)
         ):
             return JSONResponse(
                 status_code=401,
@@ -124,6 +106,43 @@ def create_grounded_ai_fastapi_app(
                         "category": "UNAUTHENTICATED",
                         "code": "SERVER_AUTHENTICATION_REQUIRED",
                         "message": "authentication required",
+                    },
+                },
+            )
+
+        try:
+            raw_body = await active_limit_policy.read_body(
+                request
+            )
+        except GroundedAIServerRequestTooLargeError:
+            return JSONResponse(
+                status_code=413,
+                content={
+                    "status": "ERROR",
+                    "error": {
+                        "category": "REQUEST_TOO_LARGE",
+                        "code": "SERVER_REQUEST_BODY_TOO_LARGE",
+                        "message": "request body exceeds configured maximum",
+                    },
+                },
+            )
+
+        try:
+            payload = json.loads(
+                raw_body.decode("utf-8")
+            )
+        except (
+            UnicodeDecodeError,
+            json.JSONDecodeError,
+        ):
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "status": "ERROR",
+                    "error": {
+                        "category": "INVALID_REQUEST",
+                        "code": "SERVER_INVALID_JSON",
+                        "message": "request body must contain valid UTF-8 JSON",
                     },
                 },
             )

@@ -16,6 +16,8 @@ MAX_RETRIES_ENV = "INVESTMENT_TERMINAL_PROVIDER_MAX_RETRIES"
 API_KEY_ENV_NAME_ENV = "INVESTMENT_TERMINAL_OPENAI_API_KEY_ENV"
 SERVER_API_KEY_ENV_NAME_ENV = "INVESTMENT_TERMINAL_SERVER_API_KEY_ENV"
 DEFAULT_SERVER_API_KEY_ENV = "INVESTMENT_TERMINAL_SERVER_API_KEY"
+MAX_REQUEST_BODY_BYTES_ENV = "INVESTMENT_TERMINAL_MAX_REQUEST_BODY_BYTES"
+DEFAULT_MAX_REQUEST_BODY_BYTES = 65536
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,6 +29,7 @@ class GroundedAIServerRuntimeConfig:
     max_retries: int
     api_key_environment_variable: str
     server_api_key_environment_variable: str
+    max_request_body_bytes: int
 
     @classmethod
     def from_environment(cls, environment: Mapping[str, str]):
@@ -50,6 +53,14 @@ class GroundedAIServerRuntimeConfig:
                 f"{SERVER_API_KEY_ENV_NAME_ENV} must not be empty"
             )
 
+        max_request_body_bytes = _positive_int(
+            environment.get(
+                MAX_REQUEST_BODY_BYTES_ENV,
+                str(DEFAULT_MAX_REQUEST_BODY_BYTES),
+            ),
+            MAX_REQUEST_BODY_BYTES_ENV,
+        )
+
         if model_identity not in allowed_models:
             raise ValueError(
                 f"{MODEL_ENV} must be explicitly present in {ALLOWED_MODELS_ENV}"
@@ -65,6 +76,7 @@ class GroundedAIServerRuntimeConfig:
             server_api_key_environment_variable=(
                 server_api_key_environment_variable
             ),
+            max_request_body_bytes=max_request_body_bytes,
         )
 
     def governance_policy(self) -> GroundedProviderGovernancePolicy:
@@ -112,4 +124,14 @@ def _non_negative_int(value: str, field_name: str) -> int:
         raise ValueError(f"{field_name} must be a non-negative integer") from exc
     if parsed < 0:
         raise ValueError(f"{field_name} must be a non-negative integer")
+    return parsed
+
+
+def _positive_int(value: str, field_name: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise ValueError(f"{field_name} must be a positive integer") from exc
+    if parsed <= 0:
+        raise ValueError(f"{field_name} must be a positive integer")
     return parsed

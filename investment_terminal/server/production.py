@@ -15,6 +15,9 @@ from investment_terminal.server.fastapi_app import (
 from investment_terminal.server.readiness import (
     GroundedAIServerReadinessService,
 )
+from investment_terminal.server.request_limits import (
+    GroundedAIServerRequestLimitPolicy,
+)
 from investment_terminal.server.runtime_config import (
     GroundedAIServerRuntimeConfig,
 )
@@ -45,11 +48,9 @@ def create_app(
         ),
     )
 
-    readiness_service = (
-        GroundedAIServerReadinessService(
-            config=config,
-            environment=source,
-        )
+    readiness_service = GroundedAIServerReadinessService(
+        config=config,
+        environment=source,
     )
 
     server_api_key = source.get(
@@ -65,14 +66,16 @@ def create_app(
             f"{config.server_api_key_environment_variable}"
         )
 
-    authenticator = (
-        GroundedAIServerAPIKeyAuthenticator(
-            expected_api_key=server_api_key,
-        )
+    authenticator = GroundedAIServerAPIKeyAuthenticator(
+        expected_api_key=server_api_key,
+    )
+    request_limit_policy = GroundedAIServerRequestLimitPolicy(
+        max_body_bytes=config.max_request_body_bytes,
     )
 
     return create_grounded_ai_fastapi_app(
         handler=handler,
         readiness_service=readiness_service,
         authenticator=authenticator,
+        request_limit_policy=request_limit_policy,
     )

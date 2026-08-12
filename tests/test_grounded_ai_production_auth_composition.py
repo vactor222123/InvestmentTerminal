@@ -57,10 +57,12 @@ def test_production_wires_authenticator(
         handler,
         readiness_service,
         authenticator,
+        request_limit_policy,
     ):
         calls["handler"] = handler
         calls["readiness_service"] = readiness_service
         calls["authenticator"] = authenticator
+        calls["request_limit_policy"] = request_limit_policy
         return FakeApp()
 
     monkeypatch.setattr(
@@ -78,10 +80,8 @@ def test_production_wires_authenticator(
         values
     )
 
-    assert isinstance(
-        app,
-        FakeApp,
-    )
+    assert isinstance(app, FakeApp)
     assert calls["authenticator"].authenticate(
         "server-secret"
     )
+    assert calls["request_limit_policy"].max_body_bytes == 65536

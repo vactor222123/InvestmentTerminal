@@ -33,10 +33,12 @@ def test_production_factory_wires_readiness_service(
         handler,
         readiness_service,
         authenticator,
+        request_limit_policy,
     ):
         calls["handler"] = handler
         calls["readiness_service"] = readiness_service
         calls["authenticator"] = authenticator
+        calls["request_limit_policy"] = request_limit_policy
         return FakeApp()
 
     monkeypatch.setattr(
@@ -54,18 +56,8 @@ def test_production_factory_wires_readiness_service(
         }
     )
 
-    assert isinstance(
-        app,
-        FakeApp,
-    )
-    assert isinstance(
-        calls["handler"],
-        FakeHandler,
-    )
-    assert (
-        calls["readiness_service"]
-        is not None
-    )
-    assert calls["authenticator"].authenticate(
-        "server-secret"
-    )
+    assert isinstance(app, FakeApp)
+    assert isinstance(calls["handler"], FakeHandler)
+    assert calls["readiness_service"] is not None
+    assert calls["authenticator"].authenticate("server-secret")
+    assert calls["request_limit_policy"].max_body_bytes == 65536

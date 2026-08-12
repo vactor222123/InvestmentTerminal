@@ -7,9 +7,7 @@ from investment_terminal.server.runtime_config import (
 )
 
 
-def test_production_factory_routes_config_through_api_composition(
-    monkeypatch,
-):
+def test_production_factory_routes_config_through_api_composition(monkeypatch):
     calls = {}
 
     class FakeHandler:
@@ -27,69 +25,37 @@ def test_production_factory_routes_config_through_api_composition(
         handler,
         readiness_service,
         authenticator,
+        request_limit_policy,
     ):
         calls["handler"] = handler
         calls["readiness_service"] = readiness_service
         calls["authenticator"] = authenticator
+        calls["request_limit_policy"] = request_limit_policy
         return FakeApp()
 
-    monkeypatch.setattr(
-        production,
-        "build_live_grounded_ai_http_handler",
-        fake_build_handler,
-    )
-    monkeypatch.setattr(
-        production,
-        "create_grounded_ai_fastapi_app",
-        fake_fastapi_factory,
-    )
+    monkeypatch.setattr(production, "build_live_grounded_ai_http_handler", fake_build_handler)
+    monkeypatch.setattr(production, "create_grounded_ai_fastapi_app", fake_fastapi_factory)
 
-    app = production.create_app(
-        {
-            DATABASE_ENV: "data/knowledge/knowledge.db",
-            MODEL_ENV: "gpt-test",
-            ALLOWED_MODELS_ENV: "gpt-test",
-            DEFAULT_SERVER_API_KEY_ENV: "server-secret",
-        }
-    )
+    app = production.create_app({
+        DATABASE_ENV: "data/knowledge/knowledge.db",
+        MODEL_ENV: "gpt-test",
+        ALLOWED_MODELS_ENV: "gpt-test",
+        DEFAULT_SERVER_API_KEY_ENV: "server-secret",
+    })
 
-    assert isinstance(
-        app,
-        FakeApp,
-    )
-    assert isinstance(
-        calls["handler"],
-        FakeHandler,
-    )
+    assert isinstance(app, FakeApp)
+    assert isinstance(calls["handler"], FakeHandler)
     assert calls["readiness_service"] is not None
-    assert calls["authenticator"].authenticate(
-        "server-secret"
-    )
-
-    assert (
-        calls["handler_kwargs"]["model_identity"]
-        == "gpt-test"
-    )
-    assert (
-        calls["handler_kwargs"]["timeout_seconds"]
-        == 30
-    )
-    assert (
-        calls["handler_kwargs"]["max_retries"]
-        == 2
-    )
-
-    assessment = calls["handler_kwargs"][
-        "governance_policy"
-    ].assess(
+    assert calls["authenticator"].authenticate("server-secret")
+    assert calls["request_limit_policy"].max_body_bytes == 65536
+    assert calls["handler_kwargs"]["model_identity"] == "gpt-test"
+    assert calls["handler_kwargs"]["timeout_seconds"] == 30
+    assert calls["handler_kwargs"]["max_retries"] == 2
+    assert calls["handler_kwargs"]["governance_policy"].assess(
         provider_identity="OPENAI",
         model_identity="gpt-test",
-    )
-    assert assessment.allowed
+    ).allowed
 
 
 def test_production_module_has_no_import_time_app_construction():
-    assert not hasattr(
-        production,
-        "app",
-    )
+    assert not hasattr(production, "app")
