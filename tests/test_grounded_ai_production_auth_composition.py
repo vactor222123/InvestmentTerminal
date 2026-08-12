@@ -1,3 +1,5 @@
+import pytest
+
 from investment_terminal.server import production
 from investment_terminal.server.runtime_config import (
     ALLOWED_MODELS_ENV,
@@ -7,13 +9,35 @@ from investment_terminal.server.runtime_config import (
 )
 
 
-def test_production_factory_wires_readiness_service(
-    monkeypatch,
-    tmp_path,
-) -> None:
-    database = tmp_path / "knowledge.db"
-    database.write_bytes(b"")
+def environment():
+    return {
+        DATABASE_ENV: "data/knowledge/knowledge.db",
+        MODEL_ENV: "gpt-test",
+        ALLOWED_MODELS_ENV: "gpt-test",
+    }
 
+
+def test_production_requires_server_api_key_before_app_creation(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(
+        production,
+        "build_live_grounded_ai_http_handler",
+        lambda **kwargs: object(),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="required server API key environment variable",
+    ):
+        production.create_app(
+            environment()
+        )
+
+
+def test_production_wires_authenticator(
+    monkeypatch,
+) -> None:
     calls = {}
 
     class FakeHandler:
@@ -45,26 +69,18 @@ def test_production_factory_wires_readiness_service(
         fake_factory,
     )
 
+    values = environment()
+    values[
+        DEFAULT_SERVER_API_KEY_ENV
+    ] = "server-secret"
+
     app = production.create_app(
-        {
-            DATABASE_ENV: str(database),
-            MODEL_ENV: "gpt-test",
-            ALLOWED_MODELS_ENV: "gpt-test",
-            DEFAULT_SERVER_API_KEY_ENV: "server-secret",
-        }
+        values
     )
 
     assert isinstance(
         app,
         FakeApp,
-    )
-    assert isinstance(
-        calls["handler"],
-        FakeHandler,
-    )
-    assert (
-        calls["readiness_service"]
-        is not None
     )
     assert calls["authenticator"].authenticate(
         "server-secret"

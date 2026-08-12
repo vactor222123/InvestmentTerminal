@@ -14,6 +14,8 @@ ALLOWED_MODELS_ENV = "INVESTMENT_TERMINAL_ALLOWED_OPENAI_MODELS"
 TIMEOUT_ENV = "INVESTMENT_TERMINAL_PROVIDER_TIMEOUT_SECONDS"
 MAX_RETRIES_ENV = "INVESTMENT_TERMINAL_PROVIDER_MAX_RETRIES"
 API_KEY_ENV_NAME_ENV = "INVESTMENT_TERMINAL_OPENAI_API_KEY_ENV"
+SERVER_API_KEY_ENV_NAME_ENV = "INVESTMENT_TERMINAL_SERVER_API_KEY_ENV"
+DEFAULT_SERVER_API_KEY_ENV = "INVESTMENT_TERMINAL_SERVER_API_KEY"
 
 
 @dataclass(frozen=True, slots=True)
@@ -24,6 +26,7 @@ class GroundedAIServerRuntimeConfig:
     timeout_seconds: float
     max_retries: int
     api_key_environment_variable: str
+    server_api_key_environment_variable: str
 
     @classmethod
     def from_environment(cls, environment: Mapping[str, str]):
@@ -37,10 +40,21 @@ class GroundedAIServerRuntimeConfig:
         ).strip()
         if not api_key_environment_variable:
             raise ValueError(f"{API_KEY_ENV_NAME_ENV} must not be empty")
+
+        server_api_key_environment_variable = environment.get(
+            SERVER_API_KEY_ENV_NAME_ENV,
+            DEFAULT_SERVER_API_KEY_ENV,
+        ).strip()
+        if not server_api_key_environment_variable:
+            raise ValueError(
+                f"{SERVER_API_KEY_ENV_NAME_ENV} must not be empty"
+            )
+
         if model_identity not in allowed_models:
             raise ValueError(
                 f"{MODEL_ENV} must be explicitly present in {ALLOWED_MODELS_ENV}"
             )
+
         return cls(
             database=database,
             model_identity=model_identity,
@@ -48,6 +62,9 @@ class GroundedAIServerRuntimeConfig:
             timeout_seconds=timeout_seconds,
             max_retries=max_retries,
             api_key_environment_variable=api_key_environment_variable,
+            server_api_key_environment_variable=(
+                server_api_key_environment_variable
+            ),
         )
 
     def governance_policy(self) -> GroundedProviderGovernancePolicy:

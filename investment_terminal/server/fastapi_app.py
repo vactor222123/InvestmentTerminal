@@ -8,11 +8,14 @@ returns its status/body unchanged.
 
 from typing import Any
 
-from fastapi import Body, FastAPI
+from fastapi import Body, FastAPI, Header
 from fastapi.responses import JSONResponse
 
 from investment_terminal.api.http_handler import (
     GroundedAIHTTPHandler,
+)
+from investment_terminal.server.authentication import (
+    GroundedAIServerAPIKeyAuthenticator,
 )
 from investment_terminal.server.readiness import (
     GroundedAIServerReadinessService,
@@ -23,6 +26,7 @@ def create_grounded_ai_fastapi_app(
     *,
     handler: GroundedAIHTTPHandler,
     readiness_service: GroundedAIServerReadinessService | None = None,
+    authenticator: GroundedAIServerAPIKeyAuthenticator | None = None,
 ) -> FastAPI:
     if not isinstance(
         handler,
@@ -41,6 +45,17 @@ def create_grounded_ai_fastapi_app(
         raise TypeError(
             "readiness_service must be a "
             "GroundedAIServerReadinessService or None"
+        )
+    if (
+        authenticator is not None
+        and not isinstance(
+            authenticator,
+            GroundedAIServerAPIKeyAuthenticator,
+        )
+    ):
+        raise TypeError(
+            "authenticator must be a "
+            "GroundedAIServerAPIKeyAuthenticator or None"
         )
 
     app = FastAPI(
@@ -90,7 +105,29 @@ def create_grounded_ai_fastapi_app(
     )
     def grounded_ai(
         payload: Any = Body(...),
+        api_key: str | None = Header(
+            default=None,
+            alias="X-API-Key",
+        ),
     ) -> JSONResponse:
+        if (
+            authenticator is None
+            or not authenticator.authenticate(
+                api_key
+            )
+        ):
+            return JSONResponse(
+                status_code=401,
+                content={
+                    "status": "ERROR",
+                    "error": {
+                        "category": "UNAUTHENTICATED",
+                        "code": "SERVER_AUTHENTICATION_REQUIRED",
+                        "message": "authentication required",
+                    },
+                },
+            )
+
         response = handler.handle(
             payload
         )

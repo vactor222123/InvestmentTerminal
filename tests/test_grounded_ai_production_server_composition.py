@@ -2,6 +2,7 @@ from investment_terminal.server import production
 from investment_terminal.server.runtime_config import (
     ALLOWED_MODELS_ENV,
     DATABASE_ENV,
+    DEFAULT_SERVER_API_KEY_ENV,
     MODEL_ENV,
 )
 
@@ -25,9 +26,11 @@ def test_production_factory_routes_config_through_api_composition(
         *,
         handler,
         readiness_service,
+        authenticator,
     ):
         calls["handler"] = handler
         calls["readiness_service"] = readiness_service
+        calls["authenticator"] = authenticator
         return FakeApp()
 
     monkeypatch.setattr(
@@ -46,6 +49,7 @@ def test_production_factory_routes_config_through_api_composition(
             DATABASE_ENV: "data/knowledge/knowledge.db",
             MODEL_ENV: "gpt-test",
             ALLOWED_MODELS_ENV: "gpt-test",
+            DEFAULT_SERVER_API_KEY_ENV: "server-secret",
         }
     )
 
@@ -58,6 +62,9 @@ def test_production_factory_routes_config_through_api_composition(
         FakeHandler,
     )
     assert calls["readiness_service"] is not None
+    assert calls["authenticator"].authenticate(
+        "server-secret"
+    )
 
     assert (
         calls["handler_kwargs"]["model_identity"]

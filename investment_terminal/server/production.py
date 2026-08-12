@@ -6,6 +6,9 @@ from fastapi import FastAPI
 from investment_terminal.api.composition import (
     build_live_grounded_ai_http_handler,
 )
+from investment_terminal.server.authentication import (
+    GroundedAIServerAPIKeyAuthenticator,
+)
 from investment_terminal.server.fastapi_app import (
     create_grounded_ai_fastapi_app,
 )
@@ -49,7 +52,27 @@ def create_app(
         )
     )
 
+    server_api_key = source.get(
+        config.server_api_key_environment_variable,
+        "",
+    )
+    if (
+        not isinstance(server_api_key, str)
+        or not server_api_key.strip()
+    ):
+        raise ValueError(
+            "required server API key environment variable is missing: "
+            f"{config.server_api_key_environment_variable}"
+        )
+
+    authenticator = (
+        GroundedAIServerAPIKeyAuthenticator(
+            expected_api_key=server_api_key,
+        )
+    )
+
     return create_grounded_ai_fastapi_app(
         handler=handler,
         readiness_service=readiness_service,
+        authenticator=authenticator,
     )
