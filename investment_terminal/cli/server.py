@@ -1,9 +1,9 @@
 """
 Production server CLI entrypoint.
 
-This command owns Uvicorn process configuration only. It does not construct
-Knowledge, provider, application, API, authentication, readiness, or FastAPI
-dependencies itself.
+The current inbound rate limiter is process-local. Therefore the production CLI
+intentionally permits exactly one Uvicorn worker until a shared/distributed
+admission backend exists.
 """
 
 import argparse
@@ -33,7 +33,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--workers",
         type=int,
         default=1,
-        help="Worker process count. Default: 1",
+        help=(
+            "Worker process count. Must be 1 while inbound rate limiting "
+            "uses process-local state."
+        ),
     )
     parser.add_argument(
         "--log-level",
@@ -62,9 +65,10 @@ def main(
         raise SystemExit(
             "--port must be between 1 and 65535"
         )
-    if args.workers <= 0:
+    if args.workers != 1:
         raise SystemExit(
-            "--workers must be a positive integer"
+            "--workers must be 1 while inbound rate limiting "
+            "uses process-local state"
         )
     if not isinstance(
         args.host,

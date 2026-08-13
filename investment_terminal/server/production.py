@@ -12,6 +12,18 @@ from investment_terminal.server.authentication import (
 from investment_terminal.server.fastapi_app import (
     create_grounded_ai_fastapi_app,
 )
+from investment_terminal.server.rate_limit_admission import (
+    GroundedAIServerRateLimitAdmissionService,
+)
+from investment_terminal.server.rate_limit_clock import (
+    GroundedAIServerMonotonicDecimalClock,
+)
+from investment_terminal.server.rate_limit_identity import (
+    GroundedAIServerRateLimitIdentityDeriver,
+)
+from investment_terminal.server.rate_limits import (
+    GroundedAIServerRateLimitPolicy,
+)
 from investment_terminal.server.readiness import (
     GroundedAIServerReadinessService,
 )
@@ -73,9 +85,27 @@ def create_app(
         max_body_bytes=config.max_request_body_bytes,
     )
 
+    rate_limit_admission_service = (
+        GroundedAIServerRateLimitAdmissionService(
+            policy=GroundedAIServerRateLimitPolicy(
+                capacity=config.rate_limit_capacity,
+                refill_tokens_per_second=(
+                    config.rate_limit_refill_tokens_per_second
+                ),
+            ),
+            clock=GroundedAIServerMonotonicDecimalClock(),
+        )
+    )
+
     return create_grounded_ai_fastapi_app(
         handler=handler,
         readiness_service=readiness_service,
         authenticator=authenticator,
         request_limit_policy=request_limit_policy,
+        rate_limit_admission_service=(
+            rate_limit_admission_service
+        ),
+        rate_limit_identity_deriver=(
+            GroundedAIServerRateLimitIdentityDeriver()
+        ),
     )

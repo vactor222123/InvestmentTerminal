@@ -25,7 +25,7 @@ def test_server_cli_uses_production_factory_target(
             "--port",
             "9000",
             "--workers",
-            "2",
+            "1",
             "--log-level",
             "warning",
         ]
@@ -39,7 +39,7 @@ def test_server_cli_uses_production_factory_target(
         "factory": True,
         "host": "0.0.0.0",
         "port": 9000,
-        "workers": 2,
+        "workers": 1,
         "log_level": "warning",
     }
 
@@ -77,6 +77,7 @@ def test_server_cli_defaults_are_conservative(
         ["--port", "65536"],
         ["--workers", "0"],
         ["--workers", "-1"],
+        ["--workers", "2"],
         ["--host", "   "],
     ],
 )

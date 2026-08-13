@@ -1,6 +1,12 @@
 import pytest
 
 from investment_terminal.server import production
+from investment_terminal.server.rate_limit_admission import (
+    GroundedAIServerRateLimitAdmissionService,
+)
+from investment_terminal.server.rate_limit_identity import (
+    GroundedAIServerRateLimitIdentityDeriver,
+)
 from investment_terminal.server.runtime_config import (
     ALLOWED_MODELS_ENV,
     DATABASE_ENV,
@@ -58,11 +64,15 @@ def test_production_wires_authenticator(
         readiness_service,
         authenticator,
         request_limit_policy,
+        rate_limit_admission_service,
+        rate_limit_identity_deriver,
     ):
         calls["handler"] = handler
         calls["readiness_service"] = readiness_service
         calls["authenticator"] = authenticator
         calls["request_limit_policy"] = request_limit_policy
+        calls["rate_limit_admission_service"] = rate_limit_admission_service
+        calls["rate_limit_identity_deriver"] = rate_limit_identity_deriver
         return FakeApp()
 
     monkeypatch.setattr(
@@ -85,3 +95,11 @@ def test_production_wires_authenticator(
         "server-secret"
     )
     assert calls["request_limit_policy"].max_body_bytes == 65536
+    assert isinstance(
+        calls["rate_limit_admission_service"],
+        GroundedAIServerRateLimitAdmissionService,
+    )
+    assert isinstance(
+        calls["rate_limit_identity_deriver"],
+        GroundedAIServerRateLimitIdentityDeriver,
+    )
