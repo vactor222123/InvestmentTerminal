@@ -3,6 +3,7 @@ FastAPI runtime adapter for grounded AI.
 """
 
 import json
+from decimal import ROUND_CEILING
 
 from fastapi import FastAPI, Header, Request
 from fastapi.responses import JSONResponse
@@ -16,6 +17,12 @@ from investment_terminal.server.error_boundary import (
 )
 from investment_terminal.server.openapi_contract import (
     grounded_ai_openapi_extra,
+)
+from investment_terminal.server.rate_limit_admission import (
+    GroundedAIServerRateLimitAdmissionService,
+)
+from investment_terminal.server.rate_limit_identity import (
+    GroundedAIServerRateLimitIdentityDeriver,
 )
 from investment_terminal.server.readiness import (
     GroundedAIServerReadinessService,
@@ -35,6 +42,12 @@ def create_grounded_ai_fastapi_app(
     readiness_service: GroundedAIServerReadinessService | None = None,
     authenticator: GroundedAIServerAPIKeyAuthenticator | None = None,
     request_limit_policy: GroundedAIServerRequestLimitPolicy | None = None,
+    rate_limit_admission_service: (
+        GroundedAIServerRateLimitAdmissionService | None
+    ) = None,
+    rate_limit_identity_deriver: (
+        GroundedAIServerRateLimitIdentityDeriver | None
+    ) = None,
 ) -> FastAPI:
     if not isinstance(handler, GroundedAIHTTPHandler):
         raise TypeError("handler must be a GroundedAIHTTPHandler")
@@ -55,6 +68,31 @@ def create_grounded_ai_fastapi_app(
     ):
         raise TypeError(
             "request_limit_policy must be a GroundedAIServerRequestLimitPolicy or None"
+        )
+    if rate_limit_admission_service is not None and not isinstance(
+        rate_limit_admission_service,
+        GroundedAIServerRateLimitAdmissionService,
+    ):
+        raise TypeError(
+            "rate_limit_admission_service must be a "
+            "GroundedAIServerRateLimitAdmissionService or None"
+        )
+    if rate_limit_identity_deriver is not None and not isinstance(
+        rate_limit_identity_deriver,
+        GroundedAIServerRateLimitIdentityDeriver,
+    ):
+        raise TypeError(
+            "rate_limit_identity_deriver must be a "
+            "GroundedAIServerRateLimitIdentityDeriver or None"
+        )
+    if (
+        rate_limit_admission_service is None
+    ) != (
+        rate_limit_identity_deriver is None
+    ):
+        raise ValueError(
+            "rate-limit admission service and identity deriver "
+            "must be configured together"
         )
 
     active_limit_policy = (
@@ -144,6 +182,39 @@ def create_grounded_ai_fastapi_app(
                     },
                 },
             )
+
+        if rate_limit_admission_service is not None:
+            identity = rate_limit_identity_deriver.derive(
+                api_key
+            )
+            decision = rate_limit_admission_service.decide(
+                identity=identity
+            )
+            if not decision.allowed:
+                retry_after_seconds = int(
+                    decision.retry_after_seconds.to_integral_value(
+                        rounding=ROUND_CEILING,
+                    )
+                )
+                return JSONResponse(
+                    status_code=429,
+                    headers={
+                        "Retry-After": str(
+                            max(
+                                1,
+                                retry_after_seconds,
+                            )
+                        ),
+                    },
+                    content={
+                        "status": "ERROR",
+                        "error": {
+                            "category": "RATE_LIMITED",
+                            "code": "SERVER_RATE_LIMIT_EXCEEDED",
+                            "message": "request rate limit exceeded",
+                        },
+                    },
+                )
 
         try:
             raw_body = await active_limit_policy.read_body(request)
