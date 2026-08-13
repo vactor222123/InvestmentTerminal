@@ -14,6 +14,9 @@ from investment_terminal.server.authentication import (
 from investment_terminal.server.error_boundary import (
     GroundedAIServerInternalErrorResponse,
 )
+from investment_terminal.server.openapi_contract import (
+    grounded_ai_openapi_extra,
+)
 from investment_terminal.server.readiness import (
     GroundedAIServerReadinessService,
 )
@@ -63,6 +66,9 @@ def create_grounded_ai_fastapi_app(
     app = FastAPI(
         title="Investment Terminal API",
         version="1",
+        docs_url=None,
+        redoc_url=None,
+        openapi_url="/openapi.json",
     )
     app.add_middleware(
         GroundedAIServerSecurityHeadersMiddleware,
@@ -79,14 +85,22 @@ def create_grounded_ai_fastapi_app(
             content=body,
         )
 
-    @app.get("/health", response_class=JSONResponse)
+    @app.get(
+        "/health",
+        response_class=JSONResponse,
+        include_in_schema=False,
+    )
     def health() -> JSONResponse:
         return JSONResponse(
             status_code=200,
             content={"status": "OK"},
         )
 
-    @app.get("/ready", response_class=JSONResponse)
+    @app.get(
+        "/ready",
+        response_class=JSONResponse,
+        include_in_schema=False,
+    )
     def ready() -> JSONResponse:
         if readiness_service is None:
             return JSONResponse(
@@ -103,12 +117,19 @@ def create_grounded_ai_fastapi_app(
             content=assessment.to_dict(),
         )
 
-    @app.post("/v1/grounded-ai", response_class=JSONResponse)
+    @app.post(
+        "/v1/grounded-ai",
+        response_class=JSONResponse,
+        operation_id="grounded_ai_generate",
+        summary="Generate a grounded AI response",
+        openapi_extra=grounded_ai_openapi_extra(),
+    )
     async def grounded_ai(
         request: Request,
         api_key: str | None = Header(
             default=None,
             alias="X-API-Key",
+            description="Inbound Investment Terminal API key",
         ),
     ) -> JSONResponse:
         if authenticator is None or not authenticator.authenticate(api_key):
