@@ -1,7 +1,7 @@
 # Investment Terminal — Product Roadmap
 
-**Status:** Canonical Roadmap
-**Updated after:** Sprint 25 — Production Server Runtime and HTTP Hardening
+**Status:** Canonical Roadmap  
+**Updated after:** Sprint 26 — Inbound API Rate Limiting and Abuse Controls  
 **Current development branch:** `develop`
 
 ## 1. Product Evolution
@@ -25,6 +25,7 @@ Foundation
 → Provider Resilience and Rate-Limit Controls
 → Application/API Productization Foundation
 → Production Server Runtime and HTTP Hardening
+→ Inbound API Rate Limiting and Abuse Controls
 ```
 
 ## 2. Completed Milestones
@@ -55,38 +56,24 @@ Stable provider-neutral application contracts, application composition, normaliz
 
 ### Sprint 25 — Production Server Runtime and HTTP Hardening
 
+Concrete FastAPI production runtime, environment-backed server configuration, production composition, liveness/readiness, inbound API-key authentication, bounded request bodies, sanitized unexpected-error handling, deterministic security headers, hardened OpenAPI, disabled production docs UIs, canonical Uvicorn CLI, and production runtime E2E.
+
+### Sprint 26 — Inbound API Rate Limiting and Abuse Controls
+
 Delivered:
 
-- concrete FastAPI production runtime over the framework-neutral API boundary;
-- environment-backed server runtime configuration;
-- production server composition root;
-- liveness and readiness routes;
-- inbound API-key authentication;
-- bounded inbound request-body size enforcement;
-- sanitized server-level unexpected-error boundary;
-- deterministic security response headers;
-- hardened public OpenAPI contract;
-- operational health/readiness routes excluded from public OpenAPI;
-- Swagger and ReDoc production UIs disabled;
-- canonical Uvicorn production CLI entrypoint;
-- production runtime end-to-end coverage.
-
-Canonical production flow:
-
-```text
-process / Uvicorn
-→ production create_app()
-→ runtime configuration
-→ authentication
-→ request-size guardrail
-→ FastAPI transport adapter
-→ framework-neutral HTTP handler
-→ API contract
-→ application service
-→ Knowledge / grounded generation / provider stack
-→ sanitized server response
-→ security response headers
-```
+- deterministic token-bucket rate-limit policy and decisions;
+- process-local per-identity admission service;
+- opaque authenticated identity derivation;
+- HTTP `429` rate-limit response contract;
+- `Retry-After` response metadata;
+- environment-backed rate-limit capacity and refill configuration;
+- monotonic Decimal production clock;
+- production composition of rate-limit policy, clock, admission, and identity derivation;
+- fail-closed single-worker CLI enforcement while limiter state is process-local;
+- safe `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset` client metadata;
+- OpenAPI documentation of rate-limit response metadata;
+- production rate-limit end-to-end coverage across runtime configuration, authentication, admission, throttling, refill, headers, and OpenAPI.
 
 ## 3. Stable Authority Hierarchy
 
@@ -101,7 +88,7 @@ Archived Review Package
 → ADMISSIBLE GroundedGenerationResult
 ```
 
-Server productization does not change evidence authority or grounding semantics.
+Server abuse controls do not change evidence authority or grounding semantics.
 
 ## 4. Production Server Status
 
@@ -117,8 +104,6 @@ Canonical CLI:
 python -m investment_terminal.cli.server
 ```
 
-The CLI owns process-level Uvicorn configuration only. Environment parsing, server security policy, API composition, application composition, Knowledge access, and provider construction remain behind their existing boundaries.
-
 Runtime routes:
 
 ```text
@@ -128,43 +113,66 @@ POST /v1/grounded-ai
 GET  /openapi.json
 ```
 
-`/docs` and `/redoc` are disabled.
+`/docs` and `/redoc` are disabled. Health/readiness remain operational routes and are intentionally excluded from the public OpenAPI schema.
 
-Health/readiness remain operational routes and are intentionally excluded from the public OpenAPI schema.
+## 5. Canonical Inbound Request Flow
 
-## 5. Server Security Boundary
-
-Inbound grounded-AI requests follow:
+Authenticated grounded-AI requests follow:
 
 ```text
-authentication
+request
+→ authentication
+→ opaque rate-limit identity derivation
+→ rate-limit admission
 → request-size enforcement
 → UTF-8 JSON decoding
 → framework-neutral HTTP handler
 → application/provider execution
-→ sanitized unexpected-error boundary
+→ sanitized server response
 → deterministic security headers
 ```
 
-Known transport/application failures preserve their stable semantics.
+Authentication is evaluated before rate-limit admission. An unauthenticated request therefore fails with `401` before consuming rate-limit capacity.
 
-Unexpected server failures return a generic internal-error response rather than raw Python, persistence, provider, path, credential, header, or request-body details.
+## 6. Rate-Limit Runtime Contract
 
-## 6. Authentication
+Runtime configuration exposes:
 
-`POST /v1/grounded-ai` requires the configured inbound `X-API-Key`.
+```text
+INVESTMENT_TERMINAL_RATE_LIMIT_CAPACITY
+INVESTMENT_TERMINAL_RATE_LIMIT_REFILL_TOKENS_PER_SECOND
+```
 
-Inbound server authentication is distinct from outbound provider credentials.
+The production limiter uses a monotonic clock and process-local token-bucket state.
 
-Authentication is evaluated before request-body processing so unauthenticated requests fail closed before payload decoding or application execution.
+Because limiter state is process-local, the production CLI intentionally permits only:
 
-## 7. Request Limits
+```text
+--workers 1
+```
 
-The production runtime enforces a bounded request-body size before JSON decoding.
+Multi-worker execution fails closed rather than multiplying effective rate-limit capacity across independent worker processes.
 
-Oversized authenticated requests return HTTP `413`.
+## 7. Client Rate-Limit Visibility
 
-The configured request-body limit belongs to the server runtime boundary and does not alter application-domain contracts.
+Authenticated requests that reach rate-limit admission may expose:
+
+```text
+RateLimit-Limit
+RateLimit-Remaining
+RateLimit-Reset
+```
+
+A throttled request additionally returns:
+
+```text
+HTTP 429
+Retry-After
+```
+
+Unauthenticated `401` responses intentionally expose no rate-limit state.
+
+Rate-limit metadata does not expose API keys, opaque rate-limit identities, identity hashes, internal bucket keys, or provider credentials.
 
 ## 8. Public OpenAPI Contract
 
@@ -180,17 +188,6 @@ Stable operation id:
 grounded_ai_generate
 ```
 
-Canonical request fields:
-
-```text
-request_id
-query
-subjects
-max_items
-```
-
-Unknown fields fail closed.
-
 Expected HTTP status surface includes:
 
 ```text
@@ -199,77 +196,53 @@ Expected HTTP status surface includes:
 401
 403
 413
+429
 500
 503
 ```
 
-Internal implementation classes, runtime secrets, and provider credential names are not part of the public schema.
+The schema documents safe rate-limit response metadata where admission has occurred.
 
-## 9. HTTP Semantics
+## 9. Testing Status
 
-Core deterministic application mapping remains:
+Sprint 26 focused coverage includes:
 
-```text
-SUCCESS          → 200
-INVALID_REQUEST  → 400
-POLICY_DENIED    → 403
-EXECUTION_FAILED → 503
-INTERNAL_ERROR   → 500
-unknown category → 500
-```
-
-Server-specific transport failures additionally include:
-
-```text
-UNAUTHENTICATED     → 401
-REQUEST_TOO_LARGE   → 413
-INVALID_JSON        → 400
-unexpected failure  → sanitized 500
-```
-
-## 10. Testing Status
-
-Sprint 25 closure regression:
-
-```text
-1928 passed, 3 skipped, 1 warning in 16.74s
-```
-
-Sprint 25 focused coverage includes:
-
+- token-bucket policy and deterministic refill behavior;
+- admission-service identity isolation;
+- opaque rate-limit identity derivation;
+- HTTP `429` and `Retry-After`;
 - runtime environment configuration;
-- production server composition;
-- health/readiness behavior;
-- inbound authentication;
-- request-size enforcement;
-- sanitized server errors;
-- security response headers;
-- hardened OpenAPI surface;
-- production CLI process delegation;
-- production runtime E2E across environment, composition, HTTP, auth, limits, application seam, readiness, security headers, and schema exposure.
+- monotonic production clock;
+- production composition;
+- single-worker CLI enforcement;
+- safe rate-limit response headers;
+- OpenAPI rate-limit metadata;
+- production rate-limit E2E.
 
-## 11. Security and Authority Boundaries
+The final Sprint 26 closure regression result is recorded by the developer immediately before the closure commit.
 
-Sprint 25 preserves:
+## 10. Security and Authority Boundaries
+
+Sprint 26 preserves:
 
 - AI remains downstream of Knowledge;
 - provider output remains untrusted until strict parsing and grounding validation;
 - provider/model governance remains fail-closed;
-- budget controls remain in their established application/provider boundaries;
+- provider budget controls remain enforced at their established boundaries;
 - inbound server credentials remain separate from outbound provider credentials;
-- credentials are not returned through API/OpenAPI response surfaces;
-- raw provider headers, bodies, URLs, and transport messages remain excluded;
-- unexpected server failures are sanitized;
-- request bodies are bounded before decoding;
+- unauthenticated requests do not consume authenticated rate-limit capacity;
+- rate-limit identities and credentials are excluded from API/OpenAPI surfaces;
+- unexpected server failures remain sanitized;
+- request bodies remain bounded before decoding;
 - API/HTTP adapters do not mutate Knowledge, History, or portfolio state;
 - no autonomous portfolio mutation is introduced;
 - no broker execution is introduced.
 
-## 12. Deferred Scope
+## 11. Deferred Scope
 
 Still deferred:
 
-- inbound API rate limiting / throttling;
+- shared/distributed rate-limit state for multi-worker or multi-instance deployment;
 - deployment container/image and infrastructure manifests;
 - TLS termination policy and HSTS deployment policy;
 - authorization beyond the current API-key authentication boundary;
@@ -292,21 +265,13 @@ Still deferred:
 - autonomous portfolio actions;
 - broker execution.
 
-## 13. Next Product Decision Point
+## 12. Next Product Decision Point
 
-Sprint 25 completes the first production HTTP runtime and server-hardening milestone over the Sprint 24 application/API foundation.
+Sprint 26 completes the first inbound API abuse-control layer over the Sprint 25 production server runtime.
 
-Strong next candidates are:
+Before selecting Sprint 27, the repository should receive a full independent architecture and implementation audit at the final Sprint 26 baseline. Audit findings should be evidence-backed and triaged before any new feature milestone is selected.
 
-```text
-A. Inbound API rate limiting and abuse controls
-B. Deployment/container/runtime operations foundation
-C. Provider concurrency and proactive rate-limit scheduling
-```
-
-The next milestone must preserve fail-closed grounding, governance, secret isolation, budget enforcement, stable API contracts, and sanitized server boundaries.
-
-## 14. Definition of Done
+## 13. Definition of Done
 
 A milestone is complete only when:
 
