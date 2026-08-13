@@ -7,9 +7,7 @@ import json
 from fastapi import FastAPI, Header, Request
 from fastapi.responses import JSONResponse
 
-from investment_terminal.api.http_handler import (
-    GroundedAIHTTPHandler,
-)
+from investment_terminal.api.http_handler import GroundedAIHTTPHandler
 from investment_terminal.server.authentication import (
     GroundedAIServerAPIKeyAuthenticator,
 )
@@ -22,6 +20,9 @@ from investment_terminal.server.readiness import (
 from investment_terminal.server.request_limits import (
     GroundedAIServerRequestLimitPolicy,
     GroundedAIServerRequestTooLargeError,
+)
+from investment_terminal.server.security_headers import (
+    GroundedAIServerSecurityHeadersMiddleware,
 )
 
 
@@ -63,14 +64,15 @@ def create_grounded_ai_fastapi_app(
         title="Investment Terminal API",
         version="1",
     )
+    app.add_middleware(
+        GroundedAIServerSecurityHeadersMiddleware,
+    )
 
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(
         request: Request,
         exc: Exception,
     ) -> JSONResponse:
-        # Intentionally do not serialize repr(exc), str(exc), traceback,
-        # request body, headers, credentials, provider details, or paths.
         body = GroundedAIServerInternalErrorResponse().to_dict()
         return JSONResponse(
             status_code=500,
@@ -109,11 +111,7 @@ def create_grounded_ai_fastapi_app(
             alias="X-API-Key",
         ),
     ) -> JSONResponse:
-        # Authentication intentionally precedes body reading and decoding.
-        if (
-            authenticator is None
-            or not authenticator.authenticate(api_key)
-        ):
+        if authenticator is None or not authenticator.authenticate(api_key):
             return JSONResponse(
                 status_code=401,
                 content={
@@ -127,9 +125,7 @@ def create_grounded_ai_fastapi_app(
             )
 
         try:
-            raw_body = await active_limit_policy.read_body(
-                request
-            )
+            raw_body = await active_limit_policy.read_body(request)
         except GroundedAIServerRequestTooLargeError:
             return JSONResponse(
                 status_code=413,
@@ -144,13 +140,8 @@ def create_grounded_ai_fastapi_app(
             )
 
         try:
-            payload = json.loads(
-                raw_body.decode("utf-8")
-            )
-        except (
-            UnicodeDecodeError,
-            json.JSONDecodeError,
-        ):
+            payload = json.loads(raw_body.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError):
             return JSONResponse(
                 status_code=400,
                 content={
@@ -163,9 +154,7 @@ def create_grounded_ai_fastapi_app(
                 },
             )
 
-        response = handler.handle(
-            payload
-        )
+        response = handler.handle(payload)
         return JSONResponse(
             status_code=response.status_code,
             content=response.body,
