@@ -21,6 +21,9 @@ from investment_terminal.server.openapi_contract import (
 from investment_terminal.server.rate_limit_admission import (
     GroundedAIServerRateLimitAdmissionService,
 )
+from investment_terminal.server.rate_limit_headers import (
+    grounded_ai_rate_limit_headers,
+)
 from investment_terminal.server.rate_limit_identity import (
     GroundedAIServerRateLimitIdentityDeriver,
 )
@@ -183,12 +186,17 @@ def create_grounded_ai_fastapi_app(
                 },
             )
 
+        rate_limit_headers: dict[str, str] = {}
         if rate_limit_admission_service is not None:
             identity = rate_limit_identity_deriver.derive(
                 api_key
             )
             decision = rate_limit_admission_service.decide(
                 identity=identity
+            )
+            rate_limit_headers = grounded_ai_rate_limit_headers(
+                policy=rate_limit_admission_service.policy,
+                decision=decision,
             )
             if not decision.allowed:
                 retry_after_seconds = int(
@@ -199,6 +207,7 @@ def create_grounded_ai_fastapi_app(
                 return JSONResponse(
                     status_code=429,
                     headers={
+                        **rate_limit_headers,
                         "Retry-After": str(
                             max(
                                 1,
@@ -221,6 +230,7 @@ def create_grounded_ai_fastapi_app(
         except GroundedAIServerRequestTooLargeError:
             return JSONResponse(
                 status_code=413,
+                headers=rate_limit_headers,
                 content={
                     "status": "ERROR",
                     "error": {
@@ -236,6 +246,7 @@ def create_grounded_ai_fastapi_app(
         except (UnicodeDecodeError, json.JSONDecodeError):
             return JSONResponse(
                 status_code=400,
+                headers=rate_limit_headers,
                 content={
                     "status": "ERROR",
                     "error": {
@@ -249,6 +260,7 @@ def create_grounded_ai_fastapi_app(
         response = handler.handle(payload)
         return JSONResponse(
             status_code=response.status_code,
+            headers=rate_limit_headers,
             content=response.body,
         )
 

@@ -1,16 +1,47 @@
-from investment_terminal.server.openapi_contract import (
-    grounded_ai_openapi_extra,
+from investment_terminal.api.http_handler import (
+    GroundedAIHTTPHandler,
+)
+from investment_terminal.application.grounded_ai import (
+    GroundedAIApplicationResult,
+    GroundedAIApplicationService,
+)
+from investment_terminal.server.fastapi_app import (
+    create_grounded_ai_fastapi_app,
 )
 
 
-def test_openapi_documents_rate_limit_response_and_retry_after() -> None:
-    responses = grounded_ai_openapi_extra()["responses"]
+class SuccessService(GroundedAIApplicationService):
+    def execute(self, request):
+        return GroundedAIApplicationResult(
+            generation={},
+            trace={},
+        )
 
-    assert "429" in responses
-    assert responses["429"]["description"] == (
-        "Inbound request rate limit exceeded"
+
+def test_openapi_documents_rate_limit_response_headers() -> None:
+    app = create_grounded_ai_fastapi_app(
+        handler=GroundedAIHTTPHandler(
+            application_service=SuccessService(),
+        )
     )
-    assert (
-        responses["429"]["headers"]["Retry-After"]["schema"]["minimum"]
-        == 1
-    )
+
+    responses = app.openapi()["paths"][
+        "/v1/grounded-ai"
+    ]["post"]["responses"]
+
+    for status_code in (
+        "200",
+        "400",
+        "403",
+        "413",
+        "429",
+        "503",
+    ):
+        headers = responses[status_code]["headers"]
+        assert "RateLimit-Limit" in headers
+        assert "RateLimit-Remaining" in headers
+        assert "RateLimit-Reset" in headers
+
+    assert "Retry-After" in responses["429"]["headers"]
+    assert "headers" not in responses["401"]
+    assert "headers" not in responses["500"]

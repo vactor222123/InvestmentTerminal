@@ -78,6 +78,10 @@ class GroundedAIServerRateLimitAdmissionService:
         return limiter.decide()
 
     @property
+    def policy(self) -> GroundedAIServerRateLimitPolicy:
+        return self._policy
+
+    @property
     def identity_count(self) -> int:
         with self._lock:
             return len(

@@ -51,12 +51,39 @@ GROUNDED_AI_ERROR_SCHEMA = {
 }
 
 
+def _rate_limit_headers() -> dict:
+    return {
+        "RateLimit-Limit": {
+            "description": "Configured token-bucket capacity",
+            "schema": {
+                "type": "integer",
+                "minimum": 1,
+            },
+        },
+        "RateLimit-Remaining": {
+            "description": "Whole requests immediately admissible",
+            "schema": {
+                "type": "integer",
+                "minimum": 0,
+            },
+        },
+        "RateLimit-Reset": {
+            "description": "Whole seconds until the bucket is full",
+            "schema": {
+                "type": "integer",
+                "minimum": 0,
+            },
+        },
+    }
+
+
 def grounded_ai_openapi_extra() -> dict:
     error_content = {
         "application/json": {
             "schema": GROUNDED_AI_ERROR_SCHEMA,
         }
     }
+    rate_limit_headers = _rate_limit_headers()
     return {
         "requestBody": {
             "required": True,
@@ -69,6 +96,7 @@ def grounded_ai_openapi_extra() -> dict:
         "responses": {
             "200": {
                 "description": "Grounded AI response",
+                "headers": rate_limit_headers,
                 "content": {
                     "application/json": {
                         "schema": GROUNDED_AI_SUCCESS_SCHEMA,
@@ -77,6 +105,7 @@ def grounded_ai_openapi_extra() -> dict:
             },
             "400": {
                 "description": "Invalid request",
+                "headers": rate_limit_headers,
                 "content": error_content,
             },
             "401": {
@@ -85,15 +114,18 @@ def grounded_ai_openapi_extra() -> dict:
             },
             "403": {
                 "description": "Policy denied",
+                "headers": rate_limit_headers,
                 "content": error_content,
             },
             "413": {
                 "description": "Request body too large",
+                "headers": rate_limit_headers,
                 "content": error_content,
             },
             "429": {
                 "description": "Inbound request rate limit exceeded",
                 "headers": {
+                    **rate_limit_headers,
                     "Retry-After": {
                         "description": (
                             "Whole seconds until the next admission is expected"
@@ -102,7 +134,7 @@ def grounded_ai_openapi_extra() -> dict:
                             "type": "integer",
                             "minimum": 1,
                         },
-                    }
+                    },
                 },
                 "content": error_content,
             },
@@ -112,6 +144,7 @@ def grounded_ai_openapi_extra() -> dict:
             },
             "503": {
                 "description": "Execution unavailable",
+                "headers": rate_limit_headers,
                 "content": error_content,
             },
         },
