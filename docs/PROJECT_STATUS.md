@@ -5,16 +5,16 @@
 ```text
 vactor222123/InvestmentTerminal
 branch: develop
-baseline: 85eb416
+baseline: 5d3d602
 ```
 
 ## Current phase
 
 ```text
-Sprint 24 — Application/API Productization Foundation
+Sprint 25 — Production Server Runtime and HTTP Hardening
 implementation complete
 full regression green
-ready for closure commit
+ready for closure documentation commit
 ```
 
 ## Completed foundation
@@ -25,132 +25,133 @@ Historical Intelligence, comparison/replay, outcome observations, methodology ha
 
 ### Sprint 24 — Application/API Productization Foundation
 
+Stable application contracts, concrete application orchestration, application composition, normalized application errors, framework-neutral API contracts, deterministic HTTP mapping, framework-neutral HTTP handler, and API composition are complete.
+
+### Sprint 25 — Production Server Runtime and HTTP Hardening
+
 Delivered:
 
 ```text
-GroundedAIApplicationRequest
-GroundedAIApplicationResult
-GroundedAIApplicationService
-LiveGroundedAIApplicationService
-build_live_grounded_ai_application()
-GroundedAIApplicationFailureDetails
-GroundedAIApplicationError
-GroundedAIAPIRequest
-GroundedAIAPIResponse
-GroundedAIAPIAdapter
-GroundedAIHTTPResponse
-GroundedAIHTTPStatusMapper
-GroundedAIHTTPHandler
-build_live_grounded_ai_http_handler()
+FastAPI production runtime
+environment-backed runtime configuration
+production server composition
+GET /health
+GET /ready
+inbound X-API-Key authentication
+request-body size enforcement
+sanitized unexpected-error boundary
+security response headers
+hardened public OpenAPI contract
+disabled Swagger/ReDoc production UIs
+canonical Uvicorn CLI entrypoint
+production runtime E2E
 ```
 
-## Canonical Productization Flow
+## Canonical Production Flow
 
 ```text
-future server/runtime adapter
+python -m investment_terminal.cli.server
         ↓
-API composition
+Uvicorn factory mode
+        ↓
+investment_terminal.server.production:create_app
+        ↓
+runtime configuration
+        ↓
+server auth / request limits
+        ↓
+FastAPI transport adapter
         ↓
 GroundedAIHTTPHandler
-        ↓
-GroundedAIAPIRequest
         ↓
 GroundedAIAPIAdapter
         ↓
 GroundedAIApplicationService
         ↓
 Knowledge / GroundedGeneration / provider stack
-        ↓
-GroundedAIApplicationResult
-        ↓
-GroundedAIAPIResponse
-        ↓
-HTTP status mapping
-        ↓
-GroundedAIHTTPResponse
 ```
 
-## Application Contract
-
-Request:
+## Runtime Surface
 
 ```text
-request_id
-user_query
-subject_keys
-max_items
+GET  /health
+GET  /ready
+POST /v1/grounded-ai
+GET  /openapi.json
 ```
 
-Result:
+Operational `/health` and `/ready` routes remain outside the public OpenAPI schema.
+
+Swagger `/docs` and ReDoc `/redoc` are disabled.
+
+## Authentication Boundary
+
+`POST /v1/grounded-ai` requires the configured inbound `X-API-Key`.
+
+Authentication is evaluated before request-body processing.
+
+The inbound server key is separate from the outbound OpenAI/provider credential.
+
+## Request Boundary
+
+Authenticated request bodies are bounded before UTF-8 JSON decoding.
+
+Expected server transport behavior:
 
 ```text
-generation
-trace
+missing/invalid API key → 401
+invalid JSON            → 400
+oversized body          → 413
+application policy      → 403
+application unavailable → 503
+unexpected server error → sanitized 500
 ```
 
-The application boundary owns use-case orchestration, not CLI parsing, HTTP framework integration, database construction, provider composition, credential lookup, or persistence.
+## Error Boundary
 
-## Application Error Contract
+Unexpected exceptions are converted to a stable generic internal-error response.
 
-Stable categories:
+The response does not intentionally expose:
 
 ```text
-POLICY_DENIED
-INVALID_REQUEST
-EXECUTION_FAILED
-INTERNAL_ERROR
+raw exception text
+tracebacks
+filesystem paths
+credentials
+provider secrets
+raw provider transport details
+request bodies
 ```
 
-Stable codes:
+Known HTTP/application failures retain their established mappings.
+
+## Security Headers
+
+Production responses receive deterministic hardening headers including:
 
 ```text
-APPLICATION_POLICY_DENIED
-APPLICATION_INVALID_REQUEST
-APPLICATION_EXECUTION_FAILED
-APPLICATION_INTERNAL_ERROR
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Referrer-Policy: no-referrer
+Cache-Control: no-store
+Pragma: no-cache
 ```
 
-Known lower-level exceptions are mapped to stable application errors.
+HSTS remains a deployment/TLS concern and is not assumed by the application runtime.
 
-The original exception remains available internally as `__cause__`.
+## Public OpenAPI Contract
 
-Unknown internal failures return a sanitized application error message.
-
-## Application Composition
-
-`build_live_grounded_ai_application()` owns:
+Public schema surface:
 
 ```text
-Knowledge SQLite store
-→ Knowledge repository
-→ Knowledge query service
-
-provider composition
-→ Grounded generation service
-
-both
-→ LiveGroundedAIApplicationService
+POST /v1/grounded-ai
 ```
 
-This removes Knowledge/provider construction from external adapters.
-
-## CLI Status
-
-The CLI now:
+Stable operation id:
 
 ```text
-parses input
-→ builds governance/pricing/budget policy values
-→ calls application composition
-→ creates GroundedAIApplicationRequest
-→ renders GroundedAIApplicationResult
+grounded_ai_generate
 ```
-
-It no longer directly constructs the Knowledge SQLite stack or primary provider/application orchestration path.
-
-Legacy `_run_live()` is retained for backward-compatible programmatic tests/callers.
-
-## API Contract
 
 Request:
 
@@ -161,124 +162,79 @@ subjects
 max_items
 ```
 
-Unknown fields are rejected.
+The schema rejects additional request properties.
 
-Success:
-
-```text
-status = SUCCESS
-request_id
-data = {
-  generation,
-  trace
-}
-```
-
-Error:
+Documented response status surface includes:
 
 ```text
-status = ERROR
-request_id
-error = {
-  category,
-  code,
-  message
-}
+200
+400
+401
+403
+413
+500
+503
 ```
 
-## HTTP Mapping
+Internal implementation types and secret values are not part of the public contract.
+
+## Production CLI
+
+Canonical launch command:
 
 ```text
-SUCCESS          → 200
-INVALID_REQUEST  → 400
-POLICY_DENIED    → 403
-EXECUTION_FAILED → 503
-INTERNAL_ERROR   → 500
-unknown category → 500
+python -m investment_terminal.cli.server
 ```
 
-Unknown failure categories fail closed to HTTP 500.
-
-## Framework-Neutral HTTP Handler
-
-The handler accepts an already-decoded payload and owns:
+The CLI delegates to:
 
 ```text
-payload validation
-→ API request mapping
-→ application execution
-→ API response mapping
-→ HTTP status mapping
+investment_terminal.server.production:create_app
 ```
 
-Malformed payloads become stable HTTP 400 responses.
+through Uvicorn factory mode.
 
-If no valid client request id exists, the error response uses `UNKNOWN` rather than inventing a new identity.
-
-## API Composition
-
-`build_live_grounded_ai_http_handler()` owns:
-
-```text
-build_live_grounded_ai_application()
-→ GroundedAIHTTPHandler
-```
-
-A future FastAPI/Flask/other server adapter can depend on this one composition boundary.
-
-## Current Non-Goals
-
-Sprint 24 intentionally does not provide:
-
-```text
-running HTTP server
-route registration
-FastAPI/Flask dependency
-authentication middleware
-authorization middleware
-OpenAPI schema publication
-health/readiness route
-deployment container/runtime
-```
-
-Those belong to the next productization stage.
+The CLI owns process options only and does not duplicate Knowledge, provider, application, API, auth, readiness, or runtime composition.
 
 ## Testing Status
 
-Full regression at Sprint 24 closure:
+Full regression at Sprint 25 closure:
 
 ```text
-1865 passed, 3 skipped in 9.04s
+1928 passed, 3 skipped, 1 warning in 16.74s
 ```
 
-Focused Sprint 24 tests cover:
+Focused Sprint 25 coverage includes:
 
 ```text
-application boundary
-application orchestration
-fail-fast budget ordering
-CLI migration
-application composition
-CLI composition migration
-application error contract
-API contract
-HTTP status mapping
-HTTP handler
-API composition
+runtime configuration
+production composition
+health/readiness
+authentication
+request limits
+server error sanitization
+security headers
+OpenAPI hardening
+server CLI
+production runtime E2E
 ```
+
+The production E2E covers the real server composition and HTTP stack while replacing only the outbound application/provider seam with deterministic network-free behavior.
 
 ## Security and Authority Boundaries
 
-Sprint 24 preserves:
+Sprint 25 preserves:
 
 - AI remains downstream of Knowledge;
-- no API adapter can bypass grounding validation;
+- no server/API adapter bypasses grounding validation;
 - provider/model governance remains fail-closed;
-- provider credentials remain outside API/application contracts;
-- raw transport data remains outside API responses;
-- policy denials are explicit and stable;
-- unknown internal failures are sanitized;
-- no API/HTTP path mutates Knowledge or History;
+- provider budget controls remain enforced at their established boundaries;
+- inbound API credentials remain separate from outbound provider credentials;
+- credentials are excluded from public API/OpenAPI surfaces;
+- raw provider transport data remains outside API responses;
+- request size is bounded before decoding;
+- unexpected server failures are sanitized;
+- no HTTP path mutates Knowledge or History;
 - no AI persistence schema is introduced;
 - no autonomous portfolio mutation is introduced;
 - no broker execution is introduced.
@@ -287,16 +243,13 @@ Sprint 24 preserves:
 
 Still deferred:
 
-- concrete web-framework runtime;
-- server routes/startup;
-- authentication and authorization;
-- API schema publication/OpenAPI;
-- health/readiness endpoints;
-- deployment/runtime packaging;
-- inbound API rate limiting;
+- inbound API rate limiting and abuse throttling;
+- deployment container/image and infrastructure manifests;
+- TLS termination/HSTS deployment policy;
+- authorization beyond API-key authentication;
 - retry jitter;
 - proactive provider rate-limit scheduling;
-- concurrency-aware throttling;
+- concurrency-aware provider throttling;
 - streaming responses;
 - additional provider adapters;
 - provider pricing catalog synchronization;
@@ -315,6 +268,6 @@ Still deferred:
 
 ## Next Decision
 
-Sprint 24 completes the framework-neutral application/API productization foundation.
+Sprint 25 completes the production server/runtime foundation over the stable Sprint 24 application/API boundary.
 
-The next milestone should add a real server/runtime adapter over the existing API composition boundary, with authentication and deployment concerns introduced incrementally rather than embedded into the application layer.
+The next milestone should be selected explicitly rather than extending Sprint 25. Leading candidates are inbound API rate limiting/abuse controls, deployment/runtime operations, or provider concurrency/rate-limit scheduling.
