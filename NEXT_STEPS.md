@@ -1,7 +1,7 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ 30a28ac`  
-**Status:** Durable continuation checkpoint established and CI-verified; Sprint 32 ready to begin.
+**Current baseline:** `develop @ b81fe98`  
+**Status:** Sprint 32 Task 1 closed with green CI; Task 32.2 is next.
 
 ## Durable Continuation Checkpoint
 
@@ -11,91 +11,50 @@ Before starting or resuming implementation work, read:
 PROJECT_CONTINUATION.md
 ```
 
-It is the canonical execution/handoff checkpoint and records the verified
-baseline, current phase, audit findings, approved Sprint plan, failure lessons,
-working protocol, and exact next Task.
-
-`PROJECT_CONTINUATION.md` MUST be updated after every completed Task.
-
-Checkpoint baseline:
-
-```text
-develop @ 30a28ac
-CI: GREEN
-```
+It is the canonical execution/handoff checkpoint and MUST be updated after
+every completed Task.
 
 ## Sprint 31
 
 Sprint 31 — Evidence Integrity & Delivery Hardening — is CLOSED.
 
-Established:
+## Sprint 32 — Production Deployment & Operational Resilience
+
+Progress:
 
 ```text
-deep immutable generated evidence
-→ strict JSON persistence boundary
-→ expanded architecture dependency guards
-→ documentation authority hierarchy
-→ Python 3.13.x reproducibility contract
-→ source dependency manifests
-→ hash-locked dependencies
-→ cross-platform lock installation
-→ GitHub Actions CI
-→ hermetic clean-clone tests
+32.1 Runtime Filesystem Contract       CLOSED / b81fe98 / CI GREEN
+32.2 SQLite Operational Inventory      NEXT
+32.3 Consistent SQLite Backup Primitive
+32.4 Backup Service
+32.5 Restore Validation
+32.6 Backup / Restore CLI
+32.7 FastAPI Lifespan Contract
+32.8 Runtime Deployment Layout
+32.9 Container Baseline
+32.10 Deployment Security Contract
+32.11 CI Container Smoke Test
+32.12 Real Operational Resilience E2E
+32.13 Sprint 32 Closure
 ```
 
-## Post-Sprint-31 Audit Result
+### 32.1 Result
 
-The strongest current gap is no longer evidence correctness or reproducible
-delivery.
-
-The next production-maturity gap is:
-
-```text
-runtime filesystem ownership
-→ SQLite operational lifecycle
-→ backup / restore
-→ explicit application lifespan
-→ deployment layout
-→ container baseline
-→ operational resilience E2E
-```
-
-## Sprint 32
-
-Selected:
-
-```text
-Sprint 32 — Production Deployment & Operational Resilience
-```
-
-The detailed approved 32.1–32.13 plan is maintained in
-`PROJECT_CONTINUATION.md`.
+The production runtime now supports an optional strict data-root contract.
+Existing explicit database paths are not silently relocated. When the root is
+configured, production fails closed if runtime database paths escape it.
 
 ## Current Next Action
 
 ```text
-Sprint 32 Task 1 — Runtime Filesystem Contract
+Sprint 32 Task 2 — SQLite Operational Inventory
 ```
 
-Do not begin with Docker. First define persistent state, path ownership,
-compatibility, and filesystem invariants.
+Task 32.2 must inventory and classify SQLite persistence before any generic
+backup primitive is implemented.
 
-## Preserved Authority
+The audit must distinguish canonical, operational, and rebuildable/projection
+state and record ownership, criticality, rebuildability, write behavior, and
+backup/restore requirements.
 
-```text
-History
-→ explicit Knowledge ingestion
-→ Knowledge
-→ Grounded AI
-→ persisted generated evidence
-```
-
-Delivery baseline:
-
-```text
-declared dependencies
-→ hash locks
-→ clean CI
-→ architecture guards
-→ full regression
-```
+Do not implement backup/restore in Task 32.2.

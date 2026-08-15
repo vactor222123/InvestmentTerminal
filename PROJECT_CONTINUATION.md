@@ -4,9 +4,9 @@
 **Update rule:** MUST be updated after every completed Task  
 **Current repository:** `vactor222123/InvestmentTerminal`  
 **Current branch:** `develop`  
-**Current baseline:** `30a28ac`  
+**Current baseline:** `b81fe98`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
-**Current next action:** Sprint 32 Task 1 — Runtime Filesystem Contract
+**Current next action:** Sprint 32 Task 2 — SQLite Operational Inventory
 
 ---
 
@@ -301,7 +301,16 @@ Sprint 32 — Production Deployment & Operational Resilience
 
 ## 8. Sprint 32 Approved Plan
 
-### 32.1 Runtime Filesystem Contract
+### 32.1 Runtime Filesystem Contract — CLOSED
+
+Closure:
+
+```text
+commit: b81fe98
+CI: GREEN
+```
+
+Established an optional strict runtime data-root boundary without silently relocating existing databases. Production validates configured database confinement before operational SQLite initialization, rejects path escape, and prepares writable operational parents while leaving missing Knowledge data to readiness semantics.
 
 Goals:
 
@@ -435,28 +444,27 @@ PROJECT_CONTINUATION.md
 ## 9. Current Next Action
 
 ```text
-Sprint 32 Task 1 — Runtime Filesystem Contract
+Sprint 32 Task 2 — SQLite Operational Inventory
 ```
 
-Before writing Task 32.1:
+Before writing Task 32.2:
 
 ```text
-1. Verify develop HEAD.
-2. Read current runtime_config.py.
-3. Read production.py.
-4. Read readiness.py.
-5. Read .env.example.
-6. Search every consumer of the three operational DB paths.
-7. Search tests that construct GroundedAIServerRuntimeConfig.
-8. Search existing path-confinement/filesystem utilities before inventing new
-   ones.
-9. Define compatibility impact.
-10. Only then produce the smallest coherent Task 32.1 package.
+1. Verify develop HEAD against b81fe98 or inspect every later commit.
+2. Search every SQLite store/repository in the repository.
+3. Identify which databases are production-operational versus historical
+   projection or other rebuildable state.
+4. For each store, determine authority, owner, rebuildability, criticality,
+   write behavior, WAL/journal behavior, and backup/restore requirement.
+5. Read schema initialization/migration code and relevant persistence tests.
+6. Read production composition and runtime filesystem contract.
+7. Do not implement backup code in 32.2.
+8. Produce one explicit operational inventory/contract that 32.3 can consume.
 ```
 
-Task 32.1 must not silently relocate existing user databases.
-
-Backward compatibility and migration behavior must be explicit.
+Task 32.2 is a classification/ownership Task. It must prevent the later backup
+primitive from treating all SQLite files as if they had the same authority or
+recovery semantics.
 
 ---
 
@@ -667,16 +675,55 @@ Sprint 32 Task 1 — Runtime Filesystem Contract
 
 ---
 
-## 15. Current Checkpoint Summary
+## 15. Sprint 32 Task Checkpoints
+
+### Task 32.1 — Runtime Filesystem Contract
+
+```text
+Status: CLOSED
+Commit: b81fe98
+CI: GREEN
+
+Changed:
+- added optional INVESTMENT_TERMINAL_RUNTIME_DATA_ROOT;
+- added explicit runtime filesystem ownership/confinement validation;
+- production validates the filesystem contract before SQLite store initialization;
+- added focused filesystem/configuration tests and runtime filesystem documentation.
+
+Decisions:
+- the runtime data root is opt-in for backward compatibility;
+- configuring a root does not relocate existing database paths;
+- when configured, all three production runtime database paths must resolve
+  inside the root;
+- path/symlink escape fails closed;
+- writable operational parents may be prepared by the contract;
+- the filesystem contract does not create a missing Knowledge database.
+
+Tests/guarantees:
+- focused runtime filesystem/config/production tests passed before commit;
+- full regression passed before commit;
+- GitHub Actions run #7 completed successfully.
+
+Lessons:
+- filesystem ownership must be established before container/volume work;
+- strict production confinement can be introduced without a hidden data migration.
+
+Next:
+Sprint 32 Task 2 — SQLite Operational Inventory
+```
+
+---
+
+## 16. Current Checkpoint Summary
 
 ```text
 Repository: vactor222123/InvestmentTerminal
 Branch: develop
-Baseline: 30a28ac
+Baseline: b81fe98
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
 Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
-Current next action: 32.1 Runtime Filesystem Contract
+Current next action: 32.2 SQLite Operational Inventory
 ```
 
 Checkpoint synchronization:
@@ -686,5 +733,5 @@ PROJECT_CONTINUATION.md introduced: develop @ 30a28ac
 CI: GREEN
 ```
 
-The handoff checkpoint is now self-consistent. Continue with Task 32.1 only
-from this verified baseline.
+Task 32.1 is closed on verified CI. Continue with Task 32.2 only from the
+verified `b81fe98` baseline, or audit every later commit before proceeding.
