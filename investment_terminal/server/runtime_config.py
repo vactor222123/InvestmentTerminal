@@ -14,6 +14,7 @@ from investment_terminal.ai.providers.pricing import (
     GroundedProviderPricingPolicy,
 )
 
+RUNTIME_DATA_ROOT_ENV = "INVESTMENT_TERMINAL_RUNTIME_DATA_ROOT"
 DATABASE_ENV = "INVESTMENT_TERMINAL_KNOWLEDGE_DATABASE"
 USAGE_COST_LEDGER_DATABASE_ENV = "INVESTMENT_TERMINAL_PROVIDER_USAGE_COST_DATABASE"
 GROUNDED_GENERATION_DATABASE_ENV = "INVESTMENT_TERMINAL_GROUNDED_GENERATION_DATABASE"
@@ -62,9 +63,20 @@ class GroundedAIServerRuntimeConfig:
     provider_pricing_currency: str
     rate_limit_capacity: int
     rate_limit_refill_tokens_per_second: Decimal
+    runtime_data_root: Path | None = None
 
     @classmethod
     def from_environment(cls, environment: Mapping[str, str]):
+        configured_runtime_data_root = environment.get(
+            RUNTIME_DATA_ROOT_ENV,
+            "",
+        ).strip()
+        runtime_data_root = (
+            Path(configured_runtime_data_root)
+            if configured_runtime_data_root
+            else None
+        )
+
         database = Path(_required(environment, DATABASE_ENV))
         usage_cost_ledger_database = Path(
             _required(environment, USAGE_COST_LEDGER_DATABASE_ENV)
@@ -160,6 +172,7 @@ class GroundedAIServerRuntimeConfig:
             provider_pricing_currency=provider_pricing_currency,
             rate_limit_capacity=rate_limit_capacity,
             rate_limit_refill_tokens_per_second=rate_limit_refill_tokens_per_second,
+            runtime_data_root=runtime_data_root,
         )
 
     def governance_policy(self) -> GroundedProviderGovernancePolicy:

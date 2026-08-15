@@ -29,6 +29,9 @@ from investment_terminal.server.rate_limits import GroundedAIServerRateLimitPoli
 from investment_terminal.server.readiness import GroundedAIServerReadinessService
 from investment_terminal.server.request_limits import GroundedAIServerRequestLimitPolicy
 from investment_terminal.server.runtime_config import GroundedAIServerRuntimeConfig
+from investment_terminal.server.runtime_filesystem import (
+    GroundedAIServerRuntimeFilesystemContract,
+)
 
 
 def _utc_now() -> datetime:
@@ -40,6 +43,10 @@ def _utc_now() -> datetime:
 def create_app(environment: Mapping[str, str] | None = None) -> FastAPI:
     source = environment if environment is not None else os.environ
     config = GroundedAIServerRuntimeConfig.from_environment(source)
+
+    GroundedAIServerRuntimeFilesystemContract.from_config(
+        config
+    ).prepare()
 
     ledger_store = GroundedProviderUsageCostLedgerSQLiteStore(
         config.usage_cost_ledger_database

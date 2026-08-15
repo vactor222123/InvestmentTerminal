@@ -12,6 +12,7 @@ from investment_terminal.server.runtime_config import (
     PROVIDER_MAX_TOTAL_TOKENS_ENV,
     PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS_ENV,
     PROVIDER_PRICING_CURRENCY_ENV,
+    RUNTIME_DATA_ROOT_ENV,
     USAGE_COST_LEDGER_DATABASE_ENV,
     GroundedAIServerRuntimeConfig,
 )
@@ -33,6 +34,33 @@ def environment() -> dict[str, str]:
         PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS_ENV: "0.20",
         PROVIDER_PRICING_CURRENCY_ENV: "EUR",
     }
+
+
+def test_runtime_data_root_is_optional_for_backward_compatibility() -> None:
+    config = GroundedAIServerRuntimeConfig.from_environment(
+        environment()
+    )
+
+    assert config.runtime_data_root is None
+
+
+def test_runtime_data_root_can_be_configured_without_relocating_paths() -> None:
+    values = environment()
+    values[RUNTIME_DATA_ROOT_ENV] = "data/knowledge"
+
+    config = GroundedAIServerRuntimeConfig.from_environment(
+        values
+    )
+
+    assert config.runtime_data_root == Path(
+        "data/knowledge"
+    )
+    assert config.database == Path(
+        "data/knowledge/knowledge.db"
+    )
+    assert config.usage_cost_ledger_database == Path(
+        "data/knowledge/provider_usage_cost.db"
+    )
 
 
 def test_grounded_generation_database_defaults_next_to_usage_ledger() -> None:
