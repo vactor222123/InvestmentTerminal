@@ -108,6 +108,22 @@ def build_history_database(
     )
 
 
+def common_args(
+    history_database: Path,
+    knowledge_database: Path,
+) -> list[str]:
+    return [
+        "--history-database",
+        str(history_database),
+        "--knowledge-database",
+        str(knowledge_database),
+        "--subject",
+        "portfolio",
+        "--generated-at",
+        dt(20).isoformat(),
+    ]
+
+
 def test_cli_composes_real_history_and_knowledge_sqlite(
     tmp_path: Path,
     capsys,
@@ -117,15 +133,12 @@ def test_cli_composes_real_history_and_knowledge_sqlite(
     build_history_database(history_database)
 
     main(
-        [
-            "--history-database",
-            str(history_database),
-            "--knowledge-database",
-            str(knowledge_database),
-            "--subject",
-            "portfolio",
-            "--generated-at",
-            dt(20).isoformat(),
+        common_args(
+            history_database,
+            knowledge_database,
+        )
+        + [
+            "--all",
             "--version",
             "2",
             "--json",
@@ -136,6 +149,8 @@ def test_cli_composes_real_history_and_knowledge_sqlite(
         capsys.readouterr().out
     )
 
+    assert report["dry_run"] is False
+    assert report["scope"] == "ALL"
     assert report["history_snapshots"] == 2
     assert report["knowledge_records"] == 1
     assert report["subject"] == "portfolio"
@@ -168,19 +183,18 @@ def test_cli_reingestion_is_idempotent_with_real_sqlite(
     knowledge_database = tmp_path / "knowledge.db"
     build_history_database(history_database)
 
-    argv = [
-        "--history-database",
-        str(history_database),
-        "--knowledge-database",
-        str(knowledge_database),
-        "--subject",
-        "portfolio",
-        "--generated-at",
-        dt(20).isoformat(),
-        "--version",
-        "1",
-        "--json",
-    ]
+    argv = (
+        common_args(
+            history_database,
+            knowledge_database,
+        )
+        + [
+            "--all",
+            "--version",
+            "1",
+            "--json",
+        ]
+    )
 
     main(argv)
     first_report = json.loads(
@@ -200,6 +214,115 @@ def test_cli_reingestion_is_idempotent_with_real_sqlite(
         )
     )
     assert len(repository.list_all()) == 1
+
+
+def test_cli_explicit_snapshot_scope_ingests_only_selected_snapshot(
+    tmp_path: Path,
+    capsys,
+) -> None:
+    history_database = tmp_path / "history.db"
+    knowledge_database = tmp_path / "knowledge.db"
+    build_history_database(history_database)
+
+    main(
+        common_args(
+            history_database,
+            knowledge_database,
+        )
+        + [
+            "--snapshot-id",
+            SNAPSHOT_A,
+            "--json",
+        ]
+    )
+
+    report = json.loads(
+        capsys.readouterr().out
+    )
+
+    assert report["scope"] == "EXPLICIT"
+    assert report["selected_snapshot_ids"] == [
+        SNAPSHOT_A,
+    ]
+    assert report["history_snapshots"] == 1
+    assert report["knowledge_records"] == 1
+
+
+def test_cli_dry_run_does_not_create_target_knowledge_database(
+    tmp_path: Path,
+    capsys,
+) -> None:
+    history_database = tmp_path / "history.db"
+    knowledge_database = tmp_path / "knowledge.db"
+    build_history_database(history_database)
+
+    main(
+        common_args(
+            history_database,
+            knowledge_database,
+        )
+        + [
+            "--snapshot-id",
+            SNAPSHOT_A,
+            "--dry-run",
+            "--json",
+        ]
+    )
+
+    report = json.loads(
+        capsys.readouterr().out
+    )
+
+    assert report["dry_run"] is True
+    assert report["knowledge_records"] == 1
+    assert report["records"][0]["knowledge_id"] == (
+        f"HISTORICAL_SNAPSHOT_FACT:{SNAPSHOT_A}"
+    )
+    assert not knowledge_database.exists()
+
+
+def test_cli_requires_explicit_scope(
+    tmp_path: Path,
+) -> None:
+    history_database = tmp_path / "history.db"
+    knowledge_database = tmp_path / "knowledge.db"
+    build_history_database(history_database)
+
+    with pytest.raises(SystemExit) as exc:
+        main(
+            common_args(
+                history_database,
+                knowledge_database,
+            )
+        )
+
+    assert exc.value.code == 2
+    assert not knowledge_database.exists()
+
+
+def test_cli_rejects_duplicate_explicit_snapshot_ids(
+    tmp_path: Path,
+) -> None:
+    history_database = tmp_path / "history.db"
+    knowledge_database = tmp_path / "knowledge.db"
+    build_history_database(history_database)
+
+    with pytest.raises(SystemExit) as exc:
+        main(
+            common_args(
+                history_database,
+                knowledge_database,
+            )
+            + [
+                "--snapshot-id",
+                SNAPSHOT_A,
+                "--snapshot-id",
+                SNAPSHOT_A,
+            ]
+        )
+
+    assert exc.value.code == 2
+    assert not knowledge_database.exists()
 
 
 def test_cli_fails_closed_when_history_state_is_missing(
@@ -228,15 +351,13 @@ def test_cli_fails_closed_when_history_state_is_missing(
 
     with pytest.raises(SystemExit) as exc:
         main(
-            [
-                "--history-database",
-                str(history_database),
-                "--knowledge-database",
-                str(knowledge_database),
-                "--subject",
-                "portfolio",
-                "--generated-at",
-                dt(20).isoformat(),
+            common_args(
+                history_database,
+                knowledge_database,
+            )
+            + [
+                "--snapshot-id",
+                SNAPSHOT_A,
             ]
         )
 
@@ -247,17 +368,17 @@ def test_cli_fails_closed_when_history_state_is_missing(
 def test_cli_requires_existing_history_database(
     tmp_path: Path,
 ) -> None:
+    history_database = tmp_path / "missing.db"
+    knowledge_database = tmp_path / "knowledge.db"
+
     with pytest.raises(SystemExit) as exc:
         main(
-            [
-                "--history-database",
-                str(tmp_path / "missing.db"),
-                "--knowledge-database",
-                str(tmp_path / "knowledge.db"),
-                "--subject",
-                "portfolio",
-                "--generated-at",
-                dt(20).isoformat(),
+            common_args(
+                history_database,
+                knowledge_database,
+            )
+            + [
+                "--all",
             ]
         )
 
