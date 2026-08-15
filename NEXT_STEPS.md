@@ -1,30 +1,38 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ f95f023`  
-**Status:** Sprint 27 implementation complete; closure documentation pending.
+**Current baseline:** `develop @ 3745ead`  
+**Status:** Sprint 27 closed; post-Sprint-27 review in progress.
 
-## Completed in Sprint 27
+## Sprint 27 Closure
 
-Explicit verified History-to-Knowledge ingestion is now available through:
+Explicit verified History-to-Knowledge ingestion is complete through:
 
 ```text
 python -m investment_terminal.cli.ingest_history_knowledge
 ```
 
-The operator must deliberately select either repeatable `--snapshot-id` values
-or `--all`. `--dry-run` validates the same projection path without persisting a
-Knowledge database mutation.
+Operational safeguards require deliberate `--snapshot-id` selection or explicit
+`--all`. `--dry-run` validates the same projection path without persistent
+Knowledge mutation.
 
-## Next Decision
+## Immediate Next Steps
 
-Do not begin Sprint 28 by assumption.
+```text
+1. Reconcile project_files.txt with the exact tracked repository.
+2. Complete post-Sprint-27 product-boundary review.
+3. Select Sprint 28 from current product needs and deferred scope.
+4. Begin Sprint 28 only from the reconciled baseline.
+```
 
-First perform a focused post-Sprint-27 review of the repository and choose the
-next milestone from current product needs and deferred scope. Candidate areas
-include operational automation, deployment/infrastructure hardening, persistent
-provider usage accounting, grounded answer persistence, or retrieval expansion.
+Candidate areas remain:
 
-The review must preserve the authority hierarchy:
+- automatic/scheduled History-to-Knowledge ingestion;
+- deployment/infrastructure hardening;
+- persistent provider usage/cost accounting;
+- grounded answer persistence/history;
+- retrieval expansion.
+
+The review must preserve:
 
 ```text
 Archived Review Package

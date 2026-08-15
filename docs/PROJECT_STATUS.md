@@ -5,35 +5,59 @@
 ```text
 vactor222123/InvestmentTerminal
 branch: develop
-baseline: 3f2f56b
+baseline: 3745ead
 ```
 
 ## Current Phase
 
 ```text
-Post-Sprint-26 independent audit CLOSED
-Sprint 27 planning ready
+Sprint 27 CLOSED
+Post-Sprint-27 review in progress
+Sprint 28 not started
 ```
 
-Sprint 26 implementation, production E2E, closure documentation, independent repository audit, and all confirmed audit remediation are complete.
+Sprint 27 — Explicit History-to-Knowledge Ingestion — is complete.
 
-## Audit Closure
+## Sprint 27 Delivered
+
+Implemented:
+
+- CLI-boundary adapter from verified History metadata to neutral Knowledge input;
+- deterministic Knowledge ingestion service;
+- exact re-ingestion idempotency;
+- fail-closed identity/version conflict semantics;
+- explicit immutable Knowledge versioning;
+- deterministic verified History batch ingestion;
+- real History SQLite → Knowledge SQLite CLI composition;
+- archived Review Package → History import → Knowledge SQLite E2E;
+- archive checksum/evidence identity preservation;
+- mandatory operational scope through repeatable `--snapshot-id` or explicit `--all`;
+- `--dry-run` projection validation without Knowledge database mutation;
+- duplicate explicit snapshot IDs rejected fail-closed.
+
+Canonical ingestion CLI:
 
 ```text
-AUD-001 / P1  CLOSED
-Production provider budget/pricing composition
-→ ad9dd1f fix(server): enforce provider budgets in production
-
-AUD-003 / P3  CLOSED
-Canonical architecture/documentation drift
-→ 5ec042d docs(architecture): reconcile canonical system documentation
-
-AUD-002 / P3  CLOSED
-Repository inventory / project_files.txt drift
-→ 3f2f56b chore(repo): reconcile tracked file inventory
+python -m investment_terminal.cli.ingest_history_knowledge
 ```
 
-No confirmed audit finding remains open.
+## Stable Authority Hierarchy
+
+```text
+Archived Review Package
+→ History
+→ explicit verified History-to-Knowledge ingestion
+→ Knowledge
+→ Grounded AI
+→ Application / API
+→ Production Server
+```
+
+History remains the canonical archived-evidence boundary.
+
+Knowledge does not import the History package.
+
+Cross-domain History → Knowledge translation remains in the CLI composition layer.
 
 ## Current System Foundation
 
@@ -59,7 +83,8 @@ Implemented:
 - versioned traceable Knowledge;
 - evidence references;
 - provenance assessment;
-- deterministic Knowledge access;
+- deterministic projection/query/comparison;
+- explicit verified History ingestion;
 - grounded prompt contracts;
 - provider-neutral generation boundary;
 - strict parsing;
@@ -107,56 +132,25 @@ Implemented:
 - Uvicorn CLI;
 - process-local inbound rate limiting;
 - safe rate-limit response metadata;
-- production rate-limit E2E;
 - fail-closed single-worker constraint.
 
-## Canonical Production Flow
+## Intentional Current Limitations
 
-```text
-python -m investment_terminal.cli.server
-→ Uvicorn factory mode
-→ investment_terminal.server.production:create_app
-→ runtime config
-→ provider governance/pricing/budget composition
-→ authentication
-→ rate-limit identity derivation
-→ rate-limit admission
-→ request-size guardrail
-→ FastAPI adapter
-→ GroundedAIHTTPHandler
-→ GroundedAIAPIAdapter
-→ GroundedAIApplicationService
-→ Knowledge / Grounded AI / provider stack
-```
+Still deferred:
 
-## Security / Authority Status
-
-Preserved:
-
-- archive evidence remains immutable;
-- SQLite remains rebuildable;
-- Knowledge remains downstream of verified evidence;
-- provider responses remain untrusted before grounding validation;
-- inbound and outbound credentials remain separate;
-- production provider governance/budget controls are wired;
-- unauthenticated requests do not consume authenticated rate-limit capacity;
-- rate-limit metadata exposes no identity/secrets;
-- request bodies are bounded before decoding;
-- unexpected server failures remain sanitized;
-- no autonomous portfolio mutation;
-- no broker execution.
-
-## Intentional Runtime Constraint
-
-Inbound rate-limit state remains process-local.
-
-Canonical production CLI supports only:
-
-```text
---workers 1
-```
-
-until a shared-state design is explicitly introduced.
+- automatic/scheduled History-to-Knowledge ingestion;
+- distributed/multi-worker rate-limit state;
+- deployment container/image and infrastructure manifests;
+- TLS termination/HSTS deployment policy;
+- authorization beyond API-key authentication;
+- streaming grounded-AI responses;
+- persistent provider usage/cost ledger;
+- provider request/response persistence;
+- grounded answer persistence/history;
+- vector retrieval/embeddings;
+- semantic entailment/contradiction detection;
+- autonomous portfolio mutation;
+- broker execution.
 
 ## Current Documentation Authority
 
@@ -167,20 +161,15 @@ docs/ARCHITECTURE.md
 docs/DOMAIN_MAP.md
 docs/AI_CONTEXT.md
 docs/README.md
+NEXT_STEPS.md
 ```
-
-Historical sprint plans/reviews remain supporting records, not current-state authority.
 
 ## Next Step
 
 ```text
-Sprint 27 planning
+Post-Sprint-27 review
+→ reconcile repository inventory
+→ select Sprint 28
 ```
 
-Planning must begin from:
-
-```text
-develop @ 3f2f56b
-```
-
-and start with a focused audit of the selected product boundary before implementation.
+Sprint 28 must not begin until current-state documentation and tracked-file inventory are reconciled.
