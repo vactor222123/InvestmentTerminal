@@ -11,6 +11,8 @@ from investment_terminal.ai.providers.usage_ledger import (
 )
 from investment_terminal.ai.providers.usage_ledger_repository import (
     GroundedProviderUsageCostLedgerRepository,
+    _validate_aware_datetime,
+    _validate_limit,
 )
 from investment_terminal.ai.providers.usage_ledger_sqlite_store import (
     GroundedProviderUsageCostLedgerSQLiteStore,
@@ -131,6 +133,73 @@ class SQLiteGroundedProviderUsageCostLedgerRepository(
                     recorded_at,
                     request_id
                 """
+            ).fetchall()
+
+        return tuple(
+            self._from_row(row)
+            for row in rows
+        )
+
+    def list_recent(
+        self,
+        limit: int,
+    ) -> tuple[GroundedProviderUsageCostLedgerRecord, ...]:
+        validated_limit = _validate_limit(limit)
+        self.store.initialize()
+        with self.store.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT *
+                FROM provider_usage_cost_ledger
+                ORDER BY
+                    recorded_at DESC,
+                    request_id DESC
+                LIMIT ?
+                """,
+                (
+                    validated_limit,
+                ),
+            ).fetchall()
+
+        return tuple(
+            self._from_row(row)
+            for row in rows
+        )
+
+    def list_between(
+        self,
+        started_at: datetime,
+        ended_at: datetime,
+    ) -> tuple[GroundedProviderUsageCostLedgerRecord, ...]:
+        start = _validate_aware_datetime(
+            started_at,
+            field_name="started_at",
+        )
+        end = _validate_aware_datetime(
+            ended_at,
+            field_name="ended_at",
+        )
+        if end <= start:
+            raise ValueError(
+                "ended_at must be later than started_at"
+            )
+
+        self.store.initialize()
+        with self.store.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT *
+                FROM provider_usage_cost_ledger
+                WHERE recorded_at >= ?
+                  AND recorded_at < ?
+                ORDER BY
+                    recorded_at,
+                    request_id
+                """,
+                (
+                    start.isoformat(),
+                    end.isoformat(),
+                ),
             ).fetchall()
 
         return tuple(
