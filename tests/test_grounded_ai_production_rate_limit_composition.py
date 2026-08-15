@@ -19,6 +19,7 @@ from investment_terminal.server.runtime_config import (
 
 def test_production_wires_rate_limit_services(
     monkeypatch,
+    tmp_path,
 ) -> None:
     calls = {}
 
@@ -45,9 +46,11 @@ def test_production_wires_rate_limit_services(
     )
 
     values = {
-        DATABASE_ENV: "data/knowledge/knowledge.db",
-        USAGE_COST_LEDGER_DATABASE_ENV: (
-            "data/knowledge/provider_usage_cost.db"
+        DATABASE_ENV: str(
+            tmp_path / "knowledge.db"
+        ),
+        USAGE_COST_LEDGER_DATABASE_ENV: str(
+            tmp_path / "provider_usage_cost.db"
         ),
         MODEL_ENV: "gpt-test",
         ALLOWED_MODELS_ENV: "gpt-test",

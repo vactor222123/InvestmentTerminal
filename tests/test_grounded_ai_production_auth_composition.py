@@ -23,11 +23,15 @@ from investment_terminal.server.runtime_config import (
 )
 
 
-def environment():
+def environment(
+    tmp_path,
+):
     return {
-        DATABASE_ENV: "data/knowledge/knowledge.db",
-        USAGE_COST_LEDGER_DATABASE_ENV: (
-            "data/knowledge/provider_usage_cost.db"
+        DATABASE_ENV: str(
+            tmp_path / "knowledge.db"
+        ),
+        USAGE_COST_LEDGER_DATABASE_ENV: str(
+            tmp_path / "provider_usage_cost.db"
         ),
         MODEL_ENV: "gpt-test",
         ALLOWED_MODELS_ENV: "gpt-test",
@@ -43,6 +47,7 @@ def environment():
 
 def test_production_requires_server_api_key_before_app_creation(
     monkeypatch,
+    tmp_path,
 ) -> None:
     monkeypatch.setattr(
         production,
@@ -54,11 +59,14 @@ def test_production_requires_server_api_key_before_app_creation(
         ValueError,
         match="required server API key environment variable",
     ):
-        production.create_app(environment())
+        production.create_app(
+            environment(tmp_path)
+        )
 
 
 def test_production_wires_authenticator(
     monkeypatch,
+    tmp_path,
 ) -> None:
     calls = {}
 
@@ -97,7 +105,7 @@ def test_production_wires_authenticator(
         fake_factory,
     )
 
-    values = environment()
+    values = environment(tmp_path)
     values[DEFAULT_SERVER_API_KEY_ENV] = "server-secret"
 
     app = production.create_app(values)
