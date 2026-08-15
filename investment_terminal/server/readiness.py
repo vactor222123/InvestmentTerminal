@@ -10,6 +10,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
+from investment_terminal.ai.generation_sqlite_store import (
+    GroundedGenerationSQLiteStore,
+)
 from investment_terminal.ai.providers.usage_ledger_sqlite_store import (
     GroundedProviderUsageCostLedgerSQLiteStore,
 )
@@ -68,6 +71,7 @@ class GroundedAIServerReadinessService:
             else "NOT_READY"
         )
         ledger_status = self._usage_cost_ledger_status()
+        generation_status = self._grounded_generation_status()
 
         secret = self._environment.get(
             self._config.api_key_environment_variable,
@@ -83,6 +87,7 @@ class GroundedAIServerReadinessService:
         checks = {
             "knowledge_database": database_status,
             "provider_usage_cost_database": ledger_status,
+            "grounded_generation_database": generation_status,
             "provider_credentials": credential_status,
         }
         status = (
@@ -100,12 +105,28 @@ class GroundedAIServerReadinessService:
         )
 
     def _usage_cost_ledger_status(self) -> str:
-        database = self._config.usage_cost_ledger_database
+        return self._sqlite_schema_status(
+            database=self._config.usage_cost_ledger_database,
+            store_type=GroundedProviderUsageCostLedgerSQLiteStore,
+        )
+
+    def _grounded_generation_status(self) -> str:
+        return self._sqlite_schema_status(
+            database=self._config.grounded_generation_database,
+            store_type=GroundedGenerationSQLiteStore,
+        )
+
+    @staticmethod
+    def _sqlite_schema_status(
+        *,
+        database,
+        store_type,
+    ) -> str:
         if not database.is_file():
             return "NOT_READY"
 
         try:
-            store = GroundedProviderUsageCostLedgerSQLiteStore(
+            store = store_type(
                 database
             )
             schema_version = store.schema_version()
