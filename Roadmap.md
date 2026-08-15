@@ -1,7 +1,7 @@
 # Investment Terminal — Product Roadmap
 
 **Status:** Canonical Roadmap  
-**Updated after:** Sprint 28 — Persistent Provider Usage & Cost Ledger  
+**Updated after:** Sprint 29 — Provider Operational Accounting Hardening  
 **Current development branch:** `develop`
 
 ## Current Product Evolution
@@ -19,6 +19,7 @@ Foundation
 → Inbound Abuse Controls
 → Explicit History-to-Knowledge Ingestion
 → Persistent Provider Usage & Cost Accounting
+→ Provider Operational Accounting Hardening
 ```
 
 ## Completed Milestones
@@ -60,18 +61,17 @@ python -m investment_terminal.cli.ingest_history_knowledge
 
 ### Sprint 28 — Persistent Provider Usage & Cost Ledger
 
-Delivered:
+Delivered immutable provider-neutral usage/cost accounting with:
 
-- immutable provider-neutral usage/cost ledger record;
-- repository contract and in-memory reference implementation;
+- immutable request identity;
+- repository contract;
 - dedicated SQLite schema/store;
-- SQLite repository with exact Decimal text round-trip;
-- recording service over already-observed usage and deterministic cost;
-- production application composition for durable recording;
+- exact Decimal persistence;
+- recording service;
+- production composition;
 - read-only operational CLI;
-- exact request identity and immutable duplicate rejection;
-- deterministic `(recorded_at, request_id)` ordering;
-- real SQLite close/reopen persistence E2E.
+- deterministic ordering;
+- real SQLite persistence E2E.
 
 Canonical operational CLI:
 
@@ -79,17 +79,27 @@ Canonical operational CLI:
 python -m investment_terminal.cli.provider_usage_cost
 ```
 
-Supported read-only commands:
+### Sprint 29 — Provider Operational Accounting Hardening
 
-```text
-list
-show --request-id <request-id>
-summary
-```
+Delivered:
 
-The ledger records successful priced provider usage after application execution.
-It does not replace Grounded AI trace data and does not become canonical
-historical investment evidence.
+- explicit runtime-configured usage/cost ledger database path;
+- production initialization of the configured ledger;
+- ledger-aware readiness;
+- schema-version-aware readiness validation;
+- fail-closed corrupt/uninitialized ledger handling;
+- test isolation for runtime SQLite artifacts;
+- bounded `list_recent(limit)` repository queries;
+- bounded half-open `list_between(started_at, ended_at)` queries;
+- bounded CLI `recent` / `between` commands;
+- repository-owned summary queries;
+- exact single-query SQLite Decimal aggregation;
+- exact high-precision cost regression coverage;
+- SQLite connection lifecycle hardening;
+- real operational close/reopen/readiness/query/summary E2E.
+
+The operational accounting boundary remains parallel to canonical investment
+evidence. It must not be promoted into History or Knowledge authority.
 
 ## Stable Authority Hierarchy
 
@@ -104,14 +114,13 @@ Archived Review Package
 → ADMISSIBLE GroundedGenerationResult
 ```
 
-Provider operational accounting remains a parallel operational evidence stream:
+Parallel operational accounting:
 
 ```text
 successful priced provider usage
-→ immutable usage/cost ledger
+→ immutable provider usage/cost ledger
+→ bounded operational queries / exact summaries
 ```
-
-It must not be promoted into History or Knowledge authority.
 
 ## Production Server Status
 
@@ -138,8 +147,27 @@ GET  /openapi.json
 
 Production composition includes provider governance, explicit pricing,
 output-token limits, token/cost budgets, persistent successful usage/cost
-recording, authentication, request-size enforcement, rate limiting, and
-sanitized HTTP error handling.
+recording, ledger schema initialization/readiness, authentication, request-size
+enforcement, rate limiting, and sanitized HTTP error handling.
+
+## Provider Accounting Runtime Contract
+
+Mandatory runtime path:
+
+```text
+INVESTMENT_TERMINAL_PROVIDER_USAGE_COST_DATABASE
+```
+
+Readiness requires:
+
+```text
+knowledge_database
+provider_usage_cost_database
+provider_credentials
+```
+
+The provider usage/cost database must exist, be valid SQLite, and expose the
+supported ledger schema version.
 
 ## Rate-Limit Runtime Contract
 
@@ -197,16 +225,21 @@ Still deferred:
 
 ## Current Decision Point
 
-Sprint 28 implementation is complete.
+Sprint 29 implementation is complete.
 
-Frozen Sprint 28 implementation baseline:
+Frozen Sprint 29 implementation baseline:
 
 ```text
-develop @ cffc060
+develop @ 1cadd3e
 ```
 
-Before selecting Sprint 29, reconcile canonical documentation and tracked-file
-inventory, then run a focused architecture/product-boundary review.
+Next:
+
+```text
+Sprint 29 documentation + inventory closure
+→ focused post-Sprint-29 architecture/product audit
+→ select Sprint 30
+```
 
 ## Definition of Done
 

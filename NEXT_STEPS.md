@@ -1,12 +1,24 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ cffc060`  
-**Status:** Sprint 28 implementation complete; closure reconciliation in progress.
+**Current baseline:** `develop @ 1cadd3e`  
+**Status:** Sprint 29 implementation complete; closure reconciliation in progress.
 
-## Sprint 28 Closure
+## Sprint 29 Closure
 
-Persistent provider usage/cost accounting is implemented through an immutable,
-provider-neutral ledger backed by SQLite.
+Provider operational accounting is now hardened beyond simple persistence.
+
+Implemented:
+
+```text
+explicit configured ledger path
+→ initialized SQLite schema
+→ schema-aware readiness
+→ bounded operational queries
+→ exact repository summary
+→ exact SQLite Decimal aggregation
+→ explicit connection lifecycle
+→ operational E2E
+```
 
 Operational inspection:
 
@@ -18,25 +30,30 @@ Commands:
 
 ```text
 list
+recent --limit <N>
+between --started-at <ISO-8601> --ended-at <ISO-8601>
 show --request-id <request-id>
 summary
 ```
 
-Production successful priced provider usage is durably recorded without changing
-History, Knowledge, grounding, or provider execution authority.
+`between` uses half-open semantics:
+
+```text
+[started_at, ended_at)
+```
 
 ## Immediate Next Steps
 
 ```text
-1. Reconcile canonical Sprint 28 documentation.
+1. Reconcile canonical Sprint 29 documentation.
 2. Reconcile project_files.txt with exact git ls-files output.
 3. Run the full regression suite.
-4. Commit the Sprint 28 closure baseline.
-5. Perform focused post-Sprint-28 architecture/product review.
-6. Select Sprint 29 only from the reconciled baseline.
+4. Commit the Sprint 29 closure baseline.
+5. Perform focused post-Sprint-29 architecture/product review.
+6. Select Sprint 30 only from the reconciled baseline.
 ```
 
-Remaining candidate areas include:
+Candidate areas for Sprint 30 review include:
 
 - automatic/scheduled History-to-Knowledge ingestion;
 - deployment/infrastructure hardening;

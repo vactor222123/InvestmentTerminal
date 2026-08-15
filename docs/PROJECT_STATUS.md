@@ -5,41 +5,52 @@
 ```text
 vactor222123/InvestmentTerminal
 branch: develop
-baseline: cffc060
+baseline: 1cadd3e
 ```
 
 ## Current Phase
 
 ```text
-Sprint 28 IMPLEMENTATION COMPLETE
-Sprint 28 closure reconciliation in progress
-Sprint 29 not started
+Sprint 29 IMPLEMENTATION COMPLETE
+Sprint 29 closure reconciliation in progress
+Sprint 30 not started
 ```
 
-Sprint 28 — Persistent Provider Usage & Cost Ledger — is implemented.
+Sprint 29 — Provider Operational Accounting Hardening — is implemented.
 
-## Sprint 28 Delivered
+## Sprint 29 Delivered
 
 Implemented:
 
-- immutable provider usage/cost ledger record;
-- provider-neutral repository contract;
-- in-memory reference repository;
-- dedicated SQLite schema/store;
-- SQLite repository;
-- exact Decimal cost persistence without float conversion;
-- recording service over observed usage + deterministic pricing result;
-- production application composition;
-- immutable duplicate request rejection;
-- deterministic chronological/request-id ordering;
-- read-only operational CLI;
-- exact summary aggregation;
-- real SQLite persistence/reopen E2E.
+- explicit mandatory provider usage/cost ledger database path;
+- production initialization of configured ledger SQLite;
+- ledger-aware production readiness;
+- schema-version-aware readiness;
+- fail-closed missing/uninitialized/corrupt ledger handling;
+- isolated runtime SQLite test paths;
+- bounded recent queries;
+- bounded half-open time-window queries;
+- bounded operational CLI commands;
+- repository-owned summaries;
+- exact high-precision Decimal cost aggregation;
+- single-query SQLite summary aggregation;
+- explicit SQLite connection lifecycle management;
+- operational persistence/readiness/query/summary E2E.
 
 Canonical operational CLI:
 
 ```text
 python -m investment_terminal.cli.provider_usage_cost
+```
+
+Commands:
+
+```text
+list
+recent --limit <N>
+between --started-at <ISO-8601> --ended-at <ISO-8601>
+show --request-id <request-id>
+summary
 ```
 
 ## Stable Authority Hierarchy
@@ -54,42 +65,10 @@ Archived Review Package
 → Production Server
 ```
 
-Provider usage/cost ledger is an operational accounting boundary. It is not
-canonical History, Knowledge, or investment evidence.
+Provider usage/cost ledger is a parallel operational accounting boundary. It is
+not canonical History, Knowledge, or investment evidence.
 
-## Current System Foundation
-
-### History / Historical Intelligence
-
-Implemented:
-
-- immutable exact-byte archive;
-- append-only manifest;
-- checksum/path verification;
-- rebuildable SQLite projection;
-- migrations and explicit import state;
-- atomic detail import;
-- timeline;
-- comparison and replay;
-- outcome observations/research;
-- provenance/population-quality controls.
-
-### Knowledge / Grounded AI
-
-Implemented:
-
-- versioned traceable Knowledge;
-- evidence references;
-- provenance assessment;
-- deterministic projection/query/comparison;
-- explicit verified History ingestion;
-- grounded prompt contracts;
-- provider-neutral generation boundary;
-- strict parsing;
-- grounding validation;
-- grounded generation trace.
-
-### Provider Operations
+## Provider Operations
 
 Implemented:
 
@@ -103,27 +82,23 @@ Implemented:
 - total-token budget;
 - total-cost budget;
 - persistent immutable successful usage/cost ledger;
-- read-only usage/cost operational CLI;
+- explicit runtime ledger database path;
+- schema-aware readiness;
+- bounded operational repository queries;
+- exact repository summary queries;
+- exact SQLite Decimal aggregation;
+- read-only operational CLI;
+- connection lifecycle hardening;
 - production composition of economic controls and ledger recording.
 
-### Application / API
-
-Implemented:
-
-- provider-neutral application orchestration;
-- normalized application errors;
-- framework-neutral API contracts;
-- deterministic HTTP mapping;
-- framework-neutral HTTP handler;
-- successful priced usage/cost recording decorator.
-
-### Production Server
+## Production Server
 
 Implemented:
 
 - FastAPI production runtime;
 - environment-backed runtime config;
 - health/readiness;
+- ledger schema/readiness validation;
 - inbound API-key authentication;
 - bounded request bodies;
 - sanitized errors;
@@ -135,6 +110,22 @@ Implemented:
 - safe rate-limit response metadata;
 - fail-closed single-worker constraint;
 - persistent provider usage/cost accounting.
+
+## Runtime Accounting Contract
+
+Mandatory ledger path:
+
+```text
+INVESTMENT_TERMINAL_PROVIDER_USAGE_COST_DATABASE
+```
+
+Readiness checks:
+
+```text
+knowledge_database
+provider_usage_cost_database
+provider_credentials
+```
 
 ## Intentional Current Limitations
 
@@ -168,8 +159,8 @@ NEXT_STEPS.md
 ## Next Step
 
 ```text
-Sprint 28 closure reconciliation
+Sprint 29 closure reconciliation
 → exact tracked-file inventory reconciliation
-→ post-Sprint-28 architecture/product review
-→ select Sprint 29
+→ post-Sprint-29 architecture/product review
+→ select Sprint 30
 ```

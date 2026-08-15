@@ -4,14 +4,18 @@
 
 **Document type:** High-level software architecture  
 **Document status:** Canonical  
-**Updated after:** Post-Sprint-26 Audit Fix 1  
-**Baseline:** `develop @ ad9dd1f`
+**Updated after:** Sprint 29 — Provider Operational Accounting Hardening  
+**Baseline:** `develop @ 1cadd3e`
 
 ## 1. Architectural Mission
 
-Investment Terminal is a private, local-first investment intelligence platform optimized for correctness, determinism, traceability, reproducibility, explainability, historical integrity, maintainability, and explicit human decision ownership.
+Investment Terminal is a private, local-first investment intelligence platform
+optimized for correctness, determinism, traceability, reproducibility,
+explainability, historical integrity, maintainability, and explicit human
+decision ownership.
 
-The system is a modular monolith. It preserves verified evidence before interpretation and keeps AI downstream of traceable Knowledge.
+The system is a modular monolith. It preserves verified evidence before
+interpretation and keeps AI downstream of traceable Knowledge.
 
 Canonical authority flow:
 
@@ -31,7 +35,15 @@ Current analytical domains
 → human decision
 ```
 
-No AI or API boundary may rewrite canonical historical evidence or autonomously mutate portfolio state.
+Parallel operational accounting flow:
+
+```text
+successful priced provider usage
+→ immutable provider usage/cost ledger
+→ bounded operational queries / exact summaries
+```
+
+Operational accounting does not become canonical investment evidence.
 
 ## 2. Architectural Style
 
@@ -72,6 +84,7 @@ Persistence
 Filesystem
 Serialization
 Provider transports
+Provider operational accounting
 CLI
 HTTP/FastAPI
 Logging
@@ -79,35 +92,14 @@ Logging
 
 ## 4. Review Domain
 
-The Review Domain owns the versioned Review Package and assembles already-produced analytical outputs.
-
-It does not own:
-
-- market-data acquisition;
-- indicator calculations;
-- portfolio valuation rules;
-- recommendation rules;
-- historical persistence;
-- Knowledge derivation;
-- AI generation.
+The Review Domain owns the versioned Review Package and assembles already-produced
+analytical outputs. It does not own historical persistence, Knowledge derivation,
+AI generation, or provider operational accounting.
 
 ## 5. History Domain
 
-History preserves completed Review Packages as immutable, verifiable, indexed historical evidence.
-
-It owns:
-
-- snapshot identity;
-- exact-byte immutable archive;
-- archive path confinement;
-- SHA-256 verification;
-- append-only manifest;
-- SQLite schema and migrations;
-- explicit import state;
-- structured historical import;
-- timeline persistence;
-- History repositories;
-- verified archived package loading.
+History preserves completed Review Packages as immutable, verifiable, indexed
+historical evidence.
 
 Source-of-truth hierarchy:
 
@@ -117,48 +109,19 @@ manifest.jsonl = append-only archive index
 history.db = rebuildable structured projection
 ```
 
-A failed detail import must not leave a misleading partial projection.
+Provider usage/cost accounting is explicitly outside this authority.
 
 ## 6. Historical Intelligence and Outcome Research
 
-Historical Intelligence operates only on verified historical facts and typed projections.
-
-It owns:
-
-- snapshot compatibility;
-- portfolio-summary comparison;
-- holdings comparison;
-- recommendation comparison;
-- deployment comparison;
-- aggregate snapshot comparison;
-- exact and normalized replay semantics;
-- outcome observations;
-- descriptive outcome research;
-- methodology identity;
-- provenance/population-quality assessment.
-
-It must not:
-
-- mutate archive evidence;
-- access live market APIs for replay;
-- silently recalculate history with current code;
-- perform fuzzy identity rewriting.
+Historical Intelligence operates only on verified historical facts and typed
+projections. It must not mutate archive evidence, access live market APIs for
+replay, silently recalculate history with current code, or perform fuzzy identity
+rewriting.
 
 ## 7. Knowledge Domain
 
-**Status: Implemented.**
-
-Knowledge is a versioned, traceable, rebuildable interpretation layer downstream of verified historical evidence.
-
-It owns:
-
-- immutable/versioned Knowledge records;
-- evidence references;
-- provenance assessment;
-- deterministic projection/query/comparison;
-- read-only Knowledge access boundaries.
-
-Knowledge may be rebuilt. History may not be rewritten.
+Knowledge is a versioned, traceable, rebuildable interpretation layer downstream
+of verified historical evidence.
 
 Canonical authority:
 
@@ -169,11 +132,9 @@ History evidence
 → grounded AI context
 ```
 
-Knowledge is not allowed to mutate History.
+Knowledge may be rebuilt. History may not be rewritten.
 
 ## 8. Grounded AI Domain
-
-**Status: Implemented.**
 
 Grounded AI consumes Knowledge through provider-neutral contracts.
 
@@ -192,11 +153,7 @@ Knowledge query/context
 
 Provider output is never canonical evidence merely because a provider returned it.
 
-Grounding validation is a mandatory trust boundary.
-
 ## 9. Provider Integration and Operational Controls
-
-The OpenAI provider is composed behind provider-neutral interfaces.
 
 Established controls include:
 
@@ -210,13 +167,38 @@ Established controls include:
 - total-token budgets;
 - total-cost budgets;
 - explicit provider pricing configuration;
-- environment-backed credentials.
+- environment-backed credentials;
+- immutable successful usage/cost persistence;
+- bounded usage/cost queries;
+- exact repository summaries;
+- exact SQLite Decimal aggregation.
 
-Canonical production runtime now composes provider pricing and budget policies explicitly.
+Canonical production runtime composes provider pricing, budget policies, and
+usage/cost recording explicitly.
 
-Economic controls are fail-closed in production configuration: canonical production startup requires explicit budget and pricing settings.
+## 10. Provider Operational Accounting Boundary
 
-## 10. Application and API Architecture
+Provider operational accounting owns:
+
+- immutable usage/cost ledger records;
+- repository query contracts;
+- dedicated SQLite storage;
+- explicit runtime database path;
+- schema versioning/readiness validation;
+- bounded recent queries;
+- half-open time-window queries;
+- exact aggregate summaries;
+- operational read-only CLI.
+
+Canonical runtime path:
+
+```text
+INVESTMENT_TERMINAL_PROVIDER_USAGE_COST_DATABASE
+```
+
+The ledger is operational accounting, not History or Knowledge.
+
+## 11. Application and API Architecture
 
 The application layer exposes provider-neutral orchestration.
 
@@ -227,34 +209,16 @@ GroundedAIApplicationService
 → GroundedAIHTTPHandler
 ```
 
-The framework-neutral HTTP handler owns deterministic application-to-HTTP mapping.
+Successful priced usage is recorded downstream of successful application
+execution through the operational accounting boundary.
 
-FastAPI is a transport adapter, not the owner of application/domain rules.
-
-## 11. Production Server Architecture
+## 12. Production Server Architecture
 
 Canonical production factory:
 
 ```text
 investment_terminal.server.production:create_app
 ```
-
-Canonical CLI:
-
-```text
-python -m investment_terminal.cli.server
-```
-
-Runtime routes:
-
-```text
-GET  /health
-GET  /ready
-POST /v1/grounded-ai
-GET  /openapi.json
-```
-
-Swagger `/docs` and ReDoc `/redoc` are disabled.
 
 Canonical inbound request flow:
 
@@ -267,40 +231,38 @@ request
 → UTF-8 JSON decoding
 → framework-neutral HTTP handler
 → application/provider execution
+→ successful usage/cost recording
 → sanitized response
 → deterministic security headers
 ```
 
-Authentication occurs before rate-limit admission.
+## 13. Readiness and Runtime Controls
 
-## 12. Authentication and Request Controls
-
-`POST /v1/grounded-ai` requires inbound `X-API-Key` authentication.
-
-Established server controls:
-
-- inbound API-key authentication;
-- bounded request bodies before JSON decoding;
-- sanitized unexpected-error handling;
-- deterministic security headers;
-- process-local token-bucket rate limiting;
-- safe `RateLimit-*` client metadata;
-- `429` plus `Retry-After`;
-- fail-closed single-worker production runtime while limiter state is process-local.
-
-Unauthenticated requests:
+Readiness is network-free and verifies local runtime prerequisites:
 
 ```text
-→ 401
-→ no authenticated rate-limit token consumed
-→ no RateLimit-* state exposed
+knowledge_database
+provider_usage_cost_database
+provider_credentials
 ```
 
-## 13. Runtime Configuration
+Provider usage/cost readiness requires:
+
+```text
+configured ledger file
+→ valid SQLite
+→ schema metadata
+→ supported schema version
+```
+
+Missing, uninitialized, corrupt, or incompatible ledger storage is `NOT_READY`.
+
+## 14. Runtime Configuration
 
 Production configuration owns:
 
 - Knowledge database path;
+- provider usage/cost database path;
 - provider model;
 - provider allowlist;
 - provider timeout/retry limits;
@@ -311,27 +273,25 @@ Production configuration owns:
 - maximum request-body size;
 - rate-limit capacity/refill rate.
 
-Configuration must fail closed on missing or invalid mandatory economic controls.
+Configuration must fail closed on missing or invalid mandatory controls.
 
-## 14. Persistence and Transaction Ownership
+## 15. Persistence and Transaction Ownership
 
 Persistence repositories own SQL/query details.
 
-Important integrity guarantees include:
+Important provider-ledger guarantees include:
 
-- immutable archive creation;
-- exact-byte checksum verification;
-- path confinement;
-- append-only manifest behavior;
-- controlled schema migration;
-- explicit import state;
-- atomic historical detail import;
+- immutable request identity;
+- exact Decimal text persistence;
 - deterministic ordering;
-- rebuildable SQLite projections.
+- bounded query ownership;
+- exact aggregate summaries;
+- schema-version readiness;
+- explicit SQLite connection lifecycle.
 
 CLI and HTTP layers must not own SQL.
 
-## 15. CLI Boundary
+## 16. CLI Boundary
 
 CLI responsibilities:
 
@@ -344,14 +304,10 @@ parse
 → exit
 ```
 
-Forbidden:
+Provider operational CLI is read-only and supports exact request lookup, bounded
+recent/time-window queries, and repository-owned summaries.
 
-- business rules in CLI;
-- direct SQL where repository boundaries exist;
-- hidden historical recalculation;
-- archive mutation from read-only commands.
-
-## 16. Dependency Rules
+## 17. Dependency Rules
 
 Allowed direction:
 
@@ -373,19 +329,10 @@ Review
 → Application/API
 ```
 
-Forbidden examples:
+Operational provider accounting remains parallel and downstream of provider
+execution; it must not become an upstream source of investment truth.
 
-```text
-History → live market API
-History → current analysis recalculation
-Historical Intelligence → archive mutation
-Knowledge → History mutation
-AI → canonical historical rewrite
-FastAPI → domain-rule ownership
-CLI → domain-rule ownership
-```
-
-## 17. Security and Authority Rules
+## 18. Security and Authority Rules
 
 - inbound server credentials are separate from outbound provider credentials;
 - secrets must not appear in API responses or rate-limit metadata;
@@ -394,45 +341,28 @@ CLI → domain-rule ownership
 - unexpected server errors are sanitized;
 - request bodies are bounded before decoding;
 - supported production rate-limit state is process-local and single-worker;
+- provider operational accounting does not gain portfolio mutation authority;
 - no autonomous trading or broker execution is introduced.
 
-## 18. Testing Architecture
+## 19. Testing Architecture
 
-Important behaviors require focused tests plus full regression.
-
-Critical end-to-end paths include:
+Critical provider accounting paths include:
 
 ```text
-Review Package
-→ Archive
-→ Verification
-→ History import
-→ Timeline
-→ Comparison / Replay
+runtime environment
+→ configured ledger path
+→ schema initialization
+→ readiness
+→ durable record
+→ close/reopen
+→ bounded queries
+→ exact summary
 ```
 
-```text
-History
-→ Knowledge
-→ Grounded prompt
-→ Provider
-→ Parsing
-→ Grounding validation
-```
+Connection lifecycle behavior is covered explicitly because SQLite WAL sidecars
+must not remain locked after metadata/readiness operations.
 
-```text
-Runtime environment
-→ production.create_app()
-→ authentication
-→ rate limiting
-→ HTTP handler
-→ application/provider controls
-→ response
-```
-
-Passing unit tests do not replace production composition tests.
-
-## 19. Intentional Current Limitations
+## 20. Intentional Current Limitations
 
 Still intentional:
 
@@ -443,6 +373,7 @@ Still intentional:
 - no autonomous portfolio mutation;
 - no broker execution;
 - no provider-price synchronization service;
-- no persistent usage/cost ledger unless introduced by a future milestone.
+- no provider request/response persistence;
+- no grounded answer persistence/history.
 
 These are explicit limitations, not hidden claims of support.

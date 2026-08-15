@@ -81,6 +81,7 @@ investment_terminal/ai/providers/usage_ledger_recording.py
 investment_terminal/ai/providers/usage_ledger_repository.py
 investment_terminal/ai/providers/usage_ledger_sqlite_repository.py
 investment_terminal/ai/providers/usage_ledger_sqlite_store.py
+investment_terminal/ai/providers/usage_ledger_summary.py
 investment_terminal/ai/response_parser.py
 investment_terminal/ai/validation.py
 investment_terminal/api/__init__.py
@@ -411,6 +412,7 @@ tests/test_grounded_ai_server_request_limit_config.py
 tests/test_grounded_ai_server_request_limits.py
 tests/test_grounded_ai_server_runtime_config.py
 tests/test_grounded_ai_server_security_headers.py
+tests/test_grounded_ai_server_usage_cost_runtime_config.py
 tests/test_grounded_context_selection.py
 tests/test_grounded_generation_audit.py
 tests/test_grounded_generation_orchestration.py
@@ -581,12 +583,18 @@ tests/test_provider_usage_accounting.py
 tests/test_provider_usage_audit_cli.py
 tests/test_provider_usage_cost_cli.py
 tests/test_provider_usage_cost_ledger_application_recording.py
+tests/test_provider_usage_cost_ledger_bounded_queries.py
+tests/test_provider_usage_cost_ledger_exact_sqlite_summary.py
 tests/test_provider_usage_cost_ledger_models.py
 tests/test_provider_usage_cost_ledger_real_e2e.py
 tests/test_provider_usage_cost_ledger_recording.py
 tests/test_provider_usage_cost_ledger_repository.py
+tests/test_provider_usage_cost_ledger_sqlite_bounded_queries.py
+tests/test_provider_usage_cost_ledger_sqlite_connection_lifecycle.py
 tests/test_provider_usage_cost_ledger_sqlite_repository.py
 tests/test_provider_usage_cost_ledger_sqlite_store.py
+tests/test_provider_usage_cost_ledger_summary.py
+tests/test_provider_usage_cost_operational_e2e.py
 tests/test_query_history_cli.py
 tests/test_quote_repository.py
 tests/test_ranking_engine.py

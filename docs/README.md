@@ -3,8 +3,8 @@
 > A private, local-first investment intelligence platform built around deterministic analysis, preserved evidence, traceable Knowledge, evidence-grounded AI assistance, and explicit operational accounting.
 
 **Status:** Active development  
-**Latest completed implementation milestone:** Sprint 28 — Persistent Provider Usage & Cost Ledger  
-**Current phase:** Sprint 28 closure reconciliation  
+**Latest completed implementation milestone:** Sprint 29 — Provider Operational Accounting Hardening  
+**Current phase:** Sprint 29 closure reconciliation  
 **Primary language:** Python
 
 ## Overview
@@ -27,32 +27,34 @@ Current-State Analysis
 → Production Server
 ```
 
-A parallel operational accounting stream now exists:
+Parallel operational accounting:
 
 ```text
 successful priced provider usage
 → immutable provider usage/cost ledger
+→ bounded operational queries
+→ exact summaries
 ```
 
 That ledger is operational evidence only. It does not become canonical History or
 Knowledge.
 
-## Sprint 28
+## Sprint 29
 
-Sprint 28 adds durable provider usage/cost accounting while preserving existing
-provider, grounding, application, History, and Knowledge boundaries.
+Sprint 29 hardens the operational accounting boundary.
 
 Implemented:
 
-- immutable ledger record;
-- repository contract;
-- SQLite store and repository;
-- exact Decimal persistence;
-- recording service;
-- production composition;
-- read-only operational CLI;
-- deterministic summaries;
-- real persistence E2E.
+- explicit ledger runtime path;
+- production schema initialization;
+- schema-aware readiness;
+- bounded recent/time-window queries;
+- bounded operational CLI commands;
+- repository-owned summaries;
+- exact single-query SQLite Decimal aggregation;
+- exact high-precision cost preservation;
+- explicit SQLite connection lifecycle;
+- real operational E2E.
 
 Operational CLI:
 
@@ -64,6 +66,8 @@ Commands:
 
 ```text
 list
+recent --limit <N>
+between --started-at <ISO-8601> --ended-at <ISO-8601>
 show --request-id <request-id>
 summary
 ```
@@ -81,22 +85,6 @@ Review Package
 
 Archived JSON remains canonical historical evidence. Provider operational
 accounting does not alter this hierarchy.
-
-## Grounded AI
-
-Grounded AI remains downstream of Knowledge:
-
-```text
-Knowledge
-→ GroundedPromptInput
-→ provider
-→ untrusted response
-→ strict parser
-→ grounding validation
-→ admissible grounded generation
-```
-
-Successful priced usage can then be persisted to the provider usage/cost ledger.
 
 ## Production Surface
 
@@ -121,8 +109,16 @@ POST /v1/grounded-ai
 GET  /openapi.json
 ```
 
-Production currently supports one worker because inbound rate-limit state is
-process-local.
+Readiness now includes:
+
+```text
+knowledge_database
+provider_usage_cost_database
+provider_credentials
+```
+
+The ledger readiness check validates the supported schema version and fails
+closed for missing, uninitialized, corrupt, or incompatible storage.
 
 ## Provider Controls
 
@@ -136,6 +132,8 @@ Canonical production composition includes:
 - explicit provider pricing policy;
 - deterministic usage/cost accounting;
 - persistent successful usage/cost ledger;
+- explicit ledger runtime path;
+- schema-aware ledger readiness;
 - environment-backed provider credentials.
 
 ## Main Engineering Principles
@@ -191,9 +189,9 @@ Not currently claimed:
 ## Current Phase
 
 ```text
-Sprint 28 IMPLEMENTATION COMPLETE
-Sprint 28 closure reconciliation IN PROGRESS
-Sprint 29 NOT STARTED
+Sprint 29 IMPLEMENTATION COMPLETE
+Sprint 29 closure reconciliation IN PROGRESS
+Sprint 30 NOT STARTED
 ```
 
 ## Disclaimer
