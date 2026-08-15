@@ -1,463 +1,188 @@
-# Investment Terminal
+# Investment Terminal — Software Architecture
 
-# Software Architecture
+**Status:** Canonical architecture  
+**Current baseline:** Sprint 30 closure
 
-Version: 1.0.0
+## Architectural Style
 
-Status:
-Architecture Approved
+Investment Terminal is a modular monolith with explicit domain and application
+boundaries. Infrastructure adapters are composed at CLI/server roots and must
+not leak persistence or provider details into domain models.
 
----
+## Authority Model
 
-# Vision
-
-Investment Terminal is a professional investment analysis platform designed to support long-term investing and position trading using verified market data, technical analysis, fundamental analysis and automated decision support.
-
-The system is designed to be modular, scalable and production-ready.
-
----
-
-# Core Principles
-
-1. Data Quality First
-2. Automation Before Manual Work
-3. Single Source of Truth
-4. Modular Architecture
-5. Test Before Release
-6. No Investment Decisions Based On Incomplete Data
-
----
-
-# High Level Architecture
-
-```
-                    Finnhub API
-                         │
-                    Yahoo Finance
-                         │
-                         ▼
-                Data Collection Layer
-                         │
-                         ▼
-                 SQLite Database
-                         │
-        ┌────────────────┼────────────────┐
-        │                │                │
-        ▼                ▼                ▼
- Technical        Fundamental        News Engine
- Indicators         Analysis
-        │                │                │
-        └────────────────┼────────────────┘
-                         ▼
-                 Decision Engine
-                         │
-          ┌──────────────┴──────────────┐
-          ▼                             ▼
-    Excel Reports               ChatGPT Analysis
+```text
+Deterministic current-state analysis
+→ Review Package
+→ History
+→ explicit verified ingestion
+→ Knowledge
+→ grounded generation
+→ validated generated evidence
 ```
 
----
+Authority does not flow backwards.
 
-# Project Structure
+- History is canonical historical evidence.
+- Knowledge is explicit, versioned, evidence-backed derived knowledge.
+- Grounded AI consumes Knowledge.
+- Persisted grounded generations are generated evidence only.
+- Provider usage/cost data is parallel operational accounting.
 
+No AI output becomes History or Knowledge automatically.
+
+## Major Domains
+
+- Market Data
+- Technical Analysis
+- Fundamental Analysis
+- Ranking
+- Recommendation
+- Portfolio
+- Decision
+- Review
+- History
+- Historical Intelligence
+- Knowledge
+- Evidence-Grounded AI
+- Provider Operations
+- Server Runtime
+
+## History Boundary
+
+Canonical historical evidence is the immutable archived Review Package.
+
+```text
+archived package bytes
+→ integrity verification
+→ manifest navigation
+→ rebuildable SQLite projection
+→ comparison / replay / query
 ```
-InvestmentTerminal/
 
-investment_terminal/
+History SQLite is a projection, not the source of truth.
 
-    config/
-    api/
-    database/
-    indicators/
-    market/
-    portfolio/
-    watchlist/
-    reports/
-    utils/
+## Knowledge Boundary
 
-data/
+Knowledge records are immutable/versioned and contain explicit evidence
+references. History-to-Knowledge ingestion is explicit, verified, deterministic,
+idempotent, and dry-run capable.
 
-output/
+Knowledge may be queried by application services, but non-History modules must
+not reach into History internals to reconstruct historical authority.
 
-logs/
+## Grounded AI Boundary
 
-tests/
-
-README.md
-Architecture.md
-requirements.txt
-Run.bat
+```text
+Knowledge envelopes
+→ context selection
+→ GroundedPromptInput
+→ provider adapter
+→ strict parsing
+→ grounding validation
+→ ADMISSIBLE GroundedGenerationResult
 ```
 
----
+Only ADMISSIBLE generations may enter durable generation persistence.
 
-# System Layers
+Persistent generation components:
 
-## Layer 1
+```text
+PersistedGroundedGeneration
+GroundedGenerationRepository
+GroundedGenerationSQLiteStore
+SQLiteGroundedGenerationRepository
+GroundedGenerationRecordingService
+GroundedGenerationHistoryService
+```
 
-Configuration
+The durable generation store is downstream evidence, not canonical Knowledge or
+History.
 
-Responsible for:
+## Provider Operational Boundary
 
-- Environment variables
-- Global constants
-- Project settings
+Provider usage/cost accounting is immutable and provider-neutral. It has its own
+SQLite schema, bounded queries, exact Decimal summaries, readiness validation,
+and operational CLI.
 
----
+This ledger is never a source of investment truth.
 
-## Layer 2
+## Production Composition
 
-API Layer
+`investment_terminal.server.production:create_app` is the canonical production
+factory.
 
-Responsible for:
+Composition order:
 
-- Finnhub
-- Yahoo Finance
-- Future APIs
+```text
+runtime configuration
+→ Knowledge repository/query
+→ provider generation service
+→ usage/cost recorder
+→ grounded-generation recorder
+→ application services
+→ framework-neutral HTTP handler
+→ FastAPI adapter
+```
 
-Responsibilities
+FastAPI owns route registration. Production composition passes application
+dependencies into the FastAPI factory rather than mutating a returned app.
 
-- Download data
-- Retry failed requests
-- Validate responses
-- Cache requests
+## Runtime Persistence
 
----
+Dedicated SQLite stores exist for distinct responsibilities, including:
 
-## Layer 3
+- Knowledge;
+- History projection;
+- provider usage/cost accounting;
+- persisted grounded generations.
 
-Database Layer
+Separate databases must not be conflated into a single authority model.
 
-SQLite
+## Runtime Routes
 
-Tables
+```text
+GET  /health
+GET  /ready
+POST /v1/grounded-ai
+GET  /v1/grounded-generations
+GET  /v1/grounded-generations/{request_id}
+GET  /openapi.json
+```
 
-- watchlist
-- portfolio
-- market_data
-- indicators
-- fundamentals
-- news
-- journal
-- recommendations
+Generation-history routes are authenticated and read-only.
 
-Database is the single source of truth.
+## Readiness
 
-Excel is never used as a database.
+Production readiness fails closed when required local prerequisites are absent
+or incompatible.
 
----
+Checks include:
 
-## Layer 4
+```text
+knowledge_database
+provider_usage_cost_database
+grounded_generation_database
+provider_credentials
+```
 
-Technical Analysis
+SQLite operational stores are schema-version validated.
 
-Indicators
+## Testing Strategy
 
-- RSI
-- SMA20
-- SMA50
-- SMA100
-- SMA200
-- EMA20
-- EMA50
-- EMA200
-- MACD
-- Signal
-- Histogram
-- ATR
-- Average Volume
+Every architectural boundary requires focused unit/integration coverage plus
+full regression coverage.
 
-Future
+Real network-free E2E tests cover:
 
-- ADX
-- Bollinger Bands
-- Ichimoku
-- VWAP
+- Review Package → History;
+- History → Knowledge;
+- provider usage/cost persistence;
+- Knowledge → grounded generation → durable generation persistence → HTTP
+  readback.
 
----
+## Non-Goals
 
-## Layer 5
-
-Fundamental Analysis
-
-Metrics
-
-- Market Cap
-
-- Revenue
-
-- EPS
-
-- P/E
-
-- PEG
-
-- ROE
-
-- Debt
-
-- Free Cash Flow
-
-- Dividend Yield
-
----
-
-## Layer 6
-
-Market Analysis
-
-Future modules
-
-- News Analysis
-
-- Insider Trading
-
-- Earnings Calendar
-
-- Fear & Greed
-
-- VIX
-
-- US10Y
-
-- Dollar Index
-
----
-
-## Layer 7
-
-Decision Engine
-
-This is the heart of the system.
-
-Every asset receives:
-
-Technical Score
-
-Fundamental Score
-
-Trend Score
-
-News Score
-
-Risk Score
-
-Final Score
-
-Investment Score
-
-Range
-
-0 - 100
-
-Example
-
-95
-
-Strong Buy
-
-82
-
-Buy
-
-70
-
-Watch
-
-55
-
-Neutral
-
-40
-
-Reduce
-
-25
-
-Sell
-
----
-
-# WatchList
-
-Each asset contains
-
-Ticker
-
-Company
-
-Sector
-
-Industry
-
-Category
-
-Priority
-
-Holding
-
-Target Allocation
-
-Current Allocation
-
-Investment Score
-
-Status
-
----
-
-# Categories
-
-Core ETF
-
-Satellite ETF
-
-Core Stock
-
-Growth Stock
-
-Dividend Stock
-
-Trading Candidate
-
-Watch Only
-
----
-
-# Portfolio
-
-Tracks
-
-Current Holdings
-
-Cash
-
-Profit
-
-Allocation
-
-Performance
-
-Rebalancing
-
----
-
-# Reports
-
-Generated automatically
-
-Investment_Database.xlsx
-
-Future
-
-Monthly Report
-
-Portfolio Report
-
-Risk Report
-
-Trading Journal
-
----
-
-# Logging
-
-Every operation is logged.
-
-No silent failures are allowed.
-
----
-
-# Error Handling
-
-If one module fails
-
-↓
-
-System continues where possible
-
-↓
-
-Critical failures stop report generation
-
----
-
-# Testing
-
-Every module requires
-
-Unit Tests
-
-Integration Tests
-
-Manual Verification
-
----
-
-# Version Roadmap
-
-Version 1
-
-Foundation
-
-SQLite
-
-Finnhub
-
-Excel
-
-Technical Indicators
-
-Version 2
-
-Decision Engine
-
-Investment Score
-
-Portfolio Score
-
-Version 3
-
-AI Assistant
-
-Automatic Reports
-
-Risk Analysis
-
-Version 4
-
-Web Dashboard
-
-Interactive Charts
-
-Notifications
-
----
-
-# Development Workflow
-
-Design
-
-↓
-
-Implementation
-
-↓
-
-Testing
-
-↓
-
-Review
-
-↓
-
-Release
-
-No feature is released without successful testing.
-
----
-
-# Mission
-
-Build a reliable investment platform that combines automation, transparent data and disciplined decision making to support high-quality investment research.
+The current system does not grant autonomous trading authority, broker
+execution, causal inference authority, or automatic promotion of AI output into
+History/Knowledge.

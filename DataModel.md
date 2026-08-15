@@ -1,424 +1,149 @@
-# Investment Terminal
+# Investment Terminal — Data Model
 
-# Data Model
+**Status:** Canonical data-boundary summary  
+**Current baseline:** Sprint 30 closure
 
-Version: 1.0.0
+## Principle
 
-Status:
-Approved
+Investment Terminal does not have one universal SQLite source of truth.
+Authority depends on the domain.
 
----
+```text
+History:
+archived Review Package bytes = canonical evidence
+history.db = rebuildable projection
 
-# Purpose
+Knowledge:
+versioned Knowledge records = canonical Knowledge boundary
 
-This document defines the complete database structure for Investment Terminal.
+Provider accounting:
+provider usage/cost ledger = operational accounting only
 
-SQLite is the single source of truth.
+Grounded generations:
+grounded generation store = persisted generated evidence only
+```
 
-No business data is stored in Excel.
+## History
 
----
+Historical archive records preserve exact Review Package bytes and checksums.
+The manifest is append-only navigation metadata. SQLite History tables are
+rebuildable structured projections used for query, comparison, and replay.
 
-# Database
+Important concepts include:
 
-investment_terminal.db
+- HistoricalSnapshot;
+- import state;
+- timeline event;
+- snapshot comparison;
+- replay result.
 
----
+## Knowledge
 
-# Table
+A Knowledge record is immutable/versioned and contains:
 
-watchlist
+```text
+knowledge_id
+knowledge_type
+version
+subject_key
+statement
+valid_from
+valid_to
+generated_at
+status
+evidence[]
+```
 
-Purpose
+Evidence references preserve:
 
-Master list of all assets monitored by the system.
+```text
+evidence_type
+evidence_id
+observed_at
+checksum_sha256
+```
 
-Columns
+Knowledge identity is stable across persistence and envelope projection.
 
-id
+## Provider Usage/Cost Ledger
 
-ticker
+Operational provider accounting records include request identity, provider/model
+identity, token usage, currency, exact Decimal costs, and recorded timestamp.
 
-name
+The ledger is immutable by request identity and supports:
 
-asset_type
+- exact lookup;
+- deterministic list;
+- bounded recent query;
+- half-open time-window query;
+- exact summary aggregation.
 
-category
+It is not canonical investment evidence.
 
-sector
+## Persisted Grounded Generations
 
-industry
+`PersistedGroundedGeneration` is the durable projection of one ADMISSIBLE
+grounded generation.
 
-currency
+Fields:
 
-exchange
-
-country
-
-priority
-
-enabled
-
-created_at
-
-updated_at
-
----
-
-# Table
-
-portfolio
-
-Purpose
-
-Current portfolio holdings.
-
-Columns
-
-id
-
-ticker
-
-quantity
-
-average_price
-
-current_price
-
-market_value
-
-profit_loss
-
-profit_loss_percent
-
-target_allocation
-
-current_allocation
-
-opened_date
-
-updated_at
-
----
-
-# Table
-
-market_data
-
-Purpose
-
-Latest market prices.
-
-Columns
-
-id
-
-ticker
-
-timestamp
-
-open
-
-high
-
-low
-
-close
-
-volume
-
-market_cap
-
-currency
-
-source
-
----
-
-# Table
-
-technical_indicators
-
-Purpose
-
-Calculated technical indicators.
-
-Columns
-
-id
-
-ticker
-
-timestamp
-
-rsi
-
-sma20
-
-sma50
-
-sma100
-
-sma200
-
-ema20
-
-ema50
-
-ema200
-
-macd
-
-macd_signal
-
-macd_histogram
-
-atr
-
-average_volume
-
-trend
-
----
-
-# Table
-
-fundamentals
-
-Purpose
-
-Fundamental company data.
-
-Columns
-
-id
-
-ticker
-
-timestamp
-
-revenue
-
-eps
-
-pe
-
-peg
-
-roe
-
-debt
-
-cash_flow
-
-dividend_yield
-
-profit_margin
-
-shares_outstanding
-
----
-
-# Table
-
-news
-
-Purpose
-
-News related to assets.
-
-Columns
-
-id
-
-ticker
-
-published_at
-
-headline
-
-source
-
-url
-
-sentiment
-
-importance
-
-processed
-
----
-
-# Table
-
-recommendations
-
-Purpose
-
-Decision Engine output.
-
-Columns
-
-id
-
-ticker
-
-timestamp
-
-technical_score
-
-fundamental_score
-
-trend_score
-
-news_score
-
-risk_score
-
-confidence_score
-
-investment_score
-
-recommendation
-
-reason
-
----
-
-# Table
-
-journal
-
-Purpose
-
-Trading journal.
-
-Columns
-
-id
-
-date
-
-ticker
-
-action
-
-quantity
-
-price
-
-reason
-
-result
-
-notes
-
----
-
-# Relationships
-
-watchlist
-        │
-        ├────────────┐
-        ▼            ▼
-market_data     portfolio
-        │            │
-        ▼            ▼
-technical    fundamentals
-        │            │
-        └──────┬─────┘
-               ▼
-      recommendations
-               │
-               ▼
-           journal
-
----
-
-# Data Flow
-
-Finnhub API
-
-↓
-
-market_data
-
-↓
-
-technical_indicators
-
-↓
-
-fundamentals
-
-↓
-
-news
-
-↓
-
-recommendations
-
-↓
-
-reports
-
----
-
-# Data Retention
-
-Market Data
-
-Daily updates
-
-Indicators
-
-Recalculated every update
-
-Fundamentals
-
-Updated after earnings
-
-News
-
-Stored permanently
-
-Recommendations
-
-Stored permanently
-
-Journal
-
-Never deleted
-
----
-
-# Design Principles
-
-Single Source of Truth
-
-Normalized data
-
-No duplicated calculations
-
-Every recommendation reproducible
-
-Historical data preserved
-
----
-
-# Future Tables
-
-earnings
-
-dividends
-
-economic_calendar
-
-sector_performance
-
-macro_data
-
-broker_transactions
-
-alerts
+```text
+request_id
+generated_at
+prompt_protocol_identity
+answer_protocol_identity
+provider_identity
+model_identity
+selected_knowledge_identities
+cited_knowledge_identities
+generation
+trace
+```
+
+Invariants:
+
+- request identity is immutable;
+- timestamps are timezone-aware;
+- citations are a subset of selected Knowledge identities;
+- generation prompt request identity matches the persisted request identity;
+- trace request identity matches;
+- trace validation status must be `ADMISSIBLE`.
+
+SQLite schema version 1 stores one row per request identity and deterministic
+JSON projections for selected/cited identities, generation, and trace.
+
+Repository queries:
+
+```text
+get / require
+list_all
+list_recent(limit)
+list_between(started_at, ended_at)
+```
+
+`list_between` uses half-open semantics:
+
+```text
+[started_at, ended_at)
+```
+
+## Authority Relationships
+
+```text
+History evidence
+→ explicit ingestion
+→ Knowledge evidence-backed statements
+→ grounded generation inputs
+→ generated evidence
+```
+
+Persisted generations do not modify the Knowledge records they cite.
+
+## Data Integrity Rules
+
+- no silent overwrite of immutable request/version identities;
+- no naive datetimes in persisted temporal boundaries;
+- deterministic ordering for list/query outputs;
+- explicit schema versions for operational SQLite stores;
+- corrupt or unsupported runtime stores fail readiness closed;
+- archived History bytes are never rewritten.

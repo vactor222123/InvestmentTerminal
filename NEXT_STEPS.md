@@ -1,75 +1,76 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ 1cadd3e`  
-**Status:** Sprint 29 implementation complete; closure reconciliation in progress.
+**Current baseline:** `develop @ 17a7fe1`  
+**Status:** Sprint 30 implementation complete; closure reconciliation in progress.
 
-## Sprint 29 Closure
+## Sprint 30 Closure
 
-Provider operational accounting is now hardened beyond simple persistence.
+Grounded generations are now durable generated evidence.
 
 Implemented:
 
 ```text
-explicit configured ledger path
-→ initialized SQLite schema
+ADMISSIBLE typed generation
+→ deterministic persistence projection
+→ immutable repository identity
+→ grounded_generations.db
+→ runtime composition
 → schema-aware readiness
-→ bounded operational queries
-→ exact repository summary
-→ exact SQLite Decimal aggregation
-→ explicit connection lifecycle
-→ operational E2E
+→ bounded queries
+→ operational CLI
+→ authenticated HTTP read API
+→ close/reopen/readback E2E
 ```
 
 Operational inspection:
 
 ```text
-python -m investment_terminal.cli.provider_usage_cost
+python -m investment_terminal.cli.grounded_generations
 ```
 
-Commands:
+Read-only HTTP inspection:
 
 ```text
-list
-recent --limit <N>
-between --started-at <ISO-8601> --ended-at <ISO-8601>
-show --request-id <request-id>
-summary
+GET /v1/grounded-generations?limit=<N>
+GET /v1/grounded-generations/{request_id}
 ```
 
-`between` uses half-open semantics:
-
-```text
-[started_at, ended_at)
-```
+Generated evidence remains downstream of Knowledge and is never automatically
+promoted into Knowledge or History.
 
 ## Immediate Next Steps
 
 ```text
-1. Reconcile canonical Sprint 29 documentation.
+1. Reconcile canonical Sprint 30 documentation.
 2. Reconcile project_files.txt with exact git ls-files output.
 3. Run the full regression suite.
-4. Commit the Sprint 29 closure baseline.
-5. Perform focused post-Sprint-29 architecture/product review.
-6. Select Sprint 30 only from the reconciled baseline.
+4. Commit and push the Sprint 30 closure baseline.
+5. Perform focused post-Sprint-30 architecture/product review.
+6. Select Sprint 31 only from the reconciled baseline.
 ```
 
-Candidate areas for Sprint 30 review include:
+## Post-Sprint-30 Audit Candidates
+
+Candidate areas include:
 
 - automatic/scheduled History-to-Knowledge ingestion;
 - deployment/infrastructure hardening;
-- grounded answer persistence/history;
-- provider request/response persistence;
-- retrieval expansion;
-- distributed rate-limit state.
+- distributed rate-limit state;
+- authorization beyond a single API-key boundary;
+- provider request/response archival policy;
+- semantic retrieval expansion;
+- contradiction/entailment analysis;
+- explicit governance for any future generated-evidence promotion workflow.
 
-The review must preserve:
+The audit must preserve:
 
 ```text
 Archived Review Package
 → History
+→ explicit ingestion
 → Knowledge
 → Grounded AI
+→ persisted generated evidence
 ```
 
-Provider usage/cost ledger data remains operational accounting, not canonical
-historical investment evidence.
+Provider usage/cost data remains parallel operational accounting.
