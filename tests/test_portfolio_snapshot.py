@@ -19,6 +19,11 @@ from investment_terminal.portfolio.portfolio_snapshot_service import (
 )
 
 
+EXAMPLE_PORTFOLIO = Path(
+    "data/portfolios/current_portfolio.example.json"
+)
+
+
 def create_portfolio() -> CurrentPortfolio:
     return CurrentPortfolio(
         name="Test Portfolio",
@@ -129,16 +134,21 @@ def test_snapshot_rejects_invalid_portfolio() -> None:
         )
 
 
-def test_cli_prints_default_portfolio(
+def test_cli_prints_tracked_example_portfolio(
     capsys,
 ) -> None:
-    main([])
+    main(
+        [
+            "--portfolio",
+            str(EXAMPLE_PORTFOLIO),
+        ]
+    )
 
     output = capsys.readouterr().out
 
     assert "Current Portfolio Snapshot" in output
-    assert "Viktor Investment Portfolio" in output
-    assert "1,600.00" in output
+    assert "Example Investment Portfolio" in output
+    assert "1,000.00" in output
     assert "RESERVE" in output
 
 

@@ -16,6 +16,11 @@ from investment_terminal.review.portfolio_analysis_review_adapter import (
 )
 
 
+EXAMPLE_PORTFOLIO = Path(
+    "data/portfolios/current_portfolio.example.json"
+)
+
+
 def create_stock_package(
     path: Path,
 ) -> None:
@@ -186,6 +191,8 @@ def test_cli_integrates_stock_package(
 
     main(
         [
+            "--portfolio",
+            str(EXAMPLE_PORTFOLIO),
             "--stock-analysis",
             str(stock_path),
             "--output",
@@ -227,6 +234,8 @@ def test_cli_falls_back_when_stock_package_missing(
 
     main(
         [
+            "--portfolio",
+            str(EXAMPLE_PORTFOLIO),
             "--stock-analysis",
             str(
                 tmp_path

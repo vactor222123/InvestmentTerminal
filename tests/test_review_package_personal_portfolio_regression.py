@@ -1,5 +1,5 @@
 """
-Regression tests for personal portfolio files and incomplete quote coverage.
+Regression tests for explicit portfolio files and incomplete quote coverage.
 """
 
 import json
@@ -10,13 +10,20 @@ from investment_terminal.cli.investment_review_package import (
 )
 
 
-def test_default_review_package_does_not_depend_on_empty_portfolio(
+EXAMPLE_PORTFOLIO = Path(
+    "data/portfolios/current_portfolio.example.json"
+)
+
+
+def test_review_package_uses_tracked_portfolio_fixture(
     tmp_path: Path,
 ) -> None:
     output = tmp_path / "review.json"
 
     main(
         [
+            "--portfolio",
+            str(EXAMPLE_PORTFOLIO),
             "--output",
             str(output),
         ]
@@ -32,7 +39,7 @@ def test_default_review_package_does_not_depend_on_empty_portfolio(
         payload["sections"]["portfolio"]
         ["cost_basis_snapshot"]
         ["portfolio_name"]
-        == "Viktor Investment Portfolio"
+        == "Example Investment Portfolio"
     )
 
 

@@ -28,6 +28,9 @@ GENERATED_AT = datetime(
     0,
     tzinfo=timezone.utc,
 )
+EXAMPLE_PORTFOLIO = Path(
+    "data/portfolios/current_portfolio.example.json"
+)
 
 
 def create_package():
@@ -160,7 +163,7 @@ def test_cli_payload_export_is_atomic(
     ) == []
 
 
-def test_cli_generates_default_package(
+def test_cli_generates_package_from_tracked_example(
     tmp_path: Path,
     capsys,
 ) -> None:
@@ -171,6 +174,8 @@ def test_cli_generates_default_package(
 
     main(
         [
+            "--portfolio",
+            str(EXAMPLE_PORTFOLIO),
             "--output",
             str(output),
         ]
@@ -187,13 +192,13 @@ def test_cli_generates_default_package(
     assert output.exists()
     assert (
         payload["portfolio_name"]
-        == "Viktor Investment Portfolio"
+        == "Example Investment Portfolio"
     )
     assert (
         payload["sections"]["portfolio"]
         ["cost_basis_snapshot"]
         ["cash_value"]
-        == 1600.0
+        == 1000.0
     )
     assert (
         payload["sections"]["portfolio"]
@@ -205,7 +210,7 @@ def test_cli_generates_default_package(
     )
 
 
-def test_cli_prints_json(
+def test_cli_prints_json_from_tracked_example(
     tmp_path: Path,
     capsys,
 ) -> None:
@@ -216,6 +221,8 @@ def test_cli_prints_json(
 
     main(
         [
+            "--portfolio",
+            str(EXAMPLE_PORTFOLIO),
             "--output",
             str(output),
             "--print-json",
@@ -228,3 +235,7 @@ def test_cli_prints_json(
 
     assert payload["schema_version"] == "1.0"
     assert len(payload["sections"]) == 8
+    assert (
+        payload["portfolio_name"]
+        == "Example Investment Portfolio"
+    )
