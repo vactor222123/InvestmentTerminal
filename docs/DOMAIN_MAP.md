@@ -1,198 +1,212 @@
 # Investment Terminal — Domain Map
 
 **Status:** Canonical Architecture Map  
-**Updated after:** Sprint 13 — Historical Comparison and Replay
+**Updated after:** Post-Sprint-26 Audit Fix 1  
+**Baseline:** `develop @ ad9dd1f`
 
 ## 1. High-Level Map
 
 ```text
-Market Data
+Market / External Data
 → Technical / Fundamental Analysis
 → Ranking / Recommendation
 → Portfolio / Decision
 → Review
 → History
-→ Historical Intelligence
-→ Future Knowledge
-→ AI Interpretation
+→ Historical Intelligence / Outcome Research
+→ Knowledge
+→ Grounded AI
+→ Application / API
+→ Production Server
 → Human Decision
 ```
 
 Supporting boundaries:
 
 ```text
-Configuration · Infrastructure · CLI · Serialization · Persistence · Logging
+Configuration · Infrastructure · Persistence · Serialization · CLI · HTTP · Provider Transport · Logging
 ```
 
 ## 2. Domain Maturity
 
-| Domain | Status |
+| Domain / Boundary | Status |
 |---|---|
-| Market Data | Established |
+| Market / External Data | Established |
 | Technical Analysis | Established |
 | Fundamental Analysis | Established |
-| Ranking | Established |
-| Recommendation | Established |
+| Ranking / Recommendation | Established |
 | Portfolio | Established |
-| Decision | Developing |
+| Decision | Established / evolving |
 | Review | Established |
-| History | Established foundation |
-| Historical Intelligence | Implemented foundation |
-| Knowledge | Planned |
-| AI Interpretation | External integration layer |
+| History | Established |
+| Historical Intelligence | Established |
+| Outcome Research | Established descriptive foundation |
+| Knowledge | Established |
+| Grounded AI | Established |
+| Provider Integration | Established OpenAI implementation |
+| Provider Governance / Usage / Budgets | Established |
+| Application / API | Established |
+| Production Server | Established |
+| Inbound Authentication / Request Limits | Established |
+| Inbound Rate Limiting | Established, process-local |
+| Broker Execution | Not implemented / intentionally out of scope |
 
-## 3. Review Domain
+## 3. Review
 
-Owns the versioned Review Package and assembly of independently produced domain outputs.
+Owns the versioned Review Package and assembly of completed analytical outputs.
 
 Does not own analytical calculations or historical storage.
 
-## 4. History Domain
-
-Purpose: preserve completed Review Packages as immutable, verifiable, indexed, and queryable historical evidence.
+## 4. History
 
 Owns:
 
-- snapshot identity;
 - immutable exact-byte archive;
-- checksum and path safety;
-- manifest;
-- SQLite schema and migrations;
-- import-state persistence;
-- structured historical import;
-- timeline generation;
-- History persistence repositories.
+- snapshot metadata;
+- append-only manifest;
+- checksum/path verification;
+- SQLite schema/migrations;
+- explicit import state;
+- structured import;
+- timeline persistence;
+- typed repositories;
+- verified archived package loading.
 
-Produces:
+Canonical evidence remains archived JSON. SQLite is rebuildable.
 
-- archived JSON;
-- manifest metadata;
-- normalized SQLite history;
-- import state;
-- typed timeline records.
-
-Does not own:
-
-- current market-data acquisition;
-- technical/fundamental calculations;
-- recommendation generation;
-- cross-snapshot comparison policy;
-- AI interpretation.
-
-## 5. Historical Intelligence Domain
-
-**Status: Implemented foundation in Sprint 13.**
-
-Purpose: analyze relationships across verified snapshots and expose safe historical replay.
+## 5. Historical Intelligence / Outcome Research
 
 Owns:
 
-- snapshot compatibility policy;
-- portfolio-summary comparison;
-- holdings comparison;
-- recommendation comparison;
-- deployment comparison;
-- aggregate snapshot comparison;
-- replay request/result semantics;
-- replay orchestration.
+- compatibility;
+- comparison;
+- replay;
+- outcome observations;
+- descriptive outcome research;
+- methodology identity;
+- provenance/population-quality assessment.
 
-Consumes:
+Consumes verified History. Does not rewrite it.
 
-- typed History repositories;
-- immutable archive evidence through verified loader;
-- snapshot/import-state metadata.
+## 6. Knowledge
 
-Produces:
+Owns versioned, traceable Knowledge records and evidence references derived from verified sources.
 
-- compatibility results;
-- `SnapshotComparison`;
-- exact replay result;
-- normalized replay result.
+Knowledge is rebuildable and cannot mutate History.
 
-Must not own:
+## 7. Grounded AI
 
-- archive mutation;
-- market API access;
-- current recommendation generation;
-- current-code historical recalculation without an explicit future contract;
-- fuzzy identity matching.
+Owns:
 
-## 6. Knowledge Domain
+- grounded prompt contracts;
+- deterministic Knowledge context selection;
+- provider-neutral model-response contracts;
+- strict response parsing;
+- grounding validation;
+- grounded generation trace.
 
-**Status: Planned.**
+Provider output is untrusted before validation.
 
-Will derive reusable traceable knowledge from historical evidence and Historical Intelligence outputs.
+## 8. Provider Integration and Controls
 
-Knowledge never rewrites History.
+Owns provider-transport composition and operational controls:
 
-## 7. Infrastructure Boundary
+- credentials;
+- provider/model governance;
+- bounded retries;
+- Retry-After handling;
+- usage accounting;
+- pricing/cost accounting;
+- output-token limits;
+- token/cost budgets.
 
-Owns technical mechanisms:
+Provider pricing is explicit configuration, not hardcoded provider truth.
 
-- filesystem;
-- SQLite connections;
-- JSON serialization;
-- CLI parsing;
-- logging;
-- configuration.
+## 9. Application / API
 
-Infrastructure does not own business meaning.
-
-## 8. CLI Boundary
-
-Current History CLIs:
+Owns provider-neutral application orchestration and stable API/error contracts.
 
 ```text
-archive_review_package.py
-import_history.py
-query_history.py
-compare_history.py
-replay_history.py
+GroundedAIApplicationService
+→ GroundedAIAPIAdapter
+→ GroundedAIHTTPHandler
 ```
 
-CLI only parses, constructs dependencies, invokes domain/application boundaries, formats, and exits.
+Does not own provider SDK details or domain persistence.
 
-CLI must not own SQL or domain rules.
+## 10. Production Server
 
-## 9. Ownership Matrix
+Owns concrete runtime composition and HTTP transport concerns:
+
+- FastAPI app;
+- runtime configuration;
+- readiness/liveness;
+- inbound authentication;
+- request-size guardrail;
+- rate-limit enforcement;
+- security headers;
+- public OpenAPI;
+- Uvicorn CLI.
+
+Production provider governance, pricing, and budgets are wired through the canonical composition root.
+
+## 11. Ownership Matrix
 
 | Data / Capability | Owner |
 |---|---|
 | Review Package | Review |
-| Historical snapshot | History |
-| Archived JSON | History |
+| Historical snapshot/archive | History |
 | Manifest | History |
-| SQLite historical rows | History |
+| SQLite historical projection | History |
 | Import state | History |
 | Timeline event | History |
-| Snapshot compatibility | Historical Intelligence |
-| Snapshot comparison | Historical Intelligence |
-| Replay semantics/result | Historical Intelligence |
-| Knowledge entry | Future Knowledge |
+| Snapshot comparison/replay | Historical Intelligence |
+| Outcome observation/research result | Outcome Research |
+| Knowledge record | Knowledge |
+| Evidence reference | Knowledge |
+| Grounded prompt/result | Grounded AI |
+| Provider usage/cost | Provider control layer |
+| Application result/error | Application |
+| HTTP response mapping | API/HTTP adapter |
+| Server authentication | Production Server |
+| Inbound rate-limit state | Production Server |
+| Human investment decision | User |
 
-## 10. Source-of-Truth Map
+## 12. Source-of-Truth Map
 
 | Information | Source of Truth |
 |---|---|
 | Current portfolio | Portfolio Domain |
 | Current Review Package | Review artifact |
 | Historical Review Package | Immutable archived JSON |
-| Snapshot metadata navigation | Manifest / synchronized repository |
+| Snapshot metadata/index | Manifest / synchronized repository |
 | Queryable historical projection | SQLite History |
-| Historical comparison | Historical Intelligence result |
-| Exact replay | Verified archived package |
-| Normalized replay | Typed SQLite projection |
-| Future knowledge | Versioned Knowledge output |
+| Historical comparison/replay interpretation | Historical Intelligence result |
+| Knowledge | Versioned Knowledge record + evidence references |
+| Grounded AI output | Validated grounded generation result, not historical evidence |
+| Provider pricing used for accounting | Explicit runtime pricing configuration |
+| Server rate-limit state | Process-local admission service |
 
-## 11. Forbidden Dependencies
+## 13. Forbidden Dependencies
 
 ```text
-History → Market API
-History → analysis calculations
+History → live market API
+History → current analysis calculations
 Historical Intelligence → archive mutation
-Historical Intelligence → raw SQL
-Replay → external data
-CLI → domain-rule implementation
-AI → canonical historical rewrite
 Knowledge → History mutation
+Grounded AI → canonical historical rewrite
+API/FastAPI → domain-rule ownership
+CLI → domain-rule ownership
 ```
+
+## 14. Intentional Runtime Constraint
+
+Inbound rate-limit state is process-local.
+
+Canonical production CLI therefore supports:
+
+```text
+--workers 1
+```
+
+until a future shared-state design is explicitly introduced.

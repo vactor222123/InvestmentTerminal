@@ -4,78 +4,126 @@
 
 **Document type:** High-level software architecture  
 **Document status:** Canonical  
-**Milestone:** Sprint 13 — Historical Comparison and Replay
+**Updated after:** Post-Sprint-26 Audit Fix 1  
+**Baseline:** `develop @ ad9dd1f`
 
 ## 1. Architectural Mission
 
-Investment Terminal is a long-term personal investment intelligence platform optimized for correctness, determinism, traceability, reproducibility, explainability, historical integrity, maintainability, and explicit human decision ownership.
+Investment Terminal is a private, local-first investment intelligence platform optimized for correctness, determinism, traceability, reproducibility, explainability, historical integrity, maintainability, and explicit human decision ownership.
 
-Canonical evidence lifecycle:
+The system is a modular monolith. It preserves verified evidence before interpretation and keeps AI downstream of traceable Knowledge.
+
+Canonical authority flow:
 
 ```text
-Collect
-→ Validate
-→ Normalize
-→ Analyse
-→ Portfolio Intelligence
-→ Decision Intelligence
+Current analytical domains
 → Review Package
-→ Immutable History
-→ Structured History
-→ Timeline
-→ Comparison
-→ Replay
-→ Future Knowledge
-→ AI-assisted human judgment
+→ immutable historical archive
+→ verified/rebuildable History projection
+→ Historical Intelligence / outcome research
+→ versioned Knowledge
+→ grounded AI context
+→ untrusted provider response
+→ strict parsing
+→ grounding validation
+→ application result
+→ HTTP/API presentation
+→ human decision
 ```
+
+No AI or API boundary may rewrite canonical historical evidence or autonomously mutate portfolio state.
 
 ## 2. Architectural Style
 
-Investment Terminal is a modular monolith with domain-oriented boundaries.
-
-Rules:
+Investment Terminal uses:
 
 - one deployable Python application;
-- explicit domain models;
-- application services orchestrate workflows;
-- repositories own persistence queries;
-- CLIs are thin entry points;
-- immutable archive evidence is separate from rebuildable projections;
-- no autonomous trading;
-- no hidden recalculation inside History.
+- domain-oriented modules;
+- explicit immutable/frozen models where practical;
+- application services for orchestration;
+- repositories for persistence/query ownership;
+- thin CLI and HTTP transport boundaries;
+- immutable archive evidence separated from rebuildable projections;
+- explicit production composition roots;
+- fail-closed governance and runtime controls.
 
-## 3. Core Domains
+## 3. Domain and Boundary Map
 
-### Review Domain
+```text
+Market / External Data
+→ Technical / Fundamental Analysis
+→ Ranking / Recommendation
+→ Portfolio / Decision
+→ Review
+→ History
+→ Historical Intelligence / Outcome Research
+→ Knowledge
+→ Grounded AI
+→ Application / API
+→ Production Server
+→ Human Decision
+```
 
-Owns the versioned Review Package and assembles already-calculated domain outputs.
+Supporting technical boundaries:
 
-Review does not calculate indicators, portfolio values, recommendation rules, or historical comparisons.
+```text
+Configuration
+Persistence
+Filesystem
+Serialization
+Provider transports
+CLI
+HTTP/FastAPI
+Logging
+```
 
-### History Domain
+## 4. Review Domain
 
-Owns:
+The Review Domain owns the versioned Review Package and assembles already-produced analytical outputs.
 
-- `HistoricalSnapshot`;
-- immutable archive writing;
-- exact-byte preservation;
+It does not own:
+
+- market-data acquisition;
+- indicator calculations;
+- portfolio valuation rules;
+- recommendation rules;
+- historical persistence;
+- Knowledge derivation;
+- AI generation.
+
+## 5. History Domain
+
+History preserves completed Review Packages as immutable, verifiable, indexed historical evidence.
+
+It owns:
+
+- snapshot identity;
+- exact-byte immutable archive;
+- archive path confinement;
 - SHA-256 verification;
-- path confinement;
 - append-only manifest;
-- SQLite historical schema;
-- schema migrations;
+- SQLite schema and migrations;
 - explicit import state;
-- structured import;
-- timeline generation;
-- History persistence repositories.
+- structured historical import;
+- timeline persistence;
+- History repositories;
+- verified archived package loading.
 
-The History Domain stores and verifies historical facts.
+Source-of-truth hierarchy:
 
-### Historical Intelligence
+```text
+Archived JSON = canonical historical evidence
+manifest.jsonl = append-only archive index
+history.db = rebuildable structured projection
+```
 
-**Status: Implemented foundation in Sprint 13.**
+A failed detail import must not leave a misleading partial projection.
 
-Owns relationships across historical facts:
+## 6. Historical Intelligence and Outcome Research
+
+Historical Intelligence operates only on verified historical facts and typed projections.
+
+It owns:
 
 - snapshot compatibility;
 - portfolio-summary comparison;
@@ -83,247 +131,318 @@ Owns relationships across historical facts:
 - recommendation comparison;
 - deployment comparison;
 - aggregate snapshot comparison;
-- safe replay semantics.
+- exact and normalized replay semantics;
+- outcome observations;
+- descriptive outcome research;
+- methodology identity;
+- provenance/population-quality assessment.
 
-Historical Intelligence does not mutate archive evidence and does not call market APIs.
+It must not:
 
-### Future Knowledge Domain
+- mutate archive evidence;
+- access live market APIs for replay;
+- silently recalculate history with current code;
+- perform fuzzy identity rewriting.
 
-Will derive reusable, versioned, traceable knowledge from verified historical evidence and comparison outputs.
+## 7. Knowledge Domain
 
-Knowledge may be rebuilt. Historical evidence may not be rewritten.
+**Status: Implemented.**
 
-## 4. History Persistence Architecture
+Knowledge is a versioned, traceable, rebuildable interpretation layer downstream of verified historical evidence.
 
-```text
-Review Package
-      ↓
-HistoricalSnapshotArchive
-      ↓
-Immutable JSON Archive
-      ↓
-HistoricalSnapshotManifest
-      ↓
-HistoricalManifestImportService
-      ↓
-HistoricalSQLiteStore
-      ↓
-Schema Migrator + Import State
-      ↓
-HistoricalImportPipeline
-      ↓
-Portfolio / Holdings / Recommendations / Deployment
-      ↓
-Timeline Events
-```
+It owns:
 
-Source-of-truth hierarchy:
+- immutable/versioned Knowledge records;
+- evidence references;
+- provenance assessment;
+- deterministic projection/query/comparison;
+- read-only Knowledge access boundaries.
+
+Knowledge may be rebuilt. History may not be rewritten.
+
+Canonical authority:
 
 ```text
-Archived JSON = canonical evidence
-manifest.jsonl = append-only index
-history.db = rebuildable projection
+History evidence
+→ Knowledge record
+→ evidence reference
+→ grounded AI context
 ```
 
-## 5. Schema Evolution
+Knowledge is not allowed to mutate History.
 
-Sprint 13 introduced controlled SQLite migrations.
+## 8. Grounded AI Domain
 
-The current History schema target is **version 2**.
+**Status: Implemented.**
 
-Migration requirements:
+Grounded AI consumes Knowledge through provider-neutral contracts.
 
-- sequential;
-- transactional;
-- idempotent;
-- rejects unsupported future versions;
-- preserves existing Sprint 12 databases.
-
-Schema version 2 adds explicit snapshot import-state persistence.
-
-## 6. Import-State Workflow
-
-Canonical states:
+Canonical flow:
 
 ```text
-METADATA_ONLY
-VERIFIED
-IMPORTING
-IMPORTED
-FAILED
+Knowledge query/context
+→ GroundedPromptInput
+→ provider-neutral prompt construction
+→ provider transport
+→ untrusted GroundedModelResponse
+→ strict parser
+→ grounding validation
+→ admissible GroundedGenerationResult
 ```
 
-Import-state transitions are explicit and persisted. Detail import is atomic across:
+Provider output is never canonical evidence merely because a provider returned it.
+
+Grounding validation is a mandatory trust boundary.
+
+## 9. Provider Integration and Operational Controls
+
+The OpenAI provider is composed behind provider-neutral interfaces.
+
+Established controls include:
+
+- model/provider allowlisting;
+- bounded retry execution;
+- Retry-After handling;
+- deterministic retry-delay policy;
+- token usage accounting;
+- deterministic pricing/cost accounting;
+- output-token limits;
+- total-token budgets;
+- total-cost budgets;
+- explicit provider pricing configuration;
+- environment-backed credentials.
+
+Canonical production runtime now composes provider pricing and budget policies explicitly.
+
+Economic controls are fail-closed in production configuration: canonical production startup requires explicit budget and pricing settings.
+
+## 10. Application and API Architecture
+
+The application layer exposes provider-neutral orchestration.
 
 ```text
-portfolio_summary
-→ holdings
-→ recommendations
-→ deployment
-→ timeline_events
+GroundedAIApplicationService
+→ provider-neutral result/error contracts
+→ GroundedAIAPIAdapter
+→ GroundedAIHTTPHandler
 ```
 
-A failed import cannot leave a misleading partial detail projection.
+The framework-neutral HTTP handler owns deterministic application-to-HTTP mapping.
 
-## 7. Historical Query Architecture
+FastAPI is a transport adapter, not the owner of application/domain rules.
 
-Repositories own SQL. Query services and CLIs consume typed results.
+## 11. Production Server Architecture
 
-Implemented query boundaries include:
-
-- chronological snapshot listing;
-- package/date filters;
-- latest snapshot;
-- previous/next navigation;
-- timeline by snapshot/type/subject/date/latest;
-- explicit import-state access.
-
-## 8. Historical Comparison Architecture
+Canonical production factory:
 
 ```text
-Snapshot metadata
-+ Import state
-+ Comparison facts
-        ↓
-HistoricalSnapshotCompatibilityService
-        ↓
-PortfolioSummaryComparator
-HoldingsComparator
-RecommendationsComparator
-DeploymentComparator
-        ↓
-HistoricalSnapshotComparisonService
-        ↓
-SnapshotComparison
+investment_terminal.server.production:create_app
 ```
 
-Compatibility may be:
-
-- `COMPATIBLE`;
-- `PARTIALLY_COMPATIBLE`;
-- `INCOMPATIBLE`.
-
-`INCOMPATIBLE` short-circuits leaf comparisons. Soft warnings remain visible.
-
-Comparators use persisted stable keys and never perform fuzzy identity matching.
-
-## 9. Historical Replay Architecture
-
-Supported modes:
+Canonical CLI:
 
 ```text
-EXACT_ARCHIVED_PACKAGE
-NORMALIZED_HISTORICAL_VIEW
+python -m investment_terminal.cli.server
 ```
 
-Exact replay:
+Runtime routes:
 
 ```text
-HistoricalSnapshot
-→ HistoricalReviewPackageLoader
-→ verified exact archived payload
+GET  /health
+GET  /ready
+POST /v1/grounded-ai
+GET  /openapi.json
 ```
 
-Normalized replay:
+Swagger `/docs` and ReDoc `/redoc` are disabled.
+
+Canonical inbound request flow:
 
 ```text
-HistoricalSnapshot
-+ Import State
-+ typed repositories
-→ rebuildable normalized projection
+request
+→ authentication
+→ opaque rate-limit identity derivation
+→ rate-limit admission
+→ request-size enforcement
+→ UTF-8 JSON decoding
+→ framework-neutral HTTP handler
+→ application/provider execution
+→ sanitized response
+→ deterministic security headers
 ```
 
-`CURRENT_CODE_RECALCULATION` is intentionally unsupported. Replay does not access external data.
+Authentication occurs before rate-limit admission.
 
-## 10. CLI Boundary
+## 12. Authentication and Request Controls
 
-Current History CLIs:
+`POST /v1/grounded-ai` requires inbound `X-API-Key` authentication.
+
+Established server controls:
+
+- inbound API-key authentication;
+- bounded request bodies before JSON decoding;
+- sanitized unexpected-error handling;
+- deterministic security headers;
+- process-local token-bucket rate limiting;
+- safe `RateLimit-*` client metadata;
+- `429` plus `Retry-After`;
+- fail-closed single-worker production runtime while limiter state is process-local.
+
+Unauthenticated requests:
 
 ```text
-archive_review_package.py
-import_history.py
-query_history.py
-compare_history.py
-replay_history.py
+→ 401
+→ no authenticated rate-limit token consumed
+→ no RateLimit-* state exposed
 ```
+
+## 13. Runtime Configuration
+
+Production configuration owns:
+
+- Knowledge database path;
+- provider model;
+- provider allowlist;
+- provider timeout/retry limits;
+- provider credential environment name;
+- provider output/token/cost budgets;
+- explicit model pricing and currency;
+- inbound server credential environment name;
+- maximum request-body size;
+- rate-limit capacity/refill rate.
+
+Configuration must fail closed on missing or invalid mandatory economic controls.
+
+## 14. Persistence and Transaction Ownership
+
+Persistence repositories own SQL/query details.
+
+Important integrity guarantees include:
+
+- immutable archive creation;
+- exact-byte checksum verification;
+- path confinement;
+- append-only manifest behavior;
+- controlled schema migration;
+- explicit import state;
+- atomic historical detail import;
+- deterministic ordering;
+- rebuildable SQLite projections.
+
+CLI and HTTP layers must not own SQL.
+
+## 15. CLI Boundary
 
 CLI responsibilities:
 
 ```text
 parse
-→ resolve paths
+→ resolve configuration/paths
 → construct dependencies
-→ call service/repository boundary
-→ format result
+→ invoke service/repository boundary
+→ format output
+→ exit
 ```
 
 Forbidden:
 
-- direct SQL;
-- hidden migrations in read-only query CLIs;
-- comparison business logic;
-- replay business logic;
-- historical recalculation.
+- business rules in CLI;
+- direct SQL where repository boundaries exist;
+- hidden historical recalculation;
+- archive mutation from read-only commands.
 
-## 11. Integrity Rules
+## 16. Dependency Rules
 
-Historical evidence must preserve:
-
-- exact bytes;
-- checksum identity;
-- safe archive-root confinement;
-- package schema identity;
-- `generated_at` identity;
-- append-only archive and manifest behavior;
-- typed import state;
-- atomic detail import;
-- deterministic ordering.
-
-## 12. End-to-End Verification
-
-Sprint 13 includes a realistic deterministic fixture that validates:
+Allowed direction:
 
 ```text
-Review Package
-→ Archive
-→ Manifest
-→ Migration
-→ Metadata synchronization
-→ Verified atomic import
-→ Timeline
-→ Query CLI
-→ Comparison CLI
-→ Exact replay
-→ Normalized replay
+Transport / CLI
+→ Application
+→ Domain services / repositories
+→ Domain models / infrastructure mechanisms
 ```
 
-No network access is required.
-
-## 13. Dependency Rules
-
-Allowed:
-
-```text
-CLI
-→ Application Services / Repositories
-→ Domain Models / Infrastructure
-```
+Evidence/interpretation direction:
 
 ```text
 Review
 → History
-→ Historical Intelligence
-→ Future Knowledge
+→ Historical Intelligence / Outcome Research
+→ Knowledge
+→ Grounded AI
+→ Application/API
 ```
 
-Forbidden:
+Forbidden examples:
 
 ```text
-History → Market API
-History → current analysis calculation
-Comparison → raw SQL
-Replay → external data
-CLI → domain-rule implementation
-Knowledge → archive mutation
+History → live market API
+History → current analysis recalculation
+Historical Intelligence → archive mutation
+Knowledge → History mutation
 AI → canonical historical rewrite
+FastAPI → domain-rule ownership
+CLI → domain-rule ownership
 ```
+
+## 17. Security and Authority Rules
+
+- inbound server credentials are separate from outbound provider credentials;
+- secrets must not appear in API responses or rate-limit metadata;
+- provider responses remain untrusted until parsing and grounding validation;
+- budget/governance controls must be present in canonical production composition;
+- unexpected server errors are sanitized;
+- request bodies are bounded before decoding;
+- supported production rate-limit state is process-local and single-worker;
+- no autonomous trading or broker execution is introduced.
+
+## 18. Testing Architecture
+
+Important behaviors require focused tests plus full regression.
+
+Critical end-to-end paths include:
+
+```text
+Review Package
+→ Archive
+→ Verification
+→ History import
+→ Timeline
+→ Comparison / Replay
+```
+
+```text
+History
+→ Knowledge
+→ Grounded prompt
+→ Provider
+→ Parsing
+→ Grounding validation
+```
+
+```text
+Runtime environment
+→ production.create_app()
+→ authentication
+→ rate limiting
+→ HTTP handler
+→ application/provider controls
+→ response
+```
+
+Passing unit tests do not replace production composition tests.
+
+## 19. Intentional Current Limitations
+
+Still intentional:
+
+- rate-limit state is process-local;
+- production server supports one worker while that remains true;
+- no distributed rate-limit backend;
+- no streaming grounded-AI response contract;
+- no autonomous portfolio mutation;
+- no broker execution;
+- no provider-price synchronization service;
+- no persistent usage/cost ledger unless introduced by a future milestone.
+
+These are explicit limitations, not hidden claims of support.

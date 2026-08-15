@@ -5,83 +5,158 @@
 ```text
 vactor222123/InvestmentTerminal
 branch: develop
-baseline: e3f3a5b
+baseline: ad9dd1f
 ```
-
-The baseline above is the implementation-complete Sprint 26 baseline immediately before the closure documentation commit.
 
 ## Current Phase
 
 ```text
-Sprint 26 — Inbound API Rate Limiting and Abuse Controls
-implementation complete
-production E2E complete
-closure documentation in progress
+Post-Sprint-26 independent audit remediation
+Sprint 27 not started
 ```
+
+Sprint 26 implementation, E2E coverage, and closure documentation are complete.
+
+## Audit Status
+
+Independent repository audit findings:
+
+```text
+AUD-001 / P1  Production provider budget/pricing composition
+               CLOSED at ad9dd1f
+
+AUD-003 / P3  Canonical architecture/documentation drift
+               IN REMEDIATION
+
+AUD-002 / P3  Repository inventory / project_files.txt drift
+               PENDING
+```
+
+## AUD-001 Closure
+
+Commit:
+
+```text
+ad9dd1f fix(server): enforce provider budgets in production
+```
+
+Canonical production runtime now requires explicit provider economic configuration and passes:
+
+```text
+requested_max_output_tokens
+pricing_policy
+budget_policy
+```
+
+through the production composition root into the existing application/provider control layer.
+
+Production configuration now includes:
+
+```text
+INVESTMENT_TERMINAL_PROVIDER_MAX_OUTPUT_TOKENS
+INVESTMENT_TERMINAL_PROVIDER_MAX_TOTAL_TOKENS
+INVESTMENT_TERMINAL_PROVIDER_MAX_TOTAL_COST
+INVESTMENT_TERMINAL_PROVIDER_BUDGET_CURRENCY
+INVESTMENT_TERMINAL_PROVIDER_INPUT_COST_PER_MILLION_TOKENS
+INVESTMENT_TERMINAL_PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS
+INVESTMENT_TERMINAL_PROVIDER_PRICING_CURRENCY
+```
+
+Budget and pricing currency must match. Missing/invalid mandatory economic settings fail closed.
 
 ## Completed Foundation
 
-### Sprint 12–23
+### History / Historical Intelligence
 
-Historical Intelligence, comparison/replay, outcome observations, methodology hardening, descriptive research, provenance/population quality, archive continuity, Knowledge Domain, Evidence-Grounded AI, real OpenAI provider integration, governance, usage, pricing, budget controls, and provider resilience are complete.
+Implemented:
 
-### Sprint 24 — Application/API Productization Foundation
+- immutable exact-byte archive;
+- append-only manifest;
+- checksum/path verification;
+- rebuildable SQLite projection;
+- migrations and import state;
+- atomic detail import;
+- timeline;
+- comparison;
+- replay;
+- outcome observations/research;
+- provenance/population-quality controls.
 
-Stable application contracts, concrete application orchestration, application composition, normalized application errors, framework-neutral API contracts, deterministic HTTP mapping, framework-neutral HTTP handler, and API composition are complete.
+### Knowledge / Grounded AI
 
-### Sprint 25 — Production Server Runtime and HTTP Hardening
+Implemented:
 
-FastAPI production runtime, environment-backed runtime configuration, production server composition, health/readiness, inbound API-key authentication, request-size enforcement, sanitized unexpected-error boundary, security response headers, hardened OpenAPI, disabled production docs UIs, canonical Uvicorn CLI, and production runtime E2E are complete.
+- versioned traceable Knowledge;
+- evidence references;
+- provenance assessment;
+- deterministic Knowledge access;
+- grounded prompt contracts;
+- provider-neutral generation boundary;
+- strict parsing;
+- grounding validation;
+- grounded generation trace.
 
-### Sprint 26 — Inbound API Rate Limiting and Abuse Controls
+### Provider Operations
 
-Delivered:
+Implemented:
 
-```text
-token-bucket rate-limit policy
-per-authenticated-identity admission
-opaque identity derivation
-HTTP 429 throttling contract
-Retry-After
-environment-backed capacity/refill configuration
-monotonic Decimal production clock
-production limiter composition
-single-worker fail-closed CLI enforcement
-RateLimit-Limit
-RateLimit-Remaining
-RateLimit-Reset
-OpenAPI rate-limit metadata
-production rate-limit E2E
-```
+- OpenAI transport composition;
+- provider/model governance;
+- bounded retry/resilience;
+- Retry-After behavior;
+- usage accounting;
+- deterministic pricing/cost accounting;
+- output-token limits;
+- total-token budget;
+- total-cost budget;
+- production composition of economic controls.
+
+### Application / API
+
+Implemented:
+
+- provider-neutral application orchestration;
+- normalized application errors;
+- framework-neutral API contracts;
+- deterministic HTTP mapping;
+- framework-neutral HTTP handler.
+
+### Production Server
+
+Implemented:
+
+- FastAPI production runtime;
+- environment-backed runtime config;
+- health/readiness;
+- inbound API-key authentication;
+- bounded request bodies;
+- sanitized errors;
+- deterministic security headers;
+- hardened OpenAPI;
+- disabled docs UIs;
+- Uvicorn CLI;
+- process-local inbound rate limiting;
+- safe rate-limit response metadata;
+- production rate-limit E2E;
+- fail-closed one-worker constraint.
 
 ## Canonical Production Flow
 
 ```text
 python -m investment_terminal.cli.server
-        ↓
-Uvicorn factory mode
-        ↓
-investment_terminal.server.production:create_app
-        ↓
-runtime configuration
-        ↓
-authentication
-        ↓
-rate-limit identity derivation
-        ↓
-rate-limit admission
-        ↓
-request-size guardrail
-        ↓
-FastAPI transport adapter
-        ↓
-GroundedAIHTTPHandler
-        ↓
-GroundedAIAPIAdapter
-        ↓
-GroundedAIApplicationService
-        ↓
-Knowledge / GroundedGeneration / provider stack
+→ Uvicorn factory mode
+→ investment_terminal.server.production:create_app
+→ runtime config
+→ provider governance/pricing/budget composition
+→ authentication
+→ rate-limit identity derivation
+→ rate-limit admission
+→ request-size guardrail
+→ FastAPI adapter
+→ GroundedAIHTTPHandler
+→ GroundedAIAPIAdapter
+→ GroundedAIApplicationService
+→ Knowledge / Grounded AI / provider stack
 ```
 
 ## Runtime Surface
@@ -93,206 +168,58 @@ POST /v1/grounded-ai
 GET  /openapi.json
 ```
 
-Operational `/health` and `/ready` routes remain outside the public OpenAPI schema. Swagger `/docs` and ReDoc `/redoc` remain disabled.
+`/health` and `/ready` are operational routes outside the public OpenAPI schema. `/docs` and `/redoc` are disabled.
 
-## Authentication and Rate-Limit Boundary
+## Security / Authority Status
 
-`POST /v1/grounded-ai` requires the configured inbound `X-API-Key`.
+Preserved:
 
-Canonical ordering:
+- archive evidence remains immutable;
+- SQLite remains rebuildable;
+- Knowledge remains downstream of verified evidence;
+- provider responses remain untrusted before grounding validation;
+- inbound and outbound credentials are separate;
+- production provider governance/budget controls are wired;
+- unauthenticated requests do not consume authenticated rate-limit capacity;
+- rate-limit metadata exposes no identity/secrets;
+- request bodies are bounded before decoding;
+- unexpected server failures remain sanitized;
+- no autonomous portfolio mutation;
+- no broker execution.
 
-```text
-authentication
-→ rate-limit identity derivation
-→ rate-limit admission
-→ body processing
-```
+## Intentional Runtime Constraint
 
-Therefore:
+Inbound rate-limit state remains process-local.
 
-```text
-missing/invalid API key
-→ 401
-→ no authenticated rate-limit token consumed
-→ no RateLimit-* state exposed
-```
-
-Authenticated admitted requests receive safe aggregate limiter metadata. Authenticated throttled requests receive `429`, `Retry-After`, and safe limiter metadata.
-
-## Rate-Limit Runtime Configuration
-
-```text
-INVESTMENT_TERMINAL_RATE_LIMIT_CAPACITY
-INVESTMENT_TERMINAL_RATE_LIMIT_REFILL_TOKENS_PER_SECOND
-```
-
-Rate-limit state is process-local.
-
-Until state ownership becomes shared across workers/processes, production execution intentionally supports only:
+Canonical production CLI therefore supports only:
 
 ```text
 --workers 1
 ```
 
-The CLI fails closed for larger worker counts so independent process-local buckets cannot multiply effective capacity.
+until a shared-state design is explicitly introduced.
 
-## Client Rate-Limit Contract
+## Current Documentation Authority
 
-Safe response metadata:
-
-```text
-RateLimit-Limit
-RateLimit-Remaining
-RateLimit-Reset
-```
-
-Throttled response:
+Current/canonical documents are:
 
 ```text
-HTTP 429
-Retry-After
+Roadmap.md
+docs/PROJECT_STATUS.md
+docs/ARCHITECTURE.md
+docs/DOMAIN_MAP.md
+docs/AI_CONTEXT.md
+docs/README.md
 ```
 
-The public surface does not expose:
+Historical sprint plans/reviews are supporting records, not current-state authority.
+
+## Next Steps
 
 ```text
-API keys
-opaque rate-limit identities
-identity hashes
-internal bucket keys
-provider credentials
+1. Close AUD-003 canonical architecture/documentation reconciliation.
+2. Reconcile AUD-002 repository inventory/project_files.txt.
+3. Run final full regression.
+4. Close post-Sprint-26 audit remediation.
+5. Only then plan Sprint 27.
 ```
-
-## Request Boundary
-
-Authenticated and admitted request bodies remain bounded before UTF-8 JSON decoding.
-
-Expected server transport behavior:
-
-```text
-missing/invalid API key → 401
-rate limit exceeded     → 429
-invalid JSON            → 400
-oversized body          → 413
-application policy      → 403
-application unavailable → 503
-unexpected server error → sanitized 500
-```
-
-## Public OpenAPI Contract
-
-Public schema surface:
-
-```text
-POST /v1/grounded-ai
-```
-
-Stable operation id:
-
-```text
-grounded_ai_generate
-```
-
-Documented response status surface includes:
-
-```text
-200
-400
-401
-403
-413
-429
-500
-503
-```
-
-OpenAPI documents safe `RateLimit-*` metadata on responses that may follow admission and `Retry-After` on `429`.
-
-## Testing Status
-
-Sprint 26 focused coverage includes:
-
-```text
-rate-limit policy
-admission service
-identity derivation
-HTTP throttling
-runtime configuration
-monotonic clock
-production composition
-CLI worker enforcement
-response headers
-OpenAPI metadata
-production rate-limit E2E
-```
-
-The production E2E verifies the real production composition path with deterministic seams and covers:
-
-```text
-runtime env
-→ production create_app()
-→ authentication
-→ admission
-→ 200
-→ 429
-→ deterministic refill
-→ 200
-```
-
-It also verifies that unauthenticated requests do not consume authenticated limiter capacity.
-
-The final full-suite count is intentionally not hard-coded here until the developer runs the closure regression on the exact documentation package working tree.
-
-## Security and Authority Boundaries
-
-Sprint 26 preserves:
-
-- AI remains downstream of Knowledge;
-- no server/API adapter bypasses grounding validation;
-- provider/model governance remains fail-closed;
-- provider budget controls remain enforced at their established boundaries;
-- inbound API credentials remain separate from outbound provider credentials;
-- rate-limit identity is opaque and remains internal;
-- unauthenticated requests do not expose rate-limit state;
-- raw provider transport data remains outside API responses;
-- request size remains bounded before decoding;
-- unexpected server failures remain sanitized;
-- no HTTP path mutates Knowledge or History;
-- no AI persistence schema is introduced;
-- no autonomous portfolio mutation is introduced;
-- no broker execution is introduced.
-
-## Deferred Capabilities
-
-Still deferred:
-
-- shared/distributed rate-limit state for multi-worker or multi-instance deployment;
-- deployment container/image and infrastructure manifests;
-- TLS termination/HSTS deployment policy;
-- authorization beyond API-key authentication;
-- retry jitter;
-- proactive provider rate-limit scheduling;
-- concurrency-aware provider throttling;
-- streaming responses;
-- additional provider adapters;
-- provider pricing catalog synchronization;
-- cached-token/reasoning-token pricing differentiation;
-- persistent usage/cost ledger;
-- provider request/response persistence;
-- semantic entailment validation;
-- contradiction detection;
-- vector retrieval/embeddings;
-- grounded answer persistence/history;
-- automatic History-to-Knowledge ingestion;
-- predictive confidence/effectiveness scoring;
-- causal inference;
-- autonomous portfolio actions;
-- broker execution.
-
-## Next Decision
-
-Sprint 26 implementation is complete.
-
-After this closure documentation package is green and committed, freeze that commit as the Sprint 26 final baseline and perform a full independent repository audit before selecting or implementing Sprint 27.
-
-The audit should inspect the repository as one production system and should report evidence-backed findings without modifying code on the first pass.
