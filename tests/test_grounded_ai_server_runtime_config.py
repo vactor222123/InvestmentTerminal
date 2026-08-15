@@ -10,6 +10,7 @@ from investment_terminal.server.runtime_config import (
     ALLOWED_MODELS_ENV,
     API_KEY_ENV_NAME_ENV,
     DATABASE_ENV,
+    USAGE_COST_LEDGER_DATABASE_ENV,
     MAX_RETRIES_ENV,
     MODEL_ENV,
     PROVIDER_BUDGET_CURRENCY_ENV,
@@ -27,6 +28,9 @@ from investment_terminal.server.runtime_config import (
 def env():
     return {
         DATABASE_ENV: "data/knowledge/knowledge.db",
+        USAGE_COST_LEDGER_DATABASE_ENV: (
+            "data/knowledge/provider_usage_cost.db"
+        ),
         MODEL_ENV: "gpt-test",
         ALLOWED_MODELS_ENV: "gpt-test,gpt-other",
         PROVIDER_MAX_OUTPUT_TOKENS_ENV: "32",

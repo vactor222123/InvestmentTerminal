@@ -3,6 +3,7 @@ import pytest
 from investment_terminal.server.runtime_config import (
     ALLOWED_MODELS_ENV,
     DATABASE_ENV,
+    USAGE_COST_LEDGER_DATABASE_ENV,
     DEFAULT_MAX_REQUEST_BODY_BYTES,
     MAX_REQUEST_BODY_BYTES_ENV,
     MODEL_ENV,
@@ -20,6 +21,9 @@ from investment_terminal.server.runtime_config import (
 def base_environment():
     return {
         DATABASE_ENV: "data/knowledge/knowledge.db",
+        USAGE_COST_LEDGER_DATABASE_ENV: (
+            "data/knowledge/provider_usage_cost.db"
+        ),
         MODEL_ENV: "gpt-test",
         ALLOWED_MODELS_ENV: "gpt-test",
         PROVIDER_MAX_OUTPUT_TOKENS_ENV: "32",

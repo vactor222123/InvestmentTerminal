@@ -10,6 +10,7 @@ from investment_terminal.server.rate_limit_identity import (
 from investment_terminal.server.runtime_config import (
     ALLOWED_MODELS_ENV,
     DATABASE_ENV,
+    USAGE_COST_LEDGER_DATABASE_ENV,
     DEFAULT_SERVER_API_KEY_ENV,
     MODEL_ENV,
     PROVIDER_BUDGET_CURRENCY_ENV,
@@ -65,6 +66,9 @@ def test_production_factory_routes_config_through_api_composition(monkeypatch):
 
     app = production.create_app({
         DATABASE_ENV: "data/knowledge/knowledge.db",
+        USAGE_COST_LEDGER_DATABASE_ENV: (
+            "data/knowledge/provider_usage_cost.db"
+        ),
         MODEL_ENV: "gpt-test",
         ALLOWED_MODELS_ENV: "gpt-test",
         DEFAULT_SERVER_API_KEY_ENV: "server-secret",

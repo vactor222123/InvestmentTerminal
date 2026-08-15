@@ -1,10 +1,10 @@
 from pathlib import Path
 
+import pytest
+
 from investment_terminal.server.runtime_config import (
     ALLOWED_MODELS_ENV,
     DATABASE_ENV,
-    USAGE_COST_LEDGER_DATABASE_ENV,
-    DEFAULT_SERVER_API_KEY_ENV,
     MODEL_ENV,
     PROVIDER_BUDGET_CURRENCY_ENV,
     PROVIDER_INPUT_COST_PER_MILLION_TOKENS_ENV,
@@ -13,17 +13,15 @@ from investment_terminal.server.runtime_config import (
     PROVIDER_MAX_TOTAL_TOKENS_ENV,
     PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS_ENV,
     PROVIDER_PRICING_CURRENCY_ENV,
-    SERVER_API_KEY_ENV_NAME_ENV,
+    USAGE_COST_LEDGER_DATABASE_ENV,
     GroundedAIServerRuntimeConfig,
 )
 
 
-def base_environment() -> dict[str, str]:
+def environment() -> dict[str, str]:
     return {
         DATABASE_ENV: "data/knowledge/knowledge.db",
-        USAGE_COST_LEDGER_DATABASE_ENV: (
-            "data/knowledge/provider_usage_cost.db"
-        ),
+        USAGE_COST_LEDGER_DATABASE_ENV: "data/knowledge/provider_usage_cost.db",
         MODEL_ENV: "gpt-test",
         ALLOWED_MODELS_ENV: "gpt-test",
         PROVIDER_MAX_OUTPUT_TOKENS_ENV: "32",
@@ -36,19 +34,20 @@ def base_environment() -> dict[str, str]:
     }
 
 
-def test_runtime_config_uses_canonical_server_api_key_env_default() -> None:
-    config = GroundedAIServerRuntimeConfig.from_environment(
-        base_environment()
+def test_runtime_config_requires_usage_cost_ledger_database() -> None:
+    values = environment()
+    del values[USAGE_COST_LEDGER_DATABASE_ENV]
+
+    with pytest.raises(
+        ValueError,
+        match=USAGE_COST_LEDGER_DATABASE_ENV,
+    ):
+        GroundedAIServerRuntimeConfig.from_environment(values)
+
+
+def test_runtime_config_exposes_usage_cost_ledger_database() -> None:
+    config = GroundedAIServerRuntimeConfig.from_environment(environment())
+
+    assert config.usage_cost_ledger_database == Path(
+        "data/knowledge/provider_usage_cost.db"
     )
-    assert (
-        config.server_api_key_environment_variable
-        == DEFAULT_SERVER_API_KEY_ENV
-    )
-
-
-def test_runtime_config_accepts_custom_server_api_key_env_name() -> None:
-    values = base_environment()
-    values[SERVER_API_KEY_ENV_NAME_ENV] = "CUSTOM_SERVER_KEY"
-
-    config = GroundedAIServerRuntimeConfig.from_environment(values)
-    assert config.server_api_key_environment_variable == "CUSTOM_SERVER_KEY"

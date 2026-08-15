@@ -17,6 +17,7 @@ from investment_terminal.server import production
 from investment_terminal.server.runtime_config import (
     ALLOWED_MODELS_ENV,
     DATABASE_ENV,
+    USAGE_COST_LEDGER_DATABASE_ENV,
     DEFAULT_SERVER_API_KEY_ENV,
     MODEL_ENV,
     PROVIDER_BUDGET_CURRENCY_ENV,
@@ -69,6 +70,9 @@ def build_environment(
 ) -> dict[str, str]:
     return {
         DATABASE_ENV: str(database),
+        USAGE_COST_LEDGER_DATABASE_ENV: str(
+            database.with_name("provider_usage_cost.db")
+        ),
         MODEL_ENV: "gpt-test",
         ALLOWED_MODELS_ENV: "gpt-test",
         DEFAULT_OPENAI_API_KEY_ENV: "provider-secret",

@@ -9,6 +9,7 @@ from investment_terminal.server.readiness import (
 from investment_terminal.server.runtime_config import (
     ALLOWED_MODELS_ENV,
     DATABASE_ENV,
+    USAGE_COST_LEDGER_DATABASE_ENV,
     MODEL_ENV,
     PROVIDER_BUDGET_CURRENCY_ENV,
     PROVIDER_INPUT_COST_PER_MILLION_TOKENS_ENV,
@@ -27,6 +28,9 @@ def config_for(
     return GroundedAIServerRuntimeConfig.from_environment(
         {
             DATABASE_ENV: str(database),
+            USAGE_COST_LEDGER_DATABASE_ENV: str(
+                database.with_name("provider_usage_cost.db")
+            ),
             MODEL_ENV: "gpt-test",
             ALLOWED_MODELS_ENV: "gpt-test",
             PROVIDER_MAX_OUTPUT_TOKENS_ENV: "32",
