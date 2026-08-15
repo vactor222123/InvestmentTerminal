@@ -5,66 +5,37 @@
 ```text
 vactor222123/InvestmentTerminal
 branch: develop
-baseline: ad9dd1f
+baseline: 3f2f56b
 ```
 
 ## Current Phase
 
 ```text
-Post-Sprint-26 independent audit remediation
-Sprint 27 not started
+Post-Sprint-26 independent audit CLOSED
+Sprint 27 planning ready
 ```
 
-Sprint 26 implementation, E2E coverage, and closure documentation are complete.
+Sprint 26 implementation, production E2E, closure documentation, independent repository audit, and all confirmed audit remediation are complete.
 
-## Audit Status
-
-Independent repository audit findings:
+## Audit Closure
 
 ```text
-AUD-001 / P1  Production provider budget/pricing composition
-               CLOSED at ad9dd1f
+AUD-001 / P1  CLOSED
+Production provider budget/pricing composition
+→ ad9dd1f fix(server): enforce provider budgets in production
 
-AUD-003 / P3  Canonical architecture/documentation drift
-               IN REMEDIATION
+AUD-003 / P3  CLOSED
+Canonical architecture/documentation drift
+→ 5ec042d docs(architecture): reconcile canonical system documentation
 
-AUD-002 / P3  Repository inventory / project_files.txt drift
-               PENDING
+AUD-002 / P3  CLOSED
+Repository inventory / project_files.txt drift
+→ 3f2f56b chore(repo): reconcile tracked file inventory
 ```
 
-## AUD-001 Closure
+No confirmed audit finding remains open.
 
-Commit:
-
-```text
-ad9dd1f fix(server): enforce provider budgets in production
-```
-
-Canonical production runtime now requires explicit provider economic configuration and passes:
-
-```text
-requested_max_output_tokens
-pricing_policy
-budget_policy
-```
-
-through the production composition root into the existing application/provider control layer.
-
-Production configuration now includes:
-
-```text
-INVESTMENT_TERMINAL_PROVIDER_MAX_OUTPUT_TOKENS
-INVESTMENT_TERMINAL_PROVIDER_MAX_TOTAL_TOKENS
-INVESTMENT_TERMINAL_PROVIDER_MAX_TOTAL_COST
-INVESTMENT_TERMINAL_PROVIDER_BUDGET_CURRENCY
-INVESTMENT_TERMINAL_PROVIDER_INPUT_COST_PER_MILLION_TOKENS
-INVESTMENT_TERMINAL_PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS
-INVESTMENT_TERMINAL_PROVIDER_PRICING_CURRENCY
-```
-
-Budget and pricing currency must match. Missing/invalid mandatory economic settings fail closed.
-
-## Completed Foundation
+## Current System Foundation
 
 ### History / Historical Intelligence
 
@@ -74,11 +45,10 @@ Implemented:
 - append-only manifest;
 - checksum/path verification;
 - rebuildable SQLite projection;
-- migrations and import state;
+- migrations and explicit import state;
 - atomic detail import;
 - timeline;
-- comparison;
-- replay;
+- comparison and replay;
 - outcome observations/research;
 - provenance/population-quality controls.
 
@@ -109,7 +79,7 @@ Implemented:
 - output-token limits;
 - total-token budget;
 - total-cost budget;
-- production composition of economic controls.
+- canonical production composition of economic controls.
 
 ### Application / API
 
@@ -138,7 +108,7 @@ Implemented:
 - process-local inbound rate limiting;
 - safe rate-limit response metadata;
 - production rate-limit E2E;
-- fail-closed one-worker constraint.
+- fail-closed single-worker constraint.
 
 ## Canonical Production Flow
 
@@ -159,17 +129,6 @@ python -m investment_terminal.cli.server
 → Knowledge / Grounded AI / provider stack
 ```
 
-## Runtime Surface
-
-```text
-GET  /health
-GET  /ready
-POST /v1/grounded-ai
-GET  /openapi.json
-```
-
-`/health` and `/ready` are operational routes outside the public OpenAPI schema. `/docs` and `/redoc` are disabled.
-
 ## Security / Authority Status
 
 Preserved:
@@ -178,7 +137,7 @@ Preserved:
 - SQLite remains rebuildable;
 - Knowledge remains downstream of verified evidence;
 - provider responses remain untrusted before grounding validation;
-- inbound and outbound credentials are separate;
+- inbound and outbound credentials remain separate;
 - production provider governance/budget controls are wired;
 - unauthenticated requests do not consume authenticated rate-limit capacity;
 - rate-limit metadata exposes no identity/secrets;
@@ -191,7 +150,7 @@ Preserved:
 
 Inbound rate-limit state remains process-local.
 
-Canonical production CLI therefore supports only:
+Canonical production CLI supports only:
 
 ```text
 --workers 1
@@ -200,8 +159,6 @@ Canonical production CLI therefore supports only:
 until a shared-state design is explicitly introduced.
 
 ## Current Documentation Authority
-
-Current/canonical documents are:
 
 ```text
 Roadmap.md
@@ -212,14 +169,18 @@ docs/AI_CONTEXT.md
 docs/README.md
 ```
 
-Historical sprint plans/reviews are supporting records, not current-state authority.
+Historical sprint plans/reviews remain supporting records, not current-state authority.
 
-## Next Steps
+## Next Step
 
 ```text
-1. Close AUD-003 canonical architecture/documentation reconciliation.
-2. Reconcile AUD-002 repository inventory/project_files.txt.
-3. Run final full regression.
-4. Close post-Sprint-26 audit remediation.
-5. Only then plan Sprint 27.
+Sprint 27 planning
 ```
+
+Planning must begin from:
+
+```text
+develop @ 3f2f56b
+```
+
+and start with a focused audit of the selected product boundary before implementation.

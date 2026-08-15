@@ -1,7 +1,7 @@
 # Investment Terminal — Product Roadmap
 
 **Status:** Canonical Roadmap  
-**Updated after:** Sprint 26 — Inbound API Rate Limiting and Abuse Controls  
+**Updated after:** Post-Sprint-26 Independent Repository Audit  
 **Current development branch:** `develop`
 
 ## 1. Product Evolution
@@ -26,6 +26,7 @@ Foundation
 → Application/API Productization Foundation
 → Production Server Runtime and HTTP Hardening
 → Inbound API Rate Limiting and Abuse Controls
+→ Post-Sprint-26 Independent Repository Audit
 ```
 
 ## 2. Completed Milestones
@@ -73,7 +74,30 @@ Delivered:
 - fail-closed single-worker CLI enforcement while limiter state is process-local;
 - safe `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset` client metadata;
 - OpenAPI documentation of rate-limit response metadata;
-- production rate-limit end-to-end coverage across runtime configuration, authentication, admission, throttling, refill, headers, and OpenAPI.
+- production rate-limit end-to-end coverage.
+
+### Post-Sprint-26 Independent Repository Audit
+
+The repository was frozen after Sprint 26 and reviewed as one production system before Sprint 27 planning.
+
+Confirmed findings and remediation:
+
+```text
+AUD-001 / P1
+Production provider budget/pricing controls were not wired through the
+canonical server composition path.
+→ CLOSED at ad9dd1f
+
+AUD-003 / P3
+Canonical architecture documentation drifted behind the implemented system.
+→ CLOSED at 5ec042d
+
+AUD-002 / P3
+project_files.txt no longer matched the tracked repository inventory.
+→ CLOSED at 3f2f56b
+```
+
+No P0 finding remained open.
 
 ## 3. Stable Authority Hierarchy
 
@@ -88,7 +112,7 @@ Archived Review Package
 → ADMISSIBLE GroundedGenerationResult
 ```
 
-Server abuse controls do not change evidence authority or grounding semantics.
+Server and provider controls do not change evidence authority.
 
 ## 4. Production Server Status
 
@@ -113,11 +137,11 @@ POST /v1/grounded-ai
 GET  /openapi.json
 ```
 
-`/docs` and `/redoc` are disabled. Health/readiness remain operational routes and are intentionally excluded from the public OpenAPI schema.
+`/docs` and `/redoc` are disabled.
+
+Canonical production composition includes provider governance, explicit pricing, output-token limits, token/cost budgets, authentication, request-size enforcement, rate limiting, and sanitized HTTP error handling.
 
 ## 5. Canonical Inbound Request Flow
-
-Authenticated grounded-AI requests follow:
 
 ```text
 request
@@ -132,30 +156,44 @@ request
 → deterministic security headers
 ```
 
-Authentication is evaluated before rate-limit admission. An unauthenticated request therefore fails with `401` before consuming rate-limit capacity.
+Authentication is evaluated before rate-limit admission.
 
 ## 6. Rate-Limit Runtime Contract
-
-Runtime configuration exposes:
 
 ```text
 INVESTMENT_TERMINAL_RATE_LIMIT_CAPACITY
 INVESTMENT_TERMINAL_RATE_LIMIT_REFILL_TOKENS_PER_SECOND
 ```
 
-The production limiter uses a monotonic clock and process-local token-bucket state.
+Rate-limit state is process-local.
 
-Because limiter state is process-local, the production CLI intentionally permits only:
+Canonical production CLI therefore intentionally permits only:
 
 ```text
 --workers 1
 ```
 
-Multi-worker execution fails closed rather than multiplying effective rate-limit capacity across independent worker processes.
+until shared rate-limit state is explicitly designed.
 
-## 7. Client Rate-Limit Visibility
+## 7. Provider Economic Runtime Contract
 
-Authenticated requests that reach rate-limit admission may expose:
+Canonical production runtime requires explicit provider economic controls:
+
+```text
+INVESTMENT_TERMINAL_PROVIDER_MAX_OUTPUT_TOKENS
+INVESTMENT_TERMINAL_PROVIDER_MAX_TOTAL_TOKENS
+INVESTMENT_TERMINAL_PROVIDER_MAX_TOTAL_COST
+INVESTMENT_TERMINAL_PROVIDER_BUDGET_CURRENCY
+INVESTMENT_TERMINAL_PROVIDER_INPUT_COST_PER_MILLION_TOKENS
+INVESTMENT_TERMINAL_PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS
+INVESTMENT_TERMINAL_PROVIDER_PRICING_CURRENCY
+```
+
+Missing or invalid mandatory economic configuration fails closed.
+
+## 8. Client Rate-Limit Visibility
+
+Authenticated requests that reach admission may expose:
 
 ```text
 RateLimit-Limit
@@ -170,93 +208,25 @@ HTTP 429
 Retry-After
 ```
 
-Unauthenticated `401` responses intentionally expose no rate-limit state.
+Unauthenticated `401` responses expose no limiter state.
 
-Rate-limit metadata does not expose API keys, opaque rate-limit identities, identity hashes, internal bucket keys, or provider credentials.
-
-## 8. Public OpenAPI Contract
-
-The public OpenAPI schema exposes only:
-
-```text
-POST /v1/grounded-ai
-```
-
-Stable operation id:
-
-```text
-grounded_ai_generate
-```
-
-Expected HTTP status surface includes:
-
-```text
-200
-400
-401
-403
-413
-429
-500
-503
-```
-
-The schema documents safe rate-limit response metadata where admission has occurred.
-
-## 9. Testing Status
-
-Sprint 26 focused coverage includes:
-
-- token-bucket policy and deterministic refill behavior;
-- admission-service identity isolation;
-- opaque rate-limit identity derivation;
-- HTTP `429` and `Retry-After`;
-- runtime environment configuration;
-- monotonic production clock;
-- production composition;
-- single-worker CLI enforcement;
-- safe rate-limit response headers;
-- OpenAPI rate-limit metadata;
-- production rate-limit E2E.
-
-The final Sprint 26 closure regression result is recorded by the developer immediately before the closure commit.
-
-## 10. Security and Authority Boundaries
-
-Sprint 26 preserves:
-
-- AI remains downstream of Knowledge;
-- provider output remains untrusted until strict parsing and grounding validation;
-- provider/model governance remains fail-closed;
-- provider budget controls remain enforced at their established boundaries;
-- inbound server credentials remain separate from outbound provider credentials;
-- unauthenticated requests do not consume authenticated rate-limit capacity;
-- rate-limit identities and credentials are excluded from API/OpenAPI surfaces;
-- unexpected server failures remain sanitized;
-- request bodies remain bounded before decoding;
-- API/HTTP adapters do not mutate Knowledge, History, or portfolio state;
-- no autonomous portfolio mutation is introduced;
-- no broker execution is introduced.
-
-## 11. Deferred Scope
+## 9. Deferred Scope
 
 Still deferred:
 
-- shared/distributed rate-limit state for multi-worker or multi-instance deployment;
+- shared/distributed rate-limit state;
 - deployment container/image and infrastructure manifests;
-- TLS termination policy and HSTS deployment policy;
-- authorization beyond the current API-key authentication boundary;
+- TLS termination/HSTS deployment policy;
+- authorization beyond API-key authentication;
 - retry jitter;
-- proactive provider rate-limit scheduling;
-- concurrency-aware provider throttling;
+- proactive/concurrency-aware provider throttling;
 - streaming responses;
 - additional provider adapters;
-- provider pricing catalog synchronization;
+- provider pricing synchronization;
 - cached-token/reasoning-token pricing differentiation;
 - persistent usage/cost ledger;
 - provider request/response persistence;
-- semantic entailment validation;
-- contradiction detection;
+- semantic entailment/contradiction detection;
 - vector retrieval/embeddings;
 - grounded answer persistence/history;
 - automatic History-to-Knowledge ingestion;
@@ -265,19 +235,28 @@ Still deferred:
 - autonomous portfolio actions;
 - broker execution.
 
-## 12. Next Product Decision Point
+## 10. Current Decision Point
 
-Sprint 26 completes the first inbound API abuse-control layer over the Sprint 25 production server runtime.
+Post-Sprint-26 audit remediation is complete.
 
-Before selecting Sprint 27, the repository should receive a full independent architecture and implementation audit at the final Sprint 26 baseline. Audit findings should be evidence-backed and triaged before any new feature milestone is selected.
+Frozen post-audit baseline:
 
-## 13. Definition of Done
+```text
+develop @ 3f2f56b
+```
+
+The repository is now clear to begin Sprint 27 planning from this baseline.
+
+Sprint 27 must be selected from current product needs and deferred scope after focused audit of the target subsystem; it must not reopen closed audit findings without new evidence.
+
+## 11. Definition of Done
 
 A milestone is complete only when:
 
 - focused tests pass;
 - full regression suite passes;
 - architecture boundaries remain clean;
+- production composition reflects required controls;
 - documentation reflects implementation;
 - deferred scope is explicit;
 - repository is committed and pushed.

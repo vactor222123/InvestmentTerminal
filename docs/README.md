@@ -4,7 +4,7 @@
 
 **Status:** Active development  
 **Latest completed milestone:** Sprint 26 — Inbound API Rate Limiting and Abuse Controls  
-**Current phase:** Post-Sprint-26 audit remediation  
+**Current phase:** Post-Sprint-26 audit closed; Sprint 27 planning ready  
 **Primary language:** Python
 
 ## Overview
@@ -134,34 +134,7 @@ Investment Terminal prioritizes:
 9. production composition tests;
 10. human decision ownership.
 
-## Repository Structure
-
-High-level structure:
-
-```text
-InvestmentTerminal/
-├── config/
-├── data/
-├── docs/
-├── investment_terminal/
-│   ├── ai/
-│   ├── api/
-│   ├── application/
-│   ├── cli/
-│   ├── history/
-│   ├── knowledge/
-│   ├── market_data/
-│   ├── portfolio/
-│   ├── review/
-│   └── server/
-├── tests/
-├── Roadmap.md
-└── requirements.txt
-```
-
 ## Important Canonical Documentation
-
-Current architecture/status authority:
 
 ```text
 Roadmap.md
@@ -169,69 +142,10 @@ docs/PROJECT_STATUS.md
 docs/ARCHITECTURE.md
 docs/DOMAIN_MAP.md
 docs/AI_CONTEXT.md
+docs/README.md
 ```
 
-Historical sprint plans/reviews remain useful historical records but are not current architecture authority.
-
-## Core Workflows
-
-### Review / History
-
-```text
-Review Package
-→ archive
-→ manifest
-→ verification
-→ History import
-→ timeline
-→ comparison / replay / outcome research
-```
-
-Representative CLIs include:
-
-```powershell
-python -m investment_terminal.cli.investment_review_package
-python -m investment_terminal.cli.archive_review_package
-python -m investment_terminal.cli.import_history
-python -m investment_terminal.cli.query_history
-python -m investment_terminal.cli.compare_history
-python -m investment_terminal.cli.replay_history
-```
-
-### Production Grounded AI Server
-
-Configure runtime environment values, including:
-
-```text
-INVESTMENT_TERMINAL_KNOWLEDGE_DATABASE
-INVESTMENT_TERMINAL_OPENAI_MODEL
-INVESTMENT_TERMINAL_ALLOWED_OPENAI_MODELS
-INVESTMENT_TERMINAL_PROVIDER_MAX_OUTPUT_TOKENS
-INVESTMENT_TERMINAL_PROVIDER_MAX_TOTAL_TOKENS
-INVESTMENT_TERMINAL_PROVIDER_MAX_TOTAL_COST
-INVESTMENT_TERMINAL_PROVIDER_BUDGET_CURRENCY
-INVESTMENT_TERMINAL_PROVIDER_INPUT_COST_PER_MILLION_TOKENS
-INVESTMENT_TERMINAL_PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS
-INVESTMENT_TERMINAL_PROVIDER_PRICING_CURRENCY
-INVESTMENT_TERMINAL_SERVER_API_KEY
-INVESTMENT_TERMINAL_RATE_LIMIT_CAPACITY
-INVESTMENT_TERMINAL_RATE_LIMIT_REFILL_TOKENS_PER_SECOND
-```
-
-Use `.env.example` as a shape/reference only. Replace provider pricing placeholders with current pricing for the configured model before production use.
-
-## Installation
-
-```powershell
-git clone <repository-url>
-cd InvestmentTerminal
-
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-```
+Historical sprint plans/reviews remain historical records rather than current architecture authority.
 
 ## Testing
 
@@ -241,22 +155,9 @@ Full suite:
 python -m pytest -q
 ```
 
-Focused test:
-
-```powershell
-python -m pytest tests\<test_file>.py -q
-```
-
 Every focused change should retain a green full regression suite.
 
 ## Development Workflow
-
-```powershell
-git checkout develop
-git pull origin develop
-```
-
-Then:
 
 ```text
 focused audit
@@ -269,20 +170,33 @@ focused audit
 
 Avoid broad refactors without a demonstrated problem.
 
-## Security and Privacy
+## Post-Sprint-26 Independent Audit
 
-Investment Terminal may process sensitive financial data.
+Sprint 26 was followed by a full repository audit before Sprint 27.
 
-Rules include:
+Confirmed findings were remediated:
 
-- never commit credentials;
-- keep inbound server credentials separate from provider credentials;
-- validate archive paths before reads;
-- preserve historical checksums and exact bytes;
-- do not expose secrets in API/error/rate-limit metadata;
-- keep provider responses untrusted until validation;
-- keep budget/governance controls wired in canonical production composition;
-- do not expose portfolio data without explicit user action.
+```text
+AUD-001 / P1
+Production provider budget/pricing composition
+→ CLOSED at ad9dd1f
+
+AUD-003 / P3
+Canonical architecture/documentation drift
+→ CLOSED at 5ec042d
+
+AUD-002 / P3
+Repository inventory drift
+→ CLOSED at 3f2f56b
+```
+
+No confirmed audit finding remains open.
+
+Current post-audit baseline:
+
+```text
+develop @ 3f2f56b
+```
 
 ## Intentional Current Limitations
 
@@ -295,21 +209,16 @@ Not currently claimed:
 - automatic provider pricing synchronization;
 - persistent provider usage/cost ledger.
 
-These are explicit future decisions, not missing hidden implementations.
+These are explicit future decisions, not hidden implementations.
 
 ## Current Phase
 
-Sprint 26 is complete.
-
-A full repository audit after Sprint 26 found one production-critical composition gap: provider budget/pricing controls existed in lower layers but were not wired through the canonical production server path.
-
-That gap is fixed at:
-
 ```text
-ad9dd1f fix(server): enforce provider budgets in production
+Post-Sprint-26 audit CLOSED
+Sprint 27 planning READY
 ```
 
-Remaining post-audit work is documentation/inventory reconciliation before Sprint 27 planning.
+Sprint 27 should begin only after a focused audit of the selected product boundary.
 
 ## Disclaimer
 
