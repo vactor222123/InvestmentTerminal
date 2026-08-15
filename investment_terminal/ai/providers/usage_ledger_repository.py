@@ -4,9 +4,13 @@ Provider usage/cost ledger repository contract and in-memory reference adapter.
 
 from abc import ABC, abstractmethod
 from datetime import datetime
+from decimal import Decimal
 
 from investment_terminal.ai.providers.usage_ledger import (
     GroundedProviderUsageCostLedgerRecord,
+)
+from investment_terminal.ai.providers.usage_ledger_summary import (
+    GroundedProviderUsageCostLedgerSummary,
 )
 from investment_terminal.utils.validation import normalize_required_text
 
@@ -84,6 +88,12 @@ class GroundedProviderUsageCostLedgerRepository(ABC):
     ) -> tuple[GroundedProviderUsageCostLedgerRecord, ...]:
         """Return records in [started_at, ended_at), ordered ascending."""
 
+    @abstractmethod
+    def summarize(
+        self,
+    ) -> GroundedProviderUsageCostLedgerSummary:
+        """Aggregate token/cost totals without exposing storage details."""
+
 
 class InMemoryGroundedProviderUsageCostLedgerRepository(
     GroundedProviderUsageCostLedgerRepository
@@ -100,19 +110,14 @@ class InMemoryGroundedProviderUsageCostLedgerRepository(
         self,
         record: GroundedProviderUsageCostLedgerRecord,
     ) -> GroundedProviderUsageCostLedgerRecord:
-        if not isinstance(
-            record,
-            GroundedProviderUsageCostLedgerRecord,
-        ):
+        if not isinstance(record, GroundedProviderUsageCostLedgerRecord):
             raise TypeError(
                 "record must be a GroundedProviderUsageCostLedgerRecord"
             )
-
         if record.request_id in self._records:
             raise ValueError(
                 "Provider usage/cost ledger request identity already exists"
             )
-
         self._records[record.request_id] = record
         return record
 
@@ -172,9 +177,31 @@ class InMemoryGroundedProviderUsageCostLedgerRepository(
             raise ValueError(
                 "ended_at must be later than started_at"
             )
-
         return tuple(
             record
             for record in self.list_all()
             if start <= record.recorded_at < end
+        )
+
+    def summarize(
+        self,
+    ) -> GroundedProviderUsageCostLedgerSummary:
+        records = tuple(self._records.values())
+        currencies = {
+            record.currency
+            for record in records
+        }
+        if len(currencies) > 1:
+            raise RuntimeError(
+                "summary requires one currency across ledger records"
+            )
+        return GroundedProviderUsageCostLedgerSummary(
+            request_count=len(records),
+            currency=next(iter(currencies)) if currencies else None,
+            input_tokens=sum(r.input_tokens for r in records),
+            output_tokens=sum(r.output_tokens for r in records),
+            total_tokens=sum(r.total_tokens for r in records),
+            input_cost=sum((r.input_cost for r in records), Decimal("0")),
+            output_cost=sum((r.output_cost for r in records), Decimal("0")),
+            total_cost=sum((r.total_cost for r in records), Decimal("0")),
         )

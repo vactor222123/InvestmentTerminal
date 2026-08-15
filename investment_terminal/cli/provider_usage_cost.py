@@ -207,41 +207,10 @@ def _build_report(
         }
 
     if options.command == "summary":
-        records = repository.list_all()
-        currencies = {
-            record.currency
-            for record in records
-        }
-        if len(currencies) > 1:
-            raise RuntimeError(
-                "summary requires one currency across ledger records"
-            )
-
-        input_tokens = sum(record.input_tokens for record in records)
-        output_tokens = sum(record.output_tokens for record in records)
-        total_tokens = sum(record.total_tokens for record in records)
-        input_cost = sum(
-            (record.input_cost for record in records),
-            Decimal("0"),
-        )
-        output_cost = sum(
-            (record.output_cost for record in records),
-            Decimal("0"),
-        )
-        total_cost = sum(
-            (record.total_cost for record in records),
-            Decimal("0"),
-        )
+        summary = repository.summarize()
         return {
             "command": "summary",
-            "request_count": len(records),
-            "currency": next(iter(currencies)) if currencies else None,
-            "input_tokens": input_tokens,
-            "output_tokens": output_tokens,
-            "total_tokens": total_tokens,
-            "input_cost": str(input_cost),
-            "output_cost": str(output_cost),
-            "total_cost": str(total_cost),
+            **summary.to_dict(),
         }
 
     raise RuntimeError(
