@@ -1,8 +1,21 @@
 # InvestmentTerminal AI Context
 
+## Resume / Handoff First
+
+For any continuation of implementation work, read:
+
+```text
+PROJECT_CONTINUATION.md
+```
+
+first, then verify its recorded baseline against the current `develop` HEAD.
+
+`PROJECT_CONTINUATION.md` is the canonical execution/handoff checkpoint and
+MUST be updated after every completed Task.
+
 ## Documentation Authority
 
-Read root canonical documents first:
+Read root canonical documents:
 
 ```text
 Architecture.md
@@ -13,7 +26,10 @@ README.md
 ```
 
 Use `docs/` as synchronized supporting context. Root canonical documents win on
-conflict.
+architecture/product conflict.
+
+`PROJECT_CONTINUATION.md` does not replace Architecture/DataModel authority; it
+owns current execution state, audit path, failure lessons, and next action.
 
 ## Mission
 
@@ -55,6 +71,7 @@ Generated evidence never becomes History or Knowledge automatically.
 13. CI must pass from a clean checkout without developer-local data.
 14. Before changing established contracts, audit consumers, fixtures,
     serialization, persistence, and composition seams.
+15. Update `PROJECT_CONTINUATION.md` after every completed Task.
 
 ## Delivery Contract
 
@@ -76,8 +93,17 @@ Canonical CI:
 ## Current Phase
 
 ```text
-Sprint 31 implementation complete
-closure reconciliation in progress
+Sprint 31 CLOSED
+post-Sprint-31 audit complete
+audit-driven hardening / production maturity
+Sprint 32 selected
 ```
 
-Next work begins only from the reconciled Sprint 31 baseline.
+Current next action:
+
+```text
+Sprint 32 Task 1 — Runtime Filesystem Contract
+```
+
+Read `PROJECT_CONTINUATION.md` for the detailed audit, Sprint 32 plan, working
+protocol, and resume instructions.

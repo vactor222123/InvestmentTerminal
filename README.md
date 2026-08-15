@@ -19,6 +19,20 @@ The system prioritizes:
 - explicit human decision ownership;
 - reproducible delivery.
 
+## Continuing Development
+
+The durable execution/handoff checkpoint is:
+
+```text
+PROJECT_CONTINUATION.md
+```
+
+Read it before resuming implementation in a new development or ChatGPT session.
+It records the verified baseline, current audit-driven development phase,
+approved Sprint plan, exact next Task, failure lessons, and working protocol.
+
+It MUST be updated after every completed Task.
+
 ## Authority Hierarchy
 
 ```text

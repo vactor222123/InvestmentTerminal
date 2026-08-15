@@ -1,19 +1,33 @@
 # Investment Terminal — Next Steps
 
-**Current baseline before Sprint 31 closure docs:** `develop @ c3d307f`  
-**Status:** Sprint 31 implementation complete; closure reconciliation in progress.
+**Current baseline:** `develop @ 2026e7b`  
+**Status:** Sprint 31 closed; post-Sprint-31 audit complete; Sprint 32 selected.
 
-## Sprint 31 Closure
+## Durable Continuation Checkpoint
 
-Sprint 31 hardened both evidence integrity and software delivery.
+Before starting or resuming implementation work, read:
 
-Implemented:
+```text
+PROJECT_CONTINUATION.md
+```
+
+It is the canonical execution/handoff checkpoint and records the verified
+baseline, current phase, audit findings, approved Sprint plan, failure lessons,
+working protocol, and exact next Task.
+
+`PROJECT_CONTINUATION.md` MUST be updated after every completed Task.
+
+## Sprint 31
+
+Sprint 31 — Evidence Integrity & Delivery Hardening — is CLOSED.
+
+Established:
 
 ```text
 deep immutable generated evidence
 → strict JSON persistence boundary
 → expanded architecture dependency guards
-→ single documentation authority hierarchy
+→ documentation authority hierarchy
 → Python 3.13.x reproducibility contract
 → source dependency manifests
 → hash-locked dependencies
@@ -22,45 +36,51 @@ deep immutable generated evidence
 → hermetic clean-clone tests
 ```
 
-The CI quality gate now proves:
+Closure baseline:
 
 ```text
-locked dependency install
-→ dependency contract tests
-→ architecture dependency tests
-→ full pytest
-→ whitespace validation
+develop @ 2026e7b
+CI: GREEN
 ```
 
-The clean Linux CI run for `c3d307f` completed successfully.
+## Post-Sprint-31 Audit Result
 
-## Immediate Closure Steps
+The strongest current gap is no longer evidence correctness or reproducible
+delivery.
+
+The next production-maturity gap is:
 
 ```text
-1. Reconcile canonical and supporting Sprint 31 documentation.
-2. Regenerate project_files.txt from exact git ls-files output.
-3. Run the full regression suite.
-4. Commit and push the Sprint 31 closure baseline.
-5. Confirm the closure commit passes GitHub Actions.
-6. Perform a focused post-Sprint-31 architecture/product audit.
-7. Select Sprint 32 only from the reconciled baseline.
+runtime filesystem ownership
+→ SQLite operational lifecycle
+→ backup / restore
+→ explicit application lifespan
+→ deployment layout
+→ container baseline
+→ operational resilience E2E
 ```
 
-## Post-Sprint-31 Audit Candidates
+## Sprint 32
 
-The strongest remaining candidate areas are:
+Selected:
 
-- production deployment/infrastructure contract;
-- backup/restore and operational SQLite lifecycle;
-- authorization beyond one API key;
-- shared/distributed rate limiting;
-- provider request/response archival policy;
-- scheduled History-to-Knowledge ingestion;
-- semantic retrieval expansion;
-- contradiction/entailment analysis;
-- explicit governance for generated-evidence promotion.
+```text
+Sprint 32 — Production Deployment & Operational Resilience
+```
 
-The next sprint should preserve:
+The detailed approved 32.1–32.13 plan is maintained in
+`PROJECT_CONTINUATION.md`.
+
+## Current Next Action
+
+```text
+Sprint 32 Task 1 — Runtime Filesystem Contract
+```
+
+Do not begin with Docker. First define persistent state, path ownership,
+compatibility, and filesystem invariants.
+
+## Preserved Authority
 
 ```text
 History
@@ -70,7 +90,7 @@ History
 → persisted generated evidence
 ```
 
-and the delivery baseline:
+Delivery baseline:
 
 ```text
 declared dependencies
