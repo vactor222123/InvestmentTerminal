@@ -7,7 +7,7 @@ semantics and record mapping remain separate.
 
 import sqlite3
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from pathlib import Path
 
 
@@ -42,25 +42,26 @@ class GroundedProviderUsageCostLedgerSQLiteStore:
                 exist_ok=True,
             )
 
-        with self.connect() as connection:
-            connection.executescript(
-                self._schema_sql()
-            )
-            connection.execute(
-                """
-                INSERT OR IGNORE INTO provider_usage_cost_schema_metadata (
-                    key,
-                    value
+        with closing(self.connect()) as connection:
+            with connection:
+                connection.executescript(
+                    self._schema_sql()
                 )
-                VALUES (
-                    'schema_version',
-                    ?
+                connection.execute(
+                    """
+                    INSERT OR IGNORE INTO provider_usage_cost_schema_metadata (
+                        key,
+                        value
+                    )
+                    VALUES (
+                        'schema_version',
+                        ?
+                    )
+                    """,
+                    (
+                        str(self.SCHEMA_VERSION),
+                    ),
                 )
-                """,
-                (
-                    str(self.SCHEMA_VERSION),
-                ),
-            )
 
         return self.database_path
 
@@ -98,7 +99,7 @@ class GroundedProviderUsageCostLedgerSQLiteStore:
             connection.close()
 
     def schema_version(self) -> int | None:
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             try:
                 row = connection.execute(
                     """
@@ -117,7 +118,7 @@ class GroundedProviderUsageCostLedgerSQLiteStore:
         )
 
     def table_names(self) -> tuple[str, ...]:
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             rows = connection.execute(
                 """
                 SELECT name
@@ -172,4 +173,3 @@ class GroundedProviderUsageCostLedgerSQLiteStore:
                 request_id
             );
         """
-
