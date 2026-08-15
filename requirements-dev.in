@@ -1,0 +1,8 @@
+# Development/test dependency source manifest.
+# Runtime dependencies remain owned by requirements.in.
+
+-r requirements.in
+
+pytest>=8.4.0
+black>=25.1.0
+flake8>=7.3.0

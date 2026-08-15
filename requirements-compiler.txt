@@ -1,0 +1,5 @@
+# Reproducibility toolchain.
+# Keep exact: lock generation must not float with the developer environment.
+
+pip==26.1.2
+pip-tools==7.6.0
