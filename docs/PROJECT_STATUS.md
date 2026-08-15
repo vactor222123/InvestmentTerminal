@@ -10,19 +10,36 @@ branch: develop
 ## Current Phase
 
 ```text
-Sprint 30 CLOSED
-Sprint 31 — Evidence Integrity & Delivery Hardening — IN PROGRESS
+Sprint 31 — Evidence Integrity & Delivery Hardening — IMPLEMENTATION COMPLETE
+Closure reconciliation in progress
 ```
 
-Current Sprint 31 completed tasks:
+Completed Sprint 31 tasks:
 
 ```text
 31.1 True grounded-generation deep immutability
 31.2 Strict JSON persistence boundary
 31.3 Expanded architecture dependency/authority guards
+31.4 Documentation authority reconciliation
+31.5 Dependency reproducibility baseline
+31.6 GitHub Actions CI quality gate + clean-clone test hardening
 ```
 
-Task 31.4 is documentation authority reconciliation.
+## Delivery Baseline
+
+```text
+Python 3.13.x
+→ requirements.in / requirements-dev.in
+→ pinned pip + pip-tools compiler
+→ requirements.lock / requirements-dev.lock
+→ GitHub Actions Linux install with --require-hashes
+→ dependency contract tests
+→ architecture dependency guards
+→ full regression suite
+→ git diff --check
+```
+
+The clean CI run for implementation baseline `c3d307f` completed successfully.
 
 ## Stable Authority Hierarchy
 
@@ -37,62 +54,28 @@ Archived Review Package
 → persisted grounded-generation evidence
 ```
 
-Parallel operational accounting:
+Provider usage/cost remains parallel operational accounting.
 
-```text
-successful priced provider usage
-→ immutable provider usage/cost ledger
-→ bounded queries / exact summaries
-```
+## Grounded Generation Integrity
 
-Neither provider accounting nor generated AI evidence gains canonical History or
-Knowledge authority automatically.
+Persisted generated evidence now guarantees:
 
-## Grounded Generation Persistence
+- deep nested immutability;
+- detached external serialization;
+- strict JSON-compatible values;
+- finite JSON numbers;
+- string-only JSON object keys;
+- ADMISSIBLE-only persistence;
+- deterministic SQLite round-trips.
 
-Implemented:
+## Architecture Enforcement
 
-- deeply immutable persisted generation/trace JSON;
-- strict JSON value validation;
-- rejection of non-finite numbers and non-string object keys;
-- detached public serialization;
-- dedicated SQLite persistence;
-- schema-aware readiness;
-- bounded recent/time-window queries;
-- read-only CLI inspection;
-- authenticated read-only HTTP inspection;
-- close/reopen/readback E2E.
-
-## Production Server
-
-Implemented:
-
-- FastAPI production runtime;
-- health/readiness;
-- inbound API-key authentication;
-- bounded request bodies;
-- sanitized errors;
-- deterministic security headers;
-- process-local rate limiting;
-- fail-closed single-worker constraint;
-- provider governance/pricing/budgets;
-- provider usage/cost persistence;
-- grounded-generation persistence/readback.
-
-Runtime routes:
-
-```text
-GET  /health
-GET  /ready
-POST /v1/grounded-ai
-GET  /v1/grounded-generations?limit=<N>
-GET  /v1/grounded-generations/{request_id}
-GET  /openapi.json
-```
+Executable guards now protect the modern dependency direction across History,
+Knowledge, AI, Application, API, Server, Review, and CLI boundaries.
 
 ## Documentation Authority
 
-Primary canonical documents are at repository root:
+Primary canonical documents remain at repository root:
 
 ```text
 Architecture.md
@@ -103,30 +86,13 @@ README.md
 CHANGELOG.md
 ```
 
-Supporting synchronized context lives under `docs/`:
+Supporting synchronized context remains under `docs/`.
+
+## Next
 
 ```text
-docs/ARCHITECTURE.md
-docs/DOMAIN_MAP.md
-docs/AI_CONTEXT.md
-docs/PROJECT_STATUS.md
-docs/README.md
+complete Sprint 31 docs/inventory closure
+→ confirm closure commit in CI
+→ post-Sprint-31 architecture/product audit
+→ select Sprint 32
 ```
-
-If a supporting document conflicts with a canonical root document, the root
-document is authoritative.
-
-## Current Sprint 31 Direction
-
-Remaining planned hardening areas include:
-
-```text
-documentation/environment reconciliation
-dependency reproducibility
-automated CI quality gate
-closure reconciliation
-```
-
-Advanced deployment, distributed rate limiting, authorization expansion,
-semantic retrieval, and generated-evidence promotion governance remain later
-scope.

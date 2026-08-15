@@ -1,76 +1,81 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ 17a7fe1`  
-**Status:** Sprint 30 implementation complete; closure reconciliation in progress.
+**Current baseline before Sprint 31 closure docs:** `develop @ c3d307f`  
+**Status:** Sprint 31 implementation complete; closure reconciliation in progress.
 
-## Sprint 30 Closure
+## Sprint 31 Closure
 
-Grounded generations are now durable generated evidence.
+Sprint 31 hardened both evidence integrity and software delivery.
 
 Implemented:
 
 ```text
-ADMISSIBLE typed generation
-→ deterministic persistence projection
-→ immutable repository identity
-→ grounded_generations.db
-→ runtime composition
-→ schema-aware readiness
-→ bounded queries
-→ operational CLI
-→ authenticated HTTP read API
-→ close/reopen/readback E2E
+deep immutable generated evidence
+→ strict JSON persistence boundary
+→ expanded architecture dependency guards
+→ single documentation authority hierarchy
+→ Python 3.13.x reproducibility contract
+→ source dependency manifests
+→ hash-locked dependencies
+→ cross-platform lock installation
+→ GitHub Actions CI
+→ hermetic clean-clone tests
 ```
 
-Operational inspection:
+The CI quality gate now proves:
 
 ```text
-python -m investment_terminal.cli.grounded_generations
+locked dependency install
+→ dependency contract tests
+→ architecture dependency tests
+→ full pytest
+→ whitespace validation
 ```
 
-Read-only HTTP inspection:
+The clean Linux CI run for `c3d307f` completed successfully.
+
+## Immediate Closure Steps
 
 ```text
-GET /v1/grounded-generations?limit=<N>
-GET /v1/grounded-generations/{request_id}
-```
-
-Generated evidence remains downstream of Knowledge and is never automatically
-promoted into Knowledge or History.
-
-## Immediate Next Steps
-
-```text
-1. Reconcile canonical Sprint 30 documentation.
-2. Reconcile project_files.txt with exact git ls-files output.
+1. Reconcile canonical and supporting Sprint 31 documentation.
+2. Regenerate project_files.txt from exact git ls-files output.
 3. Run the full regression suite.
-4. Commit and push the Sprint 30 closure baseline.
-5. Perform focused post-Sprint-30 architecture/product review.
-6. Select Sprint 31 only from the reconciled baseline.
+4. Commit and push the Sprint 31 closure baseline.
+5. Confirm the closure commit passes GitHub Actions.
+6. Perform a focused post-Sprint-31 architecture/product audit.
+7. Select Sprint 32 only from the reconciled baseline.
 ```
 
-## Post-Sprint-30 Audit Candidates
+## Post-Sprint-31 Audit Candidates
 
-Candidate areas include:
+The strongest remaining candidate areas are:
 
-- automatic/scheduled History-to-Knowledge ingestion;
-- deployment/infrastructure hardening;
-- distributed rate-limit state;
-- authorization beyond a single API-key boundary;
+- production deployment/infrastructure contract;
+- backup/restore and operational SQLite lifecycle;
+- authorization beyond one API key;
+- shared/distributed rate limiting;
 - provider request/response archival policy;
+- scheduled History-to-Knowledge ingestion;
 - semantic retrieval expansion;
 - contradiction/entailment analysis;
-- explicit governance for any future generated-evidence promotion workflow.
+- explicit governance for generated-evidence promotion.
 
-The audit must preserve:
+The next sprint should preserve:
 
 ```text
-Archived Review Package
-→ History
-→ explicit ingestion
+History
+→ explicit Knowledge ingestion
 → Knowledge
 → Grounded AI
 → persisted generated evidence
 ```
 
-Provider usage/cost data remains parallel operational accounting.
+and the delivery baseline:
+
+```text
+declared dependencies
+→ hash locks
+→ clean CI
+→ architecture guards
+→ full regression
+```

@@ -1,7 +1,7 @@
 # Investment Terminal — Product Roadmap
 
 **Status:** Canonical Roadmap  
-**Updated after:** Sprint 30 — Grounded Generation Persistence & History  
+**Updated after:** Sprint 31 — Evidence Integrity & Delivery Hardening  
 **Current development branch:** `develop`
 
 ## Product Evolution
@@ -21,6 +21,7 @@ Foundation
 → Persistent Provider Usage & Cost Accounting
 → Provider Operational Accounting Hardening
 → Persistent Grounded Generation Evidence
+→ Evidence Integrity & Reproducible Delivery
 ```
 
 ## Recent Completed Milestones
@@ -32,7 +33,7 @@ preservation, idempotent immutable versions, dry-run validation, and real E2E.
 
 ### Sprint 28 — Persistent Provider Usage & Cost Ledger
 
-Immutable provider-neutral usage/cost accounting with dedicated SQLite
+Added immutable provider-neutral usage/cost accounting with dedicated SQLite
 persistence and operational CLI.
 
 ### Sprint 29 — Provider Operational Accounting Hardening
@@ -43,26 +44,35 @@ operational E2E.
 
 ### Sprint 30 — Grounded Generation Persistence & History
 
+Added immutable generated-evidence persistence, runtime composition, readiness,
+bounded queries, CLI/HTTP inspection, and real durable Knowledge → generation →
+persistence → reopen/readback E2E.
+
+### Sprint 31 — Evidence Integrity & Delivery Hardening
+
 Delivered:
 
-- immutable `PersistedGroundedGeneration`;
-- repository contract and in-memory semantics;
-- deterministic projection from typed ADMISSIBLE generation + trace;
-- dedicated SQLite schema/store/repository;
-- application-level recording after grounding/budget checks;
-- runtime-configured generation database;
-- production composition;
-- schema-aware readiness;
-- bounded recent and half-open time-window queries;
-- read-only operational CLI;
-- authenticated read-only HTTP history endpoints;
-- real durable Knowledge → grounded generation → persistence → reopen → HTTP
-  readback E2E.
+- true deep immutability for persisted grounded generation/trace JSON;
+- strict JSON value validation;
+- fail-closed rejection of non-finite numbers and non-string object keys;
+- detached serialization and strict SQLite JSON persistence;
+- expanded executable architecture dependency/authority guards;
+- explicit documentation authority hierarchy;
+- complete environment contract for grounded-generation persistence;
+- Python 3.13.x dependency-resolution baseline;
+- separate runtime/dev dependency source manifests;
+- pinned dependency compiler toolchain;
+- hash-locked runtime and development dependency artifacts;
+- cross-platform dependency ownership without hidden `fastapi[standard]` extras;
+- first GitHub Actions quality gate;
+- locked Linux CI installation;
+- dependency and architecture contract checks in CI;
+- full regression suite in CI;
+- whitespace gate;
+- hermetic portfolio/review tests that no longer depend on a developer-local
+  personal portfolio file.
 
-Only ADMISSIBLE grounded generations are persisted.
-
-Persisted generations remain downstream generated evidence and do not become
-History or Knowledge authority.
+Sprint 31 closes with both local and clean Linux CI regression suites green.
 
 ## Stable Authority Hierarchy
 
@@ -78,7 +88,10 @@ Archived Review Package
 → persisted grounded generation evidence
 ```
 
-Parallel operational accounting:
+Generated evidence remains downstream and is not automatically promoted into
+History or Knowledge.
+
+Parallel operational accounting remains:
 
 ```text
 successful priced provider usage
@@ -86,41 +99,25 @@ successful priced provider usage
 → bounded operational queries / exact summaries
 ```
 
-## Production Routes
+## Delivery Integrity Baseline
+
+Repository delivery now includes:
 
 ```text
-GET  /health
-GET  /ready
-POST /v1/grounded-ai
-GET  /v1/grounded-generations?limit=<N>
-GET  /v1/grounded-generations/{request_id}
-GET  /openapi.json
+Python 3.13.x
+→ declared direct dependencies
+→ pinned resolver/compiler toolchain
+→ hash-locked dependency artifacts
+→ clean Linux CI install
+→ architecture contract tests
+→ full pytest
+→ git diff --check
 ```
 
-## Runtime Persistence Contracts
-
-Provider accounting:
+Canonical CI workflow:
 
 ```text
-INVESTMENT_TERMINAL_PROVIDER_USAGE_COST_DATABASE
-```
-
-Grounded generations:
-
-```text
-INVESTMENT_TERMINAL_GROUNDED_GENERATION_DATABASE
-```
-
-If the grounded-generation path is not explicitly configured, the runtime uses
-a sibling `grounded_generations.db` next to the provider ledger.
-
-Readiness checks:
-
-```text
-knowledge_database
-provider_usage_cost_database
-grounded_generation_database
-provider_credentials
+.github/workflows/ci.yml
 ```
 
 ## Deferred Scope
@@ -130,6 +127,7 @@ Still deferred:
 - automatic/scheduled History-to-Knowledge ingestion;
 - shared/distributed rate-limit state;
 - deployment container/image and infrastructure manifests;
+- backup/restore operational contract;
 - TLS termination/HSTS deployment policy;
 - authorization beyond API-key authentication;
 - retry jitter;
@@ -137,31 +135,28 @@ Still deferred:
 - streaming responses;
 - additional provider adapters;
 - provider pricing synchronization;
-- cached-token/reasoning-token pricing differentiation;
 - semantic entailment/contradiction detection;
 - vector retrieval/embeddings;
-- predictive confidence/effectiveness scoring;
-- causal inference;
+- generated-evidence promotion governance;
 - autonomous portfolio actions;
-- broker execution;
-- any automatic promotion of generated AI evidence into Knowledge or History.
+- broker execution.
 
 ## Current Decision Point
 
-Sprint 30 implementation is complete.
+Sprint 31 is complete.
 
-Frozen Sprint 30 implementation baseline:
+Frozen Sprint 31 implementation baseline before closure documentation:
 
 ```text
-develop @ 17a7fe1
+develop @ c3d307f
 ```
 
 Next:
 
 ```text
-Sprint 30 documentation + inventory closure
-→ focused post-Sprint-30 architecture/product audit
-→ select Sprint 31
+Sprint 31 documentation + inventory closure
+→ focused post-Sprint-31 architecture/product audit
+→ select Sprint 32 from the reconciled baseline
 ```
 
 ## Definition of Done
@@ -169,9 +164,10 @@ Sprint 30 documentation + inventory closure
 A milestone is complete only when:
 
 - focused tests pass;
-- full regression suite passes;
+- full regression suite passes locally;
+- clean CI regression suite passes;
 - architecture boundaries remain clean;
-- production composition reflects required controls;
+- dependency installation is reproducible;
 - documentation reflects implementation;
 - deferred scope is explicit;
 - repository inventory is reconciled;

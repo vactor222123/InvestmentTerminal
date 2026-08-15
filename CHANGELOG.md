@@ -1,5 +1,28 @@
 # Changelog
 
+## Sprint 31 — Evidence Integrity & Delivery Hardening
+
+- Made persisted grounded generation/trace JSON deeply immutable.
+- Added detached mutable serialization for external JSON consumers.
+- Enforced strict JSON values and rejected non-finite numbers/non-string keys.
+- Hardened SQLite JSON persistence and parsing.
+- Expanded executable dependency guards for History, Knowledge, AI,
+  Application, API, Server, Review, and CLI boundaries.
+- Reconciled root canonical documentation with supporting `docs/` context.
+- Added explicit grounded-generation DB configuration to `.env.example`.
+- Established Python 3.13.x dependency-resolution contract.
+- Split runtime and development direct dependency manifests.
+- Added pinned dependency compiler toolchain.
+- Added committed hash-locked runtime/development dependencies.
+- Removed hidden platform-specific `fastapi[standard]` dependency ownership;
+  declared FastAPI, Uvicorn, and HTTPX explicitly by responsibility.
+- Added first GitHub Actions CI workflow.
+- Added locked Linux dependency installation in CI.
+- Added dependency contract, architecture contract, full pytest, and whitespace
+  CI gates.
+- Made portfolio/review CLI tests hermetic by using tracked example fixtures.
+- Verified the full suite in a clean Linux GitHub Actions environment.
+
 ## Sprint 30 — Grounded Generation Persistence & History
 
 - Added immutable persisted grounded-generation model.

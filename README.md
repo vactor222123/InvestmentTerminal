@@ -6,20 +6,18 @@
 
 Investment Terminal is a modular Python application for deterministic investment
 analysis, immutable historical evidence, explicit Knowledge construction,
-evidence-grounded AI, and controlled production delivery.
+evidence-grounded AI, controlled production delivery, and reproducible software
+execution.
 
-The system is built around six non-negotiable properties:
+The system prioritizes:
 
 - correctness;
 - determinism;
 - traceability;
 - historical integrity;
 - explicit authority boundaries;
-- explicit human decision ownership.
-
-The Python engine produces canonical calculations and evidence. AI may interpret
-approved Knowledge, but it does not replace archived facts, canonical
-calculations, or the investor's final decision.
+- explicit human decision ownership;
+- reproducible delivery.
 
 ## Authority Hierarchy
 
@@ -29,76 +27,55 @@ Current-state deterministic analysis
 → immutable History
 → explicit verified History-to-Knowledge ingestion
 → versioned Knowledge
-→ GroundedPromptInput
-→ provider execution
+→ grounded generation
 → grounding validation
-→ ADMISSIBLE GroundedGenerationResult
-→ persisted generated evidence
+→ ADMISSIBLE generated evidence
+→ durable grounded-generation persistence
 ```
 
 Persisted grounded generations remain downstream generated evidence. They are
 not automatically promoted into History or Knowledge.
 
-Parallel operational accounting:
+Provider usage/cost accounting remains a parallel operational boundary.
 
-```text
-successful priced provider usage
-→ immutable provider usage/cost ledger
-→ bounded operational queries / exact summaries
-```
-
-The provider ledger is operational accounting, not canonical investment
-evidence.
-
-## Current Product Capabilities
+## Core Capabilities
 
 ### Current-state intelligence
 
 - market-data acquisition and validation;
-- technical and fundamental analysis;
+- technical/fundamental analysis;
 - ranking and machine recommendations;
-- portfolio holdings and policy;
-- cost-basis and market-value portfolio views;
-- contribution and deployment planning;
+- portfolio policy, holdings, snapshots, and contribution planning;
 - versioned Review Package generation.
 
 ### Historical intelligence
 
 - immutable exact-byte Review Package archive;
 - SHA-256 verification;
-- append-only archive manifest;
-- SQLite historical projection;
-- schema migrations;
-- explicit import state;
-- atomic detail import;
-- timeline and navigation queries;
-- snapshot comparison;
-- exact and normalized historical replay.
+- append-only manifest;
+- rebuildable SQLite historical projection;
+- comparison, timeline, and replay;
+- methodology-aware outcome research.
 
 ### Knowledge
 
-- immutable/versioned Knowledge records;
+- immutable/versioned records;
 - exact evidence references;
-- deterministic SQLite persistence and queries;
+- deterministic SQLite persistence;
 - explicit verified History-to-Knowledge ingestion;
-- dry-run ingestion;
-- idempotent identity semantics;
-- read-only operational inspection.
+- dry-run and idempotent ingestion semantics.
 
 ### Evidence-grounded AI
 
-- provider-neutral grounded prompt and answer protocols;
+- provider-neutral prompt/result protocols;
 - deterministic Knowledge selection;
-- strict provider response parsing;
-- exact Knowledge citation validation;
+- strict response parsing and citation validation;
 - ADMISSIBLE/REJECTED grounding validation;
-- auditable generation trace;
-- provider governance and budget controls;
-- immutable persistence of ADMISSIBLE grounded generations;
-- bounded generation history queries;
-- read-only CLI inspection;
-- authenticated read-only HTTP history API;
-- real durable end-to-end persistence/readback coverage.
+- provider governance, pricing, and budgets;
+- deeply immutable persisted ADMISSIBLE generations;
+- strict JSON persistence;
+- bounded history queries;
+- read-only CLI and authenticated HTTP inspection.
 
 ### Production runtime
 
@@ -114,7 +91,7 @@ Canonical server CLI:
 python -m investment_terminal.cli.server
 ```
 
-Runtime routes:
+Routes:
 
 ```text
 GET  /health
@@ -125,10 +102,64 @@ GET  /v1/grounded-generations/{request_id}
 GET  /openapi.json
 ```
 
-The production runtime includes API-key authentication, request-size controls,
-rate limiting, sanitized errors, provider governance, pricing/budget controls,
-persistent provider accounting, persistent grounded-generation evidence, and
-schema-aware readiness.
+## Reproducible Development
+
+Supported lock-generation family:
+
+```text
+Python 3.13.x
+```
+
+Dependency source manifests:
+
+```text
+requirements.in
+requirements-dev.in
+```
+
+Generated hash locks:
+
+```text
+requirements.lock
+requirements-dev.lock
+```
+
+Compile locks on Windows PowerShell:
+
+```powershell
+.\scripts\compile_requirements.ps1
+```
+
+Install the development/test environment:
+
+```powershell
+python -m pip install --require-hashes -r requirements-dev.lock
+```
+
+Do not use `pip freeze` as the project dependency source of truth.
+
+## Continuous Integration
+
+Canonical workflow:
+
+```text
+.github/workflows/ci.yml
+```
+
+CI runs on pushes to `develop` and pull requests targeting `develop`.
+
+Quality gate:
+
+```text
+locked install
+→ dependency reproducibility contract
+→ architecture dependency guards
+→ full pytest
+→ git diff --check
+```
+
+The regression suite is designed to run from a clean checkout and must not
+depend on developer-local personal portfolio files.
 
 ## Operational CLIs
 
@@ -148,19 +179,17 @@ python -m investment_terminal.cli.knowledge
 python -m investment_terminal.cli.ingest_history_knowledge
 ```
 
-Provider usage/cost accounting:
+Provider accounting:
 
 ```text
 python -m investment_terminal.cli.provider_usage_cost
 ```
 
-Grounded-generation inspection:
+Generated evidence:
 
 ```text
 python -m investment_terminal.cli.grounded_generations
 ```
-
-All inspection CLIs are read-only boundaries.
 
 ## Historical Source-of-Truth Rule
 
@@ -175,37 +204,13 @@ history.db
     rebuildable structured projection
 ```
 
-SQLite historical projections may be rebuilt. Archived Review Package bytes
-must not be rewritten.
-
-## Testing
-
-The repository contains deterministic network-free end-to-end fixtures for
-History, History-to-Knowledge ingestion, provider accounting, and grounded
-generation persistence.
-
-Sprint 30 adds a real durable flow covering:
-
-```text
-Knowledge SQLite
-→ grounded generation
-→ ADMISSIBLE validation
-→ grounded_generations.db
-→ close/reopen
-→ authenticated exact/recent HTTP readback
-```
+Archived historical evidence must not be rewritten.
 
 ## Project Philosophy
 
 **Data Quality First. Evidence Before Narrative. History Is Immutable.
-Authority Must Be Explicit.**
-
-The application must never fabricate unavailable data, hide uncertainty,
-silently reinterpret historical evidence, or promote generated AI output into
-canonical evidence without an explicit future authority transition.
-
-## Disclaimer
+Authority Must Be Explicit. Delivery Must Be Reproducible.**
 
 Investment Terminal is research and decision-support software. It does not
-provide financial advice and does not execute trades. The investor remains
-responsible for every investment decision.
+execute trades and does not transfer final investment authority away from the
+user.

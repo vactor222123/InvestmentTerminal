@@ -1,5 +1,7 @@
 .env.example
+.github/workflows/ci.yml
 .gitignore
+.python-version
 AGENTS.md
 Architecture.md
 CHANGELOG.md
@@ -20,8 +22,10 @@ docs/adr/ADR-0005-recommendation-is-not-decision.md
 docs/AI_CONTEXT.md
 docs/ARCHITECTURE.md
 docs/ARCHITECTURE_REVIEW_SPRINT_12.md
+docs/CI.md
 docs/CONSTITUTION.md
 docs/DATA_MODEL.md
+docs/DEPENDENCY_REPRODUCIBILITY.md
 docs/DESIGN_PRINCIPLES.md
 docs/DEVELOPMENT_GUIDE.md
 docs/DEVELOPMENT_GUIDELINES.md
@@ -334,9 +338,15 @@ investment_terminal/utils/validation.py
 NEXT_STEPS.md
 project_files.txt
 README.md
+requirements.in
+requirements.lock
 requirements.txt
+requirements-compiler.txt
+requirements-dev.in
+requirements-dev.lock
 Roadmap.md
 ScoringFramework.md
+scripts/compile_requirements.ps1
 SPRINT_1_PLAN.md
 src/__init__.py
 tests/__init__.py
@@ -360,6 +370,7 @@ tests/test_bank_metric_policy.py
 tests/test_bank_sector_aware_scoring.py
 tests/test_candle_model.py
 tests/test_candle_repository.py
+tests/test_ci_contract.py
 tests/test_company_classification_registry.py
 tests/test_compare_history_cli.py
 tests/test_contribution_plan.py
@@ -368,6 +379,7 @@ tests/test_current_portfolio.py
 tests/test_current_portfolio_identifiers.py
 tests/test_decision_engine.py
 tests/test_decision_model.py
+tests/test_dependency_reproducibility_contract.py
 tests/test_deployment_decision.py
 tests/test_environment_provider_credentials.py
 tests/test_finnhub_client.py
