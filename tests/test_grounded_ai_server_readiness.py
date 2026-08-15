@@ -1,7 +1,11 @@
+import sqlite3
 from pathlib import Path
 
 from investment_terminal.ai.providers.composition import (
     DEFAULT_OPENAI_API_KEY_ENV,
+)
+from investment_terminal.ai.providers.usage_ledger_sqlite_store import (
+    GroundedProviderUsageCostLedgerSQLiteStore,
 )
 from investment_terminal.server.readiness import (
     GroundedAIServerReadinessService,
@@ -44,13 +48,44 @@ def config_for(
     )
 
 
+def ledger_database_for(
+    database: Path,
+) -> Path:
+    return database.with_name(
+        "provider_usage_cost.db"
+    )
+
+
+def initialize_ledger(
+    database: Path,
+) -> None:
+    GroundedProviderUsageCostLedgerSQLiteStore(
+        ledger_database_for(database)
+    ).initialize()
+
+
 def prepare_databases(
     database: Path,
 ) -> None:
     database.write_bytes(b"")
-    database.with_name(
-        "provider_usage_cost.db"
-    ).write_bytes(b"")
+    initialize_ledger(database)
+
+
+def assessment_for(
+    database: Path,
+    *,
+    credentials: bool = True,
+):
+    environment = {}
+    if credentials:
+        environment[
+            DEFAULT_OPENAI_API_KEY_ENV
+        ] = "secret"
+
+    return GroundedAIServerReadinessService(
+        config=config_for(database),
+        environment=environment,
+    ).check()
 
 
 def test_readiness_is_ready_with_database_and_credentials(
@@ -59,12 +94,7 @@ def test_readiness_is_ready_with_database_and_credentials(
     database = tmp_path / "knowledge.db"
     prepare_databases(database)
 
-    assessment = GroundedAIServerReadinessService(
-        config=config_for(database),
-        environment={
-            DEFAULT_OPENAI_API_KEY_ENV: "secret",
-        },
-    ).check()
+    assessment = assessment_for(database)
 
     assert assessment.ready
     assert assessment.to_dict() == {
@@ -83,10 +113,10 @@ def test_readiness_fails_without_credentials(
     database = tmp_path / "knowledge.db"
     prepare_databases(database)
 
-    assessment = GroundedAIServerReadinessService(
-        config=config_for(database),
-        environment={},
-    ).check()
+    assessment = assessment_for(
+        database,
+        credentials=False,
+    )
 
     assert not assessment.ready
     assert (
@@ -99,16 +129,9 @@ def test_readiness_fails_if_database_disappears(
     tmp_path: Path,
 ) -> None:
     database = tmp_path / "knowledge.db"
-    database.with_name(
-        "provider_usage_cost.db"
-    ).write_bytes(b"")
+    initialize_ledger(database)
 
-    assessment = GroundedAIServerReadinessService(
-        config=config_for(database),
-        environment={
-            DEFAULT_OPENAI_API_KEY_ENV: "secret",
-        },
-    ).check()
+    assessment = assessment_for(database)
 
     assert not assessment.ready
     assert (
@@ -123,12 +146,80 @@ def test_readiness_fails_if_usage_cost_database_is_missing(
     database = tmp_path / "knowledge.db"
     database.write_bytes(b"")
 
-    assessment = GroundedAIServerReadinessService(
-        config=config_for(database),
-        environment={
-            DEFAULT_OPENAI_API_KEY_ENV: "secret",
-        },
-    ).check()
+    assessment = assessment_for(database)
+
+    assert not assessment.ready
+    assert (
+        assessment.checks["provider_usage_cost_database"]
+        == "NOT_READY"
+    )
+
+
+def test_readiness_does_not_create_missing_usage_cost_database(
+    tmp_path: Path,
+) -> None:
+    database = tmp_path / "knowledge.db"
+    database.write_bytes(b"")
+    ledger_database = ledger_database_for(database)
+
+    assessment = assessment_for(database)
+
+    assert not assessment.ready
+    assert not ledger_database.exists()
+
+
+def test_readiness_fails_for_uninitialized_usage_cost_database(
+    tmp_path: Path,
+) -> None:
+    database = tmp_path / "knowledge.db"
+    database.write_bytes(b"")
+    ledger_database_for(database).write_bytes(b"")
+
+    assessment = assessment_for(database)
+
+    assert not assessment.ready
+    assert (
+        assessment.checks["provider_usage_cost_database"]
+        == "NOT_READY"
+    )
+
+
+def test_readiness_fails_for_wrong_usage_cost_schema_version(
+    tmp_path: Path,
+) -> None:
+    database = tmp_path / "knowledge.db"
+    database.write_bytes(b"")
+    initialize_ledger(database)
+
+    ledger_database = ledger_database_for(database)
+    with sqlite3.connect(ledger_database) as connection:
+        connection.execute(
+            """
+            UPDATE provider_usage_cost_schema_metadata
+            SET value = '999'
+            WHERE key = 'schema_version'
+            """
+        )
+
+    assessment = assessment_for(database)
+
+    assert not assessment.ready
+    assert (
+        assessment.checks["provider_usage_cost_database"]
+        == "NOT_READY"
+    )
+
+
+def test_readiness_fails_for_corrupt_usage_cost_database(
+    tmp_path: Path,
+) -> None:
+    database = tmp_path / "knowledge.db"
+    database.write_bytes(b"")
+    ledger_database_for(database).write_bytes(
+        b"not-a-sqlite-database"
+    )
+
+    assessment = assessment_for(database)
 
     assert not assessment.ready
     assert (

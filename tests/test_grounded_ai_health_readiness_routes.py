@@ -5,6 +5,9 @@ from fastapi.testclient import TestClient
 from investment_terminal.ai.providers.composition import (
     DEFAULT_OPENAI_API_KEY_ENV,
 )
+from investment_terminal.ai.providers.usage_ledger_sqlite_store import (
+    GroundedProviderUsageCostLedgerSQLiteStore,
+)
 from investment_terminal.api.http_handler import (
     GroundedAIHTTPHandler,
 )
@@ -64,7 +67,9 @@ def readiness(
     ledger_database = database.with_name(
         "provider_usage_cost.db"
     )
-    ledger_database.write_bytes(b"")
+    GroundedProviderUsageCostLedgerSQLiteStore(
+        ledger_database
+    ).initialize()
 
     config = GroundedAIServerRuntimeConfig.from_environment(
         {

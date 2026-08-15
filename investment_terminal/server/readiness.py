@@ -5,10 +5,14 @@ Readiness is intentionally network-free. It verifies only runtime prerequisites
 that can be checked locally without invoking OpenAI or grounded generation.
 """
 
+import sqlite3
 from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
+from investment_terminal.ai.providers.usage_ledger_sqlite_store import (
+    GroundedProviderUsageCostLedgerSQLiteStore,
+)
 from investment_terminal.server.runtime_config import (
     GroundedAIServerRuntimeConfig,
 )
@@ -63,11 +67,7 @@ class GroundedAIServerReadinessService:
             if self._config.database.is_file()
             else "NOT_READY"
         )
-        ledger_status = (
-            "READY"
-            if self._config.usage_cost_ledger_database.is_file()
-            else "NOT_READY"
-        )
+        ledger_status = self._usage_cost_ledger_status()
 
         secret = self._environment.get(
             self._config.api_key_environment_variable,
@@ -97,4 +97,28 @@ class GroundedAIServerReadinessService:
         return GroundedAIServerReadiness(
             status=status,
             checks=checks,
+        )
+
+    def _usage_cost_ledger_status(self) -> str:
+        database = self._config.usage_cost_ledger_database
+        if not database.is_file():
+            return "NOT_READY"
+
+        try:
+            store = GroundedProviderUsageCostLedgerSQLiteStore(
+                database
+            )
+            schema_version = store.schema_version()
+        except (
+            OSError,
+            sqlite3.DatabaseError,
+            TypeError,
+            ValueError,
+        ):
+            return "NOT_READY"
+
+        return (
+            "READY"
+            if schema_version == store.SCHEMA_VERSION
+            else "NOT_READY"
         )
