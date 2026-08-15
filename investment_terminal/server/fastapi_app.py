@@ -9,11 +9,17 @@ from fastapi import FastAPI, Header, Request
 from fastapi.responses import JSONResponse
 
 from investment_terminal.api.http_handler import GroundedAIHTTPHandler
+from investment_terminal.application.grounded_generation_history import (
+    GroundedGenerationHistoryService,
+)
 from investment_terminal.server.authentication import (
     GroundedAIServerAPIKeyAuthenticator,
 )
 from investment_terminal.server.error_boundary import (
     GroundedAIServerInternalErrorResponse,
+)
+from investment_terminal.server.grounded_generation_routes import (
+    install_grounded_generation_routes,
 )
 from investment_terminal.server.openapi_contract import (
     grounded_ai_openapi_extra,
@@ -50,6 +56,9 @@ def create_grounded_ai_fastapi_app(
     ) = None,
     rate_limit_identity_deriver: (
         GroundedAIServerRateLimitIdentityDeriver | None
+    ) = None,
+    grounded_generation_history_service: (
+        GroundedGenerationHistoryService | None
     ) = None,
 ) -> FastAPI:
     if not isinstance(handler, GroundedAIHTTPHandler):
@@ -89,6 +98,17 @@ def create_grounded_ai_fastapi_app(
             "GroundedAIServerRateLimitIdentityDeriver or None"
         )
     if (
+        grounded_generation_history_service is not None
+        and not isinstance(
+            grounded_generation_history_service,
+            GroundedGenerationHistoryService,
+        )
+    ):
+        raise TypeError(
+            "grounded_generation_history_service must be a "
+            "GroundedGenerationHistoryService or None"
+        )
+    if (
         rate_limit_admission_service is None
     ) != (
         rate_limit_identity_deriver is None
@@ -96,6 +116,13 @@ def create_grounded_ai_fastapi_app(
         raise ValueError(
             "rate-limit admission service and identity deriver "
             "must be configured together"
+        )
+    if (
+        grounded_generation_history_service is not None
+        and authenticator is None
+    ):
+        raise ValueError(
+            "grounded generation history requires authentication"
         )
 
     active_limit_policy = (
@@ -262,6 +289,13 @@ def create_grounded_ai_fastapi_app(
             status_code=response.status_code,
             headers=rate_limit_headers,
             content=response.body,
+        )
+
+    if grounded_generation_history_service is not None:
+        install_grounded_generation_routes(
+            app=app,
+            history_service=grounded_generation_history_service,
+            authenticator=authenticator,
         )
 
     return app

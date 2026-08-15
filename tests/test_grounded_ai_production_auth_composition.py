@@ -1,5 +1,8 @@
 import pytest
 
+from investment_terminal.application.grounded_generation_history import (
+    GroundedGenerationHistoryService,
+)
 from investment_terminal.server import production
 from investment_terminal.server.rate_limit_admission import (
     GroundedAIServerRateLimitAdmissionService,
@@ -90,6 +93,7 @@ def test_production_wires_authenticator(
         request_limit_policy,
         rate_limit_admission_service,
         rate_limit_identity_deriver,
+        grounded_generation_history_service,
     ):
         calls["handler"] = handler
         calls["readiness_service"] = readiness_service
@@ -97,6 +101,9 @@ def test_production_wires_authenticator(
         calls["request_limit_policy"] = request_limit_policy
         calls["rate_limit_admission_service"] = rate_limit_admission_service
         calls["rate_limit_identity_deriver"] = rate_limit_identity_deriver
+        calls["grounded_generation_history_service"] = (
+            grounded_generation_history_service
+        )
         return FakeApp()
 
     monkeypatch.setattr(
@@ -120,4 +127,8 @@ def test_production_wires_authenticator(
     assert isinstance(
         calls["rate_limit_identity_deriver"],
         GroundedAIServerRateLimitIdentityDeriver,
+    )
+    assert isinstance(
+        calls["grounded_generation_history_service"],
+        GroundedGenerationHistoryService,
     )

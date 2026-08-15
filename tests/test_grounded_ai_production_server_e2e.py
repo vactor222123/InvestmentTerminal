@@ -86,6 +86,23 @@ def test_production_server_runtime_e2e(monkeypatch, tmp_path: Path) -> None:
     }
     assert success.headers["Cache-Control"] == "no-store"
 
+    recent = client.get(
+        "/v1/grounded-generations",
+        params={"limit": 10},
+        headers={"X-API-Key": "server-secret"},
+    )
+    assert recent.status_code == 200
+    assert recent.json()["data"] == {
+        "count": 0,
+        "records": [],
+    }
+
+    generation_unauthenticated = client.get(
+        "/v1/grounded-generations",
+        params={"limit": 10},
+    )
+    assert generation_unauthenticated.status_code == 401
+
     oversized = client.post(
         "/v1/grounded-ai", headers={"X-API-Key": "server-secret"},
         json={"request_id": "request-2", "query": "x" * 400},
@@ -103,7 +120,11 @@ def test_production_server_runtime_e2e(monkeypatch, tmp_path: Path) -> None:
 
     schema = client.get("/openapi.json")
     assert schema.status_code == 200
-    assert set(schema.json()["paths"]) == {"/v1/grounded-ai"}
+    assert set(schema.json()["paths"]) == {
+        "/v1/grounded-ai",
+        "/v1/grounded-generations",
+        "/v1/grounded-generations/{request_id}",
+    }
     assert client.get("/docs").status_code == 404
     assert client.get("/redoc").status_code == 404
 

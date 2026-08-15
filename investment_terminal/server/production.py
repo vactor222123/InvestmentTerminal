@@ -17,6 +17,9 @@ from investment_terminal.ai.providers.usage_ledger_recording import GroundedProv
 from investment_terminal.ai.providers.usage_ledger_sqlite_repository import SQLiteGroundedProviderUsageCostLedgerRepository
 from investment_terminal.ai.providers.usage_ledger_sqlite_store import GroundedProviderUsageCostLedgerSQLiteStore
 from investment_terminal.api.composition import build_live_grounded_ai_http_handler
+from investment_terminal.application.grounded_generation_history import (
+    GroundedGenerationHistoryService,
+)
 from investment_terminal.server.authentication import GroundedAIServerAPIKeyAuthenticator
 from investment_terminal.server.fastapi_app import create_grounded_ai_fastapi_app
 from investment_terminal.server.rate_limit_admission import GroundedAIServerRateLimitAdmissionService
@@ -83,7 +86,13 @@ def create_app(environment: Mapping[str, str] | None = None) -> FastAPI:
         clock=GroundedAIServerMonotonicDecimalClock(),
     )
     return create_grounded_ai_fastapi_app(
-        handler=handler, readiness_service=readiness_service, authenticator=authenticator,
-        request_limit_policy=request_limit_policy, rate_limit_admission_service=rate_limit_admission_service,
+        handler=handler,
+        readiness_service=readiness_service,
+        authenticator=authenticator,
+        request_limit_policy=request_limit_policy,
+        rate_limit_admission_service=rate_limit_admission_service,
         rate_limit_identity_deriver=GroundedAIServerRateLimitIdentityDeriver(),
+        grounded_generation_history_service=GroundedGenerationHistoryService(
+            repository=generation_repository
+        ),
     )
