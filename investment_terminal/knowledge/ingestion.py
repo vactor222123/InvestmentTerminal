@@ -19,7 +19,13 @@ from investment_terminal.knowledge.repository import (
 
 
 class HistoricalSnapshotKnowledgeIngestionService:
-    """Project one neutral historical source and persist the exact result."""
+    """
+    Project and persist immutable snapshot-backed Knowledge versions.
+
+    Idempotency is defined only for an exact existing identity whose persisted
+    record is byte-for-contract equivalent to the newly projected record.
+    Conflicting reuse of the same knowledge_id/version fails closed.
+    """
 
     def __init__(
         self,
@@ -49,13 +55,31 @@ class HistoricalSnapshotKnowledgeIngestionService:
         generated_at: datetime,
         version: int = 1,
     ) -> KnowledgeRecord:
-        """Project and persist one snapshot-backed Knowledge record."""
+        """
+        Project and persist one immutable Knowledge version.
+
+        Repeating the exact same ingestion is idempotent. Reusing the same
+        knowledge identity/version for a different record is rejected.
+        """
         record = self._projection_service.project(
             source,
             subject_key=subject_key,
             generated_at=generated_at,
             version=version,
         )
+
+        existing = self._repository.get(
+            record.knowledge_id,
+            record.version,
+        )
+        if existing is not None:
+            if existing == record:
+                return existing
+            raise ValueError(
+                "Knowledge record identity already exists with "
+                "different content"
+            )
+
         persisted = self._repository.add(record)
 
         if persisted != record:

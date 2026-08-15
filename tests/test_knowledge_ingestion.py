@@ -5,6 +5,9 @@ import pytest
 from investment_terminal.knowledge.ingestion import (
     HistoricalSnapshotKnowledgeIngestionService,
 )
+from investment_terminal.knowledge.models import (
+    KnowledgeRecord,
+)
 from investment_terminal.knowledge.projection import (
     HistoricalSnapshotKnowledgeSource,
 )
@@ -30,11 +33,16 @@ def source() -> HistoricalSnapshotKnowledgeSource:
     )
 
 
-def test_ingest_projects_and_persists_exact_record() -> None:
+def service_and_repository():
     repository = InMemoryKnowledgeRecordRepository()
     service = HistoricalSnapshotKnowledgeIngestionService(
         repository=repository,
     )
+    return service, repository
+
+
+def test_ingest_projects_and_persists_exact_record() -> None:
+    service, repository = service_and_repository()
 
     result = service.ingest(
         source(),
@@ -77,53 +85,141 @@ def test_ingest_is_deterministic_for_same_explicit_inputs() -> None:
     assert first == second
 
 
-def test_ingest_preserves_explicit_version() -> None:
-    repository = InMemoryKnowledgeRecordRepository()
+def test_exact_reingestion_is_idempotent() -> None:
+    service, repository = service_and_repository()
 
-    result = HistoricalSnapshotKnowledgeIngestionService(
-        repository=repository,
-    ).ingest(
+    first = service.ingest(
         source(),
         subject_key="portfolio",
         generated_at=dt(12),
-        version=4,
+        version=2,
     )
-
-    assert result.version == 4
-    assert repository.require(
-        result.knowledge_id,
-        4,
-    ) == result
-
-
-def test_ingest_does_not_hide_duplicate_identity() -> None:
-    repository = InMemoryKnowledgeRecordRepository()
-    service = HistoricalSnapshotKnowledgeIngestionService(
-        repository=repository,
-    )
-
-    service.ingest(
+    second = service.ingest(
         source(),
         subject_key="portfolio",
         generated_at=dt(12),
+        version=2,
+    )
+
+    assert second == first
+    assert repository.list_all() == (first,)
+
+
+def test_same_identity_with_different_content_fails_closed() -> None:
+    service, repository = service_and_repository()
+
+    first = service.ingest(
+        source(),
+        subject_key="portfolio",
+        generated_at=dt(12),
+        version=2,
     )
 
     with pytest.raises(
         ValueError,
-        match="identity already exists",
+        match="identity already exists with different content",
+    ):
+        service.ingest(
+            source(),
+            subject_key="WORLD",
+            generated_at=dt(12),
+            version=2,
+        )
+
+    assert repository.list_all() == (first,)
+
+
+def test_explicit_new_version_creates_separate_immutable_record() -> None:
+    service, repository = service_and_repository()
+
+    version_one = service.ingest(
+        source(),
+        subject_key="portfolio",
+        generated_at=dt(12),
+        version=1,
+    )
+    version_two = service.ingest(
+        source(),
+        subject_key="portfolio",
+        generated_at=dt(13),
+        version=2,
+    )
+
+    assert version_one.knowledge_id == version_two.knowledge_id
+    assert version_one.version == 1
+    assert version_two.version == 2
+    assert repository.require(
+        version_one.knowledge_id,
+        1,
+    ) == version_one
+    assert repository.require(
+        version_two.knowledge_id,
+        2,
+    ) == version_two
+
+
+def test_ingestion_never_auto_increments_version() -> None:
+    service, repository = service_and_repository()
+
+    first = service.ingest(
+        source(),
+        subject_key="portfolio",
+        generated_at=dt(12),
+        version=1,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="identity already exists with different content",
     ):
         service.ingest(
             source(),
             subject_key="portfolio",
-            generated_at=dt(12),
+            generated_at=dt(13),
+            version=1,
         )
 
+    assert repository.list_all() == (first,)
 
-def test_ingest_leaves_projection_validation_fail_closed() -> None:
-    repository = InMemoryKnowledgeRecordRepository()
+
+def test_existing_identity_check_occurs_before_add() -> None:
+    class NoDuplicateAddRepository(
+        InMemoryKnowledgeRecordRepository
+    ):
+        def add(
+            self,
+            record: KnowledgeRecord,
+        ) -> KnowledgeRecord:
+            if self.get(
+                record.knowledge_id,
+                record.version,
+            ) is not None:
+                raise AssertionError(
+                    "idempotent reingestion must not call add"
+                )
+            return super().add(record)
+
+    repository = NoDuplicateAddRepository()
     service = HistoricalSnapshotKnowledgeIngestionService(
         repository=repository,
     )
+
+    first = service.ingest(
+        source(),
+        subject_key="portfolio",
+        generated_at=dt(12),
+    )
+    second = service.ingest(
+        source(),
+        subject_key="portfolio",
+        generated_at=dt(12),
+    )
+
+    assert second == first
+
+
+def test_ingest_leaves_projection_validation_fail_closed() -> None:
+    service, repository = service_and_repository()
 
     with pytest.raises(
         ValueError,
