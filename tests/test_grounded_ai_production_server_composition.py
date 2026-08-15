@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from investment_terminal.server import production
 from investment_terminal.server.rate_limit_admission import (
     GroundedAIServerRateLimitAdmissionService,
@@ -10,6 +12,13 @@ from investment_terminal.server.runtime_config import (
     DATABASE_ENV,
     DEFAULT_SERVER_API_KEY_ENV,
     MODEL_ENV,
+    PROVIDER_BUDGET_CURRENCY_ENV,
+    PROVIDER_INPUT_COST_PER_MILLION_TOKENS_ENV,
+    PROVIDER_MAX_OUTPUT_TOKENS_ENV,
+    PROVIDER_MAX_TOTAL_COST_ENV,
+    PROVIDER_MAX_TOTAL_TOKENS_ENV,
+    PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS_ENV,
+    PROVIDER_PRICING_CURRENCY_ENV,
 )
 
 
@@ -43,14 +52,29 @@ def test_production_factory_routes_config_through_api_composition(monkeypatch):
         calls["rate_limit_identity_deriver"] = rate_limit_identity_deriver
         return FakeApp()
 
-    monkeypatch.setattr(production, "build_live_grounded_ai_http_handler", fake_build_handler)
-    monkeypatch.setattr(production, "create_grounded_ai_fastapi_app", fake_fastapi_factory)
+    monkeypatch.setattr(
+        production,
+        "build_live_grounded_ai_http_handler",
+        fake_build_handler,
+    )
+    monkeypatch.setattr(
+        production,
+        "create_grounded_ai_fastapi_app",
+        fake_fastapi_factory,
+    )
 
     app = production.create_app({
         DATABASE_ENV: "data/knowledge/knowledge.db",
         MODEL_ENV: "gpt-test",
         ALLOWED_MODELS_ENV: "gpt-test",
         DEFAULT_SERVER_API_KEY_ENV: "server-secret",
+        PROVIDER_MAX_OUTPUT_TOKENS_ENV: "32",
+        PROVIDER_MAX_TOTAL_TOKENS_ENV: "128",
+        PROVIDER_MAX_TOTAL_COST_ENV: "1.50",
+        PROVIDER_BUDGET_CURRENCY_ENV: "USD",
+        PROVIDER_INPUT_COST_PER_MILLION_TOKENS_ENV: "0.10",
+        PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS_ENV: "0.20",
+        PROVIDER_PRICING_CURRENCY_ENV: "USD",
     })
 
     assert isinstance(app, FakeApp)
@@ -66,13 +90,30 @@ def test_production_factory_routes_config_through_api_composition(monkeypatch):
         calls["rate_limit_identity_deriver"],
         GroundedAIServerRateLimitIdentityDeriver,
     )
-    assert calls["handler_kwargs"]["model_identity"] == "gpt-test"
-    assert calls["handler_kwargs"]["timeout_seconds"] == 30
-    assert calls["handler_kwargs"]["max_retries"] == 2
-    assert calls["handler_kwargs"]["governance_policy"].assess(
+
+    handler_kwargs = calls["handler_kwargs"]
+    assert handler_kwargs["model_identity"] == "gpt-test"
+    assert handler_kwargs["timeout_seconds"] == 30
+    assert handler_kwargs["max_retries"] == 2
+    assert handler_kwargs["requested_max_output_tokens"] == 32
+    assert handler_kwargs["governance_policy"].assess(
         provider_identity="OPENAI",
         model_identity="gpt-test",
     ).allowed
+
+    pricing = handler_kwargs["pricing_policy"].require_entry(
+        provider_identity="OPENAI",
+        model_identity="gpt-test",
+    )
+    assert pricing.input_cost_per_million_tokens == Decimal("0.10")
+    assert pricing.output_cost_per_million_tokens == Decimal("0.20")
+    assert pricing.currency == "USD"
+
+    budget = handler_kwargs["budget_policy"]
+    assert budget.max_output_tokens == 32
+    assert budget.max_total_tokens == 128
+    assert budget.max_total_cost == Decimal("1.50")
+    assert budget.currency == "USD"
 
 
 def test_production_module_has_no_import_time_app_construction():

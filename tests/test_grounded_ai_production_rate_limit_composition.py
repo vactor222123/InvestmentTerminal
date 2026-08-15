@@ -4,6 +4,13 @@ from investment_terminal.server.runtime_config import (
     DATABASE_ENV,
     DEFAULT_SERVER_API_KEY_ENV,
     MODEL_ENV,
+    PROVIDER_BUDGET_CURRENCY_ENV,
+    PROVIDER_INPUT_COST_PER_MILLION_TOKENS_ENV,
+    PROVIDER_MAX_OUTPUT_TOKENS_ENV,
+    PROVIDER_MAX_TOTAL_COST_ENV,
+    PROVIDER_MAX_TOTAL_TOKENS_ENV,
+    PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS_ENV,
+    PROVIDER_PRICING_CURRENCY_ENV,
     RATE_LIMIT_CAPACITY_ENV,
     RATE_LIMIT_REFILL_PER_SECOND_ENV,
 )
@@ -41,35 +48,24 @@ def test_production_wires_rate_limit_services(
         MODEL_ENV: "gpt-test",
         ALLOWED_MODELS_ENV: "gpt-test",
         DEFAULT_SERVER_API_KEY_ENV: "server-secret",
+        PROVIDER_MAX_OUTPUT_TOKENS_ENV: "32",
+        PROVIDER_MAX_TOTAL_TOKENS_ENV: "128",
+        PROVIDER_MAX_TOTAL_COST_ENV: "1.50",
+        PROVIDER_BUDGET_CURRENCY_ENV: "USD",
+        PROVIDER_INPUT_COST_PER_MILLION_TOKENS_ENV: "0.10",
+        PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS_ENV: "0.20",
+        PROVIDER_PRICING_CURRENCY_ENV: "USD",
         RATE_LIMIT_CAPACITY_ENV: "3",
         RATE_LIMIT_REFILL_PER_SECOND_ENV: "0.25",
     }
 
-    app = production.create_app(
-        values
-    )
+    app = production.create_app(values)
 
-    assert isinstance(
-        app,
-        FakeApp,
-    )
-    assert (
-        calls["rate_limit_admission_service"]
-        is not None
-    )
-    assert (
-        calls["rate_limit_identity_deriver"]
-        is not None
-    )
+    assert isinstance(app, FakeApp)
+    assert calls["rate_limit_admission_service"] is not None
+    assert calls["rate_limit_identity_deriver"] is not None
 
-    identity = calls[
-        "rate_limit_identity_deriver"
-    ].derive(
-        "server-secret"
-    )
-
-    assert calls[
-        "rate_limit_admission_service"
-    ].decide(
+    identity = calls["rate_limit_identity_deriver"].derive("server-secret")
+    assert calls["rate_limit_admission_service"].decide(
         identity=identity
     ).allowed

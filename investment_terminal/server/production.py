@@ -38,16 +38,8 @@ from investment_terminal.server.runtime_config import (
 def create_app(
     environment: Mapping[str, str] | None = None,
 ) -> FastAPI:
-    source = (
-        environment
-        if environment is not None
-        else os.environ
-    )
-    config = (
-        GroundedAIServerRuntimeConfig.from_environment(
-            source
-        )
-    )
+    source = environment if environment is not None else os.environ
+    config = GroundedAIServerRuntimeConfig.from_environment(source)
 
     handler = build_live_grounded_ai_http_handler(
         database=config.database,
@@ -55,9 +47,10 @@ def create_app(
         timeout_seconds=config.timeout_seconds,
         max_retries=config.max_retries,
         governance_policy=config.governance_policy(),
-        api_key_environment_variable=(
-            config.api_key_environment_variable
-        ),
+        requested_max_output_tokens=config.provider_max_output_tokens,
+        api_key_environment_variable=config.api_key_environment_variable,
+        pricing_policy=config.pricing_policy(),
+        budget_policy=config.budget_policy(),
     )
 
     readiness_service = GroundedAIServerReadinessService(
@@ -85,16 +78,12 @@ def create_app(
         max_body_bytes=config.max_request_body_bytes,
     )
 
-    rate_limit_admission_service = (
-        GroundedAIServerRateLimitAdmissionService(
-            policy=GroundedAIServerRateLimitPolicy(
-                capacity=config.rate_limit_capacity,
-                refill_tokens_per_second=(
-                    config.rate_limit_refill_tokens_per_second
-                ),
-            ),
-            clock=GroundedAIServerMonotonicDecimalClock(),
-        )
+    rate_limit_admission_service = GroundedAIServerRateLimitAdmissionService(
+        policy=GroundedAIServerRateLimitPolicy(
+            capacity=config.rate_limit_capacity,
+            refill_tokens_per_second=config.rate_limit_refill_tokens_per_second,
+        ),
+        clock=GroundedAIServerMonotonicDecimalClock(),
     )
 
     return create_grounded_ai_fastapi_app(
@@ -102,10 +91,6 @@ def create_app(
         readiness_service=readiness_service,
         authenticator=authenticator,
         request_limit_policy=request_limit_policy,
-        rate_limit_admission_service=(
-            rate_limit_admission_service
-        ),
-        rate_limit_identity_deriver=(
-            GroundedAIServerRateLimitIdentityDeriver()
-        ),
+        rate_limit_admission_service=rate_limit_admission_service,
+        rate_limit_identity_deriver=GroundedAIServerRateLimitIdentityDeriver(),
     )

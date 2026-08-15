@@ -16,6 +16,13 @@ from investment_terminal.server.runtime_config import (
     DEFAULT_SERVER_API_KEY_ENV,
     MAX_REQUEST_BODY_BYTES_ENV,
     MODEL_ENV,
+    PROVIDER_BUDGET_CURRENCY_ENV,
+    PROVIDER_INPUT_COST_PER_MILLION_TOKENS_ENV,
+    PROVIDER_MAX_OUTPUT_TOKENS_ENV,
+    PROVIDER_MAX_TOTAL_COST_ENV,
+    PROVIDER_MAX_TOTAL_TOKENS_ENV,
+    PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS_ENV,
+    PROVIDER_PRICING_CURRENCY_ENV,
 )
 from investment_terminal.ai.providers.composition import (
     DEFAULT_OPENAI_API_KEY_ENV,
@@ -53,6 +60,13 @@ def build_environment(
         DEFAULT_OPENAI_API_KEY_ENV: "provider-secret",
         DEFAULT_SERVER_API_KEY_ENV: "server-secret",
         MAX_REQUEST_BODY_BYTES_ENV: "256",
+        PROVIDER_MAX_OUTPUT_TOKENS_ENV: "32",
+        PROVIDER_MAX_TOTAL_TOKENS_ENV: "128",
+        PROVIDER_MAX_TOTAL_COST_ENV: "1.50",
+        PROVIDER_BUDGET_CURRENCY_ENV: "USD",
+        PROVIDER_INPUT_COST_PER_MILLION_TOKENS_ENV: "0.10",
+        PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS_ENV: "0.20",
+        PROVIDER_PRICING_CURRENCY_ENV: "USD",
     }
 
 
@@ -83,20 +97,12 @@ def test_production_server_runtime_e2e(
         raise_server_exceptions=False,
     )
 
-    health = client.get(
-        "/health"
-    )
+    health = client.get("/health")
     assert health.status_code == 200
-    assert health.json() == {
-        "status": "OK",
-    }
-    assert health.headers[
-        "X-Content-Type-Options"
-    ] == "nosniff"
+    assert health.json() == {"status": "OK"}
+    assert health.headers["X-Content-Type-Options"] == "nosniff"
 
-    ready = client.get(
-        "/ready"
-    )
+    ready = client.get("/ready")
     assert ready.status_code == 200
     assert ready.json() == {
         "status": "READY",
@@ -114,21 +120,18 @@ def test_production_server_runtime_e2e(
         },
     )
     assert unauthenticated.status_code == 401
-    assert unauthenticated.json()[
-        "error"
-    ]["code"] == "SERVER_AUTHENTICATION_REQUIRED"
+    assert (
+        unauthenticated.json()["error"]["code"]
+        == "SERVER_AUTHENTICATION_REQUIRED"
+    )
 
     success = client.post(
         "/v1/grounded-ai",
-        headers={
-            "X-API-Key": "server-secret",
-        },
+        headers={"X-API-Key": "server-secret"},
         json={
             "request_id": "request-1",
             "query": "Question",
-            "subjects": [
-                "WORLD",
-            ],
+            "subjects": ["WORLD"],
         },
     )
     assert success.status_code == 200
@@ -144,30 +147,25 @@ def test_production_server_runtime_e2e(
             },
             "trace": {
                 "request_id": "request-1",
-                "subject_keys": [
-                    "WORLD",
-                ],
+                "subject_keys": ["WORLD"],
             },
         },
     }
-    assert success.headers[
-        "Cache-Control"
-    ] == "no-store"
+    assert success.headers["Cache-Control"] == "no-store"
 
     oversized = client.post(
         "/v1/grounded-ai",
-        headers={
-            "X-API-Key": "server-secret",
-        },
+        headers={"X-API-Key": "server-secret"},
         json={
             "request_id": "request-2",
             "query": "x" * 400,
         },
     )
     assert oversized.status_code == 413
-    assert oversized.json()[
-        "error"
-    ]["code"] == "SERVER_REQUEST_BODY_TOO_LARGE"
+    assert (
+        oversized.json()["error"]["code"]
+        == "SERVER_REQUEST_BODY_TOO_LARGE"
+    )
 
     invalid_json = client.post(
         "/v1/grounded-ai",
@@ -178,26 +176,14 @@ def test_production_server_runtime_e2e(
         content=b"{bad-json",
     )
     assert invalid_json.status_code == 400
-    assert invalid_json.json()[
-        "error"
-    ]["code"] == "SERVER_INVALID_JSON"
+    assert invalid_json.json()["error"]["code"] == "SERVER_INVALID_JSON"
 
-    schema = client.get(
-        "/openapi.json"
-    )
+    schema = client.get("/openapi.json")
     assert schema.status_code == 200
-    assert set(
-        schema.json()["paths"]
-    ) == {
-        "/v1/grounded-ai",
-    }
+    assert set(schema.json()["paths"]) == {"/v1/grounded-ai"}
 
-    assert client.get(
-        "/docs"
-    ).status_code == 404
-    assert client.get(
-        "/redoc"
-    ).status_code == 404
+    assert client.get("/docs").status_code == 404
+    assert client.get("/redoc").status_code == 404
 
 
 def test_production_server_runtime_e2e_readiness_fails_closed(
@@ -219,19 +205,13 @@ def test_production_server_runtime_e2e_readiness_fails_closed(
     environment = build_environment(
         database=database,
     )
-    del environment[
-        DEFAULT_OPENAI_API_KEY_ENV
-    ]
+    del environment[DEFAULT_OPENAI_API_KEY_ENV]
 
-    app = production.create_app(
-        environment
-    )
+    app = production.create_app(environment)
     response = TestClient(
         app,
         raise_server_exceptions=False,
-    ).get(
-        "/ready"
-    )
+    ).get("/ready")
 
     assert response.status_code == 503
     assert response.json() == {
