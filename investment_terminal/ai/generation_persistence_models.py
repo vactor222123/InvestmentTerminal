@@ -10,12 +10,92 @@ from investment_terminal.utils.validation import (
 )
 
 
+class FrozenJSONDict(dict[str, Any]):
+    """JSON-compatible dictionary that rejects every mutation operation."""
+
+    @staticmethod
+    def _immutable(*args, **kwargs):
+        raise TypeError("frozen JSON object is immutable")
+
+    __setitem__ = _immutable
+    __delitem__ = _immutable
+    clear = _immutable
+    pop = _immutable
+    popitem = _immutable
+    setdefault = _immutable
+    update = _immutable
+    __ior__ = _immutable
+
+
+def _freeze_json(
+    value: Any,
+    *,
+    field_name: str,
+) -> Any:
+    if isinstance(value, dict):
+        return FrozenJSONDict(
+            {
+                key: _freeze_json(
+                    item,
+                    field_name=field_name,
+                )
+                for key, item in value.items()
+            }
+        )
+    if isinstance(value, list):
+        return tuple(
+            _freeze_json(
+                item,
+                field_name=field_name,
+            )
+            for item in value
+        )
+    if isinstance(value, tuple):
+        return tuple(
+            _freeze_json(
+                item,
+                field_name=field_name,
+            )
+            for item in value
+        )
+    if value is None or isinstance(
+        value,
+        (
+            str,
+            int,
+            float,
+            bool,
+        ),
+    ):
+        return value
+    raise TypeError(
+        f"{field_name} must contain JSON-compatible values"
+    )
+
+
+def _thaw_json(
+    value: Any,
+) -> Any:
+    if isinstance(value, dict):
+        return {
+            key: _thaw_json(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, tuple):
+        return [
+            _thaw_json(item)
+            for item in value
+        ]
+    return value
+
+
 @dataclass(frozen=True, slots=True)
 class PersistedGroundedGeneration:
     """
     Durable projection of one ADMISSIBLE grounded generation.
 
     This is generated evidence, not canonical History or Knowledge.
+    Nested generation/trace JSON is defensively deep-frozen.
     """
 
     request_id: str
@@ -96,6 +176,26 @@ class PersistedGroundedGeneration:
                 "trace must be a dictionary"
             )
 
+        frozen_generation = _freeze_json(
+            self.generation,
+            field_name="generation",
+        )
+        frozen_trace = _freeze_json(
+            self.trace,
+            field_name="trace",
+        )
+
+        object.__setattr__(
+            self,
+            "generation",
+            frozen_generation,
+        )
+        object.__setattr__(
+            self,
+            "trace",
+            frozen_trace,
+        )
+
         prompt = self.generation.get("prompt")
         if not isinstance(prompt, dict):
             raise ValueError(
@@ -129,6 +229,10 @@ class PersistedGroundedGeneration:
             "cited_knowledge_identities": list(
                 self.cited_knowledge_identities
             ),
-            "generation": self.generation,
-            "trace": self.trace,
+            "generation": _thaw_json(
+                self.generation
+            ),
+            "trace": _thaw_json(
+                self.trace
+            ),
         }

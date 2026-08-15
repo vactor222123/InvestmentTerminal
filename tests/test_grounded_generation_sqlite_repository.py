@@ -16,7 +16,15 @@ from investment_terminal.ai.generation_sqlite_store import (
 def record(
     request_id: str,
     minute: int,
+    *,
+    answer_text: str | None = None,
 ) -> PersistedGroundedGeneration:
+    answer = {
+        "claims": [],
+    }
+    if answer_text is not None:
+        answer["text"] = answer_text
+
     return PersistedGroundedGeneration(
         request_id=request_id,
         generated_at=datetime(
@@ -37,9 +45,7 @@ def record(
             "prompt": {
                 "request_id": request_id,
             },
-            "answer": {
-                "claims": [],
-            },
+            "answer": answer,
         },
         trace={
             "request_id": request_id,
@@ -125,12 +131,18 @@ def test_unicode_generation_round_trips_exactly(
             tmp_path / "grounded_generations.db"
         )
     )
-    expected = record("request-001", 1)
-    expected.generation["answer"]["text"] = "Європа — стабільна."
+    expected = record(
+        "request-001",
+        1,
+        answer_text="Європа — стабільна.",
+    )
 
     repository.add(expected)
 
-    assert (
-        repository.require("request-001").generation
-        == expected.generation
+    actual = repository.require(
+        "request-001"
+    )
+
+    assert actual.to_dict()["generation"] == (
+        expected.to_dict()["generation"]
     )

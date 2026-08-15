@@ -14,6 +14,8 @@ def record(
     request_id: str = "request-001",
     *,
     status: str = "ADMISSIBLE",
+    generation: dict | None = None,
+    trace: dict | None = None,
 ) -> PersistedGroundedGeneration:
     return PersistedGroundedGeneration(
         request_id=request_id,
@@ -26,18 +28,33 @@ def record(
         model_identity="gpt-test",
         selected_knowledge_identities=("knowledge-a@1",),
         cited_knowledge_identities=("knowledge-a@1",),
-        generation={
-            "prompt": {
+        generation=(
+            generation
+            if generation is not None
+            else {
+                "prompt": {
+                    "request_id": request_id,
+                    "messages": [
+                        {
+                            "role": "user",
+                            "content": "question",
+                        }
+                    ],
+                },
+                "answer": {
+                    "claims": [],
+                },
+            }
+        ),
+        trace=(
+            trace
+            if trace is not None
+            else {
                 "request_id": request_id,
-            },
-            "answer": {
-                "claims": [],
-            },
-        },
-        trace={
-            "request_id": request_id,
-            "validation_status": status,
-        },
+                "validation_status": status,
+                "warnings": [],
+            }
+        ),
     )
 
 
@@ -116,3 +133,104 @@ def test_require_missing_fails_closed() -> None:
 
     with pytest.raises(KeyError):
         repository.require("missing")
+
+
+def test_source_generation_mutation_cannot_change_persisted_evidence() -> None:
+    generation = {
+        "prompt": {
+            "request_id": "request-001",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "original",
+                }
+            ],
+        },
+        "answer": {
+            "claims": [],
+        },
+    }
+    trace = {
+        "request_id": "request-001",
+        "validation_status": "ADMISSIBLE",
+        "warnings": [],
+    }
+
+    value = record(
+        generation=generation,
+        trace=trace,
+    )
+
+    generation["prompt"]["request_id"] = "tampered"
+    generation["prompt"]["messages"][0]["content"] = "tampered"
+    trace["validation_status"] = "REJECTED"
+    trace["warnings"].append("tampered")
+
+    assert value.generation["prompt"]["request_id"] == "request-001"
+    assert (
+        value.generation["prompt"]["messages"][0]["content"]
+        == "original"
+    )
+    assert value.trace["validation_status"] == "ADMISSIBLE"
+    assert value.trace["warnings"] == ()
+
+
+def test_nested_persisted_evidence_rejects_mutation() -> None:
+    value = record()
+
+    with pytest.raises(
+        TypeError,
+        match="immutable",
+    ):
+        value.trace["validation_status"] = "REJECTED"
+
+    with pytest.raises(
+        TypeError,
+        match="immutable",
+    ):
+        value.generation["prompt"]["request_id"] = "tampered"
+
+    with pytest.raises(TypeError):
+        value.generation["prompt"]["messages"][0]["content"] = "tampered"
+
+    with pytest.raises(AttributeError):
+        value.trace["warnings"].append("tampered")
+
+
+def test_to_dict_returns_detached_mutable_projection() -> None:
+    value = record()
+
+    first = value.to_dict()
+    first["trace"]["validation_status"] = "REJECTED"
+    first["trace"]["warnings"].append("tampered")
+    first["generation"]["prompt"]["request_id"] = "tampered"
+    first["generation"]["prompt"]["messages"][0]["content"] = "tampered"
+
+    second = value.to_dict()
+
+    assert second["trace"]["validation_status"] == "ADMISSIBLE"
+    assert second["trace"]["warnings"] == []
+    assert second["generation"]["prompt"]["request_id"] == "request-001"
+    assert (
+        second["generation"]["prompt"]["messages"][0]["content"]
+        == "question"
+    )
+
+
+def test_non_json_nested_value_is_rejected() -> None:
+    generation = {
+        "prompt": {
+            "request_id": "request-001",
+        },
+        "unsupported": {
+            "value": object(),
+        },
+    }
+
+    with pytest.raises(
+        TypeError,
+        match="JSON-compatible",
+    ):
+        record(
+            generation=generation
+        )

@@ -148,9 +148,11 @@ def test_successful_admissible_generation_is_recorded() -> None:
     persisted = repository.require(
         "request-1"
     )
+    persisted_data = persisted.to_dict()
+
     assert persisted.generated_at == RECORDED_AT
-    assert persisted.generation == result.generation
-    assert persisted.trace == result.trace
+    assert persisted_data["generation"] == result.generation
+    assert persisted_data["trace"] == result.trace
     assert persisted.trace[
         "validation_status"
     ] == "ADMISSIBLE"

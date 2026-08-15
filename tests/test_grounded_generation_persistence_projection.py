@@ -145,11 +145,12 @@ def test_projects_existing_admissible_result_deterministically() -> None:
             generated_at=GENERATED_AT,
         )
     )
+    persisted_data = persisted.to_dict()
 
     assert persisted.request_id == result.prompt.request_id
     assert persisted.generated_at == GENERATED_AT
-    assert persisted.generation == result.to_dict()
-    assert persisted.trace == trace.to_dict()
+    assert persisted_data["generation"] == result.to_dict()
+    assert persisted_data["trace"] == trace.to_dict()
     assert (
         persisted.selected_knowledge_identities
         == result.selection.selected_identities
