@@ -5,6 +5,7 @@ Read-only command-line inspection for the provider usage/cost ledger.
 import argparse
 import json
 from collections.abc import Sequence
+from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -22,6 +23,20 @@ DEFAULT_DATABASE = (
     / "knowledge"
     / "provider_usage_cost.db"
 )
+
+
+def _aware_datetime(value: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            "must be an ISO-8601 datetime"
+        ) from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise argparse.ArgumentTypeError(
+            "must be timezone-aware"
+        )
+    return parsed
 
 
 def build_argument_parser() -> argparse.ArgumentParser:
@@ -50,6 +65,31 @@ def build_argument_parser() -> argparse.ArgumentParser:
     subparsers.add_parser(
         "list",
         help="List all provider usage/cost records.",
+    )
+
+    recent = subparsers.add_parser(
+        "recent",
+        help="List the newest bounded provider usage/cost records.",
+    )
+    recent.add_argument(
+        "--limit",
+        type=int,
+        required=True,
+    )
+
+    between = subparsers.add_parser(
+        "between",
+        help="List records in the half-open [started-at, ended-at) window.",
+    )
+    between.add_argument(
+        "--started-at",
+        type=_aware_datetime,
+        required=True,
+    )
+    between.add_argument(
+        "--ended-at",
+        type=_aware_datetime,
+        required=True,
     )
 
     show = subparsers.add_parser(
@@ -115,21 +155,47 @@ def main(
     )
 
 
+def _records_report(
+    command: str,
+    records,
+) -> dict[str, Any]:
+    return {
+        "command": command,
+        "count": len(records),
+        "records": [
+            record.to_dict()
+            for record in records
+        ],
+    }
+
+
 def _build_report(
     options: argparse.Namespace,
     *,
     repository: SQLiteGroundedProviderUsageCostLedgerRepository,
 ) -> dict[str, Any]:
     if options.command == "list":
-        records = repository.list_all()
-        return {
-            "command": "list",
-            "count": len(records),
-            "records": [
-                record.to_dict()
-                for record in records
-            ],
-        }
+        return _records_report(
+            "list",
+            repository.list_all(),
+        )
+
+    if options.command == "recent":
+        return _records_report(
+            "recent",
+            repository.list_recent(
+                options.limit
+            ),
+        )
+
+    if options.command == "between":
+        return _records_report(
+            "between",
+            repository.list_between(
+                options.started_at,
+                options.ended_at,
+            ),
+        )
 
     if options.command == "show":
         record = repository.require(
@@ -151,47 +217,25 @@ def _build_report(
                 "summary requires one currency across ledger records"
             )
 
-        input_tokens = sum(
-            record.input_tokens
-            for record in records
-        )
-        output_tokens = sum(
-            record.output_tokens
-            for record in records
-        )
-        total_tokens = sum(
-            record.total_tokens
-            for record in records
-        )
+        input_tokens = sum(record.input_tokens for record in records)
+        output_tokens = sum(record.output_tokens for record in records)
+        total_tokens = sum(record.total_tokens for record in records)
         input_cost = sum(
-            (
-                record.input_cost
-                for record in records
-            ),
+            (record.input_cost for record in records),
             Decimal("0"),
         )
         output_cost = sum(
-            (
-                record.output_cost
-                for record in records
-            ),
+            (record.output_cost for record in records),
             Decimal("0"),
         )
         total_cost = sum(
-            (
-                record.total_cost
-                for record in records
-            ),
+            (record.total_cost for record in records),
             Decimal("0"),
         )
         return {
             "command": "summary",
             "request_count": len(records),
-            "currency": (
-                next(iter(currencies))
-                if currencies
-                else None
-            ),
+            "currency": next(iter(currencies)) if currencies else None,
             "input_tokens": input_tokens,
             "output_tokens": output_tokens,
             "total_tokens": total_tokens,
@@ -211,7 +255,11 @@ def _print_human(
 ) -> None:
     print("Provider Usage/Cost Ledger")
 
-    if command == "list":
+    if command in {
+        "list",
+        "recent",
+        "between",
+    }:
         print(
             f"Records      : {report['count']}"
         )
@@ -226,30 +274,14 @@ def _print_human(
         return
 
     if command == "summary":
-        print(
-            f"Requests     : {report['request_count']}"
-        )
-        print(
-            f"Currency     : {report['currency'] or 'none'}"
-        )
-        print(
-            f"Input tokens : {report['input_tokens']}"
-        )
-        print(
-            f"Output tokens: {report['output_tokens']}"
-        )
-        print(
-            f"Total tokens : {report['total_tokens']}"
-        )
-        print(
-            f"Input cost   : {report['input_cost']}"
-        )
-        print(
-            f"Output cost  : {report['output_cost']}"
-        )
-        print(
-            f"Total cost   : {report['total_cost']}"
-        )
+        print(f"Requests     : {report['request_count']}")
+        print(f"Currency     : {report['currency'] or 'none'}")
+        print(f"Input tokens : {report['input_tokens']}")
+        print(f"Output tokens: {report['output_tokens']}")
+        print(f"Total tokens : {report['total_tokens']}")
+        print(f"Input cost   : {report['input_cost']}")
+        print(f"Output cost  : {report['output_cost']}")
+        print(f"Total cost   : {report['total_cost']}")
         return
 
     raise RuntimeError(
