@@ -2,9 +2,9 @@
 Concrete grounded AI application use case.
 
 This service owns application orchestration over Knowledge query, grounded
-generation, optional usage/cost guardrails, and safe trace projection.
-It owns no CLI parsing, HTTP framework integration, provider composition,
-credential lookup, or database construction.
+generation, optional usage/cost guardrails, optional admissible-generation
+recording, and safe trace projection. It owns no CLI parsing, HTTP framework
+integration, provider composition, credential lookup, or database construction.
 """
 
 from decimal import Decimal
@@ -15,6 +15,9 @@ from investment_terminal.ai.audit import (
 )
 from investment_terminal.ai.context_selection import (
     GroundedContextSelectionPolicy,
+)
+from investment_terminal.ai.generation_recording import (
+    GroundedGenerationRecordingService,
 )
 from investment_terminal.ai.providers.cost_audit import (
     GroundedProviderCostTraceService,
@@ -67,6 +70,9 @@ class LiveGroundedAIApplicationService(
         pricing_policy: GroundedProviderPricingPolicy | None = None,
         budget_policy: GroundedProviderBudgetPolicy | None = None,
         requested_max_output_tokens: int | None = None,
+        generation_recording_service: (
+            GroundedGenerationRecordingService | None
+        ) = None,
     ) -> None:
         _require_callable(
             query,
@@ -102,6 +108,17 @@ class LiveGroundedAIApplicationService(
                 "GroundedProviderBudgetPolicy or None"
             )
         if (
+            generation_recording_service is not None
+            and not isinstance(
+                generation_recording_service,
+                GroundedGenerationRecordingService,
+            )
+        ):
+            raise TypeError(
+                "generation_recording_service must be a "
+                "GroundedGenerationRecordingService or None"
+            )
+        if (
             requested_max_output_tokens is not None
             and (
                 isinstance(
@@ -134,6 +151,9 @@ class LiveGroundedAIApplicationService(
         self._budget_policy = budget_policy
         self._requested_max_output_tokens = (
             requested_max_output_tokens
+        )
+        self._generation_recording_service = (
+            generation_recording_service
         )
 
     def execute(
@@ -236,6 +256,13 @@ class LiveGroundedAIApplicationService(
                         ),
                     )
                 )
+
+        if self._generation_recording_service is not None:
+            self._generation_recording_service.record(
+                result=generation,
+                trace=trace,
+                trace_data=trace_data,
+            )
 
         return GroundedAIApplicationResult(
             generation=generation.to_dict(),
