@@ -4,7 +4,7 @@
 **Update rule:** MUST be updated after every completed Task  
 **Current repository:** `vactor222123/InvestmentTerminal`  
 **Current branch:** `develop`  
-**Current baseline:** `2026e7b`  
+**Current baseline:** `30a28ac`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
 **Current next action:** Sprint 32 Task 1 — Runtime Filesystem Contract
 
@@ -637,17 +637,54 @@ document.
 
 ---
 
-## 14. Current Checkpoint Summary
+## 14. Checkpoint Synchronization
+
+```text
+Checkpoint: durable continuation mechanism established
+Status: CLOSED
+Commit: 30a28ac
+CI: GREEN
+Changed:
+- added PROJECT_CONTINUATION.md;
+- linked continuation workflow from README/NEXT_STEPS/AI context;
+- made handoff updates mandatory after every completed Task.
+
+Decisions:
+- PROJECT_CONTINUATION.md is the canonical execution/handoff checkpoint;
+- architecture/data-model authority remains in the canonical architecture docs;
+- every Task Definition of Done now includes checkpoint reconciliation.
+
+Tests/guarantees:
+- clean GitHub Actions run succeeded on the checkpoint commit.
+
+Lessons:
+- handoff state must refer to an already verified commit, not a future commit
+  identity that does not yet exist.
+
+Next:
+Sprint 32 Task 1 — Runtime Filesystem Contract
+```
+
+---
+
+## 15. Current Checkpoint Summary
 
 ```text
 Repository: vactor222123/InvestmentTerminal
 Branch: develop
-Baseline: 2026e7b
+Baseline: 30a28ac
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
 Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
 Current next action: 32.1 Runtime Filesystem Contract
 ```
 
-Before Task 32.1, update this baseline to the commit that introduces this
-handoff document and verify its CI result.
+Checkpoint synchronization:
+
+```text
+PROJECT_CONTINUATION.md introduced: develop @ 30a28ac
+CI: GREEN
+```
+
+The handoff checkpoint is now self-consistent. Continue with Task 32.1 only
+from this verified baseline.

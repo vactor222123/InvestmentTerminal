@@ -1,7 +1,7 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ 2026e7b`  
-**Status:** Sprint 31 closed; post-Sprint-31 audit complete; Sprint 32 selected.
+**Current baseline:** `develop @ 30a28ac`  
+**Status:** Durable continuation checkpoint established and CI-verified; Sprint 32 ready to begin.
 
 ## Durable Continuation Checkpoint
 
@@ -16,6 +16,13 @@ baseline, current phase, audit findings, approved Sprint plan, failure lessons,
 working protocol, and exact next Task.
 
 `PROJECT_CONTINUATION.md` MUST be updated after every completed Task.
+
+Checkpoint baseline:
+
+```text
+develop @ 30a28ac
+CI: GREEN
+```
 
 ## Sprint 31
 
@@ -34,13 +41,6 @@ deep immutable generated evidence
 → cross-platform lock installation
 → GitHub Actions CI
 → hermetic clean-clone tests
-```
-
-Closure baseline:
-
-```text
-develop @ 2026e7b
-CI: GREEN
 ```
 
 ## Post-Sprint-31 Audit Result
