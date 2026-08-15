@@ -11,4 +11,5 @@ python-dotenv>=1.1.1
 colorlog>=6.9.0
 tqdm>=4.67.1
 python-dateutil>=2.9.0
-fastapi[standard]>=0.139.2
+fastapi>=0.139.2
+uvicorn>=0.52.3

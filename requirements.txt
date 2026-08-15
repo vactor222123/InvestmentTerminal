@@ -25,10 +25,12 @@ tqdm>=4.67.1
 python-dateutil>=2.9.0
 
 # API / Server Runtime
-fastapi[standard]>=0.139.2
+fastapi>=0.139.2
+uvicorn>=0.52.3
 
 # Testing
 pytest>=8.4.0
+httpx>=0.28.1
 
 # Code Quality
 black>=25.1.0

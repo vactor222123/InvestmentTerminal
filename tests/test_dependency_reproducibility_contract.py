@@ -85,6 +85,29 @@ def test_runtime_and_dev_sources_cover_legacy_direct_dependencies() -> None:
     assert runtime | dev == legacy
 
 
+def test_runtime_source_owns_server_without_standard_extra() -> None:
+    runtime_text = (
+        PROJECT_ROOT / "requirements.in"
+    ).read_text(
+        encoding="utf-8"
+    )
+    runtime = _direct_requirement_names(
+        PROJECT_ROOT / "requirements.in"
+    )
+
+    assert "fastapi[standard]" not in runtime_text
+    assert "fastapi" in runtime
+    assert "uvicorn" in runtime
+
+
+def test_dev_source_owns_testclient_transport() -> None:
+    dev = _direct_requirement_names(
+        PROJECT_ROOT / "requirements-dev.in"
+    )
+
+    assert "httpx" in dev
+
+
 def test_runtime_source_does_not_contain_test_or_formatting_tools() -> None:
     runtime = _direct_requirement_names(
         PROJECT_ROOT / "requirements.in"
@@ -93,6 +116,7 @@ def test_runtime_source_does_not_contain_test_or_formatting_tools() -> None:
     assert runtime.isdisjoint(
         {
             "pytest",
+            "httpx",
             "black",
             "flake8",
             "pip-tools",

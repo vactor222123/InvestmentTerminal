@@ -16,94 +16,96 @@ Python 3.13.x
 `.python-version` intentionally pins the lock-generation family to `3.13`,
 rather than one patch release.
 
-Patch releases such as 3.13.7 or later 3.13.x security/bugfix releases are
-accepted. We do not require developers to replace an otherwise valid 3.13
-interpreter merely to regenerate dependency locks.
+## Dependency Ownership
 
-## Dependency Layers
-
-Source manifests:
+Runtime direct dependencies are declared in:
 
 ```text
 requirements.in
-    runtime direct dependencies
-
-requirements-dev.in
-    requirements.in + test/code-quality direct dependencies
 ```
 
-Compiler toolchain:
+Development/test-only direct dependencies are declared in:
+
+```text
+requirements-dev.in
+```
+
+The legacy `requirements.txt` temporarily mirrors the combined direct set.
+
+Important ownership rule:
+
+```text
+FastAPI framework        → fastapi
+production ASGI server   → uvicorn
+TestClient transport     → httpx (development/test)
+```
+
+The project intentionally does **not** depend on `fastapi[standard]`.
+
+That convenience extra pulls optional platform-specific server dependencies such
+as `uvloop`. A lock generated on Windows can therefore omit Linux-only optional
+dependencies while still retaining an extra that asks pip to install them. In
+`--require-hashes` mode that produces an invalid cross-platform install
+contract.
+
+Directly declaring only the capabilities the project actually owns avoids this
+hidden platform-specific dependency surface.
+
+## Compiler Toolchain
 
 ```text
 requirements-compiler.txt
 ```
 
-The compiler toolchain remains exact-pinned because changing pip or pip-tools can
-change resolution or generated lock output.
+The compiler toolchain is exact-pinned because resolver/tooling changes can
+change generated lock output.
 
-Generated artifacts:
+## Generated Artifacts
 
 ```text
 requirements.lock
 requirements-dev.lock
 ```
 
-Generated lock files are repository artifacts and should be committed once
-compiled.
+Both lock files are generated artifacts and are committed.
 
 ## Lock Generation
 
-On Windows PowerShell from the repository root:
+From Windows PowerShell at repository root:
 
 ```powershell
 .\scripts\compile_requirements.ps1
 ```
 
-The script fails closed unless the active interpreter belongs to Python 3.13.x.
+The script requires Python 3.13.x and generates hash-locked requirements.
 
-It then generates hash-locked files using the pinned pip/pip-tools compiler
-toolchain.
-
-Do not generate lock files from `pip freeze`. `pip freeze` captures the current
-environment, including accidental/transitive packages, rather than resolving
-the declared dependency contract.
+Do not use `pip freeze`.
 
 ## Installation
 
-Runtime environment after locks exist:
+Runtime:
 
 ```powershell
 python -m pip install --require-hashes -r requirements.lock
 ```
 
-Development/test environment:
+Development/test:
 
 ```powershell
 python -m pip install --require-hashes -r requirements-dev.lock
 ```
 
+CI uses the development lock with `--require-hashes`.
+
 ## Updating Dependencies
 
-Dependency updates are explicit:
-
 ```text
-edit requirements.in and/or requirements-dev.in
-→ run compile_requirements.ps1 under Python 3.13.x
+edit source manifest
+→ regenerate locks
 → inspect lock diff
 → install from requirements-dev.lock
 → run full pytest
-→ commit source manifest + lock diff together
+→ commit manifests and locks together
 ```
 
 Never hand-edit generated lock files.
-
-## Legacy requirements.txt
-
-`requirements.txt` remains temporarily for compatibility with the existing
-developer workflow during Sprint 31.
-
-The source manifests must contain the same direct dependency set. An executable
-test guards that equivalence.
-
-After generated locks are validated in CI, installation documentation and
-automation should prefer `requirements.lock` / `requirements-dev.lock`.

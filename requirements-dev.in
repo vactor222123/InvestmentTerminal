@@ -4,5 +4,6 @@
 -r requirements.in
 
 pytest>=8.4.0
+httpx>=0.28.1
 black>=25.1.0
 flake8>=7.3.0
