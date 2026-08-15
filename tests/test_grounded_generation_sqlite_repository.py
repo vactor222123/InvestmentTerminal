@@ -1,3 +1,4 @@
+import sqlite3
 from datetime import datetime, timezone
 
 import pytest
@@ -146,3 +147,51 @@ def test_unicode_generation_round_trips_exactly(
     assert actual.to_dict()["generation"] == (
         expected.to_dict()["generation"]
     )
+
+
+@pytest.mark.parametrize(
+    "invalid_constant",
+    [
+        "NaN",
+        "Infinity",
+        "-Infinity",
+    ],
+)
+def test_repository_rejects_non_finite_json_from_storage(
+    tmp_path,
+    invalid_constant: str,
+) -> None:
+    database = tmp_path / "grounded_generations.db"
+    repository = SQLiteGroundedGenerationRepository(
+        GroundedGenerationSQLiteStore(
+            database
+        )
+    )
+    repository.add(
+        record("request-001", 1)
+    )
+
+    with sqlite3.connect(database) as connection:
+        connection.execute(
+            """
+            UPDATE grounded_generations
+            SET generation_json = ?
+            WHERE request_id = ?
+            """,
+            (
+                (
+                    '{"prompt":{"request_id":"request-001"},'
+                    f'"score":{invalid_constant}'
+                    '}'
+                ),
+                "request-001",
+            ),
+        )
+
+    with pytest.raises(
+        ValueError,
+        match="non-finite",
+    ):
+        repository.require(
+            "request-001"
+        )

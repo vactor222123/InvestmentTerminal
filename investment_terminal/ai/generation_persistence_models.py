@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from datetime import datetime
+from math import isfinite
 from typing import Any
 
 from investment_terminal.utils.validation import (
@@ -33,14 +34,18 @@ def _freeze_json(
     field_name: str,
 ) -> Any:
     if isinstance(value, dict):
-        return FrozenJSONDict(
-            {
-                key: _freeze_json(
-                    item,
-                    field_name=field_name,
+        frozen_items: dict[str, Any] = {}
+        for key, item in value.items():
+            if not isinstance(key, str):
+                raise TypeError(
+                    f"{field_name} JSON object keys must be strings"
                 )
-                for key, item in value.items()
-            }
+            frozen_items[key] = _freeze_json(
+                item,
+                field_name=field_name,
+            )
+        return FrozenJSONDict(
+            frozen_items
         )
     if isinstance(value, list):
         return tuple(
@@ -63,10 +68,15 @@ def _freeze_json(
         (
             str,
             int,
-            float,
             bool,
         ),
     ):
+        return value
+    if isinstance(value, float):
+        if not isfinite(value):
+            raise ValueError(
+                f"{field_name} JSON numbers must be finite"
+            )
         return value
     raise TypeError(
         f"{field_name} must contain JSON-compatible values"
@@ -95,7 +105,8 @@ class PersistedGroundedGeneration:
     Durable projection of one ADMISSIBLE grounded generation.
 
     This is generated evidence, not canonical History or Knowledge.
-    Nested generation/trace JSON is defensively deep-frozen.
+    Nested generation/trace JSON is defensively deep-frozen and validated
+    against the strict JSON value domain.
     """
 
     request_id: str
@@ -176,24 +187,21 @@ class PersistedGroundedGeneration:
                 "trace must be a dictionary"
             )
 
-        frozen_generation = _freeze_json(
-            self.generation,
-            field_name="generation",
-        )
-        frozen_trace = _freeze_json(
-            self.trace,
-            field_name="trace",
-        )
-
         object.__setattr__(
             self,
             "generation",
-            frozen_generation,
+            _freeze_json(
+                self.generation,
+                field_name="generation",
+            ),
         )
         object.__setattr__(
             self,
             "trace",
-            frozen_trace,
+            _freeze_json(
+                self.trace,
+                field_name="trace",
+            ),
         )
 
         prompt = self.generation.get("prompt")

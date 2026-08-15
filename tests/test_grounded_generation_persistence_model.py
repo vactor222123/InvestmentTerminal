@@ -234,3 +234,47 @@ def test_non_json_nested_value_is_rejected() -> None:
         record(
             generation=generation
         )
+
+
+@pytest.mark.parametrize(
+    "invalid_number",
+    [
+        float("nan"),
+        float("inf"),
+        float("-inf"),
+    ],
+)
+def test_non_finite_json_number_is_rejected(
+    invalid_number: float,
+) -> None:
+    generation = {
+        "prompt": {
+            "request_id": "request-001",
+        },
+        "score": invalid_number,
+    }
+
+    with pytest.raises(
+        ValueError,
+        match="finite",
+    ):
+        record(
+            generation=generation
+        )
+
+
+def test_non_string_json_object_key_is_rejected() -> None:
+    generation = {
+        "prompt": {
+            "request_id": "request-001",
+        },
+        1: "not-valid-json-object-key",
+    }
+
+    with pytest.raises(
+        TypeError,
+        match="keys must be strings",
+    ):
+        record(
+            generation=generation
+        )
