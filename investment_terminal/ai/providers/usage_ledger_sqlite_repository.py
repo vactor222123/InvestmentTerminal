@@ -23,6 +23,24 @@ from investment_terminal.ai.providers.usage_ledger_summary import (
 from investment_terminal.utils.validation import normalize_required_text
 
 
+class _ExactDecimalSum:
+    """SQLite aggregate that preserves Decimal text semantics exactly."""
+
+    def __init__(self) -> None:
+        self._total = Decimal("0")
+
+    def step(
+        self,
+        value: str | None,
+    ) -> None:
+        if value is None:
+            return
+        self._total += Decimal(value)
+
+    def finalize(self) -> str:
+        return str(self._total)
+
+
 class SQLiteGroundedProviderUsageCostLedgerRepository(
     GroundedProviderUsageCostLedgerRepository
 ):
@@ -32,26 +50,44 @@ class SQLiteGroundedProviderUsageCostLedgerRepository(
         self,
         store: GroundedProviderUsageCostLedgerSQLiteStore,
     ) -> None:
-        if not isinstance(store, GroundedProviderUsageCostLedgerSQLiteStore):
+        if not isinstance(
+            store,
+            GroundedProviderUsageCostLedgerSQLiteStore,
+        ):
             raise TypeError(
                 "store must be a GroundedProviderUsageCostLedgerSQLiteStore"
             )
         self.store = store
 
-    def add(self, record):
-        if not isinstance(record, GroundedProviderUsageCostLedgerRecord):
+    def add(
+        self,
+        record: GroundedProviderUsageCostLedgerRecord,
+    ) -> GroundedProviderUsageCostLedgerRecord:
+        if not isinstance(
+            record,
+            GroundedProviderUsageCostLedgerRecord,
+        ):
             raise TypeError(
                 "record must be a GroundedProviderUsageCostLedgerRecord"
             )
+
         self.store.initialize()
+
         try:
             with self.store.transaction() as connection:
                 connection.execute(
                     """
                     INSERT INTO provider_usage_cost_ledger (
-                        request_id, provider_identity, model_identity,
-                        input_tokens, output_tokens, total_tokens,
-                        currency, input_cost, output_cost, total_cost,
+                        request_id,
+                        provider_identity,
+                        model_identity,
+                        input_tokens,
+                        output_tokens,
+                        total_tokens,
+                        currency,
+                        input_cost,
+                        output_cost,
+                        total_cost,
                         recorded_at
                     )
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -75,13 +111,18 @@ class SQLiteGroundedProviderUsageCostLedgerRepository(
                 "Provider usage/cost ledger request identity already exists "
                 "or record violates repository constraints"
             ) from exc
+
         return record
 
-    def get(self, request_id):
+    def get(
+        self,
+        request_id: str,
+    ) -> GroundedProviderUsageCostLedgerRecord | None:
         normalized_id = normalize_required_text(
             request_id,
             field_name="request_id",
         )
+
         self.store.initialize()
         with self.store.connect() as connection:
             row = connection.execute(
@@ -90,25 +131,40 @@ class SQLiteGroundedProviderUsageCostLedgerRepository(
                 FROM provider_usage_cost_ledger
                 WHERE request_id = ?
                 """,
-                (normalized_id,),
+                (
+                    normalized_id,
+                ),
             ).fetchone()
+
         if row is None:
             return None
+
         return self._from_row(row)
 
-    def list_all(self):
+    def list_all(
+        self,
+    ) -> tuple[GroundedProviderUsageCostLedgerRecord, ...]:
         self.store.initialize()
         with self.store.connect() as connection:
             rows = connection.execute(
                 """
                 SELECT *
                 FROM provider_usage_cost_ledger
-                ORDER BY recorded_at, request_id
+                ORDER BY
+                    recorded_at,
+                    request_id
                 """
             ).fetchall()
-        return tuple(self._from_row(row) for row in rows)
 
-    def list_recent(self, limit):
+        return tuple(
+            self._from_row(row)
+            for row in rows
+        )
+
+    def list_recent(
+        self,
+        limit: int,
+    ) -> tuple[GroundedProviderUsageCostLedgerRecord, ...]:
         validated_limit = _validate_limit(limit)
         self.store.initialize()
         with self.store.connect() as connection:
@@ -116,14 +172,26 @@ class SQLiteGroundedProviderUsageCostLedgerRepository(
                 """
                 SELECT *
                 FROM provider_usage_cost_ledger
-                ORDER BY recorded_at DESC, request_id DESC
+                ORDER BY
+                    recorded_at DESC,
+                    request_id DESC
                 LIMIT ?
                 """,
-                (validated_limit,),
+                (
+                    validated_limit,
+                ),
             ).fetchall()
-        return tuple(self._from_row(row) for row in rows)
 
-    def list_between(self, started_at, ended_at):
+        return tuple(
+            self._from_row(row)
+            for row in rows
+        )
+
+    def list_between(
+        self,
+        started_at: datetime,
+        ended_at: datetime,
+    ) -> tuple[GroundedProviderUsageCostLedgerRecord, ...]:
         start = _validate_aware_datetime(
             started_at,
             field_name="started_at",
@@ -136,6 +204,7 @@ class SQLiteGroundedProviderUsageCostLedgerRepository(
             raise ValueError(
                 "ended_at must be later than started_at"
             )
+
         self.store.initialize()
         with self.store.connect() as connection:
             rows = connection.execute(
@@ -144,20 +213,31 @@ class SQLiteGroundedProviderUsageCostLedgerRepository(
                 FROM provider_usage_cost_ledger
                 WHERE recorded_at >= ?
                   AND recorded_at < ?
-                ORDER BY recorded_at, request_id
+                ORDER BY
+                    recorded_at,
+                    request_id
                 """,
                 (
                     start.isoformat(),
                     end.isoformat(),
                 ),
             ).fetchall()
-        return tuple(self._from_row(row) for row in rows)
+
+        return tuple(
+            self._from_row(row)
+            for row in rows
+        )
 
     def summarize(
         self,
     ) -> GroundedProviderUsageCostLedgerSummary:
         self.store.initialize()
         with self.store.connect() as connection:
+            connection.create_aggregate(
+                "exact_decimal_sum",
+                1,
+                _ExactDecimalSum,
+            )
             rows = connection.execute(
                 """
                 SELECT
@@ -165,21 +245,12 @@ class SQLiteGroundedProviderUsageCostLedgerRepository(
                     COUNT(*) AS request_count,
                     COALESCE(SUM(input_tokens), 0) AS input_tokens,
                     COALESCE(SUM(output_tokens), 0) AS output_tokens,
-                    COALESCE(SUM(total_tokens), 0) AS total_tokens
+                    COALESCE(SUM(total_tokens), 0) AS total_tokens,
+                    exact_decimal_sum(input_cost) AS input_cost,
+                    exact_decimal_sum(output_cost) AS output_cost,
+                    exact_decimal_sum(total_cost) AS total_cost
                 FROM provider_usage_cost_ledger
                 GROUP BY currency
-                ORDER BY currency
-                """
-            ).fetchall()
-
-            cost_rows = connection.execute(
-                """
-                SELECT
-                    currency,
-                    input_cost,
-                    output_cost,
-                    total_cost
-                FROM provider_usage_cost_ledger
                 ORDER BY currency
                 """
             ).fetchall()
@@ -208,22 +279,15 @@ class SQLiteGroundedProviderUsageCostLedgerRepository(
             input_tokens=int(row["input_tokens"]),
             output_tokens=int(row["output_tokens"]),
             total_tokens=int(row["total_tokens"]),
-            input_cost=sum(
-                (Decimal(r["input_cost"]) for r in cost_rows),
-                Decimal("0"),
-            ),
-            output_cost=sum(
-                (Decimal(r["output_cost"]) for r in cost_rows),
-                Decimal("0"),
-            ),
-            total_cost=sum(
-                (Decimal(r["total_cost"]) for r in cost_rows),
-                Decimal("0"),
-            ),
+            input_cost=Decimal(row["input_cost"]),
+            output_cost=Decimal(row["output_cost"]),
+            total_cost=Decimal(row["total_cost"]),
         )
 
     @staticmethod
-    def _from_row(row):
+    def _from_row(
+        row: sqlite3.Row,
+    ) -> GroundedProviderUsageCostLedgerRecord:
         return GroundedProviderUsageCostLedgerRecord(
             request_id=row["request_id"],
             provider_identity=row["provider_identity"],
