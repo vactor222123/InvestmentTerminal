@@ -44,11 +44,20 @@ def config_for(
     )
 
 
+def prepare_databases(
+    database: Path,
+) -> None:
+    database.write_bytes(b"")
+    database.with_name(
+        "provider_usage_cost.db"
+    ).write_bytes(b"")
+
+
 def test_readiness_is_ready_with_database_and_credentials(
     tmp_path: Path,
 ) -> None:
     database = tmp_path / "knowledge.db"
-    database.write_bytes(b"")
+    prepare_databases(database)
 
     assessment = GroundedAIServerReadinessService(
         config=config_for(database),
@@ -62,6 +71,7 @@ def test_readiness_is_ready_with_database_and_credentials(
         "status": "READY",
         "checks": {
             "knowledge_database": "READY",
+            "provider_usage_cost_database": "READY",
             "provider_credentials": "READY",
         },
     }
@@ -71,7 +81,7 @@ def test_readiness_fails_without_credentials(
     tmp_path: Path,
 ) -> None:
     database = tmp_path / "knowledge.db"
-    database.write_bytes(b"")
+    prepare_databases(database)
 
     assessment = GroundedAIServerReadinessService(
         config=config_for(database),
@@ -89,6 +99,9 @@ def test_readiness_fails_if_database_disappears(
     tmp_path: Path,
 ) -> None:
     database = tmp_path / "knowledge.db"
+    database.with_name(
+        "provider_usage_cost.db"
+    ).write_bytes(b"")
 
     assessment = GroundedAIServerReadinessService(
         config=config_for(database),
@@ -100,5 +113,25 @@ def test_readiness_fails_if_database_disappears(
     assert not assessment.ready
     assert (
         assessment.checks["knowledge_database"]
+        == "NOT_READY"
+    )
+
+
+def test_readiness_fails_if_usage_cost_database_is_missing(
+    tmp_path: Path,
+) -> None:
+    database = tmp_path / "knowledge.db"
+    database.write_bytes(b"")
+
+    assessment = GroundedAIServerReadinessService(
+        config=config_for(database),
+        environment={
+            DEFAULT_OPENAI_API_KEY_ENV: "secret",
+        },
+    ).check()
+
+    assert not assessment.ready
+    assert (
+        assessment.checks["provider_usage_cost_database"]
         == "NOT_READY"
     )

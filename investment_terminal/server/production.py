@@ -22,10 +22,12 @@ def create_app(environment: Mapping[str, str] | None = None) -> FastAPI:
     source = environment if environment is not None else os.environ
     config = GroundedAIServerRuntimeConfig.from_environment(source)
 
+    ledger_store = GroundedProviderUsageCostLedgerSQLiteStore(
+        config.usage_cost_ledger_database
+    )
+    ledger_store.initialize()
     ledger_repository = SQLiteGroundedProviderUsageCostLedgerRepository(
-        GroundedProviderUsageCostLedgerSQLiteStore(
-            config.usage_cost_ledger_database
-        )
+        ledger_store
     )
     handler = build_live_grounded_ai_http_handler(
         database=config.database, model_identity=config.model_identity, timeout_seconds=config.timeout_seconds,

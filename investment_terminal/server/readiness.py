@@ -63,6 +63,11 @@ class GroundedAIServerReadinessService:
             if self._config.database.is_file()
             else "NOT_READY"
         )
+        ledger_status = (
+            "READY"
+            if self._config.usage_cost_ledger_database.is_file()
+            else "NOT_READY"
+        )
 
         secret = self._environment.get(
             self._config.api_key_environment_variable,
@@ -77,6 +82,7 @@ class GroundedAIServerReadinessService:
 
         checks = {
             "knowledge_database": database_status,
+            "provider_usage_cost_database": ledger_status,
             "provider_credentials": credential_status,
         }
         status = (

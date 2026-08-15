@@ -61,11 +61,16 @@ def readiness(
     *,
     secret: str | None,
 ):
+    ledger_database = database.with_name(
+        "provider_usage_cost.db"
+    )
+    ledger_database.write_bytes(b"")
+
     config = GroundedAIServerRuntimeConfig.from_environment(
         {
             DATABASE_ENV: str(database),
             USAGE_COST_LEDGER_DATABASE_ENV: str(
-                database.with_name("provider_usage_cost.db")
+                ledger_database
             ),
             MODEL_ENV: "gpt-test",
             ALLOWED_MODELS_ENV: "gpt-test",

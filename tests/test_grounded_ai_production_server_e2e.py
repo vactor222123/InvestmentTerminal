@@ -112,6 +112,7 @@ def test_production_server_runtime_e2e(
         "status": "READY",
         "checks": {
             "knowledge_database": "READY",
+            "provider_usage_cost_database": "READY",
             "provider_credentials": "READY",
         },
     }
@@ -222,6 +223,7 @@ def test_production_server_runtime_e2e_readiness_fails_closed(
         "status": "NOT_READY",
         "checks": {
             "knowledge_database": "NOT_READY",
+            "provider_usage_cost_database": "READY",
             "provider_credentials": "NOT_READY",
         },
     }

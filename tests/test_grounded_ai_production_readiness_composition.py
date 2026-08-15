@@ -87,6 +87,10 @@ def test_production_factory_wires_readiness_service(
     assert isinstance(app, FakeApp)
     assert isinstance(calls["handler"], FakeHandler)
     assert calls["readiness_service"] is not None
+    assert database.with_name("provider_usage_cost.db").is_file()
+    assert calls["readiness_service"].check().checks[
+        "provider_usage_cost_database"
+    ] == "READY"
     assert calls["authenticator"].authenticate("server-secret")
     assert calls["request_limit_policy"].max_body_bytes == 65536
     assert isinstance(
