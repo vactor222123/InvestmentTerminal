@@ -94,8 +94,10 @@ investment_terminal/cli/compare_history.py
 investment_terminal/cli/current_portfolio.py
 investment_terminal/cli/grounded_ai.py
 investment_terminal/cli/grounded_ai_live.py
+investment_terminal/cli/history_knowledge.py
 investment_terminal/cli/import_history.py
 investment_terminal/cli/import_portfolio_holdings.py
+investment_terminal/cli/ingest_history_knowledge.py
 investment_terminal/cli/investment_review_package.py
 investment_terminal/cli/knowledge.py
 investment_terminal/cli/methodology_outcome_history.py
@@ -216,6 +218,7 @@ investment_terminal/indicators/volatility.py
 investment_terminal/knowledge/__init__.py
 investment_terminal/knowledge/comparison.py
 investment_terminal/knowledge/envelope.py
+investment_terminal/knowledge/ingestion.py
 investment_terminal/knowledge/models.py
 investment_terminal/knowledge/projection.py
 investment_terminal/knowledge/provenance.py
@@ -504,6 +507,10 @@ tests/test_historical_timeline_builder.py
 tests/test_historical_timeline_models.py
 tests/test_historical_timeline_repository.py
 tests/test_historical_trading_session_window.py
+tests/test_history_knowledge_batch_ingestion.py
+tests/test_history_knowledge_cli_composition.py
+tests/test_history_knowledge_real_e2e.py
+tests/test_history_knowledge_source_adapter.py
 tests/test_history_real_e2e.py
 tests/test_import_history_cli.py
 tests/test_indicator_modules.py
@@ -513,6 +520,7 @@ tests/test_knowledge_cli.py
 tests/test_knowledge_comparison.py
 tests/test_knowledge_e2e.py
 tests/test_knowledge_envelope.py
+tests/test_knowledge_ingestion.py
 tests/test_knowledge_models.py
 tests/test_knowledge_projection.py
 tests/test_knowledge_provenance.py
