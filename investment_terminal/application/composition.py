@@ -3,13 +3,16 @@ Application composition root for live grounded AI.
 
 This module owns infrastructure construction for the grounded AI application:
 Knowledge SQLite query, provider generation composition, and concrete
-application service assembly. CLI and future HTTP adapters depend on this
-single composition boundary.
+application service assembly. CLI and HTTP adapters depend on this single
+composition boundary.
 """
 
 from decimal import Decimal
 from pathlib import Path
 
+from investment_terminal.ai.generation_recording import (
+    GroundedGenerationRecordingService,
+)
 from investment_terminal.ai.providers.composition import (
     DEFAULT_OPENAI_API_KEY_ENV,
     build_openai_grounded_generation_service,
@@ -51,6 +54,9 @@ def build_live_grounded_ai_application(
     api_key_environment_variable: str = DEFAULT_OPENAI_API_KEY_ENV,
     pricing_policy: GroundedProviderPricingPolicy | None = None,
     budget_policy: GroundedProviderBudgetPolicy | None = None,
+    generation_recording_service: (
+        GroundedGenerationRecordingService | None
+    ) = None,
 ) -> LiveGroundedAIApplicationService:
     if not isinstance(
         database,
@@ -79,18 +85,10 @@ def build_live_grounded_ai_application(
             max_retries=max_retries,
             governance_policy=governance_policy,
             max_output_tokens=requested_max_output_tokens,
-            retry_initial_delay_seconds=(
-                retry_initial_delay_seconds
-            ),
-            retry_delay_multiplier=(
-                retry_delay_multiplier
-            ),
-            retry_maximum_delay_seconds=(
-                retry_maximum_delay_seconds
-            ),
-            api_key_environment_variable=(
-                api_key_environment_variable
-            ),
+            retry_initial_delay_seconds=retry_initial_delay_seconds,
+            retry_delay_multiplier=retry_delay_multiplier,
+            retry_maximum_delay_seconds=retry_maximum_delay_seconds,
+            api_key_environment_variable=api_key_environment_variable,
         )
     )
 
@@ -99,7 +97,6 @@ def build_live_grounded_ai_application(
         generation_service=generation_service,
         pricing_policy=pricing_policy,
         budget_policy=budget_policy,
-        requested_max_output_tokens=(
-            requested_max_output_tokens
-        ),
+        requested_max_output_tokens=requested_max_output_tokens,
+        generation_recording_service=generation_recording_service,
     )

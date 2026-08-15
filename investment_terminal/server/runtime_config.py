@@ -16,6 +16,7 @@ from investment_terminal.ai.providers.pricing import (
 
 DATABASE_ENV = "INVESTMENT_TERMINAL_KNOWLEDGE_DATABASE"
 USAGE_COST_LEDGER_DATABASE_ENV = "INVESTMENT_TERMINAL_PROVIDER_USAGE_COST_DATABASE"
+GROUNDED_GENERATION_DATABASE_ENV = "INVESTMENT_TERMINAL_GROUNDED_GENERATION_DATABASE"
 MODEL_ENV = "INVESTMENT_TERMINAL_OPENAI_MODEL"
 ALLOWED_MODELS_ENV = "INVESTMENT_TERMINAL_ALLOWED_OPENAI_MODELS"
 TIMEOUT_ENV = "INVESTMENT_TERMINAL_PROVIDER_TIMEOUT_SECONDS"
@@ -44,6 +45,7 @@ DEFAULT_RATE_LIMIT_REFILL_PER_SECOND = Decimal("1")
 class GroundedAIServerRuntimeConfig:
     database: Path
     usage_cost_ledger_database: Path
+    grounded_generation_database: Path
     model_identity: str
     allowed_models: tuple[str, ...]
     timeout_seconds: float
@@ -66,6 +68,17 @@ class GroundedAIServerRuntimeConfig:
         database = Path(_required(environment, DATABASE_ENV))
         usage_cost_ledger_database = Path(
             _required(environment, USAGE_COST_LEDGER_DATABASE_ENV)
+        )
+        configured_generation_database = environment.get(
+            GROUNDED_GENERATION_DATABASE_ENV,
+            "",
+        ).strip()
+        grounded_generation_database = (
+            Path(configured_generation_database)
+            if configured_generation_database
+            else usage_cost_ledger_database.with_name(
+                "grounded_generations.db"
+            )
         )
         model_identity = _required(environment, MODEL_ENV)
         allowed_models = _csv_required(environment, ALLOWED_MODELS_ENV)
@@ -130,6 +143,7 @@ class GroundedAIServerRuntimeConfig:
         return cls(
             database=database,
             usage_cost_ledger_database=usage_cost_ledger_database,
+            grounded_generation_database=grounded_generation_database,
             model_identity=model_identity,
             allowed_models=allowed_models,
             timeout_seconds=timeout_seconds,

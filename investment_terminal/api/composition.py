@@ -3,6 +3,9 @@
 from decimal import Decimal
 from pathlib import Path
 
+from investment_terminal.ai.generation_recording import (
+    GroundedGenerationRecordingService,
+)
 from investment_terminal.ai.providers.composition import DEFAULT_OPENAI_API_KEY_ENV
 from investment_terminal.ai.providers.governance import GroundedProviderGovernancePolicy
 from investment_terminal.ai.providers.guardrails import GroundedProviderBudgetPolicy
@@ -20,6 +23,7 @@ def build_live_grounded_ai_http_handler(
     retry_maximum_delay_seconds: Decimal | None = None, api_key_environment_variable: str = DEFAULT_OPENAI_API_KEY_ENV,
     pricing_policy: GroundedProviderPricingPolicy | None = None, budget_policy: GroundedProviderBudgetPolicy | None = None,
     usage_cost_recording_service: GroundedProviderUsageCostLedgerRecordingService | None = None,
+    generation_recording_service: GroundedGenerationRecordingService | None = None,
 ) -> GroundedAIHTTPHandler:
     application = build_live_grounded_ai_application(
         database=database, model_identity=model_identity, timeout_seconds=timeout_seconds, max_retries=max_retries,
@@ -27,6 +31,7 @@ def build_live_grounded_ai_http_handler(
         retry_initial_delay_seconds=retry_initial_delay_seconds, retry_delay_multiplier=retry_delay_multiplier,
         retry_maximum_delay_seconds=retry_maximum_delay_seconds, api_key_environment_variable=api_key_environment_variable,
         pricing_policy=pricing_policy, budget_policy=budget_policy,
+        generation_recording_service=generation_recording_service,
     )
     if usage_cost_recording_service is not None:
         application = UsageCostRecordingGroundedAIApplicationService(

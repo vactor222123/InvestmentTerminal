@@ -1,8 +1,18 @@
 import os
 from collections.abc import Mapping
+from datetime import datetime, timezone
 
 from fastapi import FastAPI
 
+from investment_terminal.ai.generation_recording import (
+    GroundedGenerationRecordingService,
+)
+from investment_terminal.ai.generation_sqlite_repository import (
+    SQLiteGroundedGenerationRepository,
+)
+from investment_terminal.ai.generation_sqlite_store import (
+    GroundedGenerationSQLiteStore,
+)
 from investment_terminal.ai.providers.usage_ledger_recording import GroundedProviderUsageCostLedgerRecordingService
 from investment_terminal.ai.providers.usage_ledger_sqlite_repository import SQLiteGroundedProviderUsageCostLedgerRepository
 from investment_terminal.ai.providers.usage_ledger_sqlite_store import GroundedProviderUsageCostLedgerSQLiteStore
@@ -18,6 +28,12 @@ from investment_terminal.server.request_limits import GroundedAIServerRequestLim
 from investment_terminal.server.runtime_config import GroundedAIServerRuntimeConfig
 
 
+def _utc_now() -> datetime:
+    return datetime.now(
+        timezone.utc
+    )
+
+
 def create_app(environment: Mapping[str, str] | None = None) -> FastAPI:
     source = environment if environment is not None else os.environ
     config = GroundedAIServerRuntimeConfig.from_environment(source)
@@ -29,6 +45,15 @@ def create_app(environment: Mapping[str, str] | None = None) -> FastAPI:
     ledger_repository = SQLiteGroundedProviderUsageCostLedgerRepository(
         ledger_store
     )
+
+    generation_store = GroundedGenerationSQLiteStore(
+        config.grounded_generation_database
+    )
+    generation_store.initialize()
+    generation_repository = SQLiteGroundedGenerationRepository(
+        generation_store
+    )
+
     handler = build_live_grounded_ai_http_handler(
         database=config.database, model_identity=config.model_identity, timeout_seconds=config.timeout_seconds,
         max_retries=config.max_retries, governance_policy=config.governance_policy(),
@@ -36,6 +61,10 @@ def create_app(environment: Mapping[str, str] | None = None) -> FastAPI:
         api_key_environment_variable=config.api_key_environment_variable, pricing_policy=config.pricing_policy(),
         budget_policy=config.budget_policy(),
         usage_cost_recording_service=GroundedProviderUsageCostLedgerRecordingService(repository=ledger_repository),
+        generation_recording_service=GroundedGenerationRecordingService(
+            repository=generation_repository,
+            clock=_utc_now,
+        ),
     )
 
     readiness_service = GroundedAIServerReadinessService(config=config, environment=source)
