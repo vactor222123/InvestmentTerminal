@@ -5,40 +5,41 @@
 ```text
 vactor222123/InvestmentTerminal
 branch: develop
-baseline: 3745ead
+baseline: cffc060
 ```
 
 ## Current Phase
 
 ```text
-Sprint 27 CLOSED
-Post-Sprint-27 review in progress
-Sprint 28 not started
+Sprint 28 IMPLEMENTATION COMPLETE
+Sprint 28 closure reconciliation in progress
+Sprint 29 not started
 ```
 
-Sprint 27 — Explicit History-to-Knowledge Ingestion — is complete.
+Sprint 28 — Persistent Provider Usage & Cost Ledger — is implemented.
 
-## Sprint 27 Delivered
+## Sprint 28 Delivered
 
 Implemented:
 
-- CLI-boundary adapter from verified History metadata to neutral Knowledge input;
-- deterministic Knowledge ingestion service;
-- exact re-ingestion idempotency;
-- fail-closed identity/version conflict semantics;
-- explicit immutable Knowledge versioning;
-- deterministic verified History batch ingestion;
-- real History SQLite → Knowledge SQLite CLI composition;
-- archived Review Package → History import → Knowledge SQLite E2E;
-- archive checksum/evidence identity preservation;
-- mandatory operational scope through repeatable `--snapshot-id` or explicit `--all`;
-- `--dry-run` projection validation without Knowledge database mutation;
-- duplicate explicit snapshot IDs rejected fail-closed.
+- immutable provider usage/cost ledger record;
+- provider-neutral repository contract;
+- in-memory reference repository;
+- dedicated SQLite schema/store;
+- SQLite repository;
+- exact Decimal cost persistence without float conversion;
+- recording service over observed usage + deterministic pricing result;
+- production application composition;
+- immutable duplicate request rejection;
+- deterministic chronological/request-id ordering;
+- read-only operational CLI;
+- exact summary aggregation;
+- real SQLite persistence/reopen E2E.
 
-Canonical ingestion CLI:
+Canonical operational CLI:
 
 ```text
-python -m investment_terminal.cli.ingest_history_knowledge
+python -m investment_terminal.cli.provider_usage_cost
 ```
 
 ## Stable Authority Hierarchy
@@ -53,11 +54,8 @@ Archived Review Package
 → Production Server
 ```
 
-History remains the canonical archived-evidence boundary.
-
-Knowledge does not import the History package.
-
-Cross-domain History → Knowledge translation remains in the CLI composition layer.
+Provider usage/cost ledger is an operational accounting boundary. It is not
+canonical History, Knowledge, or investment evidence.
 
 ## Current System Foundation
 
@@ -99,12 +97,14 @@ Implemented:
 - provider/model governance;
 - bounded retry/resilience;
 - Retry-After behavior;
-- usage accounting;
+- deterministic usage accounting;
 - deterministic pricing/cost accounting;
 - output-token limits;
 - total-token budget;
 - total-cost budget;
-- canonical production composition of economic controls.
+- persistent immutable successful usage/cost ledger;
+- read-only usage/cost operational CLI;
+- production composition of economic controls and ledger recording.
 
 ### Application / API
 
@@ -114,7 +114,8 @@ Implemented:
 - normalized application errors;
 - framework-neutral API contracts;
 - deterministic HTTP mapping;
-- framework-neutral HTTP handler.
+- framework-neutral HTTP handler;
+- successful priced usage/cost recording decorator.
 
 ### Production Server
 
@@ -132,7 +133,8 @@ Implemented:
 - Uvicorn CLI;
 - process-local inbound rate limiting;
 - safe rate-limit response metadata;
-- fail-closed single-worker constraint.
+- fail-closed single-worker constraint;
+- persistent provider usage/cost accounting.
 
 ## Intentional Current Limitations
 
@@ -144,7 +146,6 @@ Still deferred:
 - TLS termination/HSTS deployment policy;
 - authorization beyond API-key authentication;
 - streaming grounded-AI responses;
-- persistent provider usage/cost ledger;
 - provider request/response persistence;
 - grounded answer persistence/history;
 - vector retrieval/embeddings;
@@ -167,9 +168,8 @@ NEXT_STEPS.md
 ## Next Step
 
 ```text
-Post-Sprint-27 review
-→ reconcile repository inventory
-→ select Sprint 28
+Sprint 28 closure reconciliation
+→ exact tracked-file inventory reconciliation
+→ post-Sprint-28 architecture/product review
+→ select Sprint 29
 ```
-
-Sprint 28 must not begin until current-state documentation and tracked-file inventory are reconciled.

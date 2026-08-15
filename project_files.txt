@@ -76,6 +76,11 @@ investment_terminal/ai/providers/pricing.py
 investment_terminal/ai/providers/retry_delay.py
 investment_terminal/ai/providers/sleeper.py
 investment_terminal/ai/providers/transport.py
+investment_terminal/ai/providers/usage_ledger.py
+investment_terminal/ai/providers/usage_ledger_recording.py
+investment_terminal/ai/providers/usage_ledger_repository.py
+investment_terminal/ai/providers/usage_ledger_sqlite_repository.py
+investment_terminal/ai/providers/usage_ledger_sqlite_store.py
 investment_terminal/ai/response_parser.py
 investment_terminal/ai/validation.py
 investment_terminal/api/__init__.py
@@ -88,6 +93,7 @@ investment_terminal/application/composition.py
 investment_terminal/application/errors.py
 investment_terminal/application/grounded_ai.py
 investment_terminal/application/live_grounded_ai.py
+investment_terminal/application/usage_ledger.py
 investment_terminal/cli/__init__.py
 investment_terminal/cli/archive_review_package.py
 investment_terminal/cli/compare_history.py
@@ -105,6 +111,7 @@ investment_terminal/cli/outcome_history.py
 investment_terminal/cli/outcome_research.py
 investment_terminal/cli/portfolio_audit.py
 investment_terminal/cli/portfolio_ranking.py
+investment_terminal/cli/provider_usage_cost.py
 investment_terminal/cli/query_history.py
 investment_terminal/cli/replay_history.py
 investment_terminal/cli/repository_privacy_audit.py
@@ -572,6 +579,14 @@ tests/test_provider_retry_delay_serialization_compatibility.py
 tests/test_provider_retry_execution.py
 tests/test_provider_usage_accounting.py
 tests/test_provider_usage_audit_cli.py
+tests/test_provider_usage_cost_cli.py
+tests/test_provider_usage_cost_ledger_application_recording.py
+tests/test_provider_usage_cost_ledger_models.py
+tests/test_provider_usage_cost_ledger_real_e2e.py
+tests/test_provider_usage_cost_ledger_recording.py
+tests/test_provider_usage_cost_ledger_repository.py
+tests/test_provider_usage_cost_ledger_sqlite_repository.py
+tests/test_provider_usage_cost_ledger_sqlite_store.py
 tests/test_query_history_cli.py
 tests/test_quote_repository.py
 tests/test_ranking_engine.py

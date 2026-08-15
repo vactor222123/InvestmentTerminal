@@ -1,36 +1,49 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ 3745ead`  
-**Status:** Sprint 27 closed; post-Sprint-27 review in progress.
+**Current baseline:** `develop @ cffc060`  
+**Status:** Sprint 28 implementation complete; closure reconciliation in progress.
 
-## Sprint 27 Closure
+## Sprint 28 Closure
 
-Explicit verified History-to-Knowledge ingestion is complete through:
+Persistent provider usage/cost accounting is implemented through an immutable,
+provider-neutral ledger backed by SQLite.
+
+Operational inspection:
 
 ```text
-python -m investment_terminal.cli.ingest_history_knowledge
+python -m investment_terminal.cli.provider_usage_cost
 ```
 
-Operational safeguards require deliberate `--snapshot-id` selection or explicit
-`--all`. `--dry-run` validates the same projection path without persistent
-Knowledge mutation.
+Commands:
+
+```text
+list
+show --request-id <request-id>
+summary
+```
+
+Production successful priced provider usage is durably recorded without changing
+History, Knowledge, grounding, or provider execution authority.
 
 ## Immediate Next Steps
 
 ```text
-1. Reconcile project_files.txt with the exact tracked repository.
-2. Complete post-Sprint-27 product-boundary review.
-3. Select Sprint 28 from current product needs and deferred scope.
-4. Begin Sprint 28 only from the reconciled baseline.
+1. Reconcile canonical Sprint 28 documentation.
+2. Reconcile project_files.txt with exact git ls-files output.
+3. Run the full regression suite.
+4. Commit the Sprint 28 closure baseline.
+5. Perform focused post-Sprint-28 architecture/product review.
+6. Select Sprint 29 only from the reconciled baseline.
 ```
 
-Candidate areas remain:
+Remaining candidate areas include:
 
 - automatic/scheduled History-to-Knowledge ingestion;
 - deployment/infrastructure hardening;
-- persistent provider usage/cost accounting;
 - grounded answer persistence/history;
-- retrieval expansion.
+- provider request/response persistence;
+- retrieval expansion;
+- distributed rate-limit state.
 
 The review must preserve:
 
@@ -41,4 +54,5 @@ Archived Review Package
 → Grounded AI
 ```
 
-and must not move History dependencies into Knowledge/application domain code.
+Provider usage/cost ledger data remains operational accounting, not canonical
+historical investment evidence.

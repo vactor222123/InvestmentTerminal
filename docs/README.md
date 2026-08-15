@@ -1,15 +1,16 @@
 # Investment Terminal
 
-> A private, local-first investment intelligence platform built around deterministic analysis, preserved evidence, traceable Knowledge, and evidence-grounded AI assistance.
+> A private, local-first investment intelligence platform built around deterministic analysis, preserved evidence, traceable Knowledge, evidence-grounded AI assistance, and explicit operational accounting.
 
 **Status:** Active development  
-**Latest completed milestone:** Sprint 27 — Explicit History-to-Knowledge Ingestion  
-**Current phase:** Sprint 27 closed; post-Sprint-27 review in progress  
+**Latest completed implementation milestone:** Sprint 28 — Persistent Provider Usage & Cost Ledger  
+**Current phase:** Sprint 28 closure reconciliation  
 **Primary language:** Python
 
 ## Overview
 
-Investment Terminal is a modular monolith for long-term investment analysis and disciplined review workflows.
+Investment Terminal is a modular monolith for long-term investment analysis and
+disciplined review workflows.
 
 Established capability layers include:
 
@@ -26,55 +27,50 @@ Current-State Analysis
 → Production Server
 ```
 
-The central engineering rule is:
-
-> Preserve verified evidence before interpretation, keep important calculations deterministic, and make conclusions traceable to their inputs.
-
-## Sprint 27
-
-Sprint 27 added an explicit, deterministic ingestion boundary from verified History into Knowledge.
-
-Canonical command:
+A parallel operational accounting stream now exists:
 
 ```text
-python -m investment_terminal.cli.ingest_history_knowledge
+successful priced provider usage
+→ immutable provider usage/cost ledger
 ```
 
-Operational scope is mandatory:
+That ledger is operational evidence only. It does not become canonical History or
+Knowledge.
+
+## Sprint 28
+
+Sprint 28 adds durable provider usage/cost accounting while preserving existing
+provider, grounding, application, History, and Knowledge boundaries.
+
+Implemented:
+
+- immutable ledger record;
+- repository contract;
+- SQLite store and repository;
+- exact Decimal persistence;
+- recording service;
+- production composition;
+- read-only operational CLI;
+- deterministic summaries;
+- real persistence E2E.
+
+Operational CLI:
 
 ```text
---snapshot-id <UUID>
+python -m investment_terminal.cli.provider_usage_cost
 ```
 
-which may be repeated for an explicit batch, or:
+Commands:
 
 ```text
---all
+list
+show --request-id <request-id>
+summary
 ```
-
-for deliberate full-History selection.
-
-A non-persistent validation run uses:
-
-```text
---dry-run
-```
-
-The ingestion path preserves History/Knowledge domain separation:
-
-```text
-History models
-→ CLI composition adapter
-→ HistoricalSnapshotKnowledgeSource
-→ Knowledge projection
-→ Knowledge repository
-```
-
-Knowledge itself does not import the History package.
 
 ## Historical Evidence
 
-Canonical historical authority:
+Canonical historical authority remains:
 
 ```text
 Review Package
@@ -83,13 +79,12 @@ Review Package
 → verified/rebuildable SQLite History
 ```
 
-Archived JSON remains canonical evidence. SQLite History is a rebuildable query projection.
-
-Sprint 27 Knowledge records preserve exact snapshot evidence identity and archive checksum provenance.
+Archived JSON remains canonical historical evidence. Provider operational
+accounting does not alter this hierarchy.
 
 ## Grounded AI
 
-Grounded AI continues downstream of Knowledge:
+Grounded AI remains downstream of Knowledge:
 
 ```text
 Knowledge
@@ -101,7 +96,7 @@ Knowledge
 → admissible grounded generation
 ```
 
-Provider output is not canonical historical evidence.
+Successful priced usage can then be persisted to the provider usage/cost ledger.
 
 ## Production Surface
 
@@ -126,7 +121,8 @@ POST /v1/grounded-ai
 GET  /openapi.json
 ```
 
-Production currently supports one worker because inbound rate-limit state is process-local.
+Production currently supports one worker because inbound rate-limit state is
+process-local.
 
 ## Provider Controls
 
@@ -138,7 +134,8 @@ Canonical production composition includes:
 - total-token budget;
 - total-cost budget;
 - explicit provider pricing policy;
-- usage/cost accounting;
+- deterministic usage/cost accounting;
+- persistent successful usage/cost ledger;
 - environment-backed provider credentials.
 
 ## Main Engineering Principles
@@ -168,8 +165,6 @@ docs/AI_CONTEXT.md
 docs/README.md
 ```
 
-Historical sprint plans/reviews remain supporting records rather than current architecture authority.
-
 ## Testing
 
 Full suite:
@@ -178,34 +173,32 @@ Full suite:
 python -m pytest -q
 ```
 
-Every focused change should retain a green full regression suite.
-
 ## Current Deferred Scope
 
 Not currently claimed:
 
 - automatic/scheduled History-to-Knowledge ingestion;
 - distributed/multi-worker rate-limit state;
+- deployment/infrastructure hardening;
 - autonomous trading;
 - broker execution;
 - streaming grounded-AI responses;
-- automatic provider pricing synchronization;
-- persistent provider usage/cost ledger;
+- provider pricing synchronization;
+- provider request/response persistence;
 - grounded answer persistence/history;
 - vector retrieval/embeddings.
 
 ## Current Phase
 
 ```text
-Sprint 27 CLOSED
-Post-Sprint-27 review IN PROGRESS
-Sprint 28 NOT STARTED
+Sprint 28 IMPLEMENTATION COMPLETE
+Sprint 28 closure reconciliation IN PROGRESS
+Sprint 29 NOT STARTED
 ```
-
-The next milestone will be selected only after current repository inventory and product boundaries are reviewed.
 
 ## Disclaimer
 
-Investment Terminal supports investment research and portfolio review. It does not provide financial advice.
+Investment Terminal supports investment research and portfolio review. It does
+not provide financial advice.
 
 All investment decisions remain the responsibility of the investor.

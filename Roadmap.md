@@ -1,7 +1,7 @@
 # Investment Terminal — Product Roadmap
 
 **Status:** Canonical Roadmap  
-**Updated after:** Sprint 27 — Explicit History-to-Knowledge Ingestion  
+**Updated after:** Sprint 28 — Persistent Provider Usage & Cost Ledger  
 **Current development branch:** `develop`
 
 ## Current Product Evolution
@@ -18,14 +18,15 @@ Foundation
 → Production API Runtime
 → Inbound Abuse Controls
 → Explicit History-to-Knowledge Ingestion
+→ Persistent Provider Usage & Cost Accounting
 ```
 
 ## Completed Milestones
 
 ### Sprint 19 — Knowledge Domain Foundation
 
-Immutable/versioned Knowledge records, traceable evidence references, deterministic
-projection/query/comparison, read-only CLI, and real E2E.
+Immutable/versioned Knowledge records, traceable evidence references,
+deterministic projection/query/comparison, read-only CLI, and real E2E.
 
 ### Sprint 20 — Evidence-Grounded AI Experience Foundation
 
@@ -46,22 +47,10 @@ hardened OpenAPI, canonical Uvicorn CLI, and deterministic inbound rate limiting
 
 ### Sprint 27 — Explicit History-to-Knowledge Ingestion
 
-Delivered:
-
-- neutral `HistoricalSnapshotKnowledgeSource` adaptation at the CLI composition
-  boundary without reversing the History dependency boundary;
-- deterministic Knowledge ingestion service;
-- exact re-ingestion idempotency with fail-closed identity/version conflicts;
-- explicit immutable Knowledge version semantics without auto-increment;
-- deterministic verified History batch ingestion;
-- real History SQLite → Knowledge SQLite CLI composition;
-- real archived Review Package → History import → Knowledge persistence E2E;
-- exact archive checksum/evidence identity preservation;
-- explicit operational scope through repeatable `--snapshot-id` or deliberate
-  `--all`;
-- `--dry-run` validation using the same projection semantics without creating or
-  mutating the target Knowledge database;
-- duplicate explicit snapshot selection rejected fail-closed.
+Delivered explicit verified History → Knowledge ingestion with deterministic
+batching, exact evidence/checksum preservation, real SQLite composition, real
+archive-to-Knowledge E2E, mandatory selection scope, idempotency, immutable
+version semantics, and dry-run operational validation.
 
 Canonical command:
 
@@ -69,23 +58,38 @@ Canonical command:
 python -m investment_terminal.cli.ingest_history_knowledge
 ```
 
-Operational scope is mandatory:
+### Sprint 28 — Persistent Provider Usage & Cost Ledger
+
+Delivered:
+
+- immutable provider-neutral usage/cost ledger record;
+- repository contract and in-memory reference implementation;
+- dedicated SQLite schema/store;
+- SQLite repository with exact Decimal text round-trip;
+- recording service over already-observed usage and deterministic cost;
+- production application composition for durable recording;
+- read-only operational CLI;
+- exact request identity and immutable duplicate rejection;
+- deterministic `(recorded_at, request_id)` ordering;
+- real SQLite close/reopen persistence E2E.
+
+Canonical operational CLI:
 
 ```text
---snapshot-id <UUID>
+python -m investment_terminal.cli.provider_usage_cost
 ```
 
-or:
+Supported read-only commands:
 
 ```text
---all
+list
+show --request-id <request-id>
+summary
 ```
 
-A non-persistent validation run uses:
-
-```text
---dry-run
-```
+The ledger records successful priced provider usage after application execution.
+It does not replace Grounded AI trace data and does not become canonical
+historical investment evidence.
 
 ## Stable Authority Hierarchy
 
@@ -95,15 +99,19 @@ Archived Review Package
 → explicit verified History-to-Knowledge ingestion
 → Knowledge
 → GroundedPromptInput
-→ untrusted GroundedModelResponse
-→ strict parser
+→ provider execution
 → grounding validation
 → ADMISSIBLE GroundedGenerationResult
 ```
 
-History remains the downstream evidence/query boundary for archived Review
-Packages. Knowledge does not import the History package. Cross-domain translation
-and operational composition are owned by the CLI composition layer.
+Provider operational accounting remains a parallel operational evidence stream:
+
+```text
+successful priced provider usage
+→ immutable usage/cost ledger
+```
+
+It must not be promoted into History or Knowledge authority.
 
 ## Production Server Status
 
@@ -129,8 +137,9 @@ GET  /openapi.json
 ```
 
 Production composition includes provider governance, explicit pricing,
-output-token limits, token/cost budgets, authentication, request-size
-enforcement, rate limiting, and sanitized HTTP error handling.
+output-token limits, token/cost budgets, persistent successful usage/cost
+recording, authentication, request-size enforcement, rate limiting, and
+sanitized HTTP error handling.
 
 ## Rate-Limit Runtime Contract
 
@@ -177,11 +186,10 @@ Still deferred:
 - additional provider adapters;
 - provider pricing synchronization;
 - cached-token/reasoning-token pricing differentiation;
-- persistent usage/cost ledger;
 - provider request/response persistence;
+- grounded answer persistence/history;
 - semantic entailment/contradiction detection;
 - vector retrieval/embeddings;
-- grounded answer persistence/history;
 - predictive confidence/effectiveness scoring;
 - causal inference;
 - autonomous portfolio actions;
@@ -189,17 +197,16 @@ Still deferred:
 
 ## Current Decision Point
 
-Sprint 27 implementation is complete.
+Sprint 28 implementation is complete.
 
-Frozen Sprint 27 baseline:
+Frozen Sprint 28 implementation baseline:
 
 ```text
-develop @ f95f023
+develop @ cffc060
 ```
 
-Before selecting Sprint 28, the repository should be reviewed against current
-product needs and deferred scope. Closed Sprint 27 semantics should not be
-reopened without new evidence.
+Before selecting Sprint 29, reconcile canonical documentation and tracked-file
+inventory, then run a focused architecture/product-boundary review.
 
 ## Definition of Done
 
@@ -211,4 +218,5 @@ A milestone is complete only when:
 - production composition reflects required controls;
 - documentation reflects implementation;
 - deferred scope is explicit;
+- repository inventory is reconciled;
 - repository is committed and pushed.
