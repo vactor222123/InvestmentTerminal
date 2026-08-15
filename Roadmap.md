@@ -1,109 +1,98 @@
 # Investment Terminal — Product Roadmap
 
 **Status:** Canonical Roadmap  
-**Updated after:** Post-Sprint-26 Independent Repository Audit  
+**Updated after:** Sprint 27 — Explicit History-to-Knowledge Ingestion  
 **Current development branch:** `develop`
 
-## 1. Product Evolution
+## Current Product Evolution
 
 ```text
 Foundation
 → Current-State Analysis
 → Portfolio and Decision Intelligence
 → Unified Review Package
-→ Historical Intelligence Foundation
-→ Historical Comparison and Replay
-→ Outcome-Aware Historical Intelligence
-→ Historical Outcome Methodology Hardening
-→ Statistically Honest Outcome Research Foundation
-→ Research Provenance and Population Quality Hardening
-→ Explicit Historical Archive Continuity
-→ Knowledge Domain Foundation
-→ Evidence-Grounded AI Experience Foundation
-→ Provider Integration and Operational AI Controls
-→ Provider Governance and Usage Controls
-→ Provider Resilience and Rate-Limit Controls
-→ Application/API Productization Foundation
-→ Production Server Runtime and HTTP Hardening
-→ Inbound API Rate Limiting and Abuse Controls
-→ Post-Sprint-26 Independent Repository Audit
+→ Historical Intelligence
+→ Knowledge Domain
+→ Evidence-Grounded AI
+→ Provider Governance and Resilience
+→ Production API Runtime
+→ Inbound Abuse Controls
+→ Explicit History-to-Knowledge Ingestion
 ```
 
-## 2. Completed Milestones
+## Completed Milestones
 
 ### Sprint 19 — Knowledge Domain Foundation
 
-Immutable/versioned Knowledge records, traceable evidence references, provenance assessment, deterministic projection/query/comparison, read-only CLI, and real E2E.
+Immutable/versioned Knowledge records, traceable evidence references, deterministic
+projection/query/comparison, read-only CLI, and real E2E.
 
 ### Sprint 20 — Evidence-Grounded AI Experience Foundation
 
-Provider-neutral grounded prompt/answer protocols, exact Knowledge citations, deterministic context selection, strict parsing, fail-closed grounding validation, provider-independent adapter boundary, audit trace, CLI, and real Knowledge SQLite E2E.
+Provider-neutral grounded prompt/answer protocols, exact Knowledge citations,
+strict parsing, grounding validation, audit trace, CLI, and real Knowledge E2E.
 
-### Sprint 21 — Provider Integration and Operational AI Controls
+### Sprints 21–23 — Provider Integration, Governance, and Resilience
 
-Real OpenAI Responses API integration through provider-neutral transport and bounded retry execution, environment credential source, production composition root, live opt-in CLI, operational audit metadata, and offline-realistic provider E2E.
+Production provider composition, allowlisting, usage/cost controls, budgets,
+bounded retry execution, Retry-After handling, deterministic delay policy, and
+provider operational audit metadata.
 
-### Sprint 22 — Provider Governance and Usage Controls
+### Sprints 24–26 — Production API and Inbound Controls
 
-Provider/model allowlisting, usage accounting, deterministic pricing/cost accounting, provider budgets, request-side output limits, and pre/post-execution enforcement.
+Framework-neutral application/API contracts, FastAPI production runtime,
+authentication, request-size enforcement, sanitized errors, security headers,
+hardened OpenAPI, canonical Uvicorn CLI, and deterministic inbound rate limiting.
 
-### Sprint 23 — Provider Resilience and Rate-Limit Controls
-
-Deterministic bounded retry delay, Retry-After support, injectable sleeper/clock boundaries, conservative delay precedence, retry-delay audit metadata, and resilience E2E.
-
-### Sprint 24 — Application/API Productization Foundation
-
-Stable provider-neutral application contracts, application composition, normalized application errors, framework-neutral API contracts, deterministic HTTP mapping, framework-neutral HTTP handler, and API composition root.
-
-### Sprint 25 — Production Server Runtime and HTTP Hardening
-
-Concrete FastAPI production runtime, environment-backed server configuration, production composition, liveness/readiness, inbound API-key authentication, bounded request bodies, sanitized unexpected-error handling, deterministic security headers, hardened OpenAPI, disabled production docs UIs, canonical Uvicorn CLI, and production runtime E2E.
-
-### Sprint 26 — Inbound API Rate Limiting and Abuse Controls
+### Sprint 27 — Explicit History-to-Knowledge Ingestion
 
 Delivered:
 
-- deterministic token-bucket rate-limit policy and decisions;
-- process-local per-identity admission service;
-- opaque authenticated identity derivation;
-- HTTP `429` rate-limit response contract;
-- `Retry-After` response metadata;
-- environment-backed rate-limit capacity and refill configuration;
-- monotonic Decimal production clock;
-- production composition of rate-limit policy, clock, admission, and identity derivation;
-- fail-closed single-worker CLI enforcement while limiter state is process-local;
-- safe `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset` client metadata;
-- OpenAPI documentation of rate-limit response metadata;
-- production rate-limit end-to-end coverage.
+- neutral `HistoricalSnapshotKnowledgeSource` adaptation at the CLI composition
+  boundary without reversing the History dependency boundary;
+- deterministic Knowledge ingestion service;
+- exact re-ingestion idempotency with fail-closed identity/version conflicts;
+- explicit immutable Knowledge version semantics without auto-increment;
+- deterministic verified History batch ingestion;
+- real History SQLite → Knowledge SQLite CLI composition;
+- real archived Review Package → History import → Knowledge persistence E2E;
+- exact archive checksum/evidence identity preservation;
+- explicit operational scope through repeatable `--snapshot-id` or deliberate
+  `--all`;
+- `--dry-run` validation using the same projection semantics without creating or
+  mutating the target Knowledge database;
+- duplicate explicit snapshot selection rejected fail-closed.
 
-### Post-Sprint-26 Independent Repository Audit
-
-The repository was frozen after Sprint 26 and reviewed as one production system before Sprint 27 planning.
-
-Confirmed findings and remediation:
+Canonical command:
 
 ```text
-AUD-001 / P1
-Production provider budget/pricing controls were not wired through the
-canonical server composition path.
-→ CLOSED at ad9dd1f
-
-AUD-003 / P3
-Canonical architecture documentation drifted behind the implemented system.
-→ CLOSED at 5ec042d
-
-AUD-002 / P3
-project_files.txt no longer matched the tracked repository inventory.
-→ CLOSED at 3f2f56b
+python -m investment_terminal.cli.ingest_history_knowledge
 ```
 
-No P0 finding remained open.
+Operational scope is mandatory:
 
-## 3. Stable Authority Hierarchy
+```text
+--snapshot-id <UUID>
+```
+
+or:
+
+```text
+--all
+```
+
+A non-persistent validation run uses:
+
+```text
+--dry-run
+```
+
+## Stable Authority Hierarchy
 
 ```text
 Archived Review Package
 → History
+→ explicit verified History-to-Knowledge ingestion
 → Knowledge
 → GroundedPromptInput
 → untrusted GroundedModelResponse
@@ -112,9 +101,11 @@ Archived Review Package
 → ADMISSIBLE GroundedGenerationResult
 ```
 
-Server and provider controls do not change evidence authority.
+History remains the downstream evidence/query boundary for archived Review
+Packages. Knowledge does not import the History package. Cross-domain translation
+and operational composition are owned by the CLI composition layer.
 
-## 4. Production Server Status
+## Production Server Status
 
 Canonical production factory:
 
@@ -122,7 +113,7 @@ Canonical production factory:
 investment_terminal.server.production:create_app
 ```
 
-Canonical CLI:
+Canonical server CLI:
 
 ```text
 python -m investment_terminal.cli.server
@@ -137,37 +128,19 @@ POST /v1/grounded-ai
 GET  /openapi.json
 ```
 
-`/docs` and `/redoc` are disabled.
+Production composition includes provider governance, explicit pricing,
+output-token limits, token/cost budgets, authentication, request-size
+enforcement, rate limiting, and sanitized HTTP error handling.
 
-Canonical production composition includes provider governance, explicit pricing, output-token limits, token/cost budgets, authentication, request-size enforcement, rate limiting, and sanitized HTTP error handling.
-
-## 5. Canonical Inbound Request Flow
-
-```text
-request
-→ authentication
-→ opaque rate-limit identity derivation
-→ rate-limit admission
-→ request-size enforcement
-→ UTF-8 JSON decoding
-→ framework-neutral HTTP handler
-→ application/provider execution
-→ sanitized server response
-→ deterministic security headers
-```
-
-Authentication is evaluated before rate-limit admission.
-
-## 6. Rate-Limit Runtime Contract
+## Rate-Limit Runtime Contract
 
 ```text
 INVESTMENT_TERMINAL_RATE_LIMIT_CAPACITY
 INVESTMENT_TERMINAL_RATE_LIMIT_REFILL_TOKENS_PER_SECOND
 ```
 
-Rate-limit state is process-local.
-
-Canonical production CLI therefore intentionally permits only:
+Rate-limit state remains process-local. The canonical production server CLI
+therefore permits only:
 
 ```text
 --workers 1
@@ -175,9 +148,7 @@ Canonical production CLI therefore intentionally permits only:
 
 until shared rate-limit state is explicitly designed.
 
-## 7. Provider Economic Runtime Contract
-
-Canonical production runtime requires explicit provider economic controls:
+## Provider Economic Runtime Contract
 
 ```text
 INVESTMENT_TERMINAL_PROVIDER_MAX_OUTPUT_TOKENS
@@ -191,29 +162,11 @@ INVESTMENT_TERMINAL_PROVIDER_PRICING_CURRENCY
 
 Missing or invalid mandatory economic configuration fails closed.
 
-## 8. Client Rate-Limit Visibility
-
-Authenticated requests that reach admission may expose:
-
-```text
-RateLimit-Limit
-RateLimit-Remaining
-RateLimit-Reset
-```
-
-A throttled request additionally returns:
-
-```text
-HTTP 429
-Retry-After
-```
-
-Unauthenticated `401` responses expose no limiter state.
-
-## 9. Deferred Scope
+## Deferred Scope
 
 Still deferred:
 
+- automatic/scheduled History-to-Knowledge ingestion;
 - shared/distributed rate-limit state;
 - deployment container/image and infrastructure manifests;
 - TLS termination/HSTS deployment policy;
@@ -229,27 +182,26 @@ Still deferred:
 - semantic entailment/contradiction detection;
 - vector retrieval/embeddings;
 - grounded answer persistence/history;
-- automatic History-to-Knowledge ingestion;
 - predictive confidence/effectiveness scoring;
 - causal inference;
 - autonomous portfolio actions;
 - broker execution.
 
-## 10. Current Decision Point
+## Current Decision Point
 
-Post-Sprint-26 audit remediation is complete.
+Sprint 27 implementation is complete.
 
-Frozen post-audit baseline:
+Frozen Sprint 27 baseline:
 
 ```text
-develop @ 3f2f56b
+develop @ f95f023
 ```
 
-The repository is now clear to begin Sprint 27 planning from this baseline.
+Before selecting Sprint 28, the repository should be reviewed against current
+product needs and deferred scope. Closed Sprint 27 semantics should not be
+reopened without new evidence.
 
-Sprint 27 must be selected from current product needs and deferred scope after focused audit of the target subsystem; it must not reopen closed audit findings without new evidence.
-
-## 11. Definition of Done
+## Definition of Done
 
 A milestone is complete only when:
 
