@@ -4,9 +4,9 @@
 **Update rule:** MUST be updated after every completed Task  
 **Current repository:** `vactor222123/InvestmentTerminal`  
 **Current branch:** `develop`  
-**Current baseline:** `1c6fe62`  
+**Current baseline:** `b4c26a7`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
-**Current next action:** Sprint 32 Task 11 — CI Container Smoke Test
+**Current next action:** Sprint 32 Task 12 — Real Operational Resilience E2E
 
 ---
 
@@ -675,10 +675,52 @@ deployment secret manager / environment injection
 
 No automatic `/secrets/...` loader or application-level TLS stack was added.
 
-### 32.11 CI Container Smoke Test
+### 32.11 CI Container Smoke Test — CLOSED
 
-Build and start the production image with fixture configuration, then verify
-health/readiness.
+Closure:
+
+```text
+commit: b4c26a7
+CI: GREEN
+```
+
+GitHub Actions now contains a dedicated production-container smoke job that
+executes the real image lifecycle:
+
+```text
+docker build
+→ isolated runtime fixture
+→ docker run
+→ /health liveness
+→ /ready readiness
+→ non-root runtime identity check
+→ operational SQLite initialization check
+→ cleanup
+```
+
+Verified GitHub Actions run:
+
+```text
+run: #27
+Python 3.13 / tests: SUCCESS
+Production container / smoke: SUCCESS
+```
+
+This closes the previously unverified image build/start item from Task 32.9.
+
+Platform boundary is explicit:
+
+```text
+local development/regression authority:
+Windows + PowerShell + Python 3.13
+
+production container execution verification:
+GitHub Actions ubuntu-latest + Docker
+```
+
+The Linux container smoke test complements but does not replace Windows
+compatibility. Core application, persistence, backup, restore, and resilience
+logic must remain Windows-compatible.
 
 ### 32.12 Real Operational Resilience E2E
 
@@ -711,35 +753,44 @@ PROJECT_CONTINUATION.md
 ## 9. Current Next Action
 
 ```text
-Sprint 32 Task 11 — CI Container Smoke Test
+Sprint 32 Task 12 — Real Operational Resilience E2E
 ```
 
-Before writing Task 32.11:
+Before writing Task 32.12:
 
 ```text
-1. Verify develop HEAD against 1c6fe62 or inspect every later commit.
-2. Read Dockerfile, .dockerignore, CI workflow, runtime deployment layout,
-   deployment security contract, runtime config, readiness service, and server
-   CLI.
-3. Add a dedicated CI job or focused workflow phase that actually builds the
-   production image with Docker on the GitHub runner.
-4. Start the image with deterministic fixture configuration and an isolated
-   temporary/persistent runtime mount.
-5. Provide a valid Knowledge SQLite fixture inside /runtime before startup;
-   operational SQLite stores should be initialized by lifespan.
-6. Inject only synthetic test secrets through environment variables.
-7. Verify container liveness via /health and readiness via /ready as separate
-   assertions.
-8. Verify the server is running as the expected non-root user where practical.
-9. Capture container logs on failure and always clean up the container/volumes.
-10. Do not call the external OpenAI provider; the smoke test should verify
-    build/start/runtime wiring, not provider integration.
-11. Keep reverse-proxy/TLS out of this smoke test; 32.10 already defines that
-    boundary.
-12. Preserve existing Python regression CI rather than replacing it with Docker.
+1. Verify develop HEAD against b4c26a7 or inspect every later commit.
+2. Read the current runtime backup service, restore validator, restore activation
+   service, three runtime SQLite stores/repositories, operator CLI, filesystem
+   contract, and all restore/Windows regression tests before changing anything.
+3. Build one real end-to-end scenario across all three runtime-managed SQLite
+   boundaries:
+   Knowledge, provider usage/cost, and grounded generation.
+4. Write distinctive durable data into each source database using real domain
+   stores/repositories where available; do not rely on placeholder bytes.
+5. Create a real runtime backup set through RuntimeSQLiteBackupService.
+6. Validate the published backup set through the real restore validator.
+7. Mutate/damage/replace the live runtime state so restoration is necessary and
+   the test can prove it is not reading untouched source data.
+8. Perform restore activation through the real offline restore service.
+9. Reopen/restart the runtime stores after restore and assert exact durable
+   readback of the pre-backup state across all three boundaries.
+10. Assert post-backup mutations are absent after restoration where applicable.
+11. Preserve WAL-safe behavior and explicit connection closure before file
+    replacement.
+12. Treat Windows as the primary local regression environment:
+    no POSIX-only unlink/rename assumptions, no Bash-only test logic, and no
+    reliance on Linux file-handle semantics.
+13. Keep the E2E hermetic under pytest tmp_path and avoid developer-local data.
+14. Linux container CI may provide supplementary verification, but it must not
+    substitute for Windows-compatible persistence semantics.
+15. Do not broaden 32.12 into backup scheduling, registry publishing, proxy/TLS,
+    or new product features.
 ```
 
-Task 32.11 closes the currently unverified image-build/start gap from 32.9.
+Task 32.12 owns proof that the repository-managed backup/restore stack can
+actually recover real durable runtime state end-to-end, with Windows-compatible
+filesystem and SQLite semantics.
 
 ---
 
@@ -1398,16 +1449,66 @@ Sprint 32 Task 11 — CI Container Smoke Test
 
 ---
 
+### Task 32.11 — CI Container Smoke Test
+
+```text
+Status: CLOSED
+Commit: b4c26a7
+CI: GREEN
+GitHub Actions run: #27
+
+Changed:
+- added a dedicated Production container / smoke CI job;
+- built the real production Dockerfile on the GitHub runner;
+- started the image with an isolated mounted /runtime fixture;
+- injected only synthetic runtime credentials;
+- verified /health and /ready separately;
+- verified the running container UID is non-root;
+- verified lifespan-created operational SQLite stores exist on mounted runtime;
+- captured logs on failure and guaranteed container cleanup;
+- preserved the existing Python regression job.
+
+Verified runtime steps:
+- Build production image: SUCCESS
+- Start production container: SUCCESS
+- Wait for liveness: SUCCESS
+- Verify readiness: SUCCESS
+- Verify non-root runtime identity: SUCCESS
+- Verify operational stores were initialized: SUCCESS
+- Cleanup: SUCCESS
+
+Platform contract:
+- developer/local regression environment is Windows + PowerShell + Python 3.13;
+- container execution verification uses GitHub Actions ubuntu-latest + Docker;
+- Linux CI supplements but does not replace Windows compatibility;
+- persistence/backup/restore work must preserve Windows file-handle, SQLite WAL,
+  replace/unlink, and fsync semantics.
+
+Lessons:
+- static Dockerfile contract tests are not equivalent to a real image build;
+- CI contracts must be audited before adding workflow literals or secret-like
+  names;
+- liveness and readiness remain separate;
+- container CI and host-platform regression prove different properties;
+- Windows-specific persistence behavior remains a first-class compatibility
+  requirement even when production container verification runs on Linux.
+
+Next:
+Sprint 32 Task 12 — Real Operational Resilience E2E
+```
+
+---
+
 ## 16. Current Checkpoint Summary
 
 ```text
 Repository: vactor222123/InvestmentTerminal
 Branch: develop
-Baseline: 1c6fe62
+Baseline: b4c26a7
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
 Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
-Current next action: 32.11 CI Container Smoke Test
+Current next action: 32.12 Real Operational Resilience E2E
 ```
 
 Checkpoint synchronization:
@@ -1417,6 +1518,6 @@ PROJECT_CONTINUATION.md introduced: develop @ 30a28ac
 CI: GREEN
 ```
 
-Tasks 32.1–32.10 are closed on verified CI. Continue with Task 32.11 only from
-the verified `1c6fe62` implementation baseline, or audit every later commit
+Tasks 32.1–32.11 are closed on verified CI. Continue with Task 32.12 only from
+the verified `b4c26a7` implementation baseline, or audit every later commit
 before proceeding.

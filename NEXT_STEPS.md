@@ -1,7 +1,7 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ 1c6fe62`  
-**Status:** Sprint 32 Task 10 closed with green CI; Task 32.11 is next.
+**Current baseline:** `develop @ b4c26a7`  
+**Status:** Sprint 32 Task 11 closed with green CI; Task 32.12 is next.
 
 ## Durable Continuation Checkpoint
 
@@ -13,6 +13,20 @@ PROJECT_CONTINUATION.md
 
 It is the canonical execution/handoff checkpoint and MUST be updated after
 every completed Task.
+
+## Platform Contract
+
+```text
+Local development / regression:
+Windows + PowerShell + Python 3.13
+
+Production container verification:
+GitHub Actions ubuntu-latest + Docker
+```
+
+Linux container CI does not replace Windows compatibility. Persistence,
+backup/restore, SQLite WAL, file replacement, handle closing, and fsync behavior
+must remain valid on Windows.
 
 ## Sprint 32 — Production Deployment & Operational Resilience
 
@@ -29,47 +43,45 @@ Progress:
 32.8 Runtime Deployment Layout           CLOSED / 543e737 / CI GREEN
 32.9 Container Baseline                  CLOSED / f0a4b64 / CI GREEN
 32.10 Deployment Security Contract       CLOSED / 1c6fe62 / CI GREEN
-32.11 CI Container Smoke Test            NEXT
-32.12 Real Operational Resilience E2E
+32.11 CI Container Smoke Test            CLOSED / b4c26a7 / CI GREEN
+32.12 Real Operational Resilience E2E    NEXT
 32.13 Sprint 32 Closure
 ```
 
-## 32.10 Result
+## 32.11 Result
 
-Canonical production security boundary is now explicit:
-
-```text
-public client
-→ HTTPS
-→ reverse proxy / platform ingress
-→ private HTTP
-→ Investment Terminal container
-```
-
-Key invariants:
+GitHub Actions run #27 verified the real production image:
 
 ```text
-TLS/HSTS owned by ingress
-proxy_headers=False
-API-key auth remains mandatory on /v1/*
-/ready and /openapi.json are deployment-private
-secrets enter through process environment only
+docker build                          PASS
+docker run                            PASS
+/health                               PASS
+/ready                                PASS
+non-root runtime                      PASS
+operational SQLite initialization     PASS
+cleanup                               PASS
+Python regression job                 PASS
 ```
+
+This closes the unverified Docker build/start item from Task 32.9.
 
 ## Current Next Action
 
 ```text
-Sprint 32 Task 11 — CI Container Smoke Test
+Sprint 32 Task 12 — Real Operational Resilience E2E
 ```
 
-Task 32.11 must close the still-unverified container execution gap:
+Required proof:
 
 ```text
-docker build
-→ run container with fixture runtime mount
-→ /health liveness
-→ /ready readiness
-→ clean shutdown and logs on failure
+write real durable runtime state
+→ backup
+→ validate
+→ mutate/damage live state
+→ offline restore
+→ reopen/restart stores
+→ exact pre-backup readback
 ```
 
-Do not call the external AI provider in this smoke test.
+The E2E must cover all three runtime-managed SQLite boundaries and must be
+Windows-compatible. Do not introduce POSIX-only filesystem assumptions.
