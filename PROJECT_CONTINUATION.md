@@ -6,7 +6,7 @@
 **Current branch:** `develop`  
 **Current baseline:** `0b854ed`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
-**Current next action:** Sprint 32 Task 13 — Sprint 32 Closure
+**Current next action:** Post-Sprint-32 audit
 
 ---
 
@@ -186,6 +186,67 @@ Verified local regression immediately before Sprint 31 closure:
 ```
 
 The closure commit also passed clean GitHub Actions.
+
+---
+
+## 5A. Sprint 32 — Production Deployment & Operational Resilience
+
+Status:
+
+```text
+CLOSED
+implementation closure baseline: develop @ 0b854ed
+local Windows regression: GREEN
+GitHub CI: GREEN
+```
+
+Completed:
+
+```text
+32.1 Runtime Filesystem Contract
+32.2 SQLite Operational Inventory
+32.3 Consistent SQLite Backup Primitive
+32.4 Backup Service
+32.5 Restore Validation
+32.6 Backup / Restore CLI
+32.7 FastAPI Lifespan Contract
+32.8 Runtime Deployment Layout
+32.9 Container Baseline
+32.10 Deployment Security Contract
+32.11 CI Container Smoke Test
+32.12 Real Operational Resilience E2E
+32.13 Sprint 32 Closure
+```
+
+Sprint 32 established:
+
+- explicit runtime filesystem ownership and confinement;
+- classified SQLite persistence boundaries;
+- WAL-safe committed-state backup using SQLite backup API;
+- atomic all-or-nothing runtime backup sets;
+- fail-closed restore validation;
+- offline restore activation with rollback;
+- explicit operator backup/validate/restore CLI;
+- side-effect-free app composition plus ASGI lifespan startup ownership;
+- canonical deployment filesystem topology;
+- non-root production container baseline;
+- explicit TLS/reverse-proxy/secret trust boundaries;
+- real Docker image build/start smoke verification in GitHub Actions;
+- real end-to-end recovery proof across all runtime-managed SQLite boundaries;
+- Windows-compatible persistence semantics as a first-class requirement.
+
+Platform contract:
+
+```text
+local persistence/regression authority:
+Windows + PowerShell + Python 3.13
+
+production container execution verification:
+GitHub Actions ubuntu-latest + Docker
+```
+
+Linux container CI complements but does not replace Windows host-persistence
+verification.
 
 ---
 
@@ -753,45 +814,30 @@ PROJECT_CONTINUATION.md
 ## 9. Current Next Action
 
 ```text
-Sprint 32 Task 13 — Sprint 32 Closure
+Post-Sprint-32 audit
 ```
 
-Before closing Sprint 32:
+Audit from the verified Sprint 32 closure baseline before approving another
+implementation Sprint.
+
+Required audit questions:
 
 ```text
-1. Verify develop HEAD against 0b854ed or inspect every later commit.
-2. Re-read PROJECT_CONTINUATION.md, NEXT_STEPS.md, Sprint 32 docs, CI workflow,
-   and all Task 32 closure commits.
-3. Reconcile Sprint 32 status so Tasks 32.1–32.12 are recorded with their actual
-   commits and verified CI/local outcomes.
-4. Confirm no open Sprint 32 acceptance gap remains in:
-   runtime filesystem ownership,
-   SQLite inventory,
-   backup,
-   restore validation/activation,
-   operator CLI,
-   ASGI lifespan,
-   deployment layout,
-   container baseline,
-   deployment security contract,
-   container smoke,
-   real operational resilience E2E.
-5. Record the platform contract explicitly:
-   Windows local regression remains authoritative for host persistence semantics;
-   GitHub Ubuntu/Docker remains production-container verification.
-6. Do not invent new implementation work merely to make closure larger.
-7. If closure audit exposes a concrete unresolved defect, do not mark Sprint 32
-   closed; create the smallest prerequisite fix first.
-8. If no gap remains, update PROJECT_CONTINUATION.md and NEXT_STEPS.md to:
-   Sprint 32 CLOSED,
-   closure baseline 0b854ed (or later verified closure prerequisite),
-   next phase/audit direction explicitly recorded.
-9. Run full local Windows regression and git diff --check before closure commit.
-10. Verify final GitHub CI after closure commit where workflow triggers.
+1. What is now the highest-value remaining product/architecture bottleneck?
+2. Is the next risk still production maturity, or is it time to return to
+   intelligence/product expansion?
+3. Which remaining concerns are concrete and evidenced versus merely possible?
+4. Does multi-instance/shared-state maturity now justify work, or would it be
+   premature?
+5. Which user-facing capability would provide the largest value without
+   weakening the established authority hierarchy?
+6. Are there any remaining security, observability, operational, or recovery
+   gaps that are prerequisites rather than optional improvements?
+7. What is the smallest coherent next Sprint, and what is explicitly deferred?
 ```
 
-Task 32.13 owns reconciliation and closure only. It must not absorb the next
-feature sprint.
+Do not pre-name Sprint 33 before this audit. The next Sprint must be selected
+from current repository evidence, not momentum.
 
 ---
 
@@ -1545,6 +1591,43 @@ Sprint 32 Task 13 — Sprint 32 Closure
 
 ---
 
+### Task 32.13 — Sprint 32 Closure
+
+```text
+Status: CLOSED
+Implementation closure baseline: 0b854ed
+
+Closure audit:
+- runtime filesystem ownership: SATISFIED
+- SQLite persistence inventory: SATISFIED
+- WAL-safe backup primitive: SATISFIED
+- all-or-nothing runtime backup service: SATISFIED
+- fail-closed restore validation: SATISFIED
+- offline restore activation + rollback: SATISFIED
+- operator backup/validate/restore CLI: SATISFIED
+- ASGI lifespan startup ownership: SATISFIED
+- deployment layout contract: SATISFIED
+- production container baseline: SATISFIED
+- deployment security contract: SATISFIED
+- real CI container build/start smoke: SATISFIED
+- real operational recovery E2E: SATISFIED
+
+No unresolved Sprint 32 acceptance gap was found.
+
+Platform verification:
+- Windows local regression is authoritative for host persistence semantics;
+- GitHub Actions Ubuntu/Docker verifies production container execution;
+- the two verification layers are complementary.
+
+Decision:
+Sprint 32 is closed without additional production code.
+
+Next:
+Post-Sprint-32 audit
+```
+
+---
+
 ## 16. Current Checkpoint Summary
 
 ```text
@@ -1553,8 +1636,8 @@ Branch: develop
 Baseline: 0b854ed
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
-Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
-Current next action: 32.13 Sprint 32 Closure
+Sprint 32: CLOSED / implementation baseline 0b854ed
+Current next action: Post-Sprint-32 audit
 ```
 
 Checkpoint synchronization:
@@ -1564,6 +1647,6 @@ PROJECT_CONTINUATION.md introduced: develop @ 30a28ac
 CI: GREEN
 ```
 
-Tasks 32.1–32.12 are closed with verified local/CI outcomes. Continue with
-Task 32.13 only from the verified `0b854ed` implementation baseline, or audit
-every later commit before proceeding.
+Sprint 32 is CLOSED at implementation baseline `0b854ed`. Before approving
+new implementation work, perform a Post-Sprint-32 audit from the current
+develop HEAD and inspect every commit after this closure baseline.
