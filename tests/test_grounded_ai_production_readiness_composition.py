@@ -1,3 +1,5 @@
+import asyncio
+
 from investment_terminal.application.grounded_generation_history import (
     GroundedGenerationHistoryService,
 )
@@ -54,6 +56,7 @@ def test_production_factory_wires_readiness_service(
         rate_limit_admission_service,
         rate_limit_identity_deriver,
         grounded_generation_history_service,
+        lifespan,
     ):
         calls["handler"] = handler
         calls["readiness_service"] = readiness_service
@@ -64,6 +67,7 @@ def test_production_factory_wires_readiness_service(
         calls["grounded_generation_history_service"] = (
             grounded_generation_history_service
         )
+        calls["lifespan"] = lifespan
         return FakeApp()
 
     monkeypatch.setattr(
@@ -94,10 +98,23 @@ def test_production_factory_wires_readiness_service(
     assert isinstance(app, FakeApp)
     assert isinstance(calls["handler"], FakeHandler)
     assert calls["readiness_service"] is not None
-    assert database.with_name("provider_usage_cost.db").is_file()
-    assert calls["readiness_service"].check().checks[
-        "provider_usage_cost_database"
-    ] == "READY"
+
+    ledger = database.with_name(
+        "provider_usage_cost.db"
+    )
+    assert not ledger.exists()
+
+    async def enter_lifespan() -> None:
+        async with calls["lifespan"](app):
+            assert ledger.is_file()
+            assert calls["readiness_service"].check().checks[
+                "provider_usage_cost_database"
+            ] == "READY"
+
+    asyncio.run(
+        enter_lifespan()
+    )
+
     assert calls["authenticator"].authenticate("server-secret")
     assert calls["request_limit_policy"].max_body_bytes == 65536
     assert isinstance(

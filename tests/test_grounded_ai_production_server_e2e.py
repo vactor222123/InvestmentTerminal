@@ -48,85 +48,85 @@ def test_production_server_runtime_e2e(monkeypatch, tmp_path: Path) -> None:
         lambda **kwargs: GroundedAIHTTPHandler(application_service=DeterministicApplicationService()),
     )
     app = production.create_app(build_environment(database=database))
-    client = TestClient(app, raise_server_exceptions=False)
 
-    health = client.get("/health")
-    assert health.status_code == 200
-    assert health.json() == {"status": "OK"}
-    assert health.headers["X-Content-Type-Options"] == "nosniff"
+    with TestClient(app, raise_server_exceptions=False) as client:
+        health = client.get("/health")
+        assert health.status_code == 200
+        assert health.json() == {"status": "OK"}
+        assert health.headers["X-Content-Type-Options"] == "nosniff"
 
-    ready = client.get("/ready")
-    assert ready.status_code == 200
-    assert ready.json() == {
-        "status": "READY",
-        "checks": {
-            "knowledge_database": "READY",
-            "provider_usage_cost_database": "READY",
-            "grounded_generation_database": "READY",
-            "provider_credentials": "READY",
-        },
-    }
+        ready = client.get("/ready")
+        assert ready.status_code == 200
+        assert ready.json() == {
+            "status": "READY",
+            "checks": {
+                "knowledge_database": "READY",
+                "provider_usage_cost_database": "READY",
+                "grounded_generation_database": "READY",
+                "provider_credentials": "READY",
+            },
+        }
 
-    unauthenticated = client.post("/v1/grounded-ai", json={"request_id": "request-1", "query": "Question"})
-    assert unauthenticated.status_code == 401
-    assert unauthenticated.json()["error"]["code"] == "SERVER_AUTHENTICATION_REQUIRED"
+        unauthenticated = client.post("/v1/grounded-ai", json={"request_id": "request-1", "query": "Question"})
+        assert unauthenticated.status_code == 401
+        assert unauthenticated.json()["error"]["code"] == "SERVER_AUTHENTICATION_REQUIRED"
 
-    success = client.post(
-        "/v1/grounded-ai",
-        headers={"X-API-Key": "server-secret"},
-        json={"request_id": "request-1", "query": "Question", "subjects": ["WORLD"]},
-    )
-    assert success.status_code == 200
-    assert success.json() == {
-        "status": "SUCCESS", "request_id": "request-1",
-        "data": {
-            "generation": {"prompt": {"request_id": "request-1"}, "answer": "grounded result"},
-            "trace": {"request_id": "request-1", "subject_keys": ["WORLD"]},
-        },
-    }
-    assert success.headers["Cache-Control"] == "no-store"
+        success = client.post(
+            "/v1/grounded-ai",
+            headers={"X-API-Key": "server-secret"},
+            json={"request_id": "request-1", "query": "Question", "subjects": ["WORLD"]},
+        )
+        assert success.status_code == 200
+        assert success.json() == {
+            "status": "SUCCESS", "request_id": "request-1",
+            "data": {
+                "generation": {"prompt": {"request_id": "request-1"}, "answer": "grounded result"},
+                "trace": {"request_id": "request-1", "subject_keys": ["WORLD"]},
+            },
+        }
+        assert success.headers["Cache-Control"] == "no-store"
 
-    recent = client.get(
-        "/v1/grounded-generations",
-        params={"limit": 10},
-        headers={"X-API-Key": "server-secret"},
-    )
-    assert recent.status_code == 200
-    assert recent.json()["data"] == {
-        "count": 0,
-        "records": [],
-    }
+        recent = client.get(
+            "/v1/grounded-generations",
+            params={"limit": 10},
+            headers={"X-API-Key": "server-secret"},
+        )
+        assert recent.status_code == 200
+        assert recent.json()["data"] == {
+            "count": 0,
+            "records": [],
+        }
 
-    generation_unauthenticated = client.get(
-        "/v1/grounded-generations",
-        params={"limit": 10},
-    )
-    assert generation_unauthenticated.status_code == 401
+        generation_unauthenticated = client.get(
+            "/v1/grounded-generations",
+            params={"limit": 10},
+        )
+        assert generation_unauthenticated.status_code == 401
 
-    oversized = client.post(
-        "/v1/grounded-ai", headers={"X-API-Key": "server-secret"},
-        json={"request_id": "request-2", "query": "x" * 400},
-    )
-    assert oversized.status_code == 413
-    assert oversized.json()["error"]["code"] == "SERVER_REQUEST_BODY_TOO_LARGE"
+        oversized = client.post(
+            "/v1/grounded-ai", headers={"X-API-Key": "server-secret"},
+            json={"request_id": "request-2", "query": "x" * 400},
+        )
+        assert oversized.status_code == 413
+        assert oversized.json()["error"]["code"] == "SERVER_REQUEST_BODY_TOO_LARGE"
 
-    invalid_json = client.post(
-        "/v1/grounded-ai",
-        headers={"X-API-Key": "server-secret", "Content-Type": "application/json"},
-        content=b"{bad-json",
-    )
-    assert invalid_json.status_code == 400
-    assert invalid_json.json()["error"]["code"] == "SERVER_INVALID_JSON"
+        invalid_json = client.post(
+            "/v1/grounded-ai",
+            headers={"X-API-Key": "server-secret", "Content-Type": "application/json"},
+            content=b"{bad-json",
+        )
+        assert invalid_json.status_code == 400
+        assert invalid_json.json()["error"]["code"] == "SERVER_INVALID_JSON"
 
-    schema = client.get("/openapi.json")
-    assert schema.status_code == 200
-    assert set(schema.json()["paths"]) == {
-        "/v1/grounded-ai",
-        "/v1/grounded-generations",
-        "/v1/grounded-generations/{request_id}",
-    }
-    assert client.get("/docs").status_code == 404
-    assert client.get("/redoc").status_code == 404
+        schema = client.get("/openapi.json")
+        assert schema.status_code == 200
+        assert set(schema.json()["paths"]) == {
+            "/v1/grounded-ai",
+            "/v1/grounded-generations",
+            "/v1/grounded-generations/{request_id}",
+        }
+        assert client.get("/docs").status_code == 404
+        assert client.get("/redoc").status_code == 404
 
 
 def test_production_server_runtime_e2e_readiness_fails_closed(monkeypatch, tmp_path: Path) -> None:
@@ -138,14 +138,16 @@ def test_production_server_runtime_e2e_readiness_fails_closed(monkeypatch, tmp_p
     environment = build_environment(database=database)
     del environment[DEFAULT_OPENAI_API_KEY_ENV]
     app = production.create_app(environment)
-    response = TestClient(app, raise_server_exceptions=False).get("/ready")
-    assert response.status_code == 503
-    assert response.json() == {
-        "status": "NOT_READY",
-        "checks": {
-            "knowledge_database": "NOT_READY",
-            "provider_usage_cost_database": "READY",
-            "grounded_generation_database": "READY",
-            "provider_credentials": "NOT_READY",
-        },
-    }
+
+    with TestClient(app, raise_server_exceptions=False) as client:
+        response = client.get("/ready")
+        assert response.status_code == 503
+        assert response.json() == {
+            "status": "NOT_READY",
+            "checks": {
+                "knowledge_database": "NOT_READY",
+                "provider_usage_cost_database": "READY",
+                "grounded_generation_database": "READY",
+                "provider_credentials": "NOT_READY",
+            },
+        }

@@ -1,3 +1,5 @@
+import asyncio
+
 from investment_terminal.ai.generation_recording import (
     GroundedGenerationRecordingService,
 )
@@ -36,10 +38,15 @@ def test_production_composes_grounded_generation_persistence(
             or object()
         ),
     )
+
+    def fake_factory(**kwargs):
+        calls["lifespan"] = kwargs["lifespan"]
+        return FakeApp()
+
     monkeypatch.setattr(
         production,
         "create_grounded_ai_fastapi_app",
-        lambda **kwargs: FakeApp(),
+        fake_factory,
     )
 
     knowledge = tmp_path / "knowledge.db"
@@ -65,9 +72,18 @@ def test_production_composes_grounded_generation_persistence(
         PROVIDER_PRICING_CURRENCY_ENV: "EUR",
     }
 
-    production.create_app(values)
+    app = production.create_app(values)
 
-    assert generation_database.is_file()
+    assert not generation_database.exists()
+
+    async def enter_lifespan() -> None:
+        async with calls["lifespan"](app):
+            assert generation_database.is_file()
+
+    asyncio.run(
+        enter_lifespan()
+    )
+
     recorder = calls["handler_kwargs"][
         "generation_recording_service"
     ]

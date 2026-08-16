@@ -3,6 +3,8 @@ FastAPI runtime adapter for grounded AI.
 """
 
 import json
+from collections.abc import Callable
+from contextlib import AbstractAsyncContextManager
 from decimal import ROUND_CEILING
 
 from fastapi import FastAPI, Header, Request
@@ -60,6 +62,13 @@ def create_grounded_ai_fastapi_app(
     grounded_generation_history_service: (
         GroundedGenerationHistoryService | None
     ) = None,
+    lifespan: (
+        Callable[
+            [FastAPI],
+            AbstractAsyncContextManager[None],
+        ]
+        | None
+    ) = None,
 ) -> FastAPI:
     if not isinstance(handler, GroundedAIHTTPHandler):
         raise TypeError("handler must be a GroundedAIHTTPHandler")
@@ -108,6 +117,10 @@ def create_grounded_ai_fastapi_app(
             "grounded_generation_history_service must be a "
             "GroundedGenerationHistoryService or None"
         )
+    if lifespan is not None and not callable(lifespan):
+        raise TypeError(
+            "lifespan must be callable or None"
+        )
     if (
         rate_limit_admission_service is None
     ) != (
@@ -137,6 +150,7 @@ def create_grounded_ai_fastapi_app(
         docs_url=None,
         redoc_url=None,
         openapi_url="/openapi.json",
+        lifespan=lifespan,
     )
     app.add_middleware(
         GroundedAIServerSecurityHeadersMiddleware,

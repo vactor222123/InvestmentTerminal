@@ -1,5 +1,6 @@
 import os
-from collections.abc import Mapping
+from collections.abc import AsyncIterator, Mapping
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
 from fastapi import FastAPI
@@ -40,18 +41,48 @@ def _utc_now() -> datetime:
     )
 
 
+def _production_lifespan(
+    *,
+    filesystem_contract: GroundedAIServerRuntimeFilesystemContract,
+    ledger_store: GroundedProviderUsageCostLedgerSQLiteStore,
+    generation_store: GroundedGenerationSQLiteStore,
+):
+    @asynccontextmanager
+    async def lifespan(
+        app: FastAPI,
+    ) -> AsyncIterator[None]:
+        del app
+
+        # Production side effects belong to ASGI startup, not app construction.
+        # Ordering is deliberate: validate/prepare filesystem ownership before
+        # creating or migrating operational SQLite databases.
+        filesystem_contract.prepare()
+        ledger_store.initialize()
+        generation_store.initialize()
+
+        try:
+            yield
+        finally:
+            # Current runtime stores and urllib provider transport do not own
+            # long-lived handles. The explicit shutdown boundary exists so any
+            # future owned resource must be closed here rather than leaked into
+            # process lifetime.
+            pass
+
+    return lifespan
+
+
 def create_app(environment: Mapping[str, str] | None = None) -> FastAPI:
     source = environment if environment is not None else os.environ
     config = GroundedAIServerRuntimeConfig.from_environment(source)
 
-    GroundedAIServerRuntimeFilesystemContract.from_config(
+    filesystem_contract = GroundedAIServerRuntimeFilesystemContract.from_config(
         config
-    ).prepare()
+    )
 
     ledger_store = GroundedProviderUsageCostLedgerSQLiteStore(
         config.usage_cost_ledger_database
     )
-    ledger_store.initialize()
     ledger_repository = SQLiteGroundedProviderUsageCostLedgerRepository(
         ledger_store
     )
@@ -59,7 +90,6 @@ def create_app(environment: Mapping[str, str] | None = None) -> FastAPI:
     generation_store = GroundedGenerationSQLiteStore(
         config.grounded_generation_database
     )
-    generation_store.initialize()
     generation_repository = SQLiteGroundedGenerationRepository(
         generation_store
     )
@@ -101,5 +131,10 @@ def create_app(environment: Mapping[str, str] | None = None) -> FastAPI:
         rate_limit_identity_deriver=GroundedAIServerRateLimitIdentityDeriver(),
         grounded_generation_history_service=GroundedGenerationHistoryService(
             repository=generation_repository
+        ),
+        lifespan=_production_lifespan(
+            filesystem_contract=filesystem_contract,
+            ledger_store=ledger_store,
+            generation_store=generation_store,
         ),
     )

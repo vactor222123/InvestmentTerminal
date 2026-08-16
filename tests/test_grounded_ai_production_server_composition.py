@@ -51,6 +51,7 @@ def test_production_factory_routes_config_through_api_composition(
         rate_limit_admission_service,
         rate_limit_identity_deriver,
         grounded_generation_history_service,
+        lifespan,
     ):
         calls["handler"] = handler
         calls["readiness_service"] = readiness_service
@@ -61,6 +62,7 @@ def test_production_factory_routes_config_through_api_composition(
         calls["grounded_generation_history_service"] = (
             grounded_generation_history_service
         )
+        calls["lifespan"] = lifespan
         return FakeApp()
 
     monkeypatch.setattr(
@@ -110,6 +112,7 @@ def test_production_factory_routes_config_through_api_composition(
         calls["grounded_generation_history_service"],
         GroundedGenerationHistoryService,
     )
+    assert callable(calls["lifespan"])
 
     handler_kwargs = calls["handler_kwargs"]
     assert handler_kwargs["model_identity"] == "gpt-test"

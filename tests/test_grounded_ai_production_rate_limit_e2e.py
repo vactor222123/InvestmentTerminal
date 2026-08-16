@@ -100,11 +100,11 @@ def payload(request_id: str) -> dict[str, str]:
     }
 
 
-def build_client(
+def build_app(
     *,
     monkeypatch,
     database: Path,
-) -> TestClient:
+):
     DeterministicClock.reset()
 
     monkeypatch.setattr(
@@ -122,14 +122,10 @@ def build_client(
         ),
     )
 
-    app = production.create_app(
+    return production.create_app(
         build_environment(
             database=database,
         )
-    )
-    return TestClient(
-        app,
-        raise_server_exceptions=False,
     )
 
 
@@ -139,55 +135,59 @@ def test_production_rate_limit_runtime_e2e(
 ) -> None:
     database = tmp_path / "knowledge.db"
     database.write_bytes(b"sqlite-placeholder")
-    client = build_client(
+    app = build_app(
         monkeypatch=monkeypatch,
         database=database,
     )
 
-    first = client.post(
-        "/v1/grounded-ai",
-        headers=authenticated_headers(),
-        json=payload("request-1"),
-    )
+    with TestClient(
+        app,
+        raise_server_exceptions=False,
+    ) as client:
+        first = client.post(
+            "/v1/grounded-ai",
+            headers=authenticated_headers(),
+            json=payload("request-1"),
+        )
 
-    assert first.status_code == 200
-    assert first.headers["RateLimit-Limit"] == "1"
-    assert first.headers["RateLimit-Remaining"] == "0"
-    assert first.headers["RateLimit-Reset"] == "2"
-    assert "Retry-After" not in first.headers
+        assert first.status_code == 200
+        assert first.headers["RateLimit-Limit"] == "1"
+        assert first.headers["RateLimit-Remaining"] == "0"
+        assert first.headers["RateLimit-Reset"] == "2"
+        assert "Retry-After" not in first.headers
 
-    throttled = client.post(
-        "/v1/grounded-ai",
-        headers=authenticated_headers(),
-        json=payload("request-2"),
-    )
+        throttled = client.post(
+            "/v1/grounded-ai",
+            headers=authenticated_headers(),
+            json=payload("request-2"),
+        )
 
-    assert throttled.status_code == 429
-    assert throttled.headers["Retry-After"] == "2"
-    assert throttled.headers["RateLimit-Limit"] == "1"
-    assert throttled.headers["RateLimit-Remaining"] == "0"
-    assert throttled.headers["RateLimit-Reset"] == "2"
-    assert throttled.json() == {
-        "status": "ERROR",
-        "error": {
-            "category": "RATE_LIMITED",
-            "code": "SERVER_RATE_LIMIT_EXCEEDED",
-            "message": "request rate limit exceeded",
-        },
-    }
+        assert throttled.status_code == 429
+        assert throttled.headers["Retry-After"] == "2"
+        assert throttled.headers["RateLimit-Limit"] == "1"
+        assert throttled.headers["RateLimit-Remaining"] == "0"
+        assert throttled.headers["RateLimit-Reset"] == "2"
+        assert throttled.json() == {
+            "status": "ERROR",
+            "error": {
+                "category": "RATE_LIMITED",
+                "code": "SERVER_RATE_LIMIT_EXCEEDED",
+                "message": "request rate limit exceeded",
+            },
+        }
 
-    DeterministicClock.advance("2")
+        DeterministicClock.advance("2")
 
-    refilled = client.post(
-        "/v1/grounded-ai",
-        headers=authenticated_headers(),
-        json=payload("request-3"),
-    )
+        refilled = client.post(
+            "/v1/grounded-ai",
+            headers=authenticated_headers(),
+            json=payload("request-3"),
+        )
 
-    assert refilled.status_code == 200
-    assert refilled.headers["RateLimit-Limit"] == "1"
-    assert refilled.headers["RateLimit-Remaining"] == "0"
-    assert refilled.headers["RateLimit-Reset"] == "2"
+        assert refilled.status_code == 200
+        assert refilled.headers["RateLimit-Limit"] == "1"
+        assert refilled.headers["RateLimit-Remaining"] == "0"
+        assert refilled.headers["RateLimit-Reset"] == "2"
 
 
 def test_production_unauthenticated_request_does_not_consume_rate_limit(
@@ -196,29 +196,33 @@ def test_production_unauthenticated_request_does_not_consume_rate_limit(
 ) -> None:
     database = tmp_path / "knowledge.db"
     database.write_bytes(b"sqlite-placeholder")
-    client = build_client(
+    app = build_app(
         monkeypatch=monkeypatch,
         database=database,
     )
 
-    unauthenticated = client.post(
-        "/v1/grounded-ai",
-        json=payload("request-unauthenticated"),
-    )
+    with TestClient(
+        app,
+        raise_server_exceptions=False,
+    ) as client:
+        unauthenticated = client.post(
+            "/v1/grounded-ai",
+            json=payload("request-unauthenticated"),
+        )
 
-    assert unauthenticated.status_code == 401
-    assert "RateLimit-Limit" not in unauthenticated.headers
-    assert "RateLimit-Remaining" not in unauthenticated.headers
-    assert "RateLimit-Reset" not in unauthenticated.headers
+        assert unauthenticated.status_code == 401
+        assert "RateLimit-Limit" not in unauthenticated.headers
+        assert "RateLimit-Remaining" not in unauthenticated.headers
+        assert "RateLimit-Reset" not in unauthenticated.headers
 
-    authenticated = client.post(
-        "/v1/grounded-ai",
-        headers=authenticated_headers(),
-        json=payload("request-authenticated"),
-    )
+        authenticated = client.post(
+            "/v1/grounded-ai",
+            headers=authenticated_headers(),
+            json=payload("request-authenticated"),
+        )
 
-    assert authenticated.status_code == 200
-    assert authenticated.headers["RateLimit-Remaining"] == "0"
+        assert authenticated.status_code == 200
+        assert authenticated.headers["RateLimit-Remaining"] == "0"
 
 
 def test_production_openapi_exposes_rate_limit_client_contract(
@@ -227,22 +231,26 @@ def test_production_openapi_exposes_rate_limit_client_contract(
 ) -> None:
     database = tmp_path / "knowledge.db"
     database.write_bytes(b"sqlite-placeholder")
-    client = build_client(
+    app = build_app(
         monkeypatch=monkeypatch,
         database=database,
     )
 
-    responses = client.get("/openapi.json").json()["paths"][
-        "/v1/grounded-ai"
-    ]["post"]["responses"]
+    with TestClient(
+        app,
+        raise_server_exceptions=False,
+    ) as client:
+        responses = client.get("/openapi.json").json()["paths"][
+            "/v1/grounded-ai"
+        ]["post"]["responses"]
 
-    assert "RateLimit-Limit" in responses["200"]["headers"]
-    assert "RateLimit-Remaining" in responses["200"]["headers"]
-    assert "RateLimit-Reset" in responses["200"]["headers"]
+        assert "RateLimit-Limit" in responses["200"]["headers"]
+        assert "RateLimit-Remaining" in responses["200"]["headers"]
+        assert "RateLimit-Reset" in responses["200"]["headers"]
 
-    assert "Retry-After" in responses["429"]["headers"]
-    assert "RateLimit-Limit" in responses["429"]["headers"]
-    assert "RateLimit-Remaining" in responses["429"]["headers"]
-    assert "RateLimit-Reset" in responses["429"]["headers"]
+        assert "Retry-After" in responses["429"]["headers"]
+        assert "RateLimit-Limit" in responses["429"]["headers"]
+        assert "RateLimit-Remaining" in responses["429"]["headers"]
+        assert "RateLimit-Reset" in responses["429"]["headers"]
 
-    assert "headers" not in responses["401"]
+        assert "headers" not in responses["401"]
