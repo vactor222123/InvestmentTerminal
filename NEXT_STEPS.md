@@ -1,7 +1,7 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ 3b069e6`  
-**Status:** Sprint 32 Task 7 closed with green CI; Task 32.8 is next.
+**Current baseline:** `develop @ 543e737`  
+**Status:** Sprint 32 Task 8 closed with green CI; Task 32.9 is next.
 
 ## Durable Continuation Checkpoint
 
@@ -26,55 +26,54 @@ Progress:
 32.5 Restore Validation                  CLOSED / cb8bd40 / CI GREEN
 32.6 Backup / Restore CLI                CLOSED / 8a22b7b / CI GREEN
 32.7 FastAPI Lifespan Contract           CLOSED / 3b069e6 / CI GREEN
-32.8 Runtime Deployment Layout           NEXT
-32.9 Container Baseline
+32.8 Runtime Deployment Layout           CLOSED / 543e737 / CI GREEN
+32.9 Container Baseline                  NEXT
 32.10 Deployment Security Contract
 32.11 CI Container Smoke Test
 32.12 Real Operational Resilience E2E
 32.13 Sprint 32 Closure
 ```
 
-## 32.7 Result
+## 32.8 Result
 
-Production construction and startup are now separate:
+Canonical deployment topology is now explicit:
 
 ```text
-create_app()
-→ config + object composition only
-
-ASGI lifespan startup
-→ runtime filesystem prepare
-→ provider usage/cost DB initialize
-→ grounded-generation DB initialize
-→ serve requests
+/application   read-only application/code
+/runtime       persistent writable live SQLite state
+/backups       persistent independent backup storage
+/config        read-only non-secret configuration
+/secrets       read-only deployment-managed secret boundary
 ```
 
-Startup failures fail closed.
+Canonical live runtime paths:
 
-Knowledge remains an external prerequisite.
-
-Production tests that rely on startup state now use:
-
-```python
-with TestClient(app) as client:
-    ...
+```text
+/runtime/knowledge.db
+/runtime/operational/provider_usage_cost.db
+/runtime/operational/grounded_generations.db
 ```
+
+The deployment contract is descriptive and does not silently create, relocate,
+or mutate live data.
 
 ## Current Next Action
 
 ```text
-Sprint 32 Task 8 — Runtime Deployment Layout
+Sprint 32 Task 9 — Container Baseline
 ```
 
-Task 32.8 should define the concrete deployment topology for:
+Task 32.9 should consume the established layout in a minimal production
+container baseline:
 
 ```text
-read-only application/code
-writable persistent runtime data
-backup destination
-configuration boundary
-secret boundary
+locked dependency install
+non-root execution
+read-only application code
+persistent /runtime and /backups boundaries
+healthcheck
+one-worker server runtime
 ```
 
-Do not introduce Docker yet. Task 32.9 should consume the layout contract rather
-than invent it.
+Do not mix reverse-proxy/TLS/security-topology work into 32.9; that remains
+Task 32.10.

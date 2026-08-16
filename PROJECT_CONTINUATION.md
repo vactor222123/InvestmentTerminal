@@ -4,9 +4,9 @@
 **Update rule:** MUST be updated after every completed Task  
 **Current repository:** `vactor222123/InvestmentTerminal`  
 **Current branch:** `develop`  
-**Current baseline:** `3b069e6`  
+**Current baseline:** `543e737`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
-**Current next action:** Sprint 32 Task 8 — Runtime Deployment Layout
+**Current next action:** Sprint 32 Task 9 — Container Baseline
 
 ---
 
@@ -549,17 +549,47 @@ resources.
 Production tests that depend on startup state now enter lifespan explicitly via
 `with TestClient(app)`.
 
-### 32.8 Runtime Deployment Layout
+### 32.8 Runtime Deployment Layout — CLOSED
 
-Define:
+Closure:
 
 ```text
-read-only application/code
-writable persistent data
-backup destination
-configuration boundary
-secret boundary
+commit: 543e737
+CI: GREEN
 ```
+
+Established a canonical deployment topology with five independent roots:
+
+```text
+/application   read-only application/code
+/runtime       persistent writable live runtime state
+/backups       persistent independent backup storage
+/config        read-only non-secret deployment configuration
+/secrets       read-only deployment-managed secret boundary
+```
+
+Canonical runtime SQLite paths are:
+
+```text
+/runtime/knowledge.db
+/runtime/operational/provider_usage_cost.db
+/runtime/operational/grounded_generations.db
+```
+
+The deployment-layout contract is descriptive only. It validates absolute,
+independent roots and projects canonical non-secret runtime path environment,
+but does not create directories, move databases, read secrets, start the
+server, or run backup/restore.
+
+Backward compatibility remains unchanged:
+
+```text
+INVESTMENT_TERMINAL_RUNTIME_DATA_ROOT remains optional
+explicit legacy database paths remain valid
+no database is silently relocated
+```
+
+The backup root is explicitly independent from the live runtime-data root.
 
 ### 32.9 Container Baseline
 
@@ -623,32 +653,35 @@ PROJECT_CONTINUATION.md
 ## 9. Current Next Action
 
 ```text
-Sprint 32 Task 8 — Runtime Deployment Layout
+Sprint 32 Task 9 — Container Baseline
 ```
 
-Before writing Task 32.8:
+Before writing Task 32.9:
 
 ```text
-1. Verify develop HEAD against 3b069e6 or inspect every later commit.
-2. Read runtime_config.py, runtime_filesystem.py, backup/restore contracts,
-   server CLI, and current production documentation.
-3. Define a concrete deployment filesystem topology separating:
-   read-only application/code, writable runtime data, backup destination,
-   configuration input, and secrets.
-4. Define which paths are mounted/persistent versus ephemeral.
-5. Keep live SQLite paths inside runtime_data_root when strict confinement is
-   enabled.
-6. Keep backup_root independent from live runtime_data_root ownership.
-7. Define operator-facing environment/path examples without silently relocating
-   existing databases.
-8. Do not add Docker yet; 32.8 defines the contract consumed by 32.9.
-9. Add executable/configuration tests only where they close ambiguity in the
-   deployment-layout contract.
+1. Verify develop HEAD against 543e737 or inspect every later commit.
+2. Read requirements.lock, Python-version contract, server CLI, runtime
+   deployment layout, runtime filesystem contract, and current CI workflow.
+3. Build the image from the locked runtime dependency set using
+   --require-hashes.
+4. Keep application/code read-only at runtime and run the process as a non-root
+   user.
+5. Provision mount points consistent with the 32.8 contract:
+   /runtime and /backups as persistent writable boundaries, /config and
+   /secrets as read-only deployment boundaries.
+6. Do not bake real secrets or live runtime databases into the image.
+7. Define a container healthcheck against the existing /health endpoint without
+   confusing liveness with readiness.
+8. Preserve the one-worker server constraint while rate limiting remains
+   process-local.
+9. Add deterministic Docker/build contract tests where they can validate image
+   content or configuration without duplicating the later 32.11 smoke test.
+10. Keep reverse proxy/TLS and broader deployment security ownership for 32.10.
 ```
 
-Task 32.8 owns deployment layout/documented path boundaries. Container image
-construction, reverse proxy/TLS, and CI container smoke tests remain later
-Tasks.
+Task 32.9 owns the minimal production image/container baseline. It must consume
+the established deployment layout rather than inventing new filesystem or
+secret semantics.
 
 ---
 
@@ -1161,16 +1194,62 @@ Sprint 32 Task 8 — Runtime Deployment Layout
 
 ---
 
+### Task 32.8 — Runtime Deployment Layout
+
+```text
+Status: CLOSED
+Commit: 543e737
+CI: GREEN
+
+Changed:
+- added GroundedAIServerDeploymentLayout as a descriptive deployment contract;
+- defined independent /application, /runtime, /backups, /config, /secrets roots;
+- defined canonical live SQLite paths beneath /runtime;
+- projected only non-secret runtime path environment;
+- documented persistent, read-only, and ephemeral deployment boundaries;
+- updated .env.example to show the canonical production layout.
+
+Decisions:
+- /runtime and /backups are independent persistent roots;
+- application/code is not a writable runtime-state location;
+- config and secrets remain deployment-owned/read-only boundaries;
+- secrets continue to enter through the established environment-variable
+  contract; no implicit secret-file loader was introduced;
+- existing explicit-path deployments remain backward compatible and no database
+  is silently moved.
+
+Tests/guarantees:
+- deployment roots must be absolute and independent;
+- backup_root nesting under runtime_data_root is rejected;
+- runtime_data_root nesting under application_root is rejected;
+- the contract does not create deployment directories as a side effect;
+- full local regression passed;
+- GitHub Actions run #21 completed successfully.
+
+Lessons:
+- live state and its backup must not share the same failure domain by default;
+- deployment topology should be explicit before container image design;
+- read-only code/config/secret boundaries must not become accidental runtime
+  persistence;
+- introducing a deployment layout must not create a second configuration or
+  secret authority.
+
+Next:
+Sprint 32 Task 9 — Container Baseline
+```
+
+---
+
 ## 16. Current Checkpoint Summary
 
 ```text
 Repository: vactor222123/InvestmentTerminal
 Branch: develop
-Baseline: 3b069e6
+Baseline: 543e737
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
 Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
-Current next action: 32.8 Runtime Deployment Layout
+Current next action: 32.9 Container Baseline
 ```
 
 Checkpoint synchronization:
@@ -1180,6 +1259,6 @@ PROJECT_CONTINUATION.md introduced: develop @ 30a28ac
 CI: GREEN
 ```
 
-Tasks 32.1–32.7 are closed on verified CI. Continue with Task 32.8 only from
-the verified `3b069e6` implementation baseline, or audit every later commit
+Tasks 32.1–32.8 are closed on verified CI. Continue with Task 32.9 only from
+the verified `543e737` implementation baseline, or audit every later commit
 before proceeding.
