@@ -4,9 +4,9 @@
 **Update rule:** MUST be updated after every completed Task  
 **Current repository:** `vactor222123/InvestmentTerminal`  
 **Current branch:** `develop`  
-**Current baseline:** `2299a6f`  
+**Current baseline:** `5e846ce`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
-**Current next action:** Sprint 32 Task 4 — Backup Service
+**Current next action:** Sprint 32 Task 5 — Restore Validation
 
 ---
 
@@ -398,10 +398,41 @@ Existing destinations are protected by default and require explicit
 
 Do not implement backup as a naive live `.db` file copy.
 
-### 32.4 Backup Service
+### 32.4 Backup Service — CLOSED
 
-Cover the operational stores according to their authority/rebuildability
-contract and produce deterministic backup metadata.
+Closure:
+
+```text
+commit: 5e846ce
+CI: GREEN
+```
+
+Established an all-or-nothing runtime SQLite backup-set service for exactly the
+three runtime-managed persistence boundaries:
+
+```text
+KNOWLEDGE_SQLITE@1
+PROVIDER_USAGE_COST_SQLITE@1
+GROUNDED_GENERATION_SQLITE@1
+```
+
+History SQLite remains excluded from the grounded-AI runtime backup set.
+
+Backup-set contract:
+
+```text
+explicit backup_root
+→ deterministic UTC backup-set identity
+→ staging directory
+→ three Task-32.3 SQLite snapshots
+→ deterministic metadata.json
+→ atomic set-directory publication
+→ backup-root sync
+```
+
+Any database-backup or metadata failure before publication removes staging and
+leaves no final backup set. Existing final set directories are never
+overwritten.
 
 ### 32.5 Restore Validation
 
@@ -497,30 +528,32 @@ PROJECT_CONTINUATION.md
 ## 9. Current Next Action
 
 ```text
-Sprint 32 Task 4 — Backup Service
+Sprint 32 Task 5 — Restore Validation
 ```
 
-Before writing Task 32.4:
+Before writing Task 32.5:
 
 ```text
-1. Verify develop HEAD against 2299a6f or inspect every later commit.
-2. Read sqlite_inventory.py and sqlite_backup.py as fixed lower-level contracts.
-3. Read runtime_config.py and runtime_filesystem.py for production-managed paths.
-4. Confirm which runtime-managed boundaries belong in the service:
-   Knowledge, provider usage/cost, grounded generations.
-5. Define backup-root ownership without relocating live databases.
-6. Define deterministic backup-set identity, timestamp/clock injection, naming,
-   and metadata before writing files.
-7. Decide all-or-nothing versus partial-set semantics explicitly.
-8. Ensure backup metadata never changes authority classification.
-9. Keep restore validation/activation out of 32.4.
-10. Add focused tests for deterministic naming/metadata, complete runtime set,
-    partial failure behavior, and no accidental History inclusion.
+1. Verify develop HEAD against 5e846ce or inspect every later commit.
+2. Read runtime_backup_service.py, sqlite_backup.py, and sqlite_inventory.py.
+3. Read the schema/version initialization contract of each runtime-managed DB.
+4. Define a fail-closed backup-set metadata parser/validator.
+5. Require exactly the expected three runtime boundary identities; reject
+   missing, duplicate, unknown, or History entries.
+6. Validate backup files before any live-path mutation.
+7. Validate SQLite storage integrity plus expected schema/version/identity for
+   each boundary.
+8. Detect metadata/file mismatch and tampering where the existing metadata
+   contract can support it; do not invent unverifiable guarantees.
+9. Keep restore activation/replacement out of 32.5.
+10. Add focused tests for missing/extra files, malformed metadata, wrong
+    boundary mapping, corrupt SQLite, incompatible schema/version, and a valid
+    complete candidate.
 ```
 
-Task 32.4 orchestrates runtime-managed backup creation and deterministic metadata.
-The generic SQLite snapshot mechanism remains owned by 32.3. Restore validation
-and activation remain 32.5.
+Task 32.5 owns candidate validation only. It must produce a validated restore
+candidate or fail closed without mutating live databases. Operator activation
+and CLI orchestration remain later Tasks.
 
 ---
 
@@ -850,16 +883,56 @@ Sprint 32 Task 4 — Backup Service
 
 ---
 
+### Task 32.4 — Backup Service
+
+```text
+Status: CLOSED
+Commit: 5e846ce
+CI: GREEN
+
+Changed:
+- added runtime SQLite backup-set orchestration;
+- scoped the service to Knowledge, provider usage/cost, and grounded generation;
+- added explicit backup_root ownership;
+- added deterministic UTC backup-set naming and metadata;
+- added staging plus atomic set-directory publication;
+- added all-or-nothing pre-publication failure cleanup.
+
+Decisions:
+- History SQLite is not part of the grounded-AI runtime backup set;
+- backup destination is explicit and independent of runtime_data_root;
+- a backup set is valid only when all three runtime snapshots and metadata are
+  complete;
+- existing final backup-set directories are never overwritten;
+- restore validation/activation remains outside Task 32.4.
+
+Tests/guarantees:
+- focused backup-service tests passed before commit;
+- full regression passed before commit;
+- GitHub Actions run #13 completed successfully.
+
+Lessons:
+- backup atomicity must exist at the set level as well as at the individual
+  SQLite-file level;
+- live-data placement and backup-destination placement are separate deployment
+  concerns and should not be coupled implicitly.
+
+Next:
+Sprint 32 Task 5 — Restore Validation
+```
+
+---
+
 ## 16. Current Checkpoint Summary
 
 ```text
 Repository: vactor222123/InvestmentTerminal
 Branch: develop
-Baseline: 2299a6f
+Baseline: 5e846ce
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
 Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
-Current next action: 32.4 Backup Service
+Current next action: 32.5 Restore Validation
 ```
 
 Checkpoint synchronization:
@@ -869,6 +942,6 @@ PROJECT_CONTINUATION.md introduced: develop @ 30a28ac
 CI: GREEN
 ```
 
-Tasks 32.1–32.3 are closed on verified CI. Continue with Task 32.4 only from
-the verified `2299a6f` implementation baseline, or audit every later commit
+Tasks 32.1–32.4 are closed on verified CI. Continue with Task 32.5 only from
+the verified `5e846ce` implementation baseline, or audit every later commit
 before proceeding.
