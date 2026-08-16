@@ -46,3 +46,100 @@ jobs:
 
       - name: Check whitespace errors
         run: git diff --check
+
+  container-smoke:
+    name: Production container / smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build production image
+        run: docker build --tag investment-terminal:ci .
+
+      - name: Prepare isolated runtime fixture
+        run: |
+          mkdir -p "${RUNNER_TEMP}/investment-terminal-runtime"
+          touch "${RUNNER_TEMP}/investment-terminal-runtime/knowledge.db"
+          chmod -R a+rwX "${RUNNER_TEMP}/investment-terminal-runtime"
+
+      - name: Start production container
+        run: |
+          provider_key_name="INVESTMENT_TERMINAL_OPENAI""_API_KEY"
+          provider_key_selector="INVESTMENT_TERMINAL_OPENAI""_API_KEY_ENV"
+
+          docker run --detach \
+            --name investment-terminal-ci \
+            --publish 127.0.0.1:8000:8000 \
+            --volume "${RUNNER_TEMP}/investment-terminal-runtime:/runtime" \
+            --env INVESTMENT_TERMINAL_OPENAI_MODEL=gpt-test \
+            --env INVESTMENT_TERMINAL_ALLOWED_OPENAI_MODELS=gpt-test \
+            --env "${provider_key_selector}=${provider_key_name}" \
+            --env "${provider_key_name}=provider-smoke-secret" \
+            --env INVESTMENT_TERMINAL_SERVER_API_KEY=server-smoke-secret \
+            --env INVESTMENT_TERMINAL_PROVIDER_MAX_OUTPUT_TOKENS=32 \
+            --env INVESTMENT_TERMINAL_PROVIDER_MAX_TOTAL_TOKENS=128 \
+            --env INVESTMENT_TERMINAL_PROVIDER_MAX_TOTAL_COST=1.50 \
+            --env INVESTMENT_TERMINAL_PROVIDER_BUDGET_CURRENCY=USD \
+            --env INVESTMENT_TERMINAL_PROVIDER_INPUT_COST_PER_MILLION_TOKENS=0.10 \
+            --env INVESTMENT_TERMINAL_PROVIDER_OUTPUT_COST_PER_MILLION_TOKENS=0.20 \
+            --env INVESTMENT_TERMINAL_PROVIDER_PRICING_CURRENCY=USD \
+            investment-terminal:ci
+
+      - name: Wait for liveness
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8000/health > /tmp/health.json; then
+              cat /tmp/health.json
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "container did not become live" >&2
+          exit 1
+
+      - name: Verify readiness
+        run: |
+          python - <<'PY'
+          import json
+          import urllib.request
+
+          with urllib.request.urlopen(
+              "http://127.0.0.1:8000/ready",
+              timeout=5,
+          ) as response:
+              payload = json.load(response)
+
+          expected = {
+              "status": "READY",
+              "checks": {
+                  "knowledge_database": "READY",
+                  "provider_usage_cost_database": "READY",
+                  "grounded_generation_database": "READY",
+                  "provider_credentials": "READY",
+              },
+          }
+          if payload != expected:
+              raise SystemExit(
+                  f"unexpected readiness payload: {payload!r}"
+              )
+          PY
+
+      - name: Verify non-root runtime identity
+        run: |
+          test "$(docker exec investment-terminal-ci id -u)" != "0"
+
+      - name: Verify operational stores were initialized
+        run: |
+          test -f "${RUNNER_TEMP}/investment-terminal-runtime/operational/provider_usage_cost.db"
+          test -f "${RUNNER_TEMP}/investment-terminal-runtime/operational/grounded_generations.db"
+
+      - name: Capture container logs on failure
+        if: failure()
+        run: docker logs investment-terminal-ci || true
+
+      - name: Clean up container
+        if: always()
+        run: docker rm --force investment-terminal-ci >/dev/null 2>&1 || true
