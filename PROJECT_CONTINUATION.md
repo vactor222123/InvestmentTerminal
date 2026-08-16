@@ -4,9 +4,9 @@
 **Update rule:** MUST be updated after every completed Task  
 **Current repository:** `vactor222123/InvestmentTerminal`  
 **Current branch:** `develop`  
-**Current baseline:** `cb8bd40`  
+**Current baseline:** `8a22b7b`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
-**Current next action:** Sprint 32 Task 6 — Backup / Restore CLI
+**Current next action:** Sprint 32 Task 7 — FastAPI Lifespan Contract
 
 ---
 
@@ -471,11 +471,47 @@ closed.
 
 Restore activation remains outside Task 32.5.
 
-### 32.6 Backup / Restore CLI
+### 32.6 Backup / Restore CLI — CLOSED
 
-Provide explicit operator workflows while preserving domain boundaries.
+Closure:
 
-CLI must orchestrate; it must not own SQLite internals.
+```text
+commit: 8a22b7b
+CI: GREEN
+```
+
+Established a thin operator CLI with:
+
+```text
+backup
+validate
+restore
+```
+
+The CLI owns argument parsing, explicit operator intent, service orchestration,
+and human/JSON output only.
+
+Restore activation is implemented beneath the CLI in a dedicated persistence
+service:
+
+```text
+validate backup set
+→ create WAL-safe rollback snapshots of existing live DBs
+→ stage validated candidate DBs
+→ checkpoint live WAL
+→ switch target journal_mode to DELETE
+→ close SQLite connection
+→ remove stale WAL/SHM sidecars
+→ replace live DBs
+→ compensating rollback on partial activation failure
+```
+
+Actual restore requires explicit `--confirm-offline`.
+
+A prerequisite connection-lifecycle defect was also corrected in
+`KnowledgeSQLiteStore`: short-lived helper operations now explicitly close
+SQLite connections using `closing(self.connect())`, matching the already
+established provider-ledger and grounded-generation store pattern.
 
 ### 32.7 FastAPI Lifespan Contract
 
@@ -558,29 +594,29 @@ PROJECT_CONTINUATION.md
 ## 9. Current Next Action
 
 ```text
-Sprint 32 Task 6 — Backup / Restore CLI
+Sprint 32 Task 7 — FastAPI Lifespan Contract
 ```
 
-Before writing Task 32.6:
+Before writing Task 32.7:
 
 ```text
-1. Verify develop HEAD against cb8bd40 or inspect every later commit.
-2. Read runtime_backup_service.py and runtime_restore_validation.py as fixed
-   application/persistence contracts.
-3. Audit existing CLI patterns for argparse/exit codes/JSON vs human output.
-4. Decide whether 32.6 provides backup + validate-only restore commands, or
-   whether a safe activation service must first be introduced; do not let CLI
-   own raw os.replace/SQLite mechanics.
-5. Preserve explicit operator intent and fail-closed behavior.
-6. Keep History outside the runtime backup/restore CLI.
-7. Add tests for argument validation, successful backup, successful candidate
-   validation, expected failures, and no hidden live mutation.
-8. If activation is required by the approved Sprint wording, introduce it as a
-   separate service beneath CLI rather than embedding filesystem logic in CLI.
+1. Verify develop HEAD against 8a22b7b or inspect every later commit.
+2. Read create_app(), production composition, server runtime config, readiness,
+   and every operational SQLite store lifecycle currently initialized there.
+3. Identify which startup work belongs in FastAPI lifespan versus pure app
+   construction.
+4. Define explicit startup ordering and fail-closed behavior.
+5. Define explicit shutdown ownership for provider/client/resource handles.
+6. Preserve testability: app construction must not silently perform production
+   side effects that belong to lifespan.
+7. Audit TestClient usage because lifespan execution may change test setup.
+8. Keep backup/restore operator flows outside server startup/shutdown.
+9. Add focused tests for startup success/failure, shutdown cleanup, repeated app
+   construction, and readiness interaction.
 ```
 
-Task 32.6 is an operator orchestration boundary. CLI must remain thin and must
-not absorb SQLite, schema, or atomic-filesystem ownership.
+Task 32.7 owns server resource lifecycle only. It must not absorb deployment
+layout, container, reverse-proxy, or backup scheduling concerns.
 
 ---
 
@@ -998,16 +1034,64 @@ Sprint 32 Task 6 — Backup / Restore CLI
 
 ---
 
+### Task 32.6 — Backup / Restore CLI
+
+```text
+Status: CLOSED
+Commit: 8a22b7b
+CI: GREEN
+
+Changed:
+- added thin runtime backup/validate/restore CLI;
+- added dedicated offline restore-activation service beneath the CLI;
+- added WAL-safe rollback snapshots and compensating rollback;
+- added explicit --confirm-offline operator acknowledgement;
+- added Windows-safe WAL checkpoint/journal-mode transition before replacement;
+- fixed KnowledgeSQLiteStore short-lived connection lifecycle;
+- added CLI, restore-activation, busy-database, and connection-lifecycle tests.
+
+Decisions:
+- CLI does not own SQLite, schema, WAL, atomic replacement, or rollback logic;
+- restore activation always validates the backup candidate first;
+- restore is offline-only and fails closed if a live target remains busy;
+- History remains outside runtime backup/restore operator workflows;
+- cross-file restore is not described as an atomic transaction; recovery uses
+  compensating rollback.
+
+Tests/guarantees:
+- initial Windows restore tests exposed locked WAL sidecars;
+- deeper audit found KnowledgeSQLiteStore used sqlite3.Connection as a context
+  manager without explicit close();
+- Knowledge store now uses closing(self.connect()) consistently with the other
+  runtime SQLite stores;
+- full local regression passed after fixes;
+- GitHub Actions run #17 completed successfully.
+
+Lessons:
+- sqlite3.Connection context-manager semantics govern commit/rollback but must
+  not be relied upon as connection-lifecycle ownership;
+- short-lived SQLite helper methods must explicitly close connections;
+- Windows WAL locks often reveal lifecycle bugs rather than merely filesystem
+  deletion problems;
+- tests must stop defending obsolete symptoms after the underlying lifecycle
+  defect is corrected.
+
+Next:
+Sprint 32 Task 7 — FastAPI Lifespan Contract
+```
+
+---
+
 ## 16. Current Checkpoint Summary
 
 ```text
 Repository: vactor222123/InvestmentTerminal
 Branch: develop
-Baseline: cb8bd40
+Baseline: 8a22b7b
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
 Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
-Current next action: 32.6 Backup / Restore CLI
+Current next action: 32.7 FastAPI Lifespan Contract
 ```
 
 Checkpoint synchronization:
@@ -1017,6 +1101,6 @@ PROJECT_CONTINUATION.md introduced: develop @ 30a28ac
 CI: GREEN
 ```
 
-Tasks 32.1–32.5 are closed on verified CI. Continue with Task 32.6 only from
-the verified `cb8bd40` implementation baseline, or audit every later commit
+Tasks 32.1–32.6 are closed on verified CI. Continue with Task 32.7 only from
+the verified `8a22b7b` implementation baseline, or audit every later commit
 before proceeding.
