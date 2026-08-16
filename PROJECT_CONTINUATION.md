@@ -4,9 +4,9 @@
 **Update rule:** MUST be updated after every completed Task  
 **Current repository:** `vactor222123/InvestmentTerminal`  
 **Current branch:** `develop`  
-**Current baseline:** `b81fe98`  
+**Current baseline:** `ab53d8e`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
-**Current next action:** Sprint 32 Task 2 — SQLite Operational Inventory
+**Current next action:** Sprint 32 Task 3 — Consistent SQLite Backup Primitive
 
 ---
 
@@ -325,7 +325,37 @@ Do NOT begin with Docker.
 
 First establish what state is persistent and where it is allowed to live.
 
-### 32.2 SQLite Operational Inventory
+### 32.2 SQLite Operational Inventory — CLOSED
+
+Closure:
+
+```text
+commit: ab53d8e
+CI: GREEN
+```
+
+Established a neutral cross-domain SQLite persistence inventory with four
+classified boundaries:
+
+```text
+History SQLite
+→ rebuildable projection
+→ upstream archived Review Packages remain authority
+
+Knowledge SQLite
+→ rebuildable derived state
+→ backup for availability
+
+Provider usage/cost SQLite
+→ durable operational record
+→ backup required
+
+Grounded-generation SQLite
+→ durable generated evidence
+→ backup required
+```
+
+The inventory intentionally does not implement backup or restore I/O.
 
 Explicitly enumerate operational SQLite stores, ownership, criticality,
 rebuildability, and backup requirements.
@@ -444,27 +474,27 @@ PROJECT_CONTINUATION.md
 ## 9. Current Next Action
 
 ```text
-Sprint 32 Task 2 — SQLite Operational Inventory
+Sprint 32 Task 3 — Consistent SQLite Backup Primitive
 ```
 
-Before writing Task 32.2:
+Before writing Task 32.3:
 
 ```text
-1. Verify develop HEAD against b81fe98 or inspect every later commit.
-2. Search every SQLite store/repository in the repository.
-3. Identify which databases are production-operational versus historical
-   projection or other rebuildable state.
-4. For each store, determine authority, owner, rebuildability, criticality,
-   write behavior, WAL/journal behavior, and backup/restore requirement.
-5. Read schema initialization/migration code and relevant persistence tests.
-6. Read production composition and runtime filesystem contract.
-7. Do not implement backup code in 32.2.
-8. Produce one explicit operational inventory/contract that 32.3 can consume.
+1. Verify develop HEAD against ab53d8e or inspect every later commit.
+2. Read sqlite_inventory.py and treat its classification as policy input.
+3. Read all four SQLite store implementations and their connection/WAL behavior.
+4. Search for existing atomic-write helpers and reusable validation utilities.
+5. Audit Windows file-handle behavior before designing atomic publication.
+6. Define file-backed-only constraints and reject :memory: explicitly.
+7. Use SQLite backup API, never raw live-database file copying.
+8. Define validation before publication and partial-output cleanup.
+9. Keep restore activation out of 32.3.
+10. Add focused tests for WAL consistency, overwrite policy, failure cleanup,
+    and Windows-safe connection closure.
 ```
 
-Task 32.2 is a classification/ownership Task. It must prevent the later backup
-primitive from treating all SQLite files as if they had the same authority or
-recovery semantics.
+Task 32.3 owns only the consistent backup primitive. Cross-database orchestration
+belongs to 32.4 and restore activation belongs to 32.5.
 
 ---
 
@@ -714,16 +744,54 @@ Sprint 32 Task 2 — SQLite Operational Inventory
 
 ---
 
+### Task 32.2 — SQLite Operational Inventory
+
+```text
+Status: CLOSED
+Commit: ab53d8e
+CI: GREEN
+
+Changed:
+- added neutral `investment_terminal.persistence` package;
+- added executable SQLite persistence inventory;
+- classified History, Knowledge, provider usage/cost, and grounded-generation
+  SQLite boundaries;
+- added focused inventory contract tests and operational documentation.
+
+Decisions:
+- common SQLite/WAL mechanics do not imply common authority;
+- History SQLite is rebuildable projection, not historical authority;
+- Knowledge SQLite is rebuildable derived state and may be backed up for
+  availability;
+- provider ledger and grounded generations are durable records/evidence and
+  require backup if their durability guarantee is to hold;
+- History SQLite is outside grounded-AI production runtime management.
+
+Tests/guarantees:
+- focused inventory tests passed before commit;
+- full regression passed before commit;
+- GitHub Actions run #9 completed successfully.
+
+Lessons:
+- backup policy must be driven by persistence authority classification, not by
+  file extension or storage engine alone.
+
+Next:
+Sprint 32 Task 3 — Consistent SQLite Backup Primitive
+```
+
+---
+
 ## 16. Current Checkpoint Summary
 
 ```text
 Repository: vactor222123/InvestmentTerminal
 Branch: develop
-Baseline: b81fe98
+Baseline: ab53d8e
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
 Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
-Current next action: 32.2 SQLite Operational Inventory
+Current next action: 32.3 Consistent SQLite Backup Primitive
 ```
 
 Checkpoint synchronization:
