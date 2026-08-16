@@ -51,6 +51,13 @@ code scopes an exchange ticker as `EXCHANGE:TICKER`. Calendar metadata records
 identity and provenance only; session calculation remains in the owning
 freshness or History service.
 
+Every acquired market-metadata record may carry `MarketMetadataProvenance`
+with source, source-record identity, observation/fetch timestamps, and an
+optional SHA-256 checksum. `MarketMetadataQualityAssessment` exposes
+`READY`, `PARTIAL`, or `STALE` explicitly from configured freshness and
+lineage completeness; it does not convert incomplete evidence into a
+complete-looking result.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:

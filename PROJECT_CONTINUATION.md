@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `0249928`
-**Current local package:** Phase 1 Package 2 — market metadata contracts
+**Current GitHub baseline:** `6bfa797`
+**Current local package:** Phase 1 Package 3 — metadata provenance and quality
 **Current phase:** Phase 1 — Multi-Asset Evidence Foundation
-**Current next action:** Add source provenance and data-quality contracts for market metadata
+**Current next action:** Define ETF evidence and characteristics contracts
 
 ---
 
@@ -28,6 +28,9 @@ without changing their existing serialized JSON shape.
 Phase 1 Package 2 adds explicit exchange, trading-calendar, and currency
 metadata contracts and supports exchange-scoped ticker identity without
 changing existing portfolio serialization.
+
+Phase 1 Package 3 adds traceable market-metadata source provenance and
+deterministic READY/PARTIAL/STALE quality assessment.
 
 Audit document:
 
@@ -110,17 +113,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 1 Package 2 — Market Metadata Contracts
+Phase 1 Package 3 — Metadata Provenance and Quality
 ```
 
 Files:
 
 ```text
-investment_terminal/market/market_metadata_models.py
-investment_terminal/market/instrument_identity_models.py
-tests/test_market_metadata_models.py
-tests/test_instrument_identity_models.py
-tests/test_current_portfolio_identifiers.py
+investment_terminal/market/market_metadata_quality.py
+tests/test_market_metadata_quality.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -128,13 +128,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 02499285625a62b1d6e371a0f2eabcd25de414a2
+develop @ 6bfa7972d6af4b6812a8e00d97249a98a87c428c
 ```
 
 Architecture/product alignment:
 
-- metadata remains immutable, deterministic, and provider-independent;
-- calendar source/version/timezone are explicit rather than inferred;
-- exchange-supported currencies are explicit and normalized;
-- exchange-scoped tickers avoid cross-exchange key collisions;
-- existing freshness and History calendar ownership remains unchanged.
+- source identity and observation/fetch timestamps are explicit;
+- optional record identity/checksum gaps remain visible as PARTIAL;
+- stale metadata remains explicit and retains provenance warnings;
+- all persisted/exported timestamps are timezone-aware;
+- Knowledge provenance and current-state freshness ownership are unchanged.
