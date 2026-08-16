@@ -1,7 +1,7 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ ab53d8e`  
-**Status:** Sprint 32 Task 2 closed with green CI; Task 32.3 is next.
+**Current baseline:** `develop @ 2299a6f`  
+**Status:** Sprint 32 Task 3 closed with green CI; Task 32.4 is next.
 
 ## Durable Continuation Checkpoint
 
@@ -19,10 +19,10 @@ every completed Task.
 Progress:
 
 ```text
-32.1 Runtime Filesystem Contract        CLOSED / b81fe98 / CI GREEN
-32.2 SQLite Operational Inventory       CLOSED / ab53d8e / CI GREEN
-32.3 Consistent SQLite Backup Primitive NEXT
-32.4 Backup Service
+32.1 Runtime Filesystem Contract         CLOSED / b81fe98 / CI GREEN
+32.2 SQLite Operational Inventory        CLOSED / ab53d8e / CI GREEN
+32.3 Consistent SQLite Backup Primitive  CLOSED / 2299a6f / CI GREEN
+32.4 Backup Service                      NEXT
 32.5 Restore Validation
 32.6 Backup / Restore CLI
 32.7 FastAPI Lifespan Contract
@@ -34,45 +34,54 @@ Progress:
 32.13 Sprint 32 Closure
 ```
 
-## 32.2 Result
+## 32.3 Result
 
-The repository now has an explicit executable SQLite persistence inventory:
+The repository now owns one validated cross-domain SQLite backup primitive:
 
 ```text
-HISTORY_SQLITE@1
-→ rebuildable projection
-→ rebuild from upstream historical authority
-
-KNOWLEDGE_SQLITE@1
-→ rebuildable derived state
-→ backup for availability
-
-PROVIDER_USAGE_COST_SQLITE@1
-→ durable operational record
-→ backup required
-
-GROUNDED_GENERATION_SQLITE@1
-→ durable generated evidence
-→ backup required
+known persistence boundary
+→ file-backed source
+→ SQLite Connection.backup()
+→ WAL-safe consistent snapshot
+→ PRAGMA quick_check
+→ fsync
+→ atomic publication
+→ failure cleanup
 ```
 
-This classification is policy input for later backup/restore work.
+Windows-specific guarantee:
+
+```text
+all SQLite handles close before replace
+temp backup reopens as r+b before os.fsync
+```
+
+The Windows fix was verified by the full local regression suite:
+
+```text
+2218 passed
+4 skipped
+1 warning
+```
+
+and the implementation commit passed GitHub Actions.
 
 ## Current Next Action
 
 ```text
-Sprint 32 Task 3 — Consistent SQLite Backup Primitive
+Sprint 32 Task 4 — Backup Service
 ```
 
-Task 32.3 must implement a file-backed SQLite backup primitive with:
+Task 32.4 should orchestrate the three runtime-managed persistence boundaries:
 
 ```text
-SQLite backup API
-→ WAL-safe consistent snapshot
-→ temporary destination
-→ validation
-→ atomic publication
-→ partial-output cleanup
+KNOWLEDGE_SQLITE@1
+PROVIDER_USAGE_COST_SQLITE@1
+GROUNDED_GENERATION_SQLITE@1
 ```
 
-Do not implement cross-database orchestration or restore activation in 32.3.
+It must define deterministic backup-set identity/naming/metadata and explicit
+partial-failure semantics.
+
+Do not include History SQLite in the grounded-AI runtime backup set, and do not
+implement restore activation in Task 32.4.

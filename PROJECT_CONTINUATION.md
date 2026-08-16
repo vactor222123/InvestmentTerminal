@@ -4,9 +4,9 @@
 **Update rule:** MUST be updated after every completed Task  
 **Current repository:** `vactor222123/InvestmentTerminal`  
 **Current branch:** `develop`  
-**Current baseline:** `ab53d8e`  
+**Current baseline:** `2299a6f`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
-**Current next action:** Sprint 32 Task 3 — Consistent SQLite Backup Primitive
+**Current next action:** Sprint 32 Task 4 — Backup Service
 
 ---
 
@@ -360,18 +360,41 @@ The inventory intentionally does not implement backup or restore I/O.
 Explicitly enumerate operational SQLite stores, ownership, criticality,
 rebuildability, and backup requirements.
 
-### 32.3 Consistent SQLite Backup Primitive
+### 32.3 Consistent SQLite Backup Primitive — CLOSED
 
-Required properties:
+Closure:
 
 ```text
-SQLite backup API
-WAL-safe behavior
-temporary destination
-validation
-atomic publication
-failure cleanup
+commit: 2299a6f
+CI: GREEN
 ```
+
+Established a cross-domain file-backed SQLite backup primitive with:
+
+```text
+inventory identity validation
+→ SQLite Connection.backup()
+→ WAL-safe committed-state snapshot
+→ temporary destination in target directory
+→ PRAGMA quick_check
+→ backup-file fsync
+→ atomic os.replace publication
+→ directory sync where supported
+→ partial-output cleanup on failure
+```
+
+Windows-specific durability contract:
+
+```text
+close all SQLite handles before os.replace
+reopen completed temp backup as r+b before os.fsync
+```
+
+The `r+b` access mode is required because Windows' CRT-backed `os.fsync`
+requires a descriptor with write access; it does not modify backup content.
+
+Existing destinations are protected by default and require explicit
+`overwrite=True` for replacement.
 
 Do not implement backup as a naive live `.db` file copy.
 
@@ -474,27 +497,30 @@ PROJECT_CONTINUATION.md
 ## 9. Current Next Action
 
 ```text
-Sprint 32 Task 3 — Consistent SQLite Backup Primitive
+Sprint 32 Task 4 — Backup Service
 ```
 
-Before writing Task 32.3:
+Before writing Task 32.4:
 
 ```text
-1. Verify develop HEAD against ab53d8e or inspect every later commit.
-2. Read sqlite_inventory.py and treat its classification as policy input.
-3. Read all four SQLite store implementations and their connection/WAL behavior.
-4. Search for existing atomic-write helpers and reusable validation utilities.
-5. Audit Windows file-handle behavior before designing atomic publication.
-6. Define file-backed-only constraints and reject :memory: explicitly.
-7. Use SQLite backup API, never raw live-database file copying.
-8. Define validation before publication and partial-output cleanup.
-9. Keep restore activation out of 32.3.
-10. Add focused tests for WAL consistency, overwrite policy, failure cleanup,
-    and Windows-safe connection closure.
+1. Verify develop HEAD against 2299a6f or inspect every later commit.
+2. Read sqlite_inventory.py and sqlite_backup.py as fixed lower-level contracts.
+3. Read runtime_config.py and runtime_filesystem.py for production-managed paths.
+4. Confirm which runtime-managed boundaries belong in the service:
+   Knowledge, provider usage/cost, grounded generations.
+5. Define backup-root ownership without relocating live databases.
+6. Define deterministic backup-set identity, timestamp/clock injection, naming,
+   and metadata before writing files.
+7. Decide all-or-nothing versus partial-set semantics explicitly.
+8. Ensure backup metadata never changes authority classification.
+9. Keep restore validation/activation out of 32.4.
+10. Add focused tests for deterministic naming/metadata, complete runtime set,
+    partial failure behavior, and no accidental History inclusion.
 ```
 
-Task 32.3 owns only the consistent backup primitive. Cross-database orchestration
-belongs to 32.4 and restore activation belongs to 32.5.
+Task 32.4 orchestrates runtime-managed backup creation and deterministic metadata.
+The generic SQLite snapshot mechanism remains owned by 32.3. Restore validation
+and activation remain 32.5.
 
 ---
 
@@ -782,16 +808,58 @@ Sprint 32 Task 3 — Consistent SQLite Backup Primitive
 
 ---
 
+### Task 32.3 — Consistent SQLite Backup Primitive
+
+```text
+Status: CLOSED
+Commit: 2299a6f
+CI: GREEN
+
+Changed:
+- added generic cross-domain SQLite backup primitive;
+- used SQLite Connection.backup() instead of raw live-file copying;
+- added WAL-consistency and storage-integrity validation;
+- added atomic publication, overwrite policy, and failure cleanup;
+- added Windows-compatible file fsync behavior;
+- added focused backup/WAL/Windows regression tests and documentation.
+
+Decisions:
+- backup requests must identify a known SQLite persistence boundary;
+- only file-backed SQLite sources/destinations are supported;
+- source and destination must differ;
+- existing destination replacement requires explicit overwrite=True;
+- PRAGMA quick_check is storage-level validation only;
+- schema/identity restore validation remains Task 32.5;
+- all SQLite handles close before atomic replacement.
+
+Tests/guarantees:
+- initial Windows run exposed read-only descriptor fsync incompatibility;
+- fixed _sync_file() to reopen completed backup as r+b;
+- full local regression after fix: 2218 passed, 4 skipped, 1 warning;
+- GitHub Actions run #11 completed successfully.
+
+Lessons:
+- Windows filesystem durability requires auditing descriptor access mode as well
+  as file-handle closure;
+- os.fsync on Windows must not be assumed to accept a read-only descriptor;
+- cross-platform persistence code needs explicit Windows regression coverage.
+
+Next:
+Sprint 32 Task 4 — Backup Service
+```
+
+---
+
 ## 16. Current Checkpoint Summary
 
 ```text
 Repository: vactor222123/InvestmentTerminal
 Branch: develop
-Baseline: ab53d8e
+Baseline: 2299a6f
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
 Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
-Current next action: 32.3 Consistent SQLite Backup Primitive
+Current next action: 32.4 Backup Service
 ```
 
 Checkpoint synchronization:
@@ -801,5 +869,6 @@ PROJECT_CONTINUATION.md introduced: develop @ 30a28ac
 CI: GREEN
 ```
 
-Task 32.1 is closed on verified CI. Continue with Task 32.2 only from the
-verified `b81fe98` baseline, or audit every later commit before proceeding.
+Tasks 32.1–32.3 are closed on verified CI. Continue with Task 32.4 only from
+the verified `2299a6f` implementation baseline, or audit every later commit
+before proceeding.
