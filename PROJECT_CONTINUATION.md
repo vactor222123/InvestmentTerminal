@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `400878a`
-**Current local package:** Phase 1 Package 4 — ETF evidence and characteristics
+**Current GitHub baseline:** `dc7dae8`
+**Current local package:** Phase 1 Package 5 — ETF holdings and exposure composition
 **Current phase:** Phase 1 — Multi-Asset Evidence Foundation
-**Current next action:** Define ETF holdings and exposure composition contracts
+**Current next action:** Audit Phase 1 closure and define the Phase 2 transaction-ledger boundary
 
 ---
 
@@ -34,6 +34,9 @@ deterministic READY/PARTIAL/STALE quality assessment.
 
 Phase 1 Package 4 adds provider-independent ETF characteristics and an
 evidence envelope that preserves missing facts, source provenance, and quality.
+
+Phase 1 Package 5 adds constituent-holding and categorical-exposure contracts
+with explicit partial coverage, provenance, and quality.
 
 Audit document:
 
@@ -116,14 +119,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 1 Package 4 — ETF Evidence and Characteristics
+Phase 1 Package 5 — ETF Holdings and Exposure Composition
 ```
 
 Files:
 
 ```text
-investment_terminal/market/etf_evidence_models.py
-tests/test_etf_evidence_models.py
+investment_terminal/market/etf_composition_models.py
+tests/test_etf_composition_models.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -131,13 +134,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 400878a3be9068b3c1a6f2a1e2508b99a6040a2c
+develop @ dc7dae835eb7c79712968b951a9c22b001eff3bf
 ```
 
 Architecture/product alignment:
 
-- ETF characteristics are linked to the canonical ETF instrument identity;
-- unavailable characteristics remain `None` and are listed explicitly;
-- expense ratio, AUM, currency, and holdings count have deterministic bounds;
-- source provenance and quality remain separate, reusable evidence contracts;
+- ETF composition is linked to the canonical ETF instrument identity;
+- partial holdings and exposure coverage remain explicit rather than inferred;
+- weights, duplicate identities, and per-dimension totals are validated;
+- constituent identity remains optional when a source does not provide it;
 - provider clients, persistence, Review, and portfolio JSON remain unchanged.

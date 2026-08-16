@@ -64,6 +64,14 @@ listed explicitly in `missing_characteristics`. `ETFCharacteristicsEvidence`
 binds those facts to source provenance and its explicit quality assessment;
 it does not infer missing fund data.
 
+`ETFComposition` represents reported constituent holdings and categorical
+exposures without assuming that a provider supplied the whole fund. Holdings
+may carry an `InstrumentIdentity` when one is available; otherwise their
+normalized name remains explicit. Decimal weights are bounded, duplicates are
+rejected, and coverage is reported separately for holdings and each exposure
+dimension. `ETFCompositionEvidence` attaches source provenance and quality
+without changing portfolio or Review contracts.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:
