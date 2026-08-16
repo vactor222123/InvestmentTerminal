@@ -4,9 +4,9 @@
 **Update rule:** MUST be updated after every completed Task  
 **Current repository:** `vactor222123/InvestmentTerminal`  
 **Current branch:** `develop`  
-**Current baseline:** `8a22b7b`  
+**Current baseline:** `3b069e6`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
-**Current next action:** Sprint 32 Task 7 — FastAPI Lifespan Contract
+**Current next action:** Sprint 32 Task 8 — Runtime Deployment Layout
 
 ---
 
@@ -513,12 +513,41 @@ A prerequisite connection-lifecycle defect was also corrected in
 SQLite connections using `closing(self.connect())`, matching the already
 established provider-ledger and grounded-generation store pattern.
 
-### 32.7 FastAPI Lifespan Contract
+### 32.7 FastAPI Lifespan Contract — CLOSED
 
-Move startup/shutdown resource lifecycle into explicit lifespan ownership where
-appropriate.
+Closure:
 
-Verify initialization and cleanup behavior.
+```text
+commit: 3b069e6
+CI: GREEN
+```
+
+Production application construction is now side-effect free with respect to
+operational persistence.
+
+`production.create_app()` performs configuration and object composition only.
+The explicit FastAPI/ASGI lifespan owns startup side effects:
+
+```text
+runtime filesystem prepare
+→ provider usage/cost SQLite initialize
+→ grounded-generation SQLite initialize
+→ accept requests
+```
+
+Startup failure propagates out of lifespan and prevents successful application
+startup.
+
+Knowledge remains an external prerequisite and is not created or migrated by
+the server lifespan.
+
+The current production graph owns no long-lived SQLite connections or provider
+HTTP client handles, so shutdown does not invent fake cleanup. The explicit
+shutdown boundary remains the required ownership point for future long-lived
+resources.
+
+Production tests that depend on startup state now enter lifespan explicitly via
+`with TestClient(app)`.
 
 ### 32.8 Runtime Deployment Layout
 
@@ -594,29 +623,32 @@ PROJECT_CONTINUATION.md
 ## 9. Current Next Action
 
 ```text
-Sprint 32 Task 7 — FastAPI Lifespan Contract
+Sprint 32 Task 8 — Runtime Deployment Layout
 ```
 
-Before writing Task 32.7:
+Before writing Task 32.8:
 
 ```text
-1. Verify develop HEAD against 8a22b7b or inspect every later commit.
-2. Read create_app(), production composition, server runtime config, readiness,
-   and every operational SQLite store lifecycle currently initialized there.
-3. Identify which startup work belongs in FastAPI lifespan versus pure app
-   construction.
-4. Define explicit startup ordering and fail-closed behavior.
-5. Define explicit shutdown ownership for provider/client/resource handles.
-6. Preserve testability: app construction must not silently perform production
-   side effects that belong to lifespan.
-7. Audit TestClient usage because lifespan execution may change test setup.
-8. Keep backup/restore operator flows outside server startup/shutdown.
-9. Add focused tests for startup success/failure, shutdown cleanup, repeated app
-   construction, and readiness interaction.
+1. Verify develop HEAD against 3b069e6 or inspect every later commit.
+2. Read runtime_config.py, runtime_filesystem.py, backup/restore contracts,
+   server CLI, and current production documentation.
+3. Define a concrete deployment filesystem topology separating:
+   read-only application/code, writable runtime data, backup destination,
+   configuration input, and secrets.
+4. Define which paths are mounted/persistent versus ephemeral.
+5. Keep live SQLite paths inside runtime_data_root when strict confinement is
+   enabled.
+6. Keep backup_root independent from live runtime_data_root ownership.
+7. Define operator-facing environment/path examples without silently relocating
+   existing databases.
+8. Do not add Docker yet; 32.8 defines the contract consumed by 32.9.
+9. Add executable/configuration tests only where they close ambiguity in the
+   deployment-layout contract.
 ```
 
-Task 32.7 owns server resource lifecycle only. It must not absorb deployment
-layout, container, reverse-proxy, or backup scheduling concerns.
+Task 32.8 owns deployment layout/documented path boundaries. Container image
+construction, reverse proxy/TLS, and CI container smoke tests remain later
+Tasks.
 
 ---
 
@@ -1082,16 +1114,63 @@ Sprint 32 Task 7 — FastAPI Lifespan Contract
 
 ---
 
+### Task 32.7 — FastAPI Lifespan Contract
+
+```text
+Status: CLOSED
+Commit: 3b069e6
+CI: GREEN
+
+Changed:
+- moved production filesystem preparation from create_app() into ASGI lifespan;
+- moved operational SQLite initialization into lifespan startup;
+- added optional lifespan injection to the generic FastAPI adapter;
+- updated production E2E/TestClient usage to enter lifespan explicitly;
+- added focused startup side-effect, startup failure, readiness, and repeated
+  app-construction tests.
+
+Decisions:
+- create_app() is configuration/composition only;
+- operational persistence side effects belong to startup lifecycle;
+- Knowledge remains an external prerequisite;
+- startup failures fail closed before the app becomes available;
+- current shutdown has no fake resource cleanup because no long-lived owned
+  handles exist;
+- future long-lived resources must be closed in the explicit lifespan shutdown
+  boundary.
+
+Tests/guarantees:
+- initial full regression exposed three stale composition expectations;
+- fake FastAPI factories were updated to accept lifespan;
+- persistence composition tests now assert DB creation after lifespan entry,
+  not during create_app();
+- full local regression passed after fixes;
+- GitHub Actions run #19 completed successfully.
+
+Lessons:
+- application construction and runtime startup are distinct lifecycle stages;
+- tests that depend on startup state must explicitly enter ASGI lifespan;
+- when moving side effects into lifecycle ownership, all composition consumers
+  and test doubles must be audited for the new callable boundary;
+- tests should validate lifecycle timing, not preserve old construction-time
+  side effects.
+
+Next:
+Sprint 32 Task 8 — Runtime Deployment Layout
+```
+
+---
+
 ## 16. Current Checkpoint Summary
 
 ```text
 Repository: vactor222123/InvestmentTerminal
 Branch: develop
-Baseline: 8a22b7b
+Baseline: 3b069e6
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
 Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
-Current next action: 32.7 FastAPI Lifespan Contract
+Current next action: 32.8 Runtime Deployment Layout
 ```
 
 Checkpoint synchronization:
@@ -1101,6 +1180,6 @@ PROJECT_CONTINUATION.md introduced: develop @ 30a28ac
 CI: GREEN
 ```
 
-Tasks 32.1–32.6 are closed on verified CI. Continue with Task 32.7 only from
-the verified `8a22b7b` implementation baseline, or audit every later commit
+Tasks 32.1–32.7 are closed on verified CI. Continue with Task 32.8 only from
+the verified `3b069e6` implementation baseline, or audit every later commit
 before proceeding.

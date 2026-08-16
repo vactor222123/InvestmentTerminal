@@ -1,7 +1,7 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ 8a22b7b`  
-**Status:** Sprint 32 Task 6 closed with green CI; Task 32.7 is next.
+**Current baseline:** `develop @ 3b069e6`  
+**Status:** Sprint 32 Task 7 closed with green CI; Task 32.8 is next.
 
 ## Durable Continuation Checkpoint
 
@@ -25,8 +25,8 @@ Progress:
 32.4 Backup Service                      CLOSED / 5e846ce / CI GREEN
 32.5 Restore Validation                  CLOSED / cb8bd40 / CI GREEN
 32.6 Backup / Restore CLI                CLOSED / 8a22b7b / CI GREEN
-32.7 FastAPI Lifespan Contract           NEXT
-32.8 Runtime Deployment Layout
+32.7 FastAPI Lifespan Contract           CLOSED / 3b069e6 / CI GREEN
+32.8 Runtime Deployment Layout           NEXT
 32.9 Container Baseline
 32.10 Deployment Security Contract
 32.11 CI Container Smoke Test
@@ -34,47 +34,47 @@ Progress:
 32.13 Sprint 32 Closure
 ```
 
-## 32.6 Result
+## 32.7 Result
 
-Runtime operator workflows now expose:
-
-```text
-backup
-validate
-restore
-```
-
-Restore is implemented as an offline workflow beneath the CLI:
+Production construction and startup are now separate:
 
 ```text
-validate
-→ rollback snapshots
-→ staged candidates
-→ WAL checkpoint
-→ journal_mode DELETE
-→ close handles
-→ replace
-→ compensating rollback on partial failure
+create_app()
+→ config + object composition only
+
+ASGI lifespan startup
+→ runtime filesystem prepare
+→ provider usage/cost DB initialize
+→ grounded-generation DB initialize
+→ serve requests
 ```
 
-The CLI requires explicit:
+Startup failures fail closed.
 
-```text
---confirm-offline
+Knowledge remains an external prerequisite.
+
+Production tests that rely on startup state now use:
+
+```python
+with TestClient(app) as client:
+    ...
 ```
-
-A KnowledgeSQLiteStore lifecycle defect discovered by Windows restore testing
-was also fixed: short-lived store helpers now explicitly close their SQLite
-connections.
 
 ## Current Next Action
 
 ```text
-Sprint 32 Task 7 — FastAPI Lifespan Contract
+Sprint 32 Task 8 — Runtime Deployment Layout
 ```
 
-Task 32.7 should move production startup/shutdown resource ownership into an
-explicit FastAPI lifespan boundary where appropriate, with focused coverage for
-startup failure, readiness interaction, and deterministic cleanup.
+Task 32.8 should define the concrete deployment topology for:
 
-Do not mix deployment layout, container work, or backup scheduling into 32.7.
+```text
+read-only application/code
+writable persistent runtime data
+backup destination
+configuration boundary
+secret boundary
+```
+
+Do not introduce Docker yet. Task 32.9 should consume the layout contract rather
+than invent it.
