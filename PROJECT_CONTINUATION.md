@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `6bfa797`
-**Current local package:** Phase 1 Package 3 — metadata provenance and quality
+**Current GitHub baseline:** `400878a`
+**Current local package:** Phase 1 Package 4 — ETF evidence and characteristics
 **Current phase:** Phase 1 — Multi-Asset Evidence Foundation
-**Current next action:** Define ETF evidence and characteristics contracts
+**Current next action:** Define ETF holdings and exposure composition contracts
 
 ---
 
@@ -31,6 +31,9 @@ changing existing portfolio serialization.
 
 Phase 1 Package 3 adds traceable market-metadata source provenance and
 deterministic READY/PARTIAL/STALE quality assessment.
+
+Phase 1 Package 4 adds provider-independent ETF characteristics and an
+evidence envelope that preserves missing facts, source provenance, and quality.
 
 Audit document:
 
@@ -113,14 +116,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 1 Package 3 — Metadata Provenance and Quality
+Phase 1 Package 4 — ETF Evidence and Characteristics
 ```
 
 Files:
 
 ```text
-investment_terminal/market/market_metadata_quality.py
-tests/test_market_metadata_quality.py
+investment_terminal/market/etf_evidence_models.py
+tests/test_etf_evidence_models.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -128,13 +131,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 6bfa7972d6af4b6812a8e00d97249a98a87c428c
+develop @ 400878a3be9068b3c1a6f2a1e2508b99a6040a2c
 ```
 
 Architecture/product alignment:
 
-- source identity and observation/fetch timestamps are explicit;
-- optional record identity/checksum gaps remain visible as PARTIAL;
-- stale metadata remains explicit and retains provenance warnings;
-- all persisted/exported timestamps are timezone-aware;
-- Knowledge provenance and current-state freshness ownership are unchanged.
+- ETF characteristics are linked to the canonical ETF instrument identity;
+- unavailable characteristics remain `None` and are listed explicitly;
+- expense ratio, AUM, currency, and holdings count have deterministic bounds;
+- source provenance and quality remain separate, reusable evidence contracts;
+- provider clients, persistence, Review, and portfolio JSON remain unchanged.

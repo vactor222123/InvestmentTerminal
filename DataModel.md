@@ -58,6 +58,12 @@ optional SHA-256 checksum. `MarketMetadataQualityAssessment` exposes
 lineage completeness; it does not convert incomplete evidence into a
 complete-looking result.
 
+ETF reference evidence uses `ETFCharacteristics` for provider-independent
+facts linked to an ETF `InstrumentIdentity`. Unavailable characteristics are
+listed explicitly in `missing_characteristics`. `ETFCharacteristicsEvidence`
+binds those facts to source provenance and its explicit quality assessment;
+it does not infer missing fund data.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:
