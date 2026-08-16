@@ -4,9 +4,9 @@
 **Update rule:** MUST be updated after every completed Task  
 **Current repository:** `vactor222123/InvestmentTerminal`  
 **Current branch:** `develop`  
-**Current baseline:** `f0a4b64`  
+**Current baseline:** `1c6fe62`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
-**Current next action:** Sprint 32 Task 10 — Deployment Security Contract
+**Current next action:** Sprint 32 Task 11 — CI Container Smoke Test
 
 ---
 
@@ -624,19 +624,56 @@ developer environment. This is recorded as an unverified local build step, not
 as a passing image build. Real image build/start verification remains Task
 32.11.
 
-### 32.10 Deployment Security Contract
+### 32.10 Deployment Security Contract — CLOSED
 
-Define responsibility for:
+Closure:
 
 ```text
-reverse proxy
-TLS termination
-secret injection
-trusted network assumptions
+commit: 1c6fe62
+CI: GREEN
 ```
 
-Do not add application-level TLS merely for appearance if the deployment
-boundary should own TLS.
+Established explicit deployment-security ownership:
+
+```text
+public client
+→ HTTPS
+→ reverse proxy / platform ingress
+→ private HTTP
+→ Investment Terminal container
+```
+
+TLS, certificate policy, and HSTS remain owned by the TLS termination boundary.
+
+Application API-key authentication remains mandatory defense in depth behind the
+proxy boundary.
+
+The production server CLI now explicitly launches Uvicorn with:
+
+```text
+proxy_headers=False
+```
+
+so arbitrary `X-Forwarded-*` metadata is not implicitly trusted.
+
+Canonical exposure policy:
+
+```text
+/health       liveness; no app auth; deployment-private where practical
+/ready        readiness/operator endpoint; deployment-private
+/openapi.json operator/developer schema; deployment-private
+/v1/*         API-key authentication required
+```
+
+Secret authority remains single-source:
+
+```text
+deployment secret manager / environment injection
+→ process environment
+→ existing runtime config
+```
+
+No automatic `/secrets/...` loader or application-level TLS stack was added.
 
 ### 32.11 CI Container Smoke Test
 
@@ -674,36 +711,35 @@ PROJECT_CONTINUATION.md
 ## 9. Current Next Action
 
 ```text
-Sprint 32 Task 10 — Deployment Security Contract
+Sprint 32 Task 11 — CI Container Smoke Test
 ```
 
-Before writing Task 32.10:
+Before writing Task 32.11:
 
 ```text
-1. Verify develop HEAD against f0a4b64 or inspect every later commit.
-2. Read container baseline, runtime deployment layout, server authentication,
-   security-header middleware, readiness/health endpoints, and current runtime
-   config/secret environment contracts.
-3. Define the reverse-proxy trust boundary and which component terminates TLS.
-4. Define whether the application is expected to receive only private/internal
-   HTTP from the proxy versus direct public traffic.
-5. Define secret injection ownership without adding a second secret-loading
-   authority inside the application.
-6. Define trusted forwarded-header assumptions and explicitly reject implicit
-   trust of arbitrary X-Forwarded-* input unless a later implementation owns it.
-7. Define exposure rules for /health, /ready, /openapi.json, and authenticated
-   API routes.
-8. Preserve application-level API-key authentication as defense in depth behind
-   the deployment boundary.
-9. Do not implement application-level TLS merely for appearance if the proxy or
-   platform owns TLS termination.
-10. Keep CI image build/start verification for 32.11 and operational restore E2E
-    for 32.12.
+1. Verify develop HEAD against 1c6fe62 or inspect every later commit.
+2. Read Dockerfile, .dockerignore, CI workflow, runtime deployment layout,
+   deployment security contract, runtime config, readiness service, and server
+   CLI.
+3. Add a dedicated CI job or focused workflow phase that actually builds the
+   production image with Docker on the GitHub runner.
+4. Start the image with deterministic fixture configuration and an isolated
+   temporary/persistent runtime mount.
+5. Provide a valid Knowledge SQLite fixture inside /runtime before startup;
+   operational SQLite stores should be initialized by lifespan.
+6. Inject only synthetic test secrets through environment variables.
+7. Verify container liveness via /health and readiness via /ready as separate
+   assertions.
+8. Verify the server is running as the expected non-root user where practical.
+9. Capture container logs on failure and always clean up the container/volumes.
+10. Do not call the external OpenAI provider; the smoke test should verify
+    build/start/runtime wiring, not provider integration.
+11. Keep reverse-proxy/TLS out of this smoke test; 32.10 already defines that
+    boundary.
+12. Preserve existing Python regression CI rather than replacing it with Docker.
 ```
 
-Task 32.10 owns deployment-security responsibilities and trust assumptions. It
-should be a contract first; only add application code if the audit identifies a
-concrete missing enforcement point.
+Task 32.11 closes the currently unverified image-build/start gap from 32.9.
 
 ---
 
@@ -1316,16 +1352,62 @@ Sprint 32 Task 10 — Deployment Security Contract
 
 ---
 
+### Task 32.10 — Deployment Security Contract
+
+```text
+Status: CLOSED
+Commit: 1c6fe62
+CI: GREEN
+
+Changed:
+- added canonical deployment-security ownership model;
+- documented TLS/reverse-proxy/private-HTTP topology;
+- explicitly disabled Uvicorn proxy-header trust;
+- documented endpoint exposure policy for /health, /ready, /openapi.json, /v1/*;
+- preserved application API-key authentication as defense in depth;
+- preserved environment-variable secret injection as the sole application
+  secret authority;
+- added deployment-security contract tests and server CLI regression coverage.
+
+Decisions:
+- TLS certificates, HTTPS policy, and HSTS belong to proxy/platform ingress;
+- application-level TLS is not added merely for appearance;
+- application container is not a supported direct-public deployment boundary;
+- arbitrary X-Forwarded-* metadata is not trusted;
+- /ready and /openapi.json are deployment-private operator surfaces;
+- no automatic secret-file loader is introduced.
+
+Tests/guarantees:
+- focused deployment-security/server tests passed locally;
+- full Python regression passed locally;
+- git diff --check passed locally;
+- GitHub Actions run #25 completed successfully.
+
+Lessons:
+- deployment security must distinguish infrastructure ownership from application
+  enforcement;
+- defaults around proxy headers are security-sensitive and should be explicit;
+- defense-in-depth application authentication should remain even behind trusted
+  ingress;
+- secret injection must have one authoritative path rather than competing env
+  and file mechanisms.
+
+Next:
+Sprint 32 Task 11 — CI Container Smoke Test
+```
+
+---
+
 ## 16. Current Checkpoint Summary
 
 ```text
 Repository: vactor222123/InvestmentTerminal
 Branch: develop
-Baseline: f0a4b64
+Baseline: 1c6fe62
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
 Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
-Current next action: 32.10 Deployment Security Contract
+Current next action: 32.11 CI Container Smoke Test
 ```
 
 Checkpoint synchronization:
@@ -1335,6 +1417,6 @@ PROJECT_CONTINUATION.md introduced: develop @ 30a28ac
 CI: GREEN
 ```
 
-Tasks 32.1–32.9 are closed on verified CI. Continue with Task 32.10 only from
-the verified `f0a4b64` implementation baseline, or audit every later commit
+Tasks 32.1–32.10 are closed on verified CI. Continue with Task 32.11 only from
+the verified `1c6fe62` implementation baseline, or audit every later commit
 before proceeding.

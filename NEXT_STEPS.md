@@ -1,7 +1,7 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ f0a4b64`  
-**Status:** Sprint 32 Task 9 closed with green CI; Task 32.10 is next.
+**Current baseline:** `develop @ 1c6fe62`  
+**Status:** Sprint 32 Task 10 closed with green CI; Task 32.11 is next.
 
 ## Durable Continuation Checkpoint
 
@@ -28,51 +28,48 @@ Progress:
 32.7 FastAPI Lifespan Contract           CLOSED / 3b069e6 / CI GREEN
 32.8 Runtime Deployment Layout           CLOSED / 543e737 / CI GREEN
 32.9 Container Baseline                  CLOSED / f0a4b64 / CI GREEN
-32.10 Deployment Security Contract       NEXT
-32.11 CI Container Smoke Test
+32.10 Deployment Security Contract       CLOSED / 1c6fe62 / CI GREEN
+32.11 CI Container Smoke Test            NEXT
 32.12 Real Operational Resilience E2E
 32.13 Sprint 32 Closure
 ```
 
-## 32.9 Result
+## 32.10 Result
 
-Production container baseline now defines:
+Canonical production security boundary is now explicit:
 
 ```text
-python:3.13-slim
-hash-locked runtime dependency install
-non-root execution
-read-only /application
-persistent /runtime and /backups
-healthcheck on /health
-one-worker server runtime
+public client
+→ HTTPS
+→ reverse proxy / platform ingress
+→ private HTTP
+→ Investment Terminal container
 ```
 
-Local Python/contract regression was green.
-
-Important verification note:
+Key invariants:
 
 ```text
-local docker build NOT executed
-reason: Docker CLI unavailable
-real image build/start verification: Task 32.11
+TLS/HSTS owned by ingress
+proxy_headers=False
+API-key auth remains mandatory on /v1/*
+/ready and /openapi.json are deployment-private
+secrets enter through process environment only
 ```
 
 ## Current Next Action
 
 ```text
-Sprint 32 Task 10 — Deployment Security Contract
+Sprint 32 Task 11 — CI Container Smoke Test
 ```
 
-Task 32.10 should define:
+Task 32.11 must close the still-unverified container execution gap:
 
 ```text
-reverse-proxy trust boundary
-TLS termination ownership
-secret injection ownership
-trusted-network assumptions
-forwarded-header assumptions
-public/private endpoint exposure
+docker build
+→ run container with fixture runtime mount
+→ /health liveness
+→ /ready readiness
+→ clean shutdown and logs on failure
 ```
 
-Keep actual container build/start CI work in 32.11.
+Do not call the external AI provider in this smoke test.
