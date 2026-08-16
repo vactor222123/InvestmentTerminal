@@ -4,9 +4,9 @@
 **Update rule:** MUST be updated after every completed Task  
 **Current repository:** `vactor222123/InvestmentTerminal`  
 **Current branch:** `develop`  
-**Current baseline:** `543e737`  
+**Current baseline:** `f0a4b64`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
-**Current next action:** Sprint 32 Task 9 — Container Baseline
+**Current next action:** Sprint 32 Task 10 — Deployment Security Contract
 
 ---
 
@@ -591,17 +591,38 @@ no database is silently relocated
 
 The backup root is explicitly independent from the live runtime-data root.
 
-### 32.9 Container Baseline
+### 32.9 Container Baseline — CLOSED
 
-Only after filesystem/persistence contracts are explicit:
+Closure:
 
 ```text
-Dockerfile
-locked dependency install
-non-root execution
-healthcheck
-persistent volume contract
+commit: f0a4b64
+CI: GREEN
 ```
+
+Established a minimal production container baseline consuming the 32.8
+deployment layout:
+
+```text
+python:3.13-slim
+→ runtime requirements.lock installed with --require-hashes
+→ non-root investment-terminal user
+→ /application made read-only
+→ /runtime and /backups declared as persistent volume boundaries
+→ /config and /secrets created as deployment mount points
+→ /health liveness healthcheck
+→ canonical one-worker server CLI
+```
+
+The build context excludes local `.env`, SQLite/WAL/SHM files, runtime data,
+backup data, test/dev payload, and development lock files.
+
+The image does not bake Knowledge or real secrets.
+
+Local Docker build was not executed because Docker CLI was unavailable in the
+developer environment. This is recorded as an unverified local build step, not
+as a passing image build. Real image build/start verification remains Task
+32.11.
 
 ### 32.10 Deployment Security Contract
 
@@ -653,35 +674,36 @@ PROJECT_CONTINUATION.md
 ## 9. Current Next Action
 
 ```text
-Sprint 32 Task 9 — Container Baseline
+Sprint 32 Task 10 — Deployment Security Contract
 ```
 
-Before writing Task 32.9:
+Before writing Task 32.10:
 
 ```text
-1. Verify develop HEAD against 543e737 or inspect every later commit.
-2. Read requirements.lock, Python-version contract, server CLI, runtime
-   deployment layout, runtime filesystem contract, and current CI workflow.
-3. Build the image from the locked runtime dependency set using
-   --require-hashes.
-4. Keep application/code read-only at runtime and run the process as a non-root
-   user.
-5. Provision mount points consistent with the 32.8 contract:
-   /runtime and /backups as persistent writable boundaries, /config and
-   /secrets as read-only deployment boundaries.
-6. Do not bake real secrets or live runtime databases into the image.
-7. Define a container healthcheck against the existing /health endpoint without
-   confusing liveness with readiness.
-8. Preserve the one-worker server constraint while rate limiting remains
-   process-local.
-9. Add deterministic Docker/build contract tests where they can validate image
-   content or configuration without duplicating the later 32.11 smoke test.
-10. Keep reverse proxy/TLS and broader deployment security ownership for 32.10.
+1. Verify develop HEAD against f0a4b64 or inspect every later commit.
+2. Read container baseline, runtime deployment layout, server authentication,
+   security-header middleware, readiness/health endpoints, and current runtime
+   config/secret environment contracts.
+3. Define the reverse-proxy trust boundary and which component terminates TLS.
+4. Define whether the application is expected to receive only private/internal
+   HTTP from the proxy versus direct public traffic.
+5. Define secret injection ownership without adding a second secret-loading
+   authority inside the application.
+6. Define trusted forwarded-header assumptions and explicitly reject implicit
+   trust of arbitrary X-Forwarded-* input unless a later implementation owns it.
+7. Define exposure rules for /health, /ready, /openapi.json, and authenticated
+   API routes.
+8. Preserve application-level API-key authentication as defense in depth behind
+   the deployment boundary.
+9. Do not implement application-level TLS merely for appearance if the proxy or
+   platform owns TLS termination.
+10. Keep CI image build/start verification for 32.11 and operational restore E2E
+    for 32.12.
 ```
 
-Task 32.9 owns the minimal production image/container baseline. It must consume
-the established deployment layout rather than inventing new filesystem or
-secret semantics.
+Task 32.10 owns deployment-security responsibilities and trust assumptions. It
+should be a contract first; only add application code if the audit identifies a
+concrete missing enforcement point.
 
 ---
 
@@ -1240,16 +1262,70 @@ Sprint 32 Task 9 — Container Baseline
 
 ---
 
+### Task 32.9 — Container Baseline
+
+```text
+Status: CLOSED
+Commit: f0a4b64
+CI: GREEN
+
+Changed:
+- added production Dockerfile;
+- added .dockerignore excluding secrets, local runtime data, SQLite sidecars,
+  tests, docs, scripts, and development locks;
+- installed runtime requirements.lock with --require-hashes;
+- added non-root runtime user;
+- made /application read-only and disabled Python bytecode writes;
+- declared /runtime and /backups as persistent volume boundaries;
+- added /health liveness healthcheck using Python stdlib;
+- preserved canonical one-worker server command;
+- added container-baseline contract tests and documentation.
+
+Decisions:
+- container consumes the 32.8 filesystem layout instead of inventing new paths;
+- /health is liveness; /ready remains readiness and is not used for restart
+  semantics;
+- Knowledge and real secrets are not baked into the image;
+- current env-variable secret contract remains authoritative;
+- no Docker Compose/Kubernetes/TLS/reverse-proxy semantics were pulled into
+  Task 32.9.
+
+Tests/guarantees:
+- focused container contract suite passed locally;
+- full Python regression passed locally;
+- git diff --check passed locally;
+- GitHub Actions run #23 completed successfully;
+- local docker build was NOT executed because Docker CLI was unavailable.
+
+Lessons:
+- static Dockerfile contract tests do not prove the image actually builds;
+- liveness and readiness must remain separate;
+- build context must explicitly exclude developer secrets and live SQLite state;
+- container work should consume prior filesystem/security contracts rather than
+  becoming a new authority.
+
+Unverified:
+- real docker build/start on the developer machine.
+
+Verification owner:
+- Task 32.11 CI Container Smoke Test.
+
+Next:
+Sprint 32 Task 10 — Deployment Security Contract
+```
+
+---
+
 ## 16. Current Checkpoint Summary
 
 ```text
 Repository: vactor222123/InvestmentTerminal
 Branch: develop
-Baseline: 543e737
+Baseline: f0a4b64
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
 Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
-Current next action: 32.9 Container Baseline
+Current next action: 32.10 Deployment Security Contract
 ```
 
 Checkpoint synchronization:
@@ -1259,6 +1335,6 @@ PROJECT_CONTINUATION.md introduced: develop @ 30a28ac
 CI: GREEN
 ```
 
-Tasks 32.1–32.8 are closed on verified CI. Continue with Task 32.9 only from
-the verified `543e737` implementation baseline, or audit every later commit
+Tasks 32.1–32.9 are closed on verified CI. Continue with Task 32.10 only from
+the verified `f0a4b64` implementation baseline, or audit every later commit
 before proceeding.

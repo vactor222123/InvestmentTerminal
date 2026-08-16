@@ -1,7 +1,7 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ 543e737`  
-**Status:** Sprint 32 Task 8 closed with green CI; Task 32.9 is next.
+**Current baseline:** `develop @ f0a4b64`  
+**Status:** Sprint 32 Task 9 closed with green CI; Task 32.10 is next.
 
 ## Durable Continuation Checkpoint
 
@@ -27,53 +27,52 @@ Progress:
 32.6 Backup / Restore CLI                CLOSED / 8a22b7b / CI GREEN
 32.7 FastAPI Lifespan Contract           CLOSED / 3b069e6 / CI GREEN
 32.8 Runtime Deployment Layout           CLOSED / 543e737 / CI GREEN
-32.9 Container Baseline                  NEXT
-32.10 Deployment Security Contract
+32.9 Container Baseline                  CLOSED / f0a4b64 / CI GREEN
+32.10 Deployment Security Contract       NEXT
 32.11 CI Container Smoke Test
 32.12 Real Operational Resilience E2E
 32.13 Sprint 32 Closure
 ```
 
-## 32.8 Result
+## 32.9 Result
 
-Canonical deployment topology is now explicit:
-
-```text
-/application   read-only application/code
-/runtime       persistent writable live SQLite state
-/backups       persistent independent backup storage
-/config        read-only non-secret configuration
-/secrets       read-only deployment-managed secret boundary
-```
-
-Canonical live runtime paths:
+Production container baseline now defines:
 
 ```text
-/runtime/knowledge.db
-/runtime/operational/provider_usage_cost.db
-/runtime/operational/grounded_generations.db
+python:3.13-slim
+hash-locked runtime dependency install
+non-root execution
+read-only /application
+persistent /runtime and /backups
+healthcheck on /health
+one-worker server runtime
 ```
 
-The deployment contract is descriptive and does not silently create, relocate,
-or mutate live data.
+Local Python/contract regression was green.
+
+Important verification note:
+
+```text
+local docker build NOT executed
+reason: Docker CLI unavailable
+real image build/start verification: Task 32.11
+```
 
 ## Current Next Action
 
 ```text
-Sprint 32 Task 9 — Container Baseline
+Sprint 32 Task 10 — Deployment Security Contract
 ```
 
-Task 32.9 should consume the established layout in a minimal production
-container baseline:
+Task 32.10 should define:
 
 ```text
-locked dependency install
-non-root execution
-read-only application code
-persistent /runtime and /backups boundaries
-healthcheck
-one-worker server runtime
+reverse-proxy trust boundary
+TLS termination ownership
+secret injection ownership
+trusted-network assumptions
+forwarded-header assumptions
+public/private endpoint exposure
 ```
 
-Do not mix reverse-proxy/TLS/security-topology work into 32.9; that remains
-Task 32.10.
+Keep actual container build/start CI work in 32.11.
