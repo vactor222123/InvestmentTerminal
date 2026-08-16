@@ -1,7 +1,7 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ 5e846ce`  
-**Status:** Sprint 32 Task 4 closed with green CI; Task 32.5 is next.
+**Current baseline:** `develop @ cb8bd40`  
+**Status:** Sprint 32 Task 5 closed with green CI; Task 32.6 is next.
 
 ## Durable Continuation Checkpoint
 
@@ -23,8 +23,8 @@ Progress:
 32.2 SQLite Operational Inventory        CLOSED / ab53d8e / CI GREEN
 32.3 Consistent SQLite Backup Primitive  CLOSED / 2299a6f / CI GREEN
 32.4 Backup Service                      CLOSED / 5e846ce / CI GREEN
-32.5 Restore Validation                  NEXT
-32.6 Backup / Restore CLI
+32.5 Restore Validation                  CLOSED / cb8bd40 / CI GREEN
+32.6 Backup / Restore CLI                NEXT
 32.7 FastAPI Lifespan Contract
 32.8 Runtime Deployment Layout
 32.9 Container Baseline
@@ -34,40 +34,41 @@ Progress:
 32.13 Sprint 32 Closure
 ```
 
-## 32.4 Result
+## 32.5 Result
 
-Runtime backup orchestration now creates one complete backup set for exactly:
-
-```text
-KNOWLEDGE_SQLITE@1
-PROVIDER_USAGE_COST_SQLITE@1
-GROUNDED_GENERATION_SQLITE@1
-```
-
-History SQLite is intentionally excluded.
-
-Set publication is:
+Runtime restore validation now performs:
 
 ```text
-explicit backup_root
-→ deterministic UTC set identity
-→ staging directory
-→ three WAL-safe SQLite backups
-→ deterministic metadata.json
-→ atomic directory publication
-→ backup-root sync
+backup-set metadata validation
+→ exact runtime boundary membership
+→ inventory classification validation
+→ exact file mapping
+→ size validation
+→ read-only immutable SQLite quick_check
+→ required tables
+→ schema metadata/version compatibility
+→ validated restore candidate
 ```
 
-A pre-publication failure leaves no final backup set.
+Validation does not initialize or mutate live databases.
+
+Windows/SQLite lessons retained:
+
+```text
+SQLite-managed WAL/SHM sidecars may exist around backup lifecycle operations
+stage-specific tests must snapshot immediately before the stage under test
+```
 
 ## Current Next Action
 
 ```text
-Sprint 32 Task 5 — Restore Validation
+Sprint 32 Task 6 — Backup / Restore CLI
 ```
 
-Task 32.5 must validate a complete restore candidate before any live database
-mutation. It must fail closed on malformed metadata, missing/extra/wrong
-boundaries, corrupt SQLite files, and incompatible schema/version.
+Task 32.6 must keep CLI thin. It should orchestrate the existing backup and
+validation/application services, not own SQLite internals or raw filesystem
+replacement.
 
-Do not activate or overwrite live databases in Task 32.5.
+Before implementing restore activation through CLI, audit whether a dedicated
+restore-activation service is required beneath the CLI to preserve this
+boundary.

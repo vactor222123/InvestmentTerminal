@@ -4,9 +4,9 @@
 **Update rule:** MUST be updated after every completed Task  
 **Current repository:** `vactor222123/InvestmentTerminal`  
 **Current branch:** `develop`  
-**Current baseline:** `5e846ce`  
+**Current baseline:** `cb8bd40`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
-**Current next action:** Sprint 32 Task 5 — Restore Validation
+**Current next action:** Sprint 32 Task 6 — Backup / Restore CLI
 
 ---
 
@@ -434,12 +434,42 @@ Any database-backup or metadata failure before publication removes staging and
 leaves no final backup set. Existing final set directories are never
 overwritten.
 
-### 32.5 Restore Validation
+### 32.5 Restore Validation — CLOSED
 
-Restore must fail closed.
+Closure:
 
-Never overwrite/activate a live database before validating the candidate backup
-and expected schema/identity.
+```text
+commit: cb8bd40
+CI: GREEN
+```
+
+Established fail-closed validation of complete runtime SQLite backup sets before
+any live database mutation.
+
+Validation contract:
+
+```text
+backup-set metadata identity/schema
+→ directory ↔ backup_set_id consistency
+→ exact three runtime boundaries
+→ inventory classification match
+→ exact backup filenames / no path traversal
+→ size metadata match
+→ read-only immutable SQLite validation
+→ PRAGMA quick_check
+→ required tables
+→ boundary-specific schema metadata/version
+→ ValidatedRuntimeSQLiteRestoreCandidate
+```
+
+Candidate SQLite files are opened read-only with `mode=ro&immutable=1`; domain
+store `initialize()` methods are never called during validation.
+
+The validator tolerates SQLite-managed WAL/SHM sidecars that may already exist
+from backup/test SQLite activity, while arbitrary extra artifacts still fail
+closed.
+
+Restore activation remains outside Task 32.5.
 
 ### 32.6 Backup / Restore CLI
 
@@ -528,32 +558,29 @@ PROJECT_CONTINUATION.md
 ## 9. Current Next Action
 
 ```text
-Sprint 32 Task 5 — Restore Validation
+Sprint 32 Task 6 — Backup / Restore CLI
 ```
 
-Before writing Task 32.5:
+Before writing Task 32.6:
 
 ```text
-1. Verify develop HEAD against 5e846ce or inspect every later commit.
-2. Read runtime_backup_service.py, sqlite_backup.py, and sqlite_inventory.py.
-3. Read the schema/version initialization contract of each runtime-managed DB.
-4. Define a fail-closed backup-set metadata parser/validator.
-5. Require exactly the expected three runtime boundary identities; reject
-   missing, duplicate, unknown, or History entries.
-6. Validate backup files before any live-path mutation.
-7. Validate SQLite storage integrity plus expected schema/version/identity for
-   each boundary.
-8. Detect metadata/file mismatch and tampering where the existing metadata
-   contract can support it; do not invent unverifiable guarantees.
-9. Keep restore activation/replacement out of 32.5.
-10. Add focused tests for missing/extra files, malformed metadata, wrong
-    boundary mapping, corrupt SQLite, incompatible schema/version, and a valid
-    complete candidate.
+1. Verify develop HEAD against cb8bd40 or inspect every later commit.
+2. Read runtime_backup_service.py and runtime_restore_validation.py as fixed
+   application/persistence contracts.
+3. Audit existing CLI patterns for argparse/exit codes/JSON vs human output.
+4. Decide whether 32.6 provides backup + validate-only restore commands, or
+   whether a safe activation service must first be introduced; do not let CLI
+   own raw os.replace/SQLite mechanics.
+5. Preserve explicit operator intent and fail-closed behavior.
+6. Keep History outside the runtime backup/restore CLI.
+7. Add tests for argument validation, successful backup, successful candidate
+   validation, expected failures, and no hidden live mutation.
+8. If activation is required by the approved Sprint wording, introduce it as a
+   separate service beneath CLI rather than embedding filesystem logic in CLI.
 ```
 
-Task 32.5 owns candidate validation only. It must produce a validated restore
-candidate or fail closed without mutating live databases. Operator activation
-and CLI orchestration remain later Tasks.
+Task 32.6 is an operator orchestration boundary. CLI must remain thin and must
+not absorb SQLite, schema, or atomic-filesystem ownership.
 
 ---
 
@@ -923,16 +950,64 @@ Sprint 32 Task 5 — Restore Validation
 
 ---
 
+### Task 32.5 — Restore Validation
+
+```text
+Status: CLOSED
+Commit: cb8bd40
+CI: GREEN
+
+Changed:
+- added fail-closed runtime backup-set restore-candidate validation;
+- added exact runtime boundary/membership and metadata validation;
+- added read-only immutable SQLite integrity checks;
+- added boundary-specific schema/version compatibility checks;
+- added Windows SQLite sidecar handling without relaxing arbitrary-artifact
+  rejection;
+- added focused restore-validation regression coverage.
+
+Decisions:
+- validation never receives or mutates live destination paths;
+- domain store initialize() methods are not called during candidate validation;
+- a valid SQLite file is insufficient unless it matches the expected boundary
+  schema identity/version;
+- History remains outside the runtime restore set;
+- current metadata does not support cryptographic tamper claims.
+
+Tests/guarantees:
+- initial Windows runs exposed SQLite-managed WAL/SHM sidecars in backup sets;
+- validator was corrected to distinguish SQLite-managed sidecars from arbitrary
+  extra artifacts;
+- lifecycle test baseline was moved immediately before validation so it tests
+  validator mutation rather than prior backup-service housekeeping;
+- full local regression passed after fixes;
+- GitHub Actions run #15 completed successfully.
+
+Lessons:
+- SQLite read-only access must not be assumed to imply zero filesystem
+  side-effects in surrounding lifecycle stages;
+- tests for one lifecycle stage must snapshot state immediately before that
+  stage, otherwise previous-stage SQLite housekeeping can create false
+  positives;
+- fail-closed validation should reject unsupported artifacts without confusing
+  SQLite-managed sidecars for user-controlled payloads.
+
+Next:
+Sprint 32 Task 6 — Backup / Restore CLI
+```
+
+---
+
 ## 16. Current Checkpoint Summary
 
 ```text
 Repository: vactor222123/InvestmentTerminal
 Branch: develop
-Baseline: 5e846ce
+Baseline: cb8bd40
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
 Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
-Current next action: 32.5 Restore Validation
+Current next action: 32.6 Backup / Restore CLI
 ```
 
 Checkpoint synchronization:
@@ -942,6 +1017,6 @@ PROJECT_CONTINUATION.md introduced: develop @ 30a28ac
 CI: GREEN
 ```
 
-Tasks 32.1–32.4 are closed on verified CI. Continue with Task 32.5 only from
-the verified `5e846ce` implementation baseline, or audit every later commit
+Tasks 32.1–32.5 are closed on verified CI. Continue with Task 32.6 only from
+the verified `cb8bd40` implementation baseline, or audit every later commit
 before proceeding.
