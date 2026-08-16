@@ -1,7 +1,7 @@
 # Investment Terminal — Next Steps
 
-**Current baseline:** `develop @ b4c26a7`  
-**Status:** Sprint 32 Task 11 closed with green CI; Task 32.12 is next.
+**Current baseline:** `develop @ 0b854ed`  
+**Status:** Sprint 32 Task 12 closed; Task 32.13 closure is next.
 
 ## Durable Continuation Checkpoint
 
@@ -24,9 +24,8 @@ Production container verification:
 GitHub Actions ubuntu-latest + Docker
 ```
 
-Linux container CI does not replace Windows compatibility. Persistence,
-backup/restore, SQLite WAL, file replacement, handle closing, and fsync behavior
-must remain valid on Windows.
+Windows remains authoritative for host persistence semantics. Linux container
+CI is complementary verification, not a replacement.
 
 ## Sprint 32 — Production Deployment & Operational Resilience
 
@@ -44,44 +43,38 @@ Progress:
 32.9 Container Baseline                  CLOSED / f0a4b64 / CI GREEN
 32.10 Deployment Security Contract       CLOSED / 1c6fe62 / CI GREEN
 32.11 CI Container Smoke Test            CLOSED / b4c26a7 / CI GREEN
-32.12 Real Operational Resilience E2E    NEXT
-32.13 Sprint 32 Closure
+32.12 Real Operational Resilience E2E    CLOSED / 0b854ed / LOCAL+CI GREEN
+32.13 Sprint 32 Closure                  NEXT
 ```
 
-## 32.11 Result
+## 32.12 Result
 
-GitHub Actions run #27 verified the real production image:
+Real durable recovery was proven across all three runtime SQLite boundaries:
 
 ```text
-docker build                          PASS
-docker run                            PASS
-/health                               PASS
-/ready                                PASS
-non-root runtime                      PASS
-operational SQLite initialization     PASS
-cleanup                               PASS
-Python regression job                 PASS
+write pre-backup state
+→ backup
+→ validate
+→ mutate live state
+→ offline restore
+→ fresh store reopen
+→ exact pre-backup readback
+→ post-backup mutations absent
 ```
 
-This closes the unverified Docker build/start item from Task 32.9.
+Verification:
+
+```text
+Windows local regression            PASS
+GitHub Python regression             PASS
+GitHub container smoke               PASS
+```
 
 ## Current Next Action
 
 ```text
-Sprint 32 Task 12 — Real Operational Resilience E2E
+Sprint 32 Task 13 — Sprint 32 Closure
 ```
 
-Required proof:
-
-```text
-write real durable runtime state
-→ backup
-→ validate
-→ mutate/damage live state
-→ offline restore
-→ reopen/restart stores
-→ exact pre-backup readback
-```
-
-The E2E must cover all three runtime-managed SQLite boundaries and must be
-Windows-compatible. Do not introduce POSIX-only filesystem assumptions.
+Task 32.13 should only reconcile and close Sprint 32 if no unresolved acceptance
+gap remains. Do not add a new feature sprint inside the closure task.

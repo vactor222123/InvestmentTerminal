@@ -4,9 +4,9 @@
 **Update rule:** MUST be updated after every completed Task  
 **Current repository:** `vactor222123/InvestmentTerminal`  
 **Current branch:** `develop`  
-**Current baseline:** `b4c26a7`  
+**Current baseline:** `0b854ed`  
 **Current phase:** Post-Sprint-31 audited hardening / production maturity  
-**Current next action:** Sprint 32 Task 12 — Real Operational Resilience E2E
+**Current next action:** Sprint 32 Task 13 — Sprint 32 Closure
 
 ---
 
@@ -753,44 +753,45 @@ PROJECT_CONTINUATION.md
 ## 9. Current Next Action
 
 ```text
-Sprint 32 Task 12 — Real Operational Resilience E2E
+Sprint 32 Task 13 — Sprint 32 Closure
 ```
 
-Before writing Task 32.12:
+Before closing Sprint 32:
 
 ```text
-1. Verify develop HEAD against b4c26a7 or inspect every later commit.
-2. Read the current runtime backup service, restore validator, restore activation
-   service, three runtime SQLite stores/repositories, operator CLI, filesystem
-   contract, and all restore/Windows regression tests before changing anything.
-3. Build one real end-to-end scenario across all three runtime-managed SQLite
-   boundaries:
-   Knowledge, provider usage/cost, and grounded generation.
-4. Write distinctive durable data into each source database using real domain
-   stores/repositories where available; do not rely on placeholder bytes.
-5. Create a real runtime backup set through RuntimeSQLiteBackupService.
-6. Validate the published backup set through the real restore validator.
-7. Mutate/damage/replace the live runtime state so restoration is necessary and
-   the test can prove it is not reading untouched source data.
-8. Perform restore activation through the real offline restore service.
-9. Reopen/restart the runtime stores after restore and assert exact durable
-   readback of the pre-backup state across all three boundaries.
-10. Assert post-backup mutations are absent after restoration where applicable.
-11. Preserve WAL-safe behavior and explicit connection closure before file
-    replacement.
-12. Treat Windows as the primary local regression environment:
-    no POSIX-only unlink/rename assumptions, no Bash-only test logic, and no
-    reliance on Linux file-handle semantics.
-13. Keep the E2E hermetic under pytest tmp_path and avoid developer-local data.
-14. Linux container CI may provide supplementary verification, but it must not
-    substitute for Windows-compatible persistence semantics.
-15. Do not broaden 32.12 into backup scheduling, registry publishing, proxy/TLS,
-    or new product features.
+1. Verify develop HEAD against 0b854ed or inspect every later commit.
+2. Re-read PROJECT_CONTINUATION.md, NEXT_STEPS.md, Sprint 32 docs, CI workflow,
+   and all Task 32 closure commits.
+3. Reconcile Sprint 32 status so Tasks 32.1–32.12 are recorded with their actual
+   commits and verified CI/local outcomes.
+4. Confirm no open Sprint 32 acceptance gap remains in:
+   runtime filesystem ownership,
+   SQLite inventory,
+   backup,
+   restore validation/activation,
+   operator CLI,
+   ASGI lifespan,
+   deployment layout,
+   container baseline,
+   deployment security contract,
+   container smoke,
+   real operational resilience E2E.
+5. Record the platform contract explicitly:
+   Windows local regression remains authoritative for host persistence semantics;
+   GitHub Ubuntu/Docker remains production-container verification.
+6. Do not invent new implementation work merely to make closure larger.
+7. If closure audit exposes a concrete unresolved defect, do not mark Sprint 32
+   closed; create the smallest prerequisite fix first.
+8. If no gap remains, update PROJECT_CONTINUATION.md and NEXT_STEPS.md to:
+   Sprint 32 CLOSED,
+   closure baseline 0b854ed (or later verified closure prerequisite),
+   next phase/audit direction explicitly recorded.
+9. Run full local Windows regression and git diff --check before closure commit.
+10. Verify final GitHub CI after closure commit where workflow triggers.
 ```
 
-Task 32.12 owns proof that the repository-managed backup/restore stack can
-actually recover real durable runtime state end-to-end, with Windows-compatible
-filesystem and SQLite semantics.
+Task 32.13 owns reconciliation and closure only. It must not absorb the next
+feature sprint.
 
 ---
 
@@ -1499,16 +1500,61 @@ Sprint 32 Task 12 — Real Operational Resilience E2E
 
 ---
 
+### Task 32.12 — Real Operational Resilience E2E
+
+```text
+Status: CLOSED
+Commit: 0b854ed
+Local Windows regression: GREEN
+GitHub Actions run: #29 / GREEN
+
+Changed:
+- added real runtime operational-resilience E2E;
+- added recovery documentation;
+- exercised real Knowledge, provider usage/cost, and grounded-generation SQLite
+  schemas and transaction boundaries;
+- proved exact pre-backup durable state is restored after post-backup mutation;
+- proved fresh store objects can reopen and read the restored databases;
+- verified restored schema versions.
+
+Verification:
+- local Windows focused persistence suite: GREEN;
+- local Windows full regression: GREEN;
+- git diff --check: GREEN;
+- GitHub Python 3.13 / tests: SUCCESS;
+- GitHub Production container / smoke: SUCCESS.
+
+Decisions:
+- no new production persistence logic was added because the existing stack
+  already satisfied the required recovery path;
+- Windows remains first-class for SQLite WAL/file-handle/replace semantics;
+- Linux container CI is complementary cross-platform verification.
+
+Lessons:
+- operational resilience must prove restored data identity, not merely successful
+  file replacement;
+- post-backup mutation is necessary to prove the test is restoring the backup
+  point rather than observing untouched live state;
+- fresh store reconstruction after restore is the correct reopen/restart proof;
+- host-platform persistence semantics and container-runtime verification are
+  separate acceptance dimensions.
+
+Next:
+Sprint 32 Task 13 — Sprint 32 Closure
+```
+
+---
+
 ## 16. Current Checkpoint Summary
 
 ```text
 Repository: vactor222123/InvestmentTerminal
 Branch: develop
-Baseline: b4c26a7
+Baseline: 0b854ed
 Sprint 31: CLOSED / CI GREEN
 Development mode: audit-driven hardening / production maturity
 Approved Sprint: Sprint 32 — Production Deployment & Operational Resilience
-Current next action: 32.12 Real Operational Resilience E2E
+Current next action: 32.13 Sprint 32 Closure
 ```
 
 Checkpoint synchronization:
@@ -1518,6 +1564,6 @@ PROJECT_CONTINUATION.md introduced: develop @ 30a28ac
 CI: GREEN
 ```
 
-Tasks 32.1–32.11 are closed on verified CI. Continue with Task 32.12 only from
-the verified `b4c26a7` implementation baseline, or audit every later commit
-before proceeding.
+Tasks 32.1–32.12 are closed with verified local/CI outcomes. Continue with
+Task 32.13 only from the verified `0b854ed` implementation baseline, or audit
+every later commit before proceeding.
