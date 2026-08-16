@@ -4,6 +4,10 @@ Production server CLI entrypoint.
 The current inbound rate limiter is process-local. Therefore the production CLI
 intentionally permits exactly one Uvicorn worker until a shared/distributed
 admission backend exists.
+
+Forwarded proxy headers are deliberately disabled. Deployment infrastructure may
+terminate TLS and proxy private HTTP to this process, but the application server
+does not implicitly trust X-Forwarded-* metadata.
 """
 
 import argparse
@@ -85,6 +89,7 @@ def main(
         port=args.port,
         workers=args.workers,
         log_level=args.log_level,
+        proxy_headers=False,
     )
     return 0
 

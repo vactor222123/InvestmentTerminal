@@ -41,6 +41,7 @@ def test_server_cli_uses_production_factory_target(
         "port": 9000,
         "workers": 1,
         "log_level": "warning",
+        "proxy_headers": False,
     }
 
 
@@ -68,6 +69,7 @@ def test_server_cli_defaults_are_conservative(
     assert calls["port"] == 8000
     assert calls["workers"] == 1
     assert calls["factory"] is True
+    assert calls["proxy_headers"] is False
 
 
 @pytest.mark.parametrize(
