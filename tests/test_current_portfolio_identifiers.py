@@ -73,6 +73,15 @@ def test_isin_is_normalized() -> None:
     assert holding.isin == "IE00B4L5Y983"
     assert holding.exchange_ticker == "IWDA"
     assert holding.instrument_key == "IE00B4L5Y983"
+    assert holding.identity.to_dict() == {
+        "symbol": "WORLD",
+        "name": "World ETF",
+        "instrument_type": "ETF",
+        "currency": "EUR",
+        "isin": "IE00B4L5Y983",
+        "exchange_ticker": "IWDA",
+        "instrument_key": "IE00B4L5Y983",
+    }
 
 
 @pytest.mark.parametrize(

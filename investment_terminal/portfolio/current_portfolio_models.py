@@ -8,6 +8,10 @@ from math import isfinite
 from numbers import Real
 from typing import Any
 
+from investment_terminal.market.instrument_identity_models import (
+    InstrumentIdentity,
+)
+
 
 SUPPORTED_ASSET_TYPES = (
     "ETF",
@@ -47,30 +51,28 @@ class PortfolioHolding:
     strategy: str | None = None
 
     def __post_init__(self) -> None:
+        identity = InstrumentIdentity(
+            symbol=self.symbol,
+            name=self.name,
+            instrument_type=self.asset_type,
+            currency=self.currency,
+            isin=self.isin,
+            exchange_ticker=self.exchange_ticker,
+        )
         object.__setattr__(
             self,
             "symbol",
-            self._normalize_text(
-                self.symbol,
-                field_name="symbol",
-            ).upper(),
+            identity.symbol,
         )
         object.__setattr__(
             self,
             "name",
-            self._normalize_text(
-                self.name,
-                field_name="name",
-            ),
+            identity.name,
         )
         object.__setattr__(
             self,
             "asset_type",
-            self._normalize_choice(
-                self.asset_type,
-                field_name="asset_type",
-                choices=SUPPORTED_ASSET_TYPES,
-            ),
+            identity.instrument_type,
         )
         object.__setattr__(
             self,
@@ -84,25 +86,17 @@ class PortfolioHolding:
         object.__setattr__(
             self,
             "currency",
-            self._normalize_text(
-                self.currency,
-                field_name="currency",
-            ).upper(),
+            identity.currency,
         )
         object.__setattr__(
             self,
             "isin",
-            self._normalize_optional_isin(
-                self.isin
-            ),
+            identity.isin,
         )
         object.__setattr__(
             self,
             "exchange_ticker",
-            self._normalize_optional_text(
-                self.exchange_ticker,
-                uppercase=True,
-            ),
+            identity.exchange_ticker,
         )
         object.__setattr__(
             self,
@@ -133,14 +127,6 @@ class PortfolioHolding:
         ):
             raise ValueError(
                 "Individual stocks must use the TACTICAL sleeve"
-            )
-
-        if (
-            self.asset_type in {"ETF", "BOND", "GOLD"}
-            and self.isin is None
-        ):
-            raise ValueError(
-                "ETF, BOND, and GOLD holdings must provide an ISIN"
             )
 
         if (
@@ -178,7 +164,19 @@ class PortfolioHolding:
         """
         Stable identifier used for duplicate detection and price mapping.
         """
-        return self.isin or self.exchange_ticker or self.symbol
+        return self.identity.instrument_key
+
+    @property
+    def identity(self) -> InstrumentIdentity:
+        """Return the canonical market identity for this holding."""
+        return InstrumentIdentity(
+            symbol=self.symbol,
+            name=self.name,
+            instrument_type=self.asset_type,
+            currency=self.currency,
+            isin=self.isin,
+            exchange_ticker=self.exchange_ticker,
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return {
