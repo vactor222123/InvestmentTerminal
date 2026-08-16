@@ -44,8 +44,48 @@ def test_instrument_identity_serializes_stable_key() -> None:
         "currency": "USD",
         "isin": None,
         "exchange_ticker": "MSFT",
+        "exchange_code": None,
         "instrument_key": "MSFT",
     }
+
+
+def test_instrument_identity_scopes_ticker_by_exchange() -> None:
+    identity = InstrumentIdentity(
+        symbol="VUSA",
+        name="Vanguard S&P 500 ETF",
+        instrument_type="ETF",
+        currency="GBP",
+        isin="IE00B3XXRP09",
+        exchange_ticker="VUSA",
+        exchange_code="XLON",
+    )
+
+    assert identity.exchange_code == "XLON"
+    assert identity.instrument_key == "IE00B3XXRP09"
+
+
+def test_exchange_scoped_ticker_is_key_without_isin() -> None:
+    identity = InstrumentIdentity(
+        symbol="MSFT",
+        name="Microsoft",
+        instrument_type="STOCK",
+        currency="USD",
+        exchange_ticker="MSFT",
+        exchange_code="XNAS",
+    )
+
+    assert identity.instrument_key == "XNAS:MSFT"
+
+
+def test_exchange_code_requires_exchange_ticker() -> None:
+    with pytest.raises(ValueError, match="requires exchange_ticker"):
+        InstrumentIdentity(
+            symbol="MSFT",
+            name="Microsoft",
+            instrument_type="STOCK",
+            currency="USD",
+            exchange_code="XNAS",
+        )
 
 
 @pytest.mark.parametrize("currency", ["EU", "EURO", "12A"])

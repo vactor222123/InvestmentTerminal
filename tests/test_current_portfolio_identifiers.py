@@ -80,6 +80,7 @@ def test_isin_is_normalized() -> None:
         "currency": "EUR",
         "isin": "IE00B4L5Y983",
         "exchange_ticker": "IWDA",
+        "exchange_code": None,
         "instrument_key": "IE00B4L5Y983",
     }
 

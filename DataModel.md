@@ -37,6 +37,20 @@ Important concepts include:
 - snapshot comparison;
 - replay result.
 
+## Multi-Asset Market Metadata
+
+Provider-independent immutable contracts define:
+
+- `InstrumentIdentity` for security identity and exchange-scoped tickers;
+- `CurrencyMetadata` for explicit currency codes and minor units;
+- `TradingCalendarMetadata` for versioned timezone/source provenance;
+- `ExchangeMetadata` for exchange, country, calendar, and supported currencies.
+
+An ISIN remains the strongest instrument key. Without an ISIN, an exchange
+code scopes an exchange ticker as `EXCHANGE:TICKER`. Calendar metadata records
+identity and provenance only; session calculation remains in the owning
+freshness or History service.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:

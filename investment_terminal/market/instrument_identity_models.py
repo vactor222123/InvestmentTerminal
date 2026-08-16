@@ -29,6 +29,7 @@ class InstrumentIdentity:
     currency: str
     isin: str | None = None
     exchange_ticker: str | None = None
+    exchange_code: str | None = None
 
     def __post_init__(self) -> None:
         symbol = normalize_required_text(
@@ -81,6 +82,20 @@ class InstrumentIdentity:
         ):
             raise ValueError("exchange_ticker must not contain whitespace")
 
+        exchange_code = normalize_optional_text(
+            self.exchange_code,
+            field_name="exchange_code",
+            uppercase=True,
+        )
+        if exchange_code is not None and any(
+            character.isspace() for character in exchange_code
+        ):
+            raise ValueError("exchange_code must not contain whitespace")
+        if exchange_code is not None and exchange_ticker is None:
+            raise ValueError(
+                "exchange_code requires exchange_ticker"
+            )
+
         if (
             instrument_type in {"ETF", "BOND", "GOLD"}
             and isin is None
@@ -102,11 +117,19 @@ class InstrumentIdentity:
         object.__setattr__(self, "currency", currency)
         object.__setattr__(self, "isin", isin)
         object.__setattr__(self, "exchange_ticker", exchange_ticker)
+        object.__setattr__(self, "exchange_code", exchange_code)
 
     @property
     def instrument_key(self) -> str:
         """Return the strongest available stable instrument identifier."""
-        return self.isin or self.exchange_ticker or self.symbol
+        if self.isin is not None:
+            return self.isin
+        if (
+            self.exchange_code is not None
+            and self.exchange_ticker is not None
+        ):
+            return f"{self.exchange_code}:{self.exchange_ticker}"
+        return self.exchange_ticker or self.symbol
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -116,5 +139,6 @@ class InstrumentIdentity:
             "currency": self.currency,
             "isin": self.isin,
             "exchange_ticker": self.exchange_ticker,
+            "exchange_code": self.exchange_code,
             "instrument_key": self.instrument_key,
         }

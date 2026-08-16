@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `caf6541`
-**Current local package:** Phase 1 Package 1 — security identity contract
+**Current GitHub baseline:** `0249928`
+**Current local package:** Phase 1 Package 2 — market metadata contracts
 **Current phase:** Phase 1 — Multi-Asset Evidence Foundation
-**Current next action:** Add exchange, trading-calendar, and currency metadata contracts
+**Current next action:** Add source provenance and data-quality contracts for market metadata
 
 ---
 
@@ -24,6 +24,10 @@ A complete product alignment audit has been performed.
 Phase 1 Package 1 establishes a provider-independent immutable instrument
 identity contract and makes current portfolio holdings expose that contract
 without changing their existing serialized JSON shape.
+
+Phase 1 Package 2 adds explicit exchange, trading-calendar, and currency
+metadata contracts and supports exchange-scoped ticker identity without
+changing existing portfolio serialization.
 
 Audit document:
 
@@ -106,29 +110,31 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 1 Package 1 — Security Identity Contract
+Phase 1 Package 2 — Market Metadata Contracts
 ```
 
 Files:
 
 ```text
+investment_terminal/market/market_metadata_models.py
 investment_terminal/market/instrument_identity_models.py
-investment_terminal/portfolio/current_portfolio_models.py
+tests/test_market_metadata_models.py
 tests/test_instrument_identity_models.py
 tests/test_current_portfolio_identifiers.py
+DataModel.md
 PROJECT_CONTINUATION.md
 ```
 
 Source baseline verified against GitHub:
 
 ```text
-develop @ caf6541dc8a284b7ea5f04f68a9e5626154dd0b0
+develop @ 02499285625a62b1d6e371a0f2eabcd25de414a2
 ```
 
 Architecture/product alignment:
 
-- identity remains deterministic provider-independent market metadata;
-- portfolio consumes the identity contract without changing JSON fields;
-- no History, Review, Knowledge, AI, or transport dependency is introduced;
-- ETF/BOND/GOLD identity remains explicit through required ISIN evidence;
-- invalid currency and ambiguous whitespace identifiers fail closed.
+- metadata remains immutable, deterministic, and provider-independent;
+- calendar source/version/timezone are explicit rather than inferred;
+- exchange-supported currencies are explicit and normalized;
+- exchange-scoped tickers avoid cross-exchange key collisions;
+- existing freshness and History calendar ownership remains unchanged.
