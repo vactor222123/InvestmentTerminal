@@ -72,6 +72,16 @@ rejected, and coverage is reported separately for holdings and each exposure
 dimension. `ETFCompositionEvidence` attaches source provenance and quality
 without changing portfolio or Review contracts.
 
+## Portfolio Transaction Ledger
+
+The Portfolio domain owns immutable lifecycle transactions independently from
+current holding snapshots and Review History. `PortfolioTransaction` represents
+`BUY`, `SELL`, `DIVIDEND`, and `FEE` events with timezone-aware occurrence,
+explicit settlement currency, stable identity, and type-specific monetary
+fields. `PortfolioTransactionLedger` requires unique transaction identities and
+deterministic chronological ordering. Persistence, lot matching, performance,
+and position reconstruction remain separate later boundaries.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:

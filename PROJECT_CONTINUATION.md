@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `dc7dae8`
-**Current local package:** Phase 1 Package 5 — ETF holdings and exposure composition
-**Current phase:** Phase 1 — Multi-Asset Evidence Foundation
-**Current next action:** Audit Phase 1 closure and define the Phase 2 transaction-ledger boundary
+**Current GitHub baseline:** `d1f0f82`
+**Current local package:** Phase 2 Package 1 — transaction-ledger domain contracts
+**Current phase:** Phase 2 — Portfolio Lifecycle Intelligence
+**Current next action:** Add an append-only transaction repository contract and in-memory reference implementation
 
 ---
 
@@ -37,6 +37,10 @@ evidence envelope that preserves missing facts, source provenance, and quality.
 
 Phase 1 Package 5 adds constituent-holding and categorical-exposure contracts
 with explicit partial coverage, provenance, and quality.
+
+Phase 1 is closed after verifying its complete roadmap scope and green CI.
+Phase 2 Package 1 establishes immutable portfolio lifecycle transaction and
+deterministically ordered ledger contracts without changing current snapshots.
 
 Audit document:
 
@@ -119,14 +123,15 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 1 Package 5 — ETF Holdings and Exposure Composition
+Phase 2 Package 1 — Transaction-Ledger Domain Contracts
 ```
 
 Files:
 
 ```text
-investment_terminal/market/etf_composition_models.py
-tests/test_etf_composition_models.py
+investment_terminal/portfolio/transaction_ledger_models.py
+tests/test_transaction_ledger_models.py
+docs/PHASE_1_CLOSURE.md
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -134,13 +139,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ dc7dae835eb7c79712968b951a9c22b001eff3bf
+develop @ d1f0f82401c1e951ae55af7e673b8c483629f3cf
 ```
 
 Architecture/product alignment:
 
-- ETF composition is linked to the canonical ETF instrument identity;
-- partial holdings and exposure coverage remain explicit rather than inferred;
-- weights, duplicate identities, and per-dimension totals are validated;
-- constituent identity remains optional when a source does not provide it;
-- provider clients, persistence, Review, and portfolio JSON remain unchanged.
+- Portfolio owns lifecycle transactions; History ownership is unchanged;
+- BUY/SELL/DIVIDEND/FEE semantics are explicit and immutable;
+- occurrence timestamps are timezone-aware and settlement currency is explicit;
+- ledger identity, transaction uniqueness, and deterministic order are enforced;
+- persistence, imports, lots, performance, and current snapshots remain unchanged.
