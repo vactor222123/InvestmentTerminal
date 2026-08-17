@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `3d482e1`
-**Current local package:** Phase 3 Package 6 — strategy-specific portfolio rule contracts
+**Current GitHub baseline:** `324ac54`
+**Current local package:** Phase 3 Package 7 — deterministic strategy-rule evaluation evidence
 **Current phase:** Phase 3 — Portfolio Decision Intelligence
-**Current next action:** Add deterministic strategy-rule evaluation evidence
+**Current next action:** Audit and close Phase 3 against ROADMAP_AFTER_AUDIT.md
 
 ---
 
@@ -99,6 +99,9 @@ bucket adjustment evidence with an explicit caller-supplied tolerance.
 Phase 3 Package 6 adds a complete versioned rule contract with separate review
 cadence and measurable conditions for every canonical portfolio strategy.
 
+Phase 3 Package 7 deterministically evaluates explicit metric evidence against
+the effective strategy rule set with traceable PASS/FAIL/REVIEW outcomes.
+
 Audit document:
 
 ```text
@@ -180,14 +183,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 3 Package 6 — Strategy-Specific Portfolio Rule Contracts
+Phase 3 Package 7 — Deterministic Strategy-Rule Evaluation Evidence
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/portfolio_strategy_rules.py
-tests/test_portfolio_strategy_rules.py
+investment_terminal/portfolio/portfolio_strategy_rule_evaluation.py
+tests/test_portfolio_strategy_rule_evaluation.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -195,15 +198,15 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 3d482e1f906768bdfa95cce234498d07d6e0a90f
+develop @ 324ac541b72bca59c9e1def81430fc5d4dc8c31d
 ```
 
 Architecture/product alignment:
 
-- all four canonical strategies require separate rules in canonical order;
-- rule-set identity, version, and timezone-aware effective time are explicit;
-- review cadence is strategy-specific and caller-supplied;
-- conditions preserve phase, metric, operator, threshold, unit, and missing-data action;
-- no default investment thresholds or identical implicit strategy rules are introduced;
-- evaluation, recommendations, and execution remain separate;
+- evaluation consumes only the effective versioned rule set and explicit metrics;
+- every condition preserves observed value, evidence identity, threshold, and reason;
+- missing metrics follow their configured FAIL or REVIEW behavior;
+- metric-unit mismatches fail closed;
+- strategy and whole-rule-set outcomes aggregate deterministically;
+- evaluation evidence explicitly denies execution authority;
 - canonical Review History remains unchanged.

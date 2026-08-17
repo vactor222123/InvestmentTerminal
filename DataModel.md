@@ -188,6 +188,12 @@ measurable `StrategyRuleCondition` records, including phase, comparison,
 threshold, unit, and missing-data action. The contract supplies no hidden
 investment thresholds, performs no evaluation, and grants no execution authority.
 
+`PortfolioStrategyRuleEvaluator` compares explicit strategy metric evidence with
+the effective versioned rule set. Every condition result preserves its observed
+value, evidence identity, comparison, and reason. Missing metrics follow the
+configured `FAIL` or `REVIEW` action, unit mismatches fail closed, and aggregate
+status never grants execution authority.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:
