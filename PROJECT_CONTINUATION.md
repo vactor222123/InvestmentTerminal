@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `40d02b0`
-**Current local package:** Phase 4 Package 1
+**Current GitHub baseline:** `92a60da`
+**Current local package:** Phase 4 Package 2
 **Current phase:** Phase 4 — Context and Market Intelligence
-**Current next action:** Verify Phase 4 Package 1 in CI, then audit provider-neutral context ingestion boundaries for Phase 4 Package 2
+**Current next action:** Verify Phase 4 Package 2 in CI, then audit durable external-context persistence boundaries for Phase 4 Package 3
 
 ---
 
@@ -109,6 +109,10 @@ Phase 4 Package 1 establishes provider-independent immutable external-context
 records for news, macroeconomic, geopolitical, and event evidence with explicit
 source provenance, caller-configured freshness, quality status, and uncertainty.
 
+Phase 4 Package 2 adds a provider-neutral bounded query and ingestion boundary
+that validates normalized provider output, rejects scope and identity defects,
+applies freshness quality, and returns deterministic evidence without storage.
+
 Audit document:
 
 ```text
@@ -190,15 +194,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 4 Package 1 — External Context Evidence Contracts
+Phase 4 Package 2 — Provider-Neutral Context Ingestion
 ```
 
 Files:
 
 ```text
-investment_terminal/context/__init__.py
-investment_terminal/context/external_context_models.py
-tests/test_external_context_models.py
+investment_terminal/context/external_context_ingestion.py
+tests/test_external_context_ingestion.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -206,15 +209,16 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 40d02b05df24c2f255867574fbf316c1b115fe12
+develop @ 92a60dabcdb441616b3726cf6436fed295d84ef9
 ```
 
 Architecture/product alignment:
 
-- context contracts are provider-independent and immutable;
-- news, macroeconomic, geopolitical, and event evidence share one explicit
-  normalized boundary without conflating their meaning;
-- provenance, freshness, incomplete lineage, and uncertainty remain visible;
-- provider ingestion, sentiment, Review composition, History, Knowledge, and AI
-  behavior remain unchanged;
-- Phase 4 Package 2 provider-neutral ingestion is the next focused audit.
+- context queries have explicit types, subjects, time bounds, freshness, and
+  result limits;
+- provider adapters return normalized source items behind a Protocol boundary;
+- out-of-scope, future, duplicate, oversized, and malformed results fail closed;
+- evidence ordering and quality assessment are deterministic;
+- persistence, sentiment, Review composition, History, Knowledge, and AI remain
+  unchanged;
+- Phase 4 Package 3 durable persistence is the next focused audit.

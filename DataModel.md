@@ -300,6 +300,15 @@ and reports `READY`, `PARTIAL`, or `STALE` without hiding incomplete lineage.
 assessment. Provider ingestion, persistence, sentiment calculation, Review
 Package composition, and AI interpretation remain separate later boundaries.
 
+`ExternalContextQuery` defines an explicit half-open publication window,
+requested context types and subjects, freshness policy, and result limit.
+Provider adapters implement `ExternalContextProvider` and return normalized
+`ExternalContextSourceItem` values rather than leaking provider payloads into
+the domain. `ExternalContextIngestionService` rejects out-of-scope, future,
+duplicate, oversized, or malformed provider results, applies the Package 1
+quality policy, and returns deterministic `ExternalContextIngestionResult`
+evidence. It does not persist records or interpret their investment meaning.
+
 ## Authority Relationships
 
 ```text
