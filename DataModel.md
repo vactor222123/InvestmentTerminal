@@ -82,6 +82,12 @@ fields. `PortfolioTransactionLedger` requires unique transaction identities and
 deterministic chronological ordering. Persistence, lot matching, performance,
 and position reconstruction remain separate later boundaries.
 
+`PortfolioTransactionRepository` defines append-only identity semantics,
+exact lookup, half-open time-window queries, instrument queries, and immutable
+ledger projection without exposing storage details. Its in-memory reference
+implementation establishes deterministic behavior before a durable adapter is
+introduced.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:

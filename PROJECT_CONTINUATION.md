@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `d1f0f82`
-**Current local package:** Phase 2 Package 1 — transaction-ledger domain contracts
+**Current GitHub baseline:** `f9fb0c6`
+**Current local package:** Phase 2 Package 2 — append-only transaction repository
 **Current phase:** Phase 2 — Portfolio Lifecycle Intelligence
-**Current next action:** Add an append-only transaction repository contract and in-memory reference implementation
+**Current next action:** Add a durable SQLite transaction store and repository adapter
 
 ---
 
@@ -41,6 +41,9 @@ with explicit partial coverage, provenance, and quality.
 Phase 1 is closed after verifying its complete roadmap scope and green CI.
 Phase 2 Package 1 establishes immutable portfolio lifecycle transaction and
 deterministically ordered ledger contracts without changing current snapshots.
+
+Phase 2 Package 2 establishes append-only repository semantics and an in-memory
+reference implementation with deterministic time and instrument queries.
 
 Audit document:
 
@@ -123,15 +126,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 2 Package 1 — Transaction-Ledger Domain Contracts
+Phase 2 Package 2 — Append-Only Transaction Repository
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/transaction_ledger_models.py
-tests/test_transaction_ledger_models.py
-docs/PHASE_1_CLOSURE.md
+investment_terminal/portfolio/transaction_ledger_repository.py
+tests/test_transaction_ledger_repository.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -139,13 +141,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ d1f0f82401c1e951ae55af7e673b8c483629f3cf
+develop @ f9fb0c60c393970e968ac2fb25cacbfe6cf6f2c8
 ```
 
 Architecture/product alignment:
 
-- Portfolio owns lifecycle transactions; History ownership is unchanged;
-- BUY/SELL/DIVIDEND/FEE semantics are explicit and immutable;
-- occurrence timestamps are timezone-aware and settlement currency is explicit;
-- ledger identity, transaction uniqueness, and deterministic order are enforced;
-- persistence, imports, lots, performance, and current snapshots remain unchanged.
+- duplicate transaction identities are rejected without replacing originals;
+- exact, time-window, and instrument queries have deterministic ordering;
+- half-open time boundaries and timezone awareness are explicit;
+- immutable ledger snapshots are projected from repository state;
+- durable persistence, imports, lots, performance, and snapshots remain unchanged.
