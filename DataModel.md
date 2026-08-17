@@ -93,6 +93,10 @@ metadata, and single-operation rollback. `SQLitePortfolioTransactionRepository`
 stores canonical strict JSON payloads with indexed occurrence and instrument
 keys, preserving the repository contract across process restarts.
 
+`TransactionImportBatch` and `TransactionImportResult` preserve source and
+import time while accounting separately for every imported and duplicate input
+identity. Re-import is idempotent without silently removing duplicate evidence.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:

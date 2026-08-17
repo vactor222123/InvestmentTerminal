@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `1ab8b34`
-**Current local package:** Phase 2 Package 3 — durable SQLite transaction ledger
+**Current GitHub baseline:** `9ec2cf9`
+**Current local package:** Phase 2 Package 4 — transaction import accounting
 **Current phase:** Phase 2 — Portfolio Lifecycle Intelligence
-**Current next action:** Add transaction import contracts and deterministic duplicate accounting
+**Current next action:** Add transaction CSV parsing and validation boundary
 
 ---
 
@@ -47,6 +47,9 @@ reference implementation with deterministic time and instrument queries.
 
 Phase 2 Package 3 adds a versioned SQLite store and durable repository adapter
 with immutable ledger metadata, strict JSON payloads, and rollback behavior.
+
+Phase 2 Package 4 adds provider-neutral import batches and deterministic,
+visible accounting for imported and duplicate transaction identities.
 
 Audit document:
 
@@ -129,15 +132,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 2 Package 3 — Durable SQLite Transaction Ledger
+Phase 2 Package 4 — Transaction Import Accounting
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/transaction_ledger_sqlite_store.py
-investment_terminal/portfolio/transaction_ledger_sqlite_repository.py
-tests/test_transaction_ledger_sqlite.py
+investment_terminal/portfolio/transaction_import.py
+tests/test_transaction_import.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -145,13 +147,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 1ab8b34586f7bfc47b045dc8d3ec906a7ca90281
+develop @ 9ec2cf9b77141145b07e4f58bce1677100fd0478
 ```
 
 Architecture/product alignment:
 
-- schema and ledger metadata are versioned and validated on every initialization;
-- transaction payloads round-trip through strict canonical JSON;
-- duplicate identities preserve original rows and fail visibly;
-- repository queries remain deterministic across process recreation;
-- failed writes roll back; imports, lots, performance, and snapshots remain unchanged.
+- import batches preserve source identity and timezone-aware import time;
+- every submitted identity is accounted as imported or duplicate;
+- duplicates within one batch and across re-imports remain visible;
+- existing immutable transactions are never replaced;
+- parsing, lots, performance, and current snapshots remain unchanged.
