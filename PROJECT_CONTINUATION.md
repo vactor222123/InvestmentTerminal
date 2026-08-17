@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `143add3`
-**Current local package:** Phase 3 Package 1 — provider-neutral portfolio risk inputs
+**Current GitHub baseline:** `5daf01d`
+**Current local package:** Phase 3 Package 2 — deterministic portfolio drawdown
 **Current phase:** Phase 3 — Portfolio Decision Intelligence
-**Current next action:** Add deterministic portfolio drawdown analysis
+**Current next action:** Add deterministic portfolio volatility analysis
 
 ---
 
@@ -83,6 +83,9 @@ is `docs/PHASE_2_CLOSURE.md`.
 Phase 3 Package 1 adds provider-neutral, currency-explicit portfolio and
 instrument return-series inputs with ordered periods, cutoff validation, and
 source provenance, without calculating or classifying risk.
+
+Phase 3 Package 2 adds compounded portfolio drawdown analysis with an explicit
+wealth path, running peaks, maximum peak-to-trough evidence, and recovery state.
 
 Audit document:
 
@@ -165,14 +168,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 3 Package 1 — Provider-Neutral Portfolio Risk Inputs
+Phase 3 Package 2 — Deterministic Portfolio Drawdown Analysis
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/portfolio_risk_inputs.py
-tests/test_portfolio_risk_inputs.py
+investment_terminal/portfolio/portfolio_drawdown.py
+tests/test_portfolio_drawdown.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -180,14 +183,15 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 143add3f03f1ef8d76fe3a3abfe2f732732f3782
+develop @ 5daf01dc02b05c26a9f3b0a5821b3ab261385351
 ```
 
 Architecture/product alignment:
 
-- return periods are finite, timezone-aware, unique, ordered, and non-overlapping;
-- portfolio and instrument identities remain explicit and deterministic;
-- observation currency and provider-neutral provenance are preserved;
-- no observation or fetch timestamp may exceed the risk cutoff;
-- drawdown, volatility, correlation, classifications, and recommendations remain separate;
+- returns compound into a deterministic portfolio wealth path;
+- every point preserves its running peak and relative drawdown;
+- maximum drawdown keeps the earliest equal trough deterministically;
+- peak, trough, and first recovery timestamps remain explicit;
+- total loss is bounded at negative one and unrecovered episodes stay visible;
+- volatility, correlation, classifications, and recommendations remain separate;
 - canonical Review History remains unchanged.

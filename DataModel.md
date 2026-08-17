@@ -153,6 +153,13 @@ instrument series to a ledger, portfolio, and `as_of` cutoff. Future observation
 or provenance timestamps fail closed. The contract performs no drawdown,
 volatility, correlation, risk classification, or recommendation calculation.
 
+`PortfolioDrawdownCalculator` compounds the validated portfolio returns into a
+deterministic wealth path. Each `PortfolioDrawdownPoint` preserves its running
+peak and exact relative decline. `PortfolioDrawdownAnalysis` records the earliest
+maximum peak/trough episode and its first recovery, when present, while retaining
+portfolio identity, currency, cadence, cutoff, and source provenance. It does
+not assign qualitative risk labels or recommendations.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:
