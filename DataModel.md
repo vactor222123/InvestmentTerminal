@@ -107,6 +107,11 @@ positions using average-cost accounting. It preserves canonical instrument
 identity and cost currency, ignores non-trade cash events, removes fully sold
 positions, and fails closed when a sale exceeds the available quantity.
 
+`RealizedPerformanceCalculator` applies the same average-cost accounting to
+each SELL event and preserves sale proceeds, allocated cost basis, gain/loss,
+and return percentage. Aggregates remain separated and deterministically
+ordered by currency, so values in unlike currencies are never silently mixed.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:

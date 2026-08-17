@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `29997c5`
-**Current local package:** Phase 2 Package 6 — deterministic position reconstruction
+**Current GitHub baseline:** `5318963`
+**Current local package:** Phase 2 Package 7 — realised performance calculation
 **Current phase:** Phase 2 — Portfolio Lifecycle Intelligence
-**Current next action:** Add realised performance calculation for SELL transactions
+**Current next action:** Add unrealised performance projection using explicit current prices
 
 ---
 
@@ -56,6 +56,9 @@ line-specific validation, and lossless conversion into transaction import batche
 
 Phase 2 Package 6 adds deterministic open-position reconstruction from BUY and
 SELL events with average-cost accounting and fail-closed oversell validation.
+
+Phase 2 Package 7 adds deterministic realised gain/loss calculation per SELL
+event and currency-safe summaries using the established average-cost method.
 
 Audit document:
 
@@ -138,14 +141,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 2 Package 6 — Deterministic Position Reconstruction
+Phase 2 Package 7 — Realised Performance Calculation
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/position_reconstruction.py
-tests/test_position_reconstruction.py
+investment_terminal/portfolio/realized_performance.py
+tests/test_realized_performance.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -153,13 +156,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 29997c532c6e15d59cf143008dea27200831f625
+develop @ 531896325a3af9bbfe4577712d26f9d244d2ef3e
 ```
 
 Architecture/product alignment:
 
-- ordered immutable ledger transactions are the sole reconstruction input;
-- BUY and SELL events use deterministic average-cost position accounting;
-- oversells, identity drift, and mixed cost currencies fail closed;
-- dividends and fees remain separate cash events and do not alter quantity;
-- transaction persistence, realised performance, and snapshots remain unchanged.
+- realised results retain exact SELL transaction and instrument provenance;
+- allocated cost basis follows deterministic average-cost accounting;
+- sale-level gain/loss and return percentage remain explicit;
+- summaries never aggregate unlike currencies;
+- dividends, fees, unrealised valuation, persistence, and snapshots remain unchanged.
