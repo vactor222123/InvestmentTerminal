@@ -284,6 +284,22 @@ list_between(started_at, ended_at)
 [started_at, ended_at)
 ```
 
+## External Context Evidence
+
+The Context domain owns provider-independent immutable contracts for `NEWS`,
+`MACROECONOMIC`, `GEOPOLITICAL`, and `EVENT` records. Each
+`ExternalContextRecord` preserves normalized subjects, an optional event time,
+and an explicit uncertainty level with reasons whenever uncertainty is not
+`NONE`.
+
+`ExternalContextProvenance` records the provider, provider record identity,
+publication and fetch timestamps, and optional source URL and SHA-256 checksum.
+`ExternalContextQualityService` evaluates caller-configured freshness in hours
+and reports `READY`, `PARTIAL`, or `STALE` without hiding incomplete lineage.
+`ExternalContextEvidence` binds the normalized record, provenance, and quality
+assessment. Provider ingestion, persistence, sentiment calculation, Review
+Package composition, and AI interpretation remain separate later boundaries.
+
 ## Authority Relationships
 
 ```text

@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `8b04883`
-**Current local package:** Phase 3 closure
+**Current GitHub baseline:** `40d02b0`
+**Current local package:** Phase 4 Package 1
 **Current phase:** Phase 4 — Context and Market Intelligence
-**Current next action:** Audit existing context/news ingestion boundaries for Phase 4 Package 1
+**Current next action:** Verify Phase 4 Package 1 in CI, then audit provider-neutral context ingestion boundaries for Phase 4 Package 2
 
 ---
 
@@ -105,6 +105,10 @@ the effective strategy rule set with traceable PASS/FAIL/REVIEW outcomes.
 Phase 3 is closed after verifying every roadmap scope item and green CI through
 run 66. The closure record is `docs/PHASE_3_CLOSURE.md`.
 
+Phase 4 Package 1 establishes provider-independent immutable external-context
+records for news, macroeconomic, geopolitical, and event evidence with explicit
+source provenance, caller-configured freshness, quality status, and uncertainty.
+
 Audit document:
 
 ```text
@@ -186,27 +190,31 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 3 Closure — Portfolio Decision Intelligence
+Phase 4 Package 1 — External Context Evidence Contracts
 ```
 
 Files:
 
 ```text
-docs/PHASE_3_CLOSURE.md
+investment_terminal/context/__init__.py
+investment_terminal/context/external_context_models.py
+tests/test_external_context_models.py
+DataModel.md
 PROJECT_CONTINUATION.md
 ```
 
 Source baseline verified against GitHub:
 
 ```text
-develop @ 8b048835b2033a042792f1b1f8da20e171e29845
+develop @ 40d02b05df24c2f255867574fbf316c1b115fe12
 ```
 
 Architecture/product alignment:
 
-- every Phase 3 roadmap scope item is implemented and tested;
-- all four canonical strategies have explicit versioned rules and evaluation;
-- missing/incompatible evidence remains visible and fails closed where required;
-- rebalancing and strategy evidence never authorizes execution;
-- Phase 4 context/news ingestion is the next focused audit;
-- canonical Review History remains unchanged.
+- context contracts are provider-independent and immutable;
+- news, macroeconomic, geopolitical, and event evidence share one explicit
+  normalized boundary without conflating their meaning;
+- provenance, freshness, incomplete lineage, and uncertainty remain visible;
+- provider ingestion, sentiment, Review composition, History, Knowledge, and AI
+  behavior remain unchanged;
+- Phase 4 Package 2 provider-neutral ingestion is the next focused audit.
