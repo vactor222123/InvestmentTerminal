@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `4588353`
-**Current local package:** Phase 2 Package 10 — append-only valuation history repository
+**Current GitHub baseline:** `e8b2f62`
+**Current local package:** Phase 2 Package 11 — SQLite valuation history persistence
 **Current phase:** Phase 2 — Portfolio Lifecycle Intelligence
-**Current next action:** Add SQLite persistence for portfolio valuation history
+**Current next action:** Add tax-lot readiness contracts for explicit acquisition-lot attribution
 
 ---
 
@@ -68,6 +68,10 @@ deterministically ordered portfolio valuation history contract.
 
 Phase 2 Package 10 adds append-only valuation repository semantics and an
 in-memory reference implementation with deterministic temporal queries.
+
+Phase 2 Package 11 adds versioned SQLite valuation-history persistence with
+immutable ownership metadata, strict JSON payloads, indexed temporal queries,
+transaction rollback, and lossless restart reconstruction.
 
 Audit document:
 
@@ -150,14 +154,15 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 2 Package 10 — Append-Only Valuation History Repository
+Phase 2 Package 11 — SQLite Valuation History Persistence
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/portfolio_valuation_history_repository.py
-tests/test_portfolio_valuation_history_repository.py
+investment_terminal/portfolio/portfolio_valuation_history_sqlite_store.py
+investment_terminal/portfolio/portfolio_valuation_history_sqlite_repository.py
+tests/test_portfolio_valuation_history_sqlite_repository.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -165,13 +170,14 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 4588353b5cd8cc156c9973d939dc7d18ded16995
+develop @ e8b2f621e07621293e9d8a785459771f7924148e
 ```
 
 Architecture/product alignment:
 
-- snapshot identities are append-only and cannot be replaced;
-- repository ownership enforces one ledger and portfolio;
-- all temporal queries are deterministic and timezone-aware;
-- recent/latest access preserves chronological evidence order;
-- canonical Review History and durable persistence remain unchanged.
+- SQLite schema version 1 binds immutable ledger and portfolio metadata;
+- canonical strict JSON preserves complete valuation evidence across restart;
+- snapshot identities remain append-only and cannot be replaced;
+- indexed temporal queries are deterministic and timezone-aware;
+- failed appends roll back and corrupt payloads fail visibly;
+- canonical Review History remains unchanged.

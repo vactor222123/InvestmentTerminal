@@ -126,7 +126,13 @@ canonical Review History.
 `PortfolioValuationHistoryRepository` defines append-only snapshot identity,
 exact lookup, half-open time-window queries, recent/latest access, and immutable
 history projection. Its in-memory implementation establishes executable
-semantics without introducing persistence or coupling to Review History.
+semantics without coupling to Review History.
+
+`PortfolioValuationHistorySQLiteStore` schema version 1 binds one database to
+immutable ledger and portfolio metadata. The SQLite repository stores canonical
+strict JSON snapshots, rejects identity replacement, uses indexed deterministic
+valuation-time queries, rolls back failed appends, and reconstructs the complete
+domain projection after restart. Corrupt payloads fail visibly on read.
 
 ## Knowledge
 
