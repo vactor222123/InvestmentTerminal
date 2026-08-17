@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `de9f8df`
-**Current local package:** Phase 3 Package 4 — deterministic portfolio correlation
+**Current GitHub baseline:** `f4f8da0`
+**Current local package:** Phase 3 Package 5 — deterministic portfolio rebalancing evidence
 **Current phase:** Phase 3 — Portfolio Decision Intelligence
-**Current next action:** Add deterministic portfolio rebalancing evidence
+**Current next action:** Add strategy-specific portfolio rule contracts
 
 ---
 
@@ -93,6 +93,9 @@ without hidden cadence or market-calendar assumptions.
 Phase 3 Package 4 adds pairwise Pearson correlation evidence with exact period
 alignment and explicit unavailable states for incompatible or insufficient data.
 
+Phase 3 Package 5 converts canonical policy gaps into non-executable strategic
+bucket adjustment evidence with an explicit caller-supplied tolerance.
+
 Audit document:
 
 ```text
@@ -174,14 +177,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 3 Package 4 — Deterministic Portfolio Correlation Analysis
+Phase 3 Package 5 — Deterministic Portfolio Rebalancing Evidence
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/portfolio_correlation.py
-tests/test_portfolio_correlation.py
+investment_terminal/portfolio/portfolio_rebalancing.py
+tests/test_portfolio_rebalancing.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -189,15 +192,15 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ de9f8dfa6b642ded5a1208ebdd22bfac6d03598e
+develop @ f4f8da05943c95bd600630f96e2ba4123634e775
 ```
 
 Architecture/product alignment:
 
-- Pearson correlation uses only exact shared observation periods;
-- portfolio-to-instrument and instrument-to-instrument pairs are explicit;
-- pair ordering, overlap count, identity, and both provenances are preserved;
-- incompatible currency or cadence fails into explicit unavailable evidence;
-- insufficient overlap and zero variance remain visible instead of fabricated;
-- correlation does not imply causation, classification, or recommendation;
+- canonical policy-gap evidence remains the sole current/target source;
+- tolerance is explicit and inclusive rather than a hidden policy assumption;
+- every strategic bucket exposes deterministic INCREASE, REDUCE, or HOLD evidence;
+- aggregate increases, reductions, and fundable transfer remain visible;
+- evidence explicitly denies execution authority and selects no instruments;
+- contribution planning, trade selection, and execution remain separate;
 - canonical Review History remains unchanged.

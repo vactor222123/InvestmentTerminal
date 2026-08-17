@@ -174,6 +174,13 @@ currency mismatch, cadence mismatch, insufficient overlap, and zero variance
 as explicit unavailable evidence. Correlation remains descriptive and does not
 imply causation, classification, or a recommendation.
 
+`PortfolioRebalancingEvidenceBuilder` converts canonical strategic policy gaps
+into bucket-level `INCREASE`, `REDUCE`, or `HOLD` evidence using an explicit
+caller-supplied tolerance. It exposes the proposed adjustment amounts and the
+portion that can be funded by opposing reductions, while explicitly denying
+execution authority. Instrument selection and trade execution remain outside
+this contract.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:
