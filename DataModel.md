@@ -88,6 +88,11 @@ ledger projection without exposing storage details. Its in-memory reference
 implementation establishes deterministic behavior before a durable adapter is
 introduced.
 
+`PortfolioTransactionSQLiteStore` owns schema version 1, immutable ledger
+metadata, and single-operation rollback. `SQLitePortfolioTransactionRepository`
+stores canonical strict JSON payloads with indexed occurrence and instrument
+keys, preserving the repository contract across process restarts.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:

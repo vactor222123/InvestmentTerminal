@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `f9fb0c6`
-**Current local package:** Phase 2 Package 2 — append-only transaction repository
+**Current GitHub baseline:** `1ab8b34`
+**Current local package:** Phase 2 Package 3 — durable SQLite transaction ledger
 **Current phase:** Phase 2 — Portfolio Lifecycle Intelligence
-**Current next action:** Add a durable SQLite transaction store and repository adapter
+**Current next action:** Add transaction import contracts and deterministic duplicate accounting
 
 ---
 
@@ -44,6 +44,9 @@ deterministically ordered ledger contracts without changing current snapshots.
 
 Phase 2 Package 2 establishes append-only repository semantics and an in-memory
 reference implementation with deterministic time and instrument queries.
+
+Phase 2 Package 3 adds a versioned SQLite store and durable repository adapter
+with immutable ledger metadata, strict JSON payloads, and rollback behavior.
 
 Audit document:
 
@@ -126,14 +129,15 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 2 Package 2 — Append-Only Transaction Repository
+Phase 2 Package 3 — Durable SQLite Transaction Ledger
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/transaction_ledger_repository.py
-tests/test_transaction_ledger_repository.py
+investment_terminal/portfolio/transaction_ledger_sqlite_store.py
+investment_terminal/portfolio/transaction_ledger_sqlite_repository.py
+tests/test_transaction_ledger_sqlite.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -141,13 +145,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ f9fb0c60c393970e968ac2fb25cacbfe6cf6f2c8
+develop @ 1ab8b34586f7bfc47b045dc8d3ec906a7ca90281
 ```
 
 Architecture/product alignment:
 
-- duplicate transaction identities are rejected without replacing originals;
-- exact, time-window, and instrument queries have deterministic ordering;
-- half-open time boundaries and timezone awareness are explicit;
-- immutable ledger snapshots are projected from repository state;
-- durable persistence, imports, lots, performance, and snapshots remain unchanged.
+- schema and ledger metadata are versioned and validated on every initialization;
+- transaction payloads round-trip through strict canonical JSON;
+- duplicate identities preserve original rows and fail visibly;
+- repository queries remain deterministic across process recreation;
+- failed writes roll back; imports, lots, performance, and snapshots remain unchanged.
