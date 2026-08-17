@@ -181,6 +181,13 @@ portion that can be funded by opposing reductions, while explicitly denying
 execution authority. Instrument selection and trade execution remain outside
 this contract.
 
+`PortfolioStrategyRuleSet` is a versioned, effective-dated configuration for
+`CORE_LONG_TERM`, `STOCK_LONG_TERM`, `POSITION_TRADE`, and `CASH_RESERVE` in
+canonical order. Each strategy has its own explicit review cadence and ordered
+measurable `StrategyRuleCondition` records, including phase, comparison,
+threshold, unit, and missing-data action. The contract supplies no hidden
+investment thresholds, performs no evaluation, and grants no execution authority.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:

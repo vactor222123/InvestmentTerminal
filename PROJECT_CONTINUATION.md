@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `f4f8da0`
-**Current local package:** Phase 3 Package 5 — deterministic portfolio rebalancing evidence
+**Current GitHub baseline:** `3d482e1`
+**Current local package:** Phase 3 Package 6 — strategy-specific portfolio rule contracts
 **Current phase:** Phase 3 — Portfolio Decision Intelligence
-**Current next action:** Add strategy-specific portfolio rule contracts
+**Current next action:** Add deterministic strategy-rule evaluation evidence
 
 ---
 
@@ -96,6 +96,9 @@ alignment and explicit unavailable states for incompatible or insufficient data.
 Phase 3 Package 5 converts canonical policy gaps into non-executable strategic
 bucket adjustment evidence with an explicit caller-supplied tolerance.
 
+Phase 3 Package 6 adds a complete versioned rule contract with separate review
+cadence and measurable conditions for every canonical portfolio strategy.
+
 Audit document:
 
 ```text
@@ -177,14 +180,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 3 Package 5 — Deterministic Portfolio Rebalancing Evidence
+Phase 3 Package 6 — Strategy-Specific Portfolio Rule Contracts
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/portfolio_rebalancing.py
-tests/test_portfolio_rebalancing.py
+investment_terminal/portfolio/portfolio_strategy_rules.py
+tests/test_portfolio_strategy_rules.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -192,15 +195,15 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ f4f8da05943c95bd600630f96e2ba4123634e775
+develop @ 3d482e1f906768bdfa95cce234498d07d6e0a90f
 ```
 
 Architecture/product alignment:
 
-- canonical policy-gap evidence remains the sole current/target source;
-- tolerance is explicit and inclusive rather than a hidden policy assumption;
-- every strategic bucket exposes deterministic INCREASE, REDUCE, or HOLD evidence;
-- aggregate increases, reductions, and fundable transfer remain visible;
-- evidence explicitly denies execution authority and selects no instruments;
-- contribution planning, trade selection, and execution remain separate;
+- all four canonical strategies require separate rules in canonical order;
+- rule-set identity, version, and timezone-aware effective time are explicit;
+- review cadence is strategy-specific and caller-supplied;
+- conditions preserve phase, metric, operator, threshold, unit, and missing-data action;
+- no default investment thresholds or identical implicit strategy rules are introduced;
+- evaluation, recommendations, and execution remain separate;
 - canonical Review History remains unchanged.
