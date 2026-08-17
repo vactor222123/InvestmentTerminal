@@ -314,6 +314,10 @@ deterministic publication-time and subject queries. Its in-memory reference
 implementation rejects reuse of either canonical context identity or provider
 source identity. Durable SQLite storage remains a separate adapter boundary.
 
+`ExternalContextSQLiteStore` and `SQLiteExternalContextRepository` provide
+schema-versioned durable storage, atomic append, indexed time/subject queries,
+strict JSON round-trips, and restart-safe reconstruction.
+
 ## Authority Relationships
 
 ```text
