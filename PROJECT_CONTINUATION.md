@@ -5,9 +5,9 @@
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
 **Current GitHub baseline:** `f630bcabd032460657fb8329e82b9cae194b5bd7`
-**Current local package:** Phase 4 Closure
+**Current local package:** Phase 5 Package 1
 **Current phase:** Phase 5 — Market Discovery
-**Current next action:** Apply Phase 4 closure, then audit the maintained asset-universe boundary
+**Current next action:** Apply Phase 5 Package 1, then audit the provider-neutral universe ingestion boundary
 
 ---
 
@@ -129,6 +129,11 @@ Phase 4 is closed after verifying every roadmap scope item against the current
 Context, Review, persistence, and test boundaries. The closure record is
 `docs/PHASE_4_CLOSURE.md`.
 
+Phase 5 Package 1 establishes immutable, versioned maintained asset-universe
+snapshots using canonical instrument identities, effective membership time,
+source provenance, and explicit quality without changing the legacy symbol-list
+universe contract.
+
 Audit document:
 
 ```text
@@ -210,26 +215,29 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 4 Closure — Context and Market Intelligence
+Phase 5 Package 1 — Maintained Asset-Universe Contracts
 ```
 
 Files:
 
 ```text
-docs/PHASE_4_CLOSURE.md
+investment_terminal/universe/maintained_universe_models.py
+tests/test_maintained_universe_models.py
+DataModel.md
 PROJECT_CONTINUATION.md
 ```
 
 Source baseline verified against GitHub:
 
 ```text
-develop @ f630bcabd032460657fb8329e82b9cae194b5bd7
+develop @ 25778c64d938224ba00e6ebf536e191acb79d8b4
 ```
 
 Architecture/product alignment:
 
-- news, macroeconomic, geopolitical, event, and sentiment scope is implemented;
-- provenance, freshness, quality, and uncertainty remain explicit end to end;
-- Context remains upstream evidence and Review remains downstream assembly;
-- Phase 4 is closed in `docs/PHASE_4_CLOSURE.md`;
-- Phase 5 maintained asset-universe discovery is the next focused audit.
+- maintained universes use canonical provider-independent instrument identity;
+- immutable version and effective time make snapshot identity explicit;
+- membership is unique and deterministically ordered by instrument key;
+- existing provenance and quality contracts remain explicit end to end;
+- legacy text-file universes remain backward compatible;
+- provider-neutral universe ingestion is the next focused audit.

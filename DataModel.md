@@ -329,6 +329,20 @@ score/confidence, assessment time, method/version, and reasons remain explicit;
 the Review projection accounts for assessed and unassessed records without
 inventing sentiment for missing evidence.
 
+## Market Discovery
+
+`MaintainedAssetUniverse` is an immutable, versioned, effective-dated snapshot
+of canonical `InstrumentIdentity` members. `AssetUniverseMember` records when
+an instrument entered the maintained snapshot and may preserve an explicit
+inclusion reason. Members are unique by the strongest canonical instrument key
+and serialize in deterministic key order.
+
+`MaintainedAssetUniverseEvidence` binds the snapshot to existing market-metadata
+source provenance and explicit `READY`, `PARTIAL`, or `STALE` quality. Provider
+ingestion, persistence, sector classification, screening, ranking, and Review
+composition remain separate later boundaries. The legacy text-file
+`InvestmentUniverse` remains a backward-compatible local symbol-list input.
+
 ## Authority Relationships
 
 ```text
