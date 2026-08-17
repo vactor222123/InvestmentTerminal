@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `9ec2cf9`
-**Current local package:** Phase 2 Package 4 — transaction import accounting
+**Current GitHub baseline:** `0791a24`
+**Current local package:** Phase 2 Package 5 — transaction CSV parsing boundary
 **Current phase:** Phase 2 — Portfolio Lifecycle Intelligence
-**Current next action:** Add transaction CSV parsing and validation boundary
+**Current next action:** Add deterministic position reconstruction from BUY and SELL transactions
 
 ---
 
@@ -50,6 +50,9 @@ with immutable ledger metadata, strict JSON payloads, and rollback behavior.
 
 Phase 2 Package 4 adds provider-neutral import batches and deterministic,
 visible accounting for imported and duplicate transaction identities.
+
+Phase 2 Package 5 adds a canonical provider-neutral transaction CSV schema,
+line-specific validation, and lossless conversion into transaction import batches.
 
 Audit document:
 
@@ -132,14 +135,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 2 Package 4 — Transaction Import Accounting
+Phase 2 Package 5 — Transaction CSV Parsing Boundary
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/transaction_import.py
-tests/test_transaction_import.py
+investment_terminal/portfolio/transaction_csv_parser.py
+tests/test_transaction_csv_parser.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -147,13 +150,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 9ec2cf9b77141145b07e4f58bce1677100fd0478
+develop @ 0791a244776b31591b95d1530626e029b47e3e4e
 ```
 
 Architecture/product alignment:
 
-- import batches preserve source identity and timezone-aware import time;
-- every submitted identity is accounted as imported or duplicate;
-- duplicates within one batch and across re-imports remain visible;
-- existing immutable transactions are never replaced;
-- parsing, lots, performance, and current snapshots remain unchanged.
+- the CSV boundary is provider-neutral and requires one explicit canonical schema;
+- UTF-8/BOM input, decimal comma, and ISO 8601 timezone offsets are supported;
+- source row order and duplicate transaction evidence are preserved unchanged;
+- instrument and transaction invariants remain owned by their domain models;
+- repositories, lots, performance, and current snapshots remain unchanged.

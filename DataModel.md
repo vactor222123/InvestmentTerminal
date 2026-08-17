@@ -97,6 +97,11 @@ keys, preserving the repository contract across process restarts.
 import time while accounting separately for every imported and duplicate input
 identity. Re-import is idempotent without silently removing duplicate evidence.
 
+`PortfolioTransactionCsvParser` is the provider-neutral UTF-8 ingestion
+boundary. It validates one explicit canonical schema, preserves source order and
+duplicate rows, constructs canonical instrument identities, and reports invalid
+domain values with their CSV line number before producing an import batch.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:
