@@ -160,6 +160,13 @@ maximum peak/trough episode and its first recovery, when present, while retainin
 portfolio identity, currency, cadence, cutoff, and source provenance. It does
 not assign qualitative risk labels or recommendations.
 
+`PortfolioVolatilityCalculator` calculates the arithmetic mean and sample
+standard deviation of validated portfolio returns. Annualisation uses an
+explicit positive `periods_per_year` input rather than inferring a market
+calendar. `PortfolioVolatilityAnalysis` preserves the observation count,
+currency, cadence, source provenance, periodic volatility, and annualised
+volatility without assigning risk labels or thresholds.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:

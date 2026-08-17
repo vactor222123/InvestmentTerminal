@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `5daf01d`
-**Current local package:** Phase 3 Package 2 — deterministic portfolio drawdown
+**Current GitHub baseline:** `9b13571`
+**Current local package:** Phase 3 Package 3 — deterministic portfolio volatility
 **Current phase:** Phase 3 — Portfolio Decision Intelligence
-**Current next action:** Add deterministic portfolio volatility analysis
+**Current next action:** Add deterministic portfolio correlation analysis
 
 ---
 
@@ -86,6 +86,9 @@ source provenance, without calculating or classifying risk.
 
 Phase 3 Package 2 adds compounded portfolio drawdown analysis with an explicit
 wealth path, running peaks, maximum peak-to-trough evidence, and recovery state.
+
+Phase 3 Package 3 adds sample portfolio volatility and explicit annualisation
+without hidden cadence or market-calendar assumptions.
 
 Audit document:
 
@@ -168,14 +171,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 3 Package 2 — Deterministic Portfolio Drawdown Analysis
+Phase 3 Package 3 — Deterministic Portfolio Volatility Analysis
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/portfolio_drawdown.py
-tests/test_portfolio_drawdown.py
+investment_terminal/portfolio/portfolio_volatility.py
+tests/test_portfolio_volatility.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -183,15 +186,15 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 5daf01dc02b05c26a9f3b0a5821b3ab261385351
+develop @ 9b13571893893b3ea4ab2f25a7f52228cb564baa
 ```
 
 Architecture/product alignment:
 
-- returns compound into a deterministic portfolio wealth path;
-- every point preserves its running peak and relative drawdown;
-- maximum drawdown keeps the earliest equal trough deterministically;
-- peak, trough, and first recovery timestamps remain explicit;
-- total loss is bounded at negative one and unrecovered episodes stay visible;
-- volatility, correlation, classifications, and recommendations remain separate;
+- volatility uses sample standard deviation over validated return observations;
+- observation count, periodic mean, and periodic volatility remain explicit;
+- annualisation requires a caller-supplied positive periods-per-year factor;
+- zero-volatility series remain valid evidence;
+- currency, cadence, identity, and provenance are preserved;
+- correlation, classifications, and recommendations remain separate;
 - canonical Review History remains unchanged.
