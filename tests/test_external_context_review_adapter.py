@@ -13,6 +13,9 @@ from investment_terminal.context.external_context_models import (
 from investment_terminal.review.external_context_review_adapter import (
     ExternalContextReviewAdapter,
 )
+from investment_terminal.context.external_context_sentiment import (
+    ExternalContextSentimentEvidence,
+)
 
 
 def evidence(
@@ -92,8 +95,60 @@ def test_adapter_represents_empty_evidence_explicitly() -> None:
             "STALE": 0,
         },
         "warnings": [],
+        "sentiment_counts": {
+            "NEGATIVE": 0,
+            "NEUTRAL": 0,
+            "POSITIVE": 0,
+            "MIXED": 0,
+            "UNKNOWN": 0,
+            "NOT_ASSESSED": 0,
+        },
         "items": [],
     }
+
+
+def test_adapter_attaches_sentiment_and_accounts_for_missing_assessments() -> None:
+    result = ExternalContextReviewAdapter.adapt(
+        (evidence("first", 11), evidence("second", 12)),
+        sentiment=(ExternalContextSentimentEvidence(
+            context_id="second",
+            label="NEGATIVE",
+            score=-0.5,
+            confidence=0.75,
+            assessed_at=datetime(2026, 8, 12, tzinfo=timezone.utc),
+            method="provider_model",
+            method_version="1",
+        ),),
+    )
+
+    assert result["sentiment_counts"]["NEGATIVE"] == 1
+    assert result["sentiment_counts"]["NOT_ASSESSED"] == 1
+    assert result["items"][0]["sentiment"] == {
+        "status": "NOT_ASSESSED",
+    }
+    assert result["items"][1]["sentiment"]["label"] == "NEGATIVE"
+
+
+def test_adapter_rejects_duplicate_and_orphaned_sentiment() -> None:
+    assessment = ExternalContextSentimentEvidence(
+        context_id="context-1",
+        label="NEUTRAL",
+        assessed_at=datetime(2026, 8, 11, tzinfo=timezone.utc),
+        method="rules",
+        method_version="1",
+    )
+
+    with pytest.raises(ValueError, match="unique context_id"):
+        ExternalContextReviewAdapter.adapt(
+            (evidence("context-1", 11),),
+            sentiment=(assessment, assessment),
+        )
+
+    with pytest.raises(ValueError, match="unknown context_id"):
+        ExternalContextReviewAdapter.adapt(
+            (evidence("other", 11),),
+            sentiment=(assessment,),
+        )
 
 
 def test_adapter_rejects_invalid_input() -> None:

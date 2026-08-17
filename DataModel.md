@@ -323,6 +323,12 @@ Package without moving interpretation authority upstream. It preserves record,
 provenance, quality, freshness, and uncertainty, applies deterministic ordering,
 and exposes explicit aggregate and empty-evidence states.
 
+`ExternalContextSentimentEvidence` attaches a provider-independent, traceable
+sentiment assessment to one canonical context identity. Labels, optional bounded
+score/confidence, assessment time, method/version, and reasons remain explicit;
+the Review projection accounts for assessed and unassessed records without
+inventing sentiment for missing evidence.
+
 ## Authority Relationships
 
 ```text

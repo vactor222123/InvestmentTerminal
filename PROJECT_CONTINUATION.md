@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `63ea758d09ce94390eb3d69b7478afe10fae81cb`
-**Current local package:** Phase 4 Package 5
+**Current GitHub baseline:** `3f07389dd1d3c892d88e1d33558707fec554170d`
+**Current local package:** Phase 4 Package 6
 **Current phase:** Phase 4 — Context and Market Intelligence
-**Current next action:** Apply and verify Phase 4 Package 5 in CI, then audit sentiment/context evidence
+**Current next action:** Apply and verify Phase 4 Package 6 in CI, then perform Phase 4 closure audit
 
 ---
 
@@ -122,6 +122,9 @@ repository adapter for external-context evidence.
 Phase 4 Package 5 adds deterministic external-context projection into the
 Review Package while preserving provenance, freshness, quality, and uncertainty.
 
+Phase 4 Package 6 adds provider-independent sentiment evidence and lossless
+Review Package association with explicit missing-assessment accounting.
+
 Audit document:
 
 ```text
@@ -203,18 +206,16 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 4 Package 5 — External Context Review Integration
+Phase 4 Package 6 — External Context Sentiment Evidence
 ```
 
 Files:
 
 ```text
+investment_terminal/context/external_context_sentiment.py
 investment_terminal/review/external_context_review_adapter.py
-investment_terminal/review/review_package_models.py
-investment_terminal/review/review_package_builder.py
-investment_terminal/cli/investment_review_package.py
+tests/test_external_context_sentiment.py
 tests/test_external_context_review_adapter.py
-tests/test_investment_review_package.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -222,14 +223,14 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 63ea758d09ce94390eb3d69b7478afe10fae81cb
+develop @ 3f07389dd1d3c892d88e1d33558707fec554170d
 ```
 
 Architecture/product alignment:
 
-- Review remains the downstream assembly boundary and Context does not import it;
-- normalized evidence is ordered deterministically before projection;
-- record, provenance, quality, freshness, and uncertainty remain lossless;
-- aggregate quality and empty/not-connected states are explicit;
-- History, Knowledge, AI, repositories, and provider ingestion remain unchanged;
-- sentiment/context evidence is the next focused audit.
+- sentiment is attached only by canonical context identity;
+- label, score, confidence, method/version, time, and reasons remain explicit;
+- missing sentiment remains NOT_ASSESSED and is counted rather than inferred;
+- duplicate or orphaned sentiment assessments fail closed;
+- ingestion, repositories, History, Knowledge, and AI remain unchanged;
+- a complete Phase 4 closure audit is the next action.
