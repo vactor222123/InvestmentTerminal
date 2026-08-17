@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `92a60da`
-**Current local package:** Phase 4 Package 2
+**Current GitHub baseline:** `0d6eb2d`
+**Current local package:** Phase 4 Package 3
 **Current phase:** Phase 4 — Context and Market Intelligence
-**Current next action:** Verify Phase 4 Package 2 in CI, then audit durable external-context persistence boundaries for Phase 4 Package 3
+**Current next action:** Verify Phase 4 Package 3 in CI, then audit SQLite external-context persistence for Phase 4 Package 4
 
 ---
 
@@ -113,6 +113,9 @@ Phase 4 Package 2 adds a provider-neutral bounded query and ingestion boundary
 that validates normalized provider output, rejects scope and identity defects,
 applies freshness quality, and returns deterministic evidence without storage.
 
+Phase 4 Package 3 adds append-only external-context repository semantics and an
+in-memory reference implementation with deterministic time and subject queries.
+
 Audit document:
 
 ```text
@@ -194,14 +197,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 4 Package 2 — Provider-Neutral Context Ingestion
+Phase 4 Package 3 — External Context Repository
 ```
 
 Files:
 
 ```text
-investment_terminal/context/external_context_ingestion.py
-tests/test_external_context_ingestion.py
+investment_terminal/context/external_context_repository.py
+tests/test_external_context_repository.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -209,16 +212,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 92a60dabcdb441616b3726cf6436fed295d84ef9
+develop @ 0d6eb2d925a16db6e3aeebe5ee97e7154c6b872c
 ```
 
 Architecture/product alignment:
 
-- context queries have explicit types, subjects, time bounds, freshness, and
-  result limits;
-- provider adapters return normalized source items behind a Protocol boundary;
-- out-of-scope, future, duplicate, oversized, and malformed results fail closed;
-- evidence ordering and quality assessment are deterministic;
-- persistence, sentiment, Review composition, History, Knowledge, and AI remain
-  unchanged;
-- Phase 4 Package 3 durable persistence is the next focused audit.
+- repository writes are append-only for context and provider identities;
+- retrieval and half-open publication-time queries are deterministic;
+- subject queries are case-insensitive without rewriting evidence;
+- SQLite, sentiment, Review, History, Knowledge, and AI remain unchanged;
+- Phase 4 Package 4 SQLite persistence is the next focused audit.

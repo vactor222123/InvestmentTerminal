@@ -309,6 +309,11 @@ duplicate, oversized, or malformed provider results, applies the Package 1
 quality policy, and returns deterministic `ExternalContextIngestionResult`
 evidence. It does not persist records or interpret their investment meaning.
 
+`ExternalContextRepository` defines append-only identity semantics and
+deterministic publication-time and subject queries. Its in-memory reference
+implementation rejects reuse of either canonical context identity or provider
+source identity. Durable SQLite storage remains a separate adapter boundary.
+
 ## Authority Relationships
 
 ```text
