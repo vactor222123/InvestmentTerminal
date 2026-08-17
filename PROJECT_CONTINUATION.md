@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `e8b2f62`
-**Current local package:** Phase 2 Package 11 — SQLite valuation history persistence
+**Current GitHub baseline:** `f322cf8`
+**Current local package:** Phase 2 Package 12 — explicit tax-lot attribution readiness
 **Current phase:** Phase 2 — Portfolio Lifecycle Intelligence
-**Current next action:** Add tax-lot readiness contracts for explicit acquisition-lot attribution
+**Current next action:** Audit Phase 2 completion against ROADMAP_AFTER_AUDIT.md and select the first Phase 3 package
 
 ---
 
@@ -72,6 +72,9 @@ in-memory reference implementation with deterministic temporal queries.
 Phase 2 Package 11 adds versioned SQLite valuation-history persistence with
 immutable ownership metadata, strict JSON payloads, indexed temporal queries,
 transaction rollback, and lossless restart reconstruction.
+
+Phase 2 Package 12 adds explicit acquisition-lot selection and deterministic
+lot-level attribution without imposing an implicit jurisdictional disposal method.
 
 Audit document:
 
@@ -154,15 +157,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 2 Package 11 — SQLite Valuation History Persistence
+Phase 2 Package 12 — Explicit Tax-Lot Attribution Readiness
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/portfolio_valuation_history_sqlite_store.py
-investment_terminal/portfolio/portfolio_valuation_history_sqlite_repository.py
-tests/test_portfolio_valuation_history_sqlite_repository.py
+investment_terminal/portfolio/tax_lot_attribution.py
+tests/test_tax_lot_attribution.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -170,14 +172,15 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ e8b2f621e07621293e9d8a785459771f7924148e
+develop @ f322cf82c61f891bc6f7f045e5f6a545eb3f1740
 ```
 
 Architecture/product alignment:
 
-- SQLite schema version 1 binds immutable ledger and portfolio metadata;
-- canonical strict JSON preserves complete valuation evidence across restart;
-- snapshot identities remain append-only and cannot be replaced;
-- indexed temporal queries are deterministic and timezone-aware;
-- failed appends roll back and corrupt payloads fail visibly;
+- every SELL requires complete explicit acquisition-lot attribution;
+- no FIFO, LIFO, or jurisdictional disposal rule is inferred;
+- acquisition quantity cannot be allocated more than once;
+- lot pairings preserve exact instrument, currency, time, cost, and proceeds;
+- outputs are immutable and deterministically ordered;
+- existing average-cost performance contracts remain unchanged;
 - canonical Review History remains unchanged.

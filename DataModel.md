@@ -112,6 +112,12 @@ each SELL event and preserves sale proceeds, allocated cost basis, gain/loss,
 and return percentage. Aggregates remain separated and deterministically
 ordered by currency, so values in unlike currencies are never silently mixed.
 
+`TaxLotSelection` records an explicit sale-to-acquisition quantity mapping;
+no jurisdiction-specific FIFO, LIFO, or other disposal method is inferred.
+`TaxLotAttributor` requires exact attribution of every SELL, prevents reuse of
+acquisition quantity, validates time, instrument, and currency compatibility,
+and produces deterministic lot-level realised evidence plus remaining open lots.
+
 `UnrealizedPerformanceCalculator` values reconstructed open positions through
 the existing explicit quote-provider boundary. Position results retain quote
 source and timestamp, reject future or mismatched quotes, expose zero-cost
