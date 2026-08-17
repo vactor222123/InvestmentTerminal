@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `72d3577`
-**Current local package:** Phase 4 Package 4
+**Current GitHub baseline:** `63ea758d09ce94390eb3d69b7478afe10fae81cb`
+**Current local package:** Phase 4 Package 5
 **Current phase:** Phase 4 — Context and Market Intelligence
-**Current next action:** Verify Phase 4 Package 4 in CI, then audit external-context Review Package integration
+**Current next action:** Apply and verify Phase 4 Package 5 in CI, then audit sentiment/context evidence
 
 ---
 
@@ -116,6 +116,12 @@ applies freshness quality, and returns deterministic evidence without storage.
 Phase 4 Package 3 adds append-only external-context repository semantics and an
 in-memory reference implementation with deterministic time and subject queries.
 
+Phase 4 Package 4 adds versioned SQLite persistence and a durable append-only
+repository adapter for external-context evidence.
+
+Phase 4 Package 5 adds deterministic external-context projection into the
+Review Package while preserving provenance, freshness, quality, and uncertainty.
+
 Audit document:
 
 ```text
@@ -197,14 +203,18 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 4 Package 3 — External Context Repository
+Phase 4 Package 5 — External Context Review Integration
 ```
 
 Files:
 
 ```text
-investment_terminal/context/external_context_repository.py
-tests/test_external_context_repository.py
+investment_terminal/review/external_context_review_adapter.py
+investment_terminal/review/review_package_models.py
+investment_terminal/review/review_package_builder.py
+investment_terminal/cli/investment_review_package.py
+tests/test_external_context_review_adapter.py
+tests/test_investment_review_package.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -212,13 +222,14 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 0d6eb2d925a16db6e3aeebe5ee97e7154c6b872c
+develop @ 63ea758d09ce94390eb3d69b7478afe10fae81cb
 ```
 
 Architecture/product alignment:
 
-- repository writes are append-only for context and provider identities;
-- retrieval and half-open publication-time queries are deterministic;
-- subject queries are case-insensitive without rewriting evidence;
-- SQLite, sentiment, Review, History, Knowledge, and AI remain unchanged;
-- Phase 4 Package 4 SQLite persistence is the next focused audit.
+- Review remains the downstream assembly boundary and Context does not import it;
+- normalized evidence is ordered deterministically before projection;
+- record, provenance, quality, freshness, and uncertainty remain lossless;
+- aggregate quality and empty/not-connected states are explicit;
+- History, Knowledge, AI, repositories, and provider ingestion remain unchanged;
+- sentiment/context evidence is the next focused audit.

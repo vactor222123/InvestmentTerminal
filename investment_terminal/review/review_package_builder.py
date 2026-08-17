@@ -28,6 +28,7 @@ class InvestmentReviewPackageBuilder:
         watchlist: dict[str, Any],
         opportunities: dict[str, Any],
         machine_recommendations: dict[str, Any],
+        external_context: dict[str, Any] | None = None,
         generated_at: datetime | None = None,
         warnings: tuple[str, ...] = (),
     ) -> InvestmentReviewPackage:
@@ -63,6 +64,18 @@ class InvestmentReviewPackageBuilder:
             ReviewPackageSection(
                 name="machine_recommendations",
                 payload=machine_recommendations,
+            ),
+            ReviewPackageSection(
+                name="external_context",
+                payload=(
+                    external_context
+                    if external_context is not None
+                    else {
+                        "status": "NOT_CONNECTED",
+                        "item_count": 0,
+                        "items": [],
+                    }
+                ),
             ),
         )
 

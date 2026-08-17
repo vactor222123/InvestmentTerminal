@@ -69,6 +69,7 @@ class InvestmentReviewPackage:
         "watchlist",
         "opportunities",
         "machine_recommendations",
+        "external_context",
     )
 
     def __post_init__(self) -> None:

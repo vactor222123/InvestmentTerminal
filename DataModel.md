@@ -318,6 +318,11 @@ source identity. Durable SQLite storage remains a separate adapter boundary.
 schema-versioned durable storage, atomic append, indexed time/subject queries,
 strict JSON round-trips, and restart-safe reconstruction.
 
+`ExternalContextReviewAdapter` projects normalized evidence into the Review
+Package without moving interpretation authority upstream. It preserves record,
+provenance, quality, freshness, and uncertainty, applies deterministic ordering,
+and exposes explicit aggregate and empty-evidence states.
+
 ## Authority Relationships
 
 ```text

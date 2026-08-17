@@ -55,7 +55,7 @@ def test_builder_creates_required_sections() -> None:
     package = create_package()
 
     assert package.schema_version == "1.0"
-    assert len(package.sections) == 8
+    assert len(package.sections) == 9
     assert package.section(
         "portfolio"
     ).payload["total_value"] == 10000.0
@@ -75,7 +75,38 @@ def test_package_is_json_ready() -> None:
         "machine_recommendations"
         in payload["sections"]
     )
+    assert payload["sections"]["external_context"] == {
+        "status": "NOT_CONNECTED",
+        "item_count": 0,
+        "items": [],
+    }
     assert serialized
+
+
+def test_builder_preserves_external_context_section() -> None:
+    package = InvestmentReviewPackageBuilder().build(
+        portfolio_name="Test Portfolio",
+        data_freshness={},
+        market_analysis={},
+        portfolio={},
+        stock_analysis={},
+        etf_analysis={},
+        watchlist={},
+        opportunities={},
+        machine_recommendations={},
+        external_context={
+            "status": "READY",
+            "item_count": 1,
+            "items": [{"context_id": "context-1"}],
+        },
+        generated_at=GENERATED_AT,
+    )
+
+    assert package.section("external_context").payload == {
+        "status": "READY",
+        "item_count": 1,
+        "items": [{"context_id": "context-1"}],
+    }
 
 
 def test_exporter_writes_json(
@@ -234,7 +265,7 @@ def test_cli_prints_json_from_tracked_example(
     )
 
     assert payload["schema_version"] == "1.0"
-    assert len(payload["sections"]) == 8
+    assert len(payload["sections"]) == 9
     assert (
         payload["portfolio_name"]
         == "Example Investment Portfolio"

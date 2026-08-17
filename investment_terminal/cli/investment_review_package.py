@@ -158,6 +158,11 @@ def main(
         machine_recommendations=sections[
             "machine_recommendations"
         ],
+        external_context={
+            "status": "NOT_CONNECTED",
+            "item_count": 0,
+            "items": [],
+        },
         generated_at=datetime.now(
             timezone.utc
         ),
@@ -326,7 +331,7 @@ def build_warnings(
     warnings = [
         "ETF analysis is not integrated yet.",
         "Watchlist analysis is not integrated yet.",
-        "News and geopolitical context must be added externally.",
+        "External context evidence is not connected.",
     ]
 
     if not portfolio_market_value_connected:
