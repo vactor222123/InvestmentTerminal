@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `f322cf8`
-**Current local package:** Phase 2 Package 12 — explicit tax-lot attribution readiness
-**Current phase:** Phase 2 — Portfolio Lifecycle Intelligence
-**Current next action:** Audit Phase 2 completion against ROADMAP_AFTER_AUDIT.md and select the first Phase 3 package
+**Current GitHub baseline:** `349620e`
+**Current local package:** Phase 2 Closure — roadmap completion audit
+**Current phase:** Phase 3 — Portfolio Decision Intelligence
+**Current next action:** Add provider-neutral portfolio risk input contracts
 
 ---
 
@@ -75,6 +75,10 @@ transaction rollback, and lossless restart reconstruction.
 
 Phase 2 Package 12 adds explicit acquisition-lot selection and deterministic
 lot-level attribution without imposing an implicit jurisdictional disposal method.
+
+Phase 2 is closed after verifying every roadmap scope item against the current
+Portfolio modules and tests at green CI baseline `349620e`. The closure record
+is `docs/PHASE_2_CLOSURE.md`.
 
 Audit document:
 
@@ -157,30 +161,28 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 2 Package 12 — Explicit Tax-Lot Attribution Readiness
+Phase 2 Closure — Portfolio Lifecycle Intelligence
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/tax_lot_attribution.py
-tests/test_tax_lot_attribution.py
-DataModel.md
+docs/PHASE_2_CLOSURE.md
+tests/test_phase_2_closure_contract.py
 PROJECT_CONTINUATION.md
 ```
 
 Source baseline verified against GitHub:
 
 ```text
-develop @ f322cf82c61f891bc6f7f045e5f6a545eb3f1740
+develop @ 349620e34712fa19caeb42b0d383b6af0f661173
 ```
 
 Architecture/product alignment:
 
-- every SELL requires complete explicit acquisition-lot attribution;
-- no FIFO, LIFO, or jurisdictional disposal rule is inferred;
-- acquisition quantity cannot be allocated more than once;
-- lot pairings preserve exact instrument, currency, time, cost, and proceeds;
-- outputs are immutable and deterministically ordered;
-- existing average-cost performance contracts remain unchanged;
-- canonical Review History remains unchanged.
+- all seven Phase 2 roadmap scope items have concrete modules and tests;
+- transaction and valuation persistence remain separate operational stores;
+- current portfolio snapshots remain separate from lifecycle history;
+- canonical Review History remains immutable and authoritative only for reviews;
+- no jurisdiction-specific tax method is inferred;
+- Phase 3 begins with risk evidence inputs before risk calculations.
