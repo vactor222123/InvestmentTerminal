@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `324ac54`
-**Current local package:** Phase 3 Package 7 — deterministic strategy-rule evaluation evidence
-**Current phase:** Phase 3 — Portfolio Decision Intelligence
-**Current next action:** Audit and close Phase 3 against ROADMAP_AFTER_AUDIT.md
+**Current GitHub baseline:** `8b04883`
+**Current local package:** Phase 3 closure
+**Current phase:** Phase 4 — Context and Market Intelligence
+**Current next action:** Audit existing context/news ingestion boundaries for Phase 4 Package 1
 
 ---
 
@@ -102,6 +102,9 @@ cadence and measurable conditions for every canonical portfolio strategy.
 Phase 3 Package 7 deterministically evaluates explicit metric evidence against
 the effective strategy rule set with traceable PASS/FAIL/REVIEW outcomes.
 
+Phase 3 is closed after verifying every roadmap scope item and green CI through
+run 66. The closure record is `docs/PHASE_3_CLOSURE.md`.
+
 Audit document:
 
 ```text
@@ -183,30 +186,27 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 3 Package 7 — Deterministic Strategy-Rule Evaluation Evidence
+Phase 3 Closure — Portfolio Decision Intelligence
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/portfolio_strategy_rule_evaluation.py
-tests/test_portfolio_strategy_rule_evaluation.py
-DataModel.md
+docs/PHASE_3_CLOSURE.md
 PROJECT_CONTINUATION.md
 ```
 
 Source baseline verified against GitHub:
 
 ```text
-develop @ 324ac541b72bca59c9e1def81430fc5d4dc8c31d
+develop @ 8b048835b2033a042792f1b1f8da20e171e29845
 ```
 
 Architecture/product alignment:
 
-- evaluation consumes only the effective versioned rule set and explicit metrics;
-- every condition preserves observed value, evidence identity, threshold, and reason;
-- missing metrics follow their configured FAIL or REVIEW behavior;
-- metric-unit mismatches fail closed;
-- strategy and whole-rule-set outcomes aggregate deterministically;
-- evaluation evidence explicitly denies execution authority;
+- every Phase 3 roadmap scope item is implemented and tested;
+- all four canonical strategies have explicit versioned rules and evaluation;
+- missing/incompatible evidence remains visible and fails closed where required;
+- rebalancing and strategy evidence never authorizes execution;
+- Phase 4 context/news ingestion is the next focused audit;
 - canonical Review History remains unchanged.
