@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `9b13571`
-**Current local package:** Phase 3 Package 3 — deterministic portfolio volatility
+**Current GitHub baseline:** `de9f8df`
+**Current local package:** Phase 3 Package 4 — deterministic portfolio correlation
 **Current phase:** Phase 3 — Portfolio Decision Intelligence
-**Current next action:** Add deterministic portfolio correlation analysis
+**Current next action:** Add deterministic portfolio rebalancing evidence
 
 ---
 
@@ -90,6 +90,9 @@ wealth path, running peaks, maximum peak-to-trough evidence, and recovery state.
 Phase 3 Package 3 adds sample portfolio volatility and explicit annualisation
 without hidden cadence or market-calendar assumptions.
 
+Phase 3 Package 4 adds pairwise Pearson correlation evidence with exact period
+alignment and explicit unavailable states for incompatible or insufficient data.
+
 Audit document:
 
 ```text
@@ -171,14 +174,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 3 Package 3 — Deterministic Portfolio Volatility Analysis
+Phase 3 Package 4 — Deterministic Portfolio Correlation Analysis
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/portfolio_volatility.py
-tests/test_portfolio_volatility.py
+investment_terminal/portfolio/portfolio_correlation.py
+tests/test_portfolio_correlation.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -186,15 +189,15 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 9b13571893893b3ea4ab2f25a7f52228cb564baa
+develop @ de9f8dfa6b642ded5a1208ebdd22bfac6d03598e
 ```
 
 Architecture/product alignment:
 
-- volatility uses sample standard deviation over validated return observations;
-- observation count, periodic mean, and periodic volatility remain explicit;
-- annualisation requires a caller-supplied positive periods-per-year factor;
-- zero-volatility series remain valid evidence;
-- currency, cadence, identity, and provenance are preserved;
-- correlation, classifications, and recommendations remain separate;
+- Pearson correlation uses only exact shared observation periods;
+- portfolio-to-instrument and instrument-to-instrument pairs are explicit;
+- pair ordering, overlap count, identity, and both provenances are preserved;
+- incompatible currency or cadence fails into explicit unavailable evidence;
+- insufficient overlap and zero variance remain visible instead of fabricated;
+- correlation does not imply causation, classification, or recommendation;
 - canonical Review History remains unchanged.

@@ -167,6 +167,13 @@ calendar. `PortfolioVolatilityAnalysis` preserves the observation count,
 currency, cadence, source provenance, periodic volatility, and annualised
 volatility without assigning risk labels or thresholds.
 
+`PortfolioCorrelationCalculator` calculates pairwise Pearson correlation for
+the portfolio and instrument return series using only exact shared observation
+periods. `PortfolioCorrelationPair` keeps both source provenances and exposes
+currency mismatch, cadence mismatch, insufficient overlap, and zero variance
+as explicit unavailable evidence. Correlation remains descriptive and does not
+imply causation, classification, or a recommendation.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:
