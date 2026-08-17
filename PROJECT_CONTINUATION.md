@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `0791a24`
-**Current local package:** Phase 2 Package 5 — transaction CSV parsing boundary
+**Current GitHub baseline:** `29997c5`
+**Current local package:** Phase 2 Package 6 — deterministic position reconstruction
 **Current phase:** Phase 2 — Portfolio Lifecycle Intelligence
-**Current next action:** Add deterministic position reconstruction from BUY and SELL transactions
+**Current next action:** Add realised performance calculation for SELL transactions
 
 ---
 
@@ -53,6 +53,9 @@ visible accounting for imported and duplicate transaction identities.
 
 Phase 2 Package 5 adds a canonical provider-neutral transaction CSV schema,
 line-specific validation, and lossless conversion into transaction import batches.
+
+Phase 2 Package 6 adds deterministic open-position reconstruction from BUY and
+SELL events with average-cost accounting and fail-closed oversell validation.
 
 Audit document:
 
@@ -135,14 +138,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 2 Package 5 — Transaction CSV Parsing Boundary
+Phase 2 Package 6 — Deterministic Position Reconstruction
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/transaction_csv_parser.py
-tests/test_transaction_csv_parser.py
+investment_terminal/portfolio/position_reconstruction.py
+tests/test_position_reconstruction.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -150,13 +153,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 0791a244776b31591b95d1530626e029b47e3e4e
+develop @ 29997c532c6e15d59cf143008dea27200831f625
 ```
 
 Architecture/product alignment:
 
-- the CSV boundary is provider-neutral and requires one explicit canonical schema;
-- UTF-8/BOM input, decimal comma, and ISO 8601 timezone offsets are supported;
-- source row order and duplicate transaction evidence are preserved unchanged;
-- instrument and transaction invariants remain owned by their domain models;
-- repositories, lots, performance, and current snapshots remain unchanged.
+- ordered immutable ledger transactions are the sole reconstruction input;
+- BUY and SELL events use deterministic average-cost position accounting;
+- oversells, identity drift, and mixed cost currencies fail closed;
+- dividends and fees remain separate cash events and do not alter quantity;
+- transaction persistence, realised performance, and snapshots remain unchanged.

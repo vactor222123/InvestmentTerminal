@@ -102,6 +102,11 @@ boundary. It validates one explicit canonical schema, preserves source order and
 duplicate rows, constructs canonical instrument identities, and reports invalid
 domain values with their CSV line number before producing an import batch.
 
+`PositionReconstructor` deterministically projects the ordered ledger into open
+positions using average-cost accounting. It preserves canonical instrument
+identity and cost currency, ignores non-trade cash events, removes fully sold
+positions, and fails closed when a sale exceeds the available quantity.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:
