@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `031a53a`
-**Current local package:** Phase 2 Package 8 — unrealised performance projection
+**Current GitHub baseline:** `9cf80d4`
+**Current local package:** Phase 2 Package 9 — portfolio valuation history contracts
 **Current phase:** Phase 2 — Portfolio Lifecycle Intelligence
-**Current next action:** Add portfolio valuation history contracts for transaction-derived performance snapshots
+**Current next action:** Add append-only portfolio valuation history repository
 
 ---
 
@@ -62,6 +62,9 @@ event and currency-safe summaries using the established average-cost method.
 
 Phase 2 Package 8 adds quote-backed unrealised performance for reconstructed
 positions with explicit valuation time, quote provenance, and currency isolation.
+
+Phase 2 Package 9 adds immutable transaction-derived valuation snapshots and a
+deterministically ordered portfolio valuation history contract.
 
 Audit document:
 
@@ -144,14 +147,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 2 Package 8 — Unrealised Performance Projection
+Phase 2 Package 9 — Portfolio Valuation History Contracts
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/unrealized_performance.py
-tests/test_unrealized_performance.py
+investment_terminal/portfolio/portfolio_valuation_history.py
+tests/test_portfolio_valuation_history.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -159,13 +162,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 031a53a27dc749948709bded8547238d4b33976a
+develop @ 9cf80d4a30c16846cd750e9b46190e492bf10eff
 ```
 
 Architecture/product alignment:
 
-- transaction-derived positions are valued through the existing quote provider;
-- quote instrument, ticker, currency, timestamp, and source remain explicit;
-- missing, future, or mismatched quotes fail closed;
-- summaries never aggregate unlike currencies;
-- realised performance, persistence, and current snapshot valuation remain unchanged.
+- snapshots retain complete realised and unrealised source projections;
+- ledger, portfolio, and temporal compatibility fail closed;
+- valuation rows never aggregate unlike currencies;
+- snapshot identity and history ordering are deterministic and immutable;
+- canonical Review History and persistence remain unchanged.

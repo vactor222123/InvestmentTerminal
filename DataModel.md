@@ -117,6 +117,12 @@ the existing explicit quote-provider boundary. Position results retain quote
 source and timestamp, reject future or mismatched quotes, expose zero-cost
 returns as unavailable, and aggregate only within a shared currency.
 
+`PortfolioValuationSnapshot` combines compatible realised and point-in-time
+unrealised projections while retaining both source projections. Currency rows
+never mix unlike units. `PortfolioValuationHistory` requires immutable snapshot
+identities and deterministic valuation-time ordering; it remains separate from
+canonical Review History.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:
