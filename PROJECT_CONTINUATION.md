@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `3f07389dd1d3c892d88e1d33558707fec554170d`
-**Current local package:** Phase 4 Package 6
-**Current phase:** Phase 4 — Context and Market Intelligence
-**Current next action:** Apply and verify Phase 4 Package 6 in CI, then perform Phase 4 closure audit
+**Current GitHub baseline:** `f630bcabd032460657fb8329e82b9cae194b5bd7`
+**Current local package:** Phase 4 Closure
+**Current phase:** Phase 5 — Market Discovery
+**Current next action:** Apply Phase 4 closure, then audit the maintained asset-universe boundary
 
 ---
 
@@ -125,6 +125,10 @@ Review Package while preserving provenance, freshness, quality, and uncertainty.
 Phase 4 Package 6 adds provider-independent sentiment evidence and lossless
 Review Package association with explicit missing-assessment accounting.
 
+Phase 4 is closed after verifying every roadmap scope item against the current
+Context, Review, persistence, and test boundaries. The closure record is
+`docs/PHASE_4_CLOSURE.md`.
+
 Audit document:
 
 ```text
@@ -206,31 +210,26 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 4 Package 6 — External Context Sentiment Evidence
+Phase 4 Closure — Context and Market Intelligence
 ```
 
 Files:
 
 ```text
-investment_terminal/context/external_context_sentiment.py
-investment_terminal/review/external_context_review_adapter.py
-tests/test_external_context_sentiment.py
-tests/test_external_context_review_adapter.py
-DataModel.md
+docs/PHASE_4_CLOSURE.md
 PROJECT_CONTINUATION.md
 ```
 
 Source baseline verified against GitHub:
 
 ```text
-develop @ 3f07389dd1d3c892d88e1d33558707fec554170d
+develop @ f630bcabd032460657fb8329e82b9cae194b5bd7
 ```
 
 Architecture/product alignment:
 
-- sentiment is attached only by canonical context identity;
-- label, score, confidence, method/version, time, and reasons remain explicit;
-- missing sentiment remains NOT_ASSESSED and is counted rather than inferred;
-- duplicate or orphaned sentiment assessments fail closed;
-- ingestion, repositories, History, Knowledge, and AI remain unchanged;
-- a complete Phase 4 closure audit is the next action.
+- news, macroeconomic, geopolitical, event, and sentiment scope is implemented;
+- provenance, freshness, quality, and uncertainty remain explicit end to end;
+- Context remains upstream evidence and Review remains downstream assembly;
+- Phase 4 is closed in `docs/PHASE_4_CLOSURE.md`;
+- Phase 5 maintained asset-universe discovery is the next focused audit.
