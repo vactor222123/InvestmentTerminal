@@ -123,6 +123,11 @@ never mix unlike units. `PortfolioValuationHistory` requires immutable snapshot
 identities and deterministic valuation-time ordering; it remains separate from
 canonical Review History.
 
+`PortfolioValuationHistoryRepository` defines append-only snapshot identity,
+exact lookup, half-open time-window queries, recent/latest access, and immutable
+history projection. Its in-memory implementation establishes executable
+semantics without introducing persistence or coupling to Review History.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:

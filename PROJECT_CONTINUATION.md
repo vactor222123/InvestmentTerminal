@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `9cf80d4`
-**Current local package:** Phase 2 Package 9 — portfolio valuation history contracts
+**Current GitHub baseline:** `4588353`
+**Current local package:** Phase 2 Package 10 — append-only valuation history repository
 **Current phase:** Phase 2 — Portfolio Lifecycle Intelligence
-**Current next action:** Add append-only portfolio valuation history repository
+**Current next action:** Add SQLite persistence for portfolio valuation history
 
 ---
 
@@ -65,6 +65,9 @@ positions with explicit valuation time, quote provenance, and currency isolation
 
 Phase 2 Package 9 adds immutable transaction-derived valuation snapshots and a
 deterministically ordered portfolio valuation history contract.
+
+Phase 2 Package 10 adds append-only valuation repository semantics and an
+in-memory reference implementation with deterministic temporal queries.
 
 Audit document:
 
@@ -147,14 +150,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 2 Package 9 — Portfolio Valuation History Contracts
+Phase 2 Package 10 — Append-Only Valuation History Repository
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/portfolio_valuation_history.py
-tests/test_portfolio_valuation_history.py
+investment_terminal/portfolio/portfolio_valuation_history_repository.py
+tests/test_portfolio_valuation_history_repository.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -162,13 +165,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 9cf80d4a30c16846cd750e9b46190e492bf10eff
+develop @ 4588353b5cd8cc156c9973d939dc7d18ded16995
 ```
 
 Architecture/product alignment:
 
-- snapshots retain complete realised and unrealised source projections;
-- ledger, portfolio, and temporal compatibility fail closed;
-- valuation rows never aggregate unlike currencies;
-- snapshot identity and history ordering are deterministic and immutable;
-- canonical Review History and persistence remain unchanged.
+- snapshot identities are append-only and cannot be replaced;
+- repository ownership enforces one ledger and portfolio;
+- all temporal queries are deterministic and timezone-aware;
+- recent/latest access preserves chronological evidence order;
+- canonical Review History and durable persistence remain unchanged.
