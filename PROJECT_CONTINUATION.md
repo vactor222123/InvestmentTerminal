@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `349620e`
-**Current local package:** Phase 2 Closure — roadmap completion audit
+**Current GitHub baseline:** `143add3`
+**Current local package:** Phase 3 Package 1 — provider-neutral portfolio risk inputs
 **Current phase:** Phase 3 — Portfolio Decision Intelligence
-**Current next action:** Add provider-neutral portfolio risk input contracts
+**Current next action:** Add deterministic portfolio drawdown analysis
 
 ---
 
@@ -79,6 +79,10 @@ lot-level attribution without imposing an implicit jurisdictional disposal metho
 Phase 2 is closed after verifying every roadmap scope item against the current
 Portfolio modules and tests at green CI baseline `349620e`. The closure record
 is `docs/PHASE_2_CLOSURE.md`.
+
+Phase 3 Package 1 adds provider-neutral, currency-explicit portfolio and
+instrument return-series inputs with ordered periods, cutoff validation, and
+source provenance, without calculating or classifying risk.
 
 Audit document:
 
@@ -161,28 +165,29 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 2 Closure — Portfolio Lifecycle Intelligence
+Phase 3 Package 1 — Provider-Neutral Portfolio Risk Inputs
 ```
 
 Files:
 
 ```text
-docs/PHASE_2_CLOSURE.md
-tests/test_phase_2_closure_contract.py
+investment_terminal/portfolio/portfolio_risk_inputs.py
+tests/test_portfolio_risk_inputs.py
+DataModel.md
 PROJECT_CONTINUATION.md
 ```
 
 Source baseline verified against GitHub:
 
 ```text
-develop @ 349620e34712fa19caeb42b0d383b6af0f661173
+develop @ 143add3f03f1ef8d76fe3a3abfe2f732732f3782
 ```
 
 Architecture/product alignment:
 
-- all seven Phase 2 roadmap scope items have concrete modules and tests;
-- transaction and valuation persistence remain separate operational stores;
-- current portfolio snapshots remain separate from lifecycle history;
-- canonical Review History remains immutable and authoritative only for reviews;
-- no jurisdiction-specific tax method is inferred;
-- Phase 3 begins with risk evidence inputs before risk calculations.
+- return periods are finite, timezone-aware, unique, ordered, and non-overlapping;
+- portfolio and instrument identities remain explicit and deterministic;
+- observation currency and provider-neutral provenance are preserved;
+- no observation or fetch timestamp may exceed the risk cutoff;
+- drawdown, volatility, correlation, classifications, and recommendations remain separate;
+- canonical Review History remains unchanged.

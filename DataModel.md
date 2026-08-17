@@ -140,6 +140,19 @@ strict JSON snapshots, rejects identity replacement, uses indexed deterministic
 valuation-time queries, rolls back failed appends, and reconstructs the complete
 domain projection after restart. Corrupt payloads fail visibly on read.
 
+## Portfolio Risk Inputs
+
+`ReturnObservation` records one finite total return over an explicit,
+timezone-aware, non-overlapping period. `ReturnSeries` binds ordered unique
+observations to a portfolio or instrument subject, currency, supported cadence,
+and `RiskDataProvenance`. At least two observations are required so downstream
+risk calculations never receive a singleton disguised as a series.
+
+`PortfolioRiskInput` binds one portfolio series and deterministic unique
+instrument series to a ledger, portfolio, and `as_of` cutoff. Future observation
+or provenance timestamps fail closed. The contract performs no drawdown,
+volatility, correlation, risk classification, or recommendation calculation.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:
