@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `5318963`
-**Current local package:** Phase 2 Package 7 — realised performance calculation
+**Current GitHub baseline:** `031a53a`
+**Current local package:** Phase 2 Package 8 — unrealised performance projection
 **Current phase:** Phase 2 — Portfolio Lifecycle Intelligence
-**Current next action:** Add unrealised performance projection using explicit current prices
+**Current next action:** Add portfolio valuation history contracts for transaction-derived performance snapshots
 
 ---
 
@@ -59,6 +59,9 @@ SELL events with average-cost accounting and fail-closed oversell validation.
 
 Phase 2 Package 7 adds deterministic realised gain/loss calculation per SELL
 event and currency-safe summaries using the established average-cost method.
+
+Phase 2 Package 8 adds quote-backed unrealised performance for reconstructed
+positions with explicit valuation time, quote provenance, and currency isolation.
 
 Audit document:
 
@@ -141,14 +144,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 2 Package 7 — Realised Performance Calculation
+Phase 2 Package 8 — Unrealised Performance Projection
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/realized_performance.py
-tests/test_realized_performance.py
+investment_terminal/portfolio/unrealized_performance.py
+tests/test_unrealized_performance.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -156,13 +159,13 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 531896325a3af9bbfe4577712d26f9d244d2ef3e
+develop @ 031a53a27dc749948709bded8547238d4b33976a
 ```
 
 Architecture/product alignment:
 
-- realised results retain exact SELL transaction and instrument provenance;
-- allocated cost basis follows deterministic average-cost accounting;
-- sale-level gain/loss and return percentage remain explicit;
+- transaction-derived positions are valued through the existing quote provider;
+- quote instrument, ticker, currency, timestamp, and source remain explicit;
+- missing, future, or mismatched quotes fail closed;
 - summaries never aggregate unlike currencies;
-- dividends, fees, unrealised valuation, persistence, and snapshots remain unchanged.
+- realised performance, persistence, and current snapshot valuation remain unchanged.

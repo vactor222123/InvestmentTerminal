@@ -112,6 +112,11 @@ each SELL event and preserves sale proceeds, allocated cost basis, gain/loss,
 and return percentage. Aggregates remain separated and deterministically
 ordered by currency, so values in unlike currencies are never silently mixed.
 
+`UnrealizedPerformanceCalculator` values reconstructed open positions through
+the existing explicit quote-provider boundary. Position results retain quote
+source and timestamp, reject future or mismatched quotes, expose zero-cost
+returns as unavailable, and aggregate only within a shared currency.
+
 ## Knowledge
 
 A Knowledge record is immutable/versioned and contains:
