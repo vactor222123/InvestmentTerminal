@@ -156,7 +156,7 @@ Audited implementation order:
 
 1. immutable workflow run and stage-result contract — COMPLETE;
 2. typed deterministic evidence assembly across portfolio, context, and market
-   discovery boundaries;
+   discovery boundaries — COMPLETE;
 3. Review Package generation and atomic export;
 4. explicit immutable archive and rebuildable History projection stages;
 5. deterministic previous-snapshot selection and comparison;

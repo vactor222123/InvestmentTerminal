@@ -139,6 +139,12 @@ Later composition may invoke public domain services, but orchestration must not
 recalculate analysis, collapse immutable archive authority into the SQLite
 projection, promote History into Knowledge, or invoke AI implicitly.
 
+The Review domain owns typed evidence assembly across the current portfolio,
+canonical current-state market result, external context/sentiment, and market
+discovery outputs. Assembly validates identities, time cutoffs, readiness, and
+coverage without calculating upstream evidence or generating Review Package
+sections. Missing optional inputs remain explicit for the generation stage.
+
 ## Runtime Persistence
 
 Dedicated SQLite stores exist for distinct responsibilities, including:

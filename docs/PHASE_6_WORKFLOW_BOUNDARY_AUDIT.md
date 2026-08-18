@@ -98,7 +98,7 @@ provider/infrastructure refresh
    result models with `COMPLETED`, `SKIPPED`, and `FAILED` outcomes, explicit
    dependencies, run time, warnings, and artifact identities without changing
    Review Package JSON.
-2. **Package 2 — Deterministic evidence assembly.** Compose existing current
+2. **Package 2 — Deterministic evidence assembly — COMPLETE.** Compose existing current
    portfolio, current-state market, Phase 4 context, and Phase 5 discovery
    evidence through typed adapters with explicit missing coverage.
 3. **Package 3 — Review generation/export stage.** Generate and atomically export
@@ -119,4 +119,4 @@ analysis domains. It requires a thin application orchestration layer that
 composes their public boundaries and makes partial progress and failures
 explicit.
 
-The next action is **Phase 6 Package 2 — Deterministic evidence assembly**.
+The next action is **Phase 6 Package 3 — Review generation/export stage**.

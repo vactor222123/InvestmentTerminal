@@ -404,6 +404,13 @@ workflow attempt. It requires every stage in canonical order, verifies that
 executed stages have completed dependencies, keeps every stage inside the run
 time boundary, and serializes without changing the Review Package contract.
 
+`IntegratedInvestmentReviewEvidence` is the typed pre-generation aggregate. It
+requires a current `PortfolioSnapshot` and ready canonical current-state market
+result, and may carry ordered external context/sentiment plus ETF discovery,
+sector analysis, and screening evidence. Optional omissions are represented by
+deterministic `missing_evidence`; discovery inputs must share one maintained
+universe identity, and no source timestamp may exceed `assembled_at`.
+
 ## Authority Relationships
 
 ```text

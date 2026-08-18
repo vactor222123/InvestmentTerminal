@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `18222eea6661b76c0441ed2c9b0487b25d9657c9`
-**Current local package:** Phase 6 Package 1 — Workflow Run Contract
+**Current GitHub baseline:** `238375c2681fcbf5d67d5253578af18b08a03539`
+**Current local package:** Phase 6 Package 2 — Deterministic Evidence Assembly
 **Current phase:** Phase 6 — Integrated Investment Review Workflow — IN PROGRESS
-**Current next action:** Implement Phase 6 Package 2 — Deterministic evidence assembly
+**Current next action:** Implement Phase 6 Package 3 — Review generation/export stage
 
 ---
 
@@ -176,6 +176,13 @@ explicit dependencies, `COMPLETED`/`SKIPPED`/`FAILED` outcomes, timezone-aware
 run boundaries, warnings, failure or skip reasons, and stable artifact
 identities without importing Review/History internals or changing Review JSON.
 
+Phase 6 Package 2 adds the immutable typed pre-generation aggregate for current
+portfolio, canonical ready current-state market analysis, Phase 4 external
+context/sentiment, and Phase 5 ETF discovery, sector analysis, and screening.
+Assembly enforces one cutoff, deterministic context ordering, unique and
+associated sentiment, shared discovery universe identity, and explicit missing
+optional evidence without recalculating upstream results.
+
 Audit document:
 
 ```text
@@ -257,14 +264,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 6 Package 1 — Workflow Run Contract
+Phase 6 Package 2 — Deterministic Evidence Assembly
 ```
 
 Files:
 
 ```text
-investment_terminal/application/investment_review_workflow_models.py
-tests/test_investment_review_workflow_models.py
+investment_terminal/review/integrated_evidence_assembly.py
+tests/test_integrated_evidence_assembly.py
 Architecture.md
 DataModel.md
 docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
@@ -276,22 +283,21 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 18222eea6661b76c0441ed2c9b0487b25d9657c9
+develop @ 238375c2681fcbf5d67d5253578af18b08a03539
 ```
 
 Architecture/product alignment:
 
-- the application-owned contract defines eight explicit stages from refresh to
-  historical comparison without performing side effects;
-- stage dependencies are canonical and executed stages require every dependency
-  to have completed successfully;
-- skipped and failed stages require visible reasons, while skipped stages cannot
-  claim produced artifacts;
-- run and stage timestamps are timezone-aware and bounded by the run interval;
-- artifact identities are immutable, normalized, unique per stage, and detached
-  from artifact payloads;
-- architecture guards confirm the contract imports no Review or History
-  internals;
-- focused workflow-model and architecture tests pass: 27 passed;
-- complete local suite passes: 2651 passed, 4 skipped;
-- the next package is deterministic evidence assembly through typed adapters.
+- portfolio and current-state market evidence are mandatory typed inputs;
+- current-state market readiness is enforced by the existing canonical guard;
+- context and sentiment are immutable, deterministically ordered, unique, and
+  associated by context identity;
+- ETF discovery, sector analysis, and screening remain optional but must share
+  one maintained-universe identity when supplied;
+- every evidence timestamp is bounded by the explicit assembly cutoff;
+- missing Phase 4/5 inputs remain visible in deterministic `missing_evidence`;
+- assembly performs no analysis, Review Package generation, persistence, AI
+  invocation, or trade authorization;
+- focused integrated-evidence and affected-boundary tests pass: 45 passed;
+- complete local suite passes: 2659 passed, 4 skipped;
+- the next package is Review Package generation and atomic export.
