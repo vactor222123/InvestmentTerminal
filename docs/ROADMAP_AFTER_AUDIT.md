@@ -164,6 +164,11 @@ Audited implementation order:
 6. one user-facing review command with a hermetic end-to-end contract —
    COMPLETE.
 
+Closure readiness is `NOT CLOSED` at baseline `0212fb2`. The success path is
+complete, but the command must durably report failed and dependent skipped
+stages, including successful archive registration followed by projection
+failure. See `docs/PHASE_6_CLOSURE_AUDIT.md`.
+
 Boundary audit:
 
 ```text

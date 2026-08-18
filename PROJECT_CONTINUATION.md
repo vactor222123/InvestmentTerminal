@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `75bc22a1ea8d3781ce2cccc26865a3d121d34dbf`
-**Current local package:** Phase 6 Package 6 — User-Facing Review Command
+**Current GitHub baseline:** `0212fb2326012483d4beac68a97c75e2e734f276`
+**Current local package:** Phase 6 Closure Readiness Audit
 **Current phase:** Phase 6 — Integrated Investment Review Workflow — IN PROGRESS
-**Current next action:** Perform the Phase 6 closure audit
+**Current next action:** Implement Phase 6 failure-reporting closure remediation
 
 ---
 
@@ -207,6 +207,13 @@ and deterministic comparison services, then persists the versioned workflow
 report. A hermetic two-run E2E verifies first-run and comparison behavior with
 no network, AI, Knowledge promotion, broker action, or trade execution.
 
+The Phase 6 closure-readiness audit verifies all six success-path packages and
+authority boundaries but records Phase 6 as `NOT CLOSED`. The command currently
+constructs and writes a workflow report only after complete success; later
+failure can therefore hide completed earlier work, dependent skips, or a
+canonical archive registered before projection failure. The audit and bounded
+remediation are recorded in `docs/PHASE_6_CLOSURE_AUDIT.md`.
+
 Audit document:
 
 ```text
@@ -288,18 +295,18 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 6 Package 6 — User-Facing Review Command
+Phase 6 Closure Readiness Audit — NOT CLOSED
 ```
 
 Files:
 
 ```text
-investment_terminal/cli/review.py
-investment_terminal/cli/portfolio_ranking.py
-investment_terminal/history/historical_recommendations_importer.py
-tests/test_review_cli.py
-tests/test_historical_recommendations_importer.py
-README.md
+docs/PHASE_6_CLOSURE_AUDIT.md
+docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
+docs/ROADMAP_AFTER_AUDIT.md
+Roadmap.md
+NEXT_STEPS.md
+PROJECT_CONTINUATION.md
 Architecture.md
 DataModel.md
 docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
@@ -311,22 +318,23 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 75bc22a1ea8d3781ce2cccc26865a3d121d34dbf
+develop @ 0212fb2326012483d4beac68a97c75e2e734f276
 ```
 
 Architecture/product alignment:
 
-- command composition reuses existing typed services instead of duplicating
-  analytical or persistence logic;
-- live ranking now returns its canonical typed export result while preserving
-  existing printing and JSON export behavior;
-- optional context and Phase 5 discovery inputs remain explicit missing
-  evidence when no runtime source is configured;
-- Review rationale lists are losslessly retained in canonical JSON and
-  deterministically projected as text for the existing History schema;
-- first and second hermetic runs verify archive/projection plus first-run and
-  read-only comparison outcomes;
-- the command never invokes Knowledge promotion, AI, brokers, or trades;
-- focused workflow and affected-boundary tests pass: 52 passed;
-- complete local suite passes: 2680 passed, 4 skipped;
-- the next action is the Phase 6 closure audit.
+- all six planned success-path packages and their ownership boundaries are
+  present;
+- the focused Phase 6 contract, integration, architecture, and persistence
+  suite passes: 56 passed;
+- the complete local suite passes: 2680 passed, 4 skipped;
+- immutable archive authority, rebuildable projection, read-only comparison,
+  and explicit optional-evidence gaps remain correct;
+- closure is blocked because operational failures do not yet produce the
+  versioned workflow report;
+- projection failure can leave a valid registered archive without a report that
+  marks archive complete, projection failed, and comparison skipped;
+- no analytical, Review, History, Knowledge, AI, broker, or trade authority
+  redesign is required;
+- the next action is the bounded command-level failure-reporting remediation,
+  followed by a repeated closure audit.

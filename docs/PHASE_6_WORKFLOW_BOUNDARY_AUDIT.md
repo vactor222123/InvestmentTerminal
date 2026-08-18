@@ -115,7 +115,10 @@ provider/infrastructure refresh
    `investment_terminal.cli.review` composition root with a hermetic end-to-end
    test, versioned workflow report, explicit optional-evidence gaps, and no
    automatic AI, Knowledge promotion, broker access, or trade execution.
-7. **Phase closure audit.** Verify the complete roadmap flow and architecture.
+7. **Phase closure audit — NOT CLOSED.** The success path and authority
+   boundaries are verified, but the user-facing command does not yet persist a
+   failed workflow report or dependent skipped stages. The remediation is
+   specified in `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
 ## Audit decision
 
@@ -124,4 +127,4 @@ analysis domains. It requires a thin application orchestration layer that
 composes their public boundaries and makes partial progress and failures
 explicit.
 
-The next action is the **Phase 6 closure audit**.
+The next action is the **Phase 6 failure-reporting closure remediation**.

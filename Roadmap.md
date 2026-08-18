@@ -160,7 +160,9 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → Phase 6 Package 4 — History preservation/projection — COMPLETE
 → Phase 6 Package 5 — historical comparison — COMPLETE
 → Phase 6 Package 6 — user-facing review command — COMPLETE
-→ Phase 6 closure audit
+→ Phase 6 closure audit — NOT CLOSED
+→ failure-reporting remediation
+→ repeat Phase 6 closure audit
 ```
 
 ## Definition of Done
