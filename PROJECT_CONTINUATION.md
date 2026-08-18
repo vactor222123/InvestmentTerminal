@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `89c3a706cd425c0fbe85e5321c841d297a2260ee`
-**Current local package:** Phase 6 Workflow Boundary Audit
-**Current phase:** Phase 6 — Integrated Investment Review Workflow — AUDITED
-**Current next action:** Implement Phase 6 Package 1 — Workflow run contract
+**Current GitHub baseline:** `18222eea6661b76c0441ed2c9b0487b25d9657c9`
+**Current local package:** Phase 6 Package 1 — Workflow Run Contract
+**Current phase:** Phase 6 — Integrated Investment Review Workflow — IN PROGRESS
+**Current next action:** Implement Phase 6 Package 2 — Deterministic evidence assembly
 
 ---
 
@@ -170,6 +170,12 @@ boundaries. The missing capability is a thin application-level run contract and
 coordinator with explicit stage outcomes and fail-closed dependencies. The audit
 record is `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md`.
 
+Phase 6 Package 1 establishes an immutable, versioned application contract for
+the complete workflow attempt. Eight canonically ordered stage results preserve
+explicit dependencies, `COMPLETED`/`SKIPPED`/`FAILED` outcomes, timezone-aware
+run boundaries, warnings, failure or skip reasons, and stable artifact
+identities without importing Review/History internals or changing Review JSON.
+
 Audit document:
 
 ```text
@@ -251,14 +257,17 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 6 — Integrated Investment Review Workflow Boundary Audit
+Phase 6 Package 1 — Workflow Run Contract
 ```
 
 Files:
 
 ```text
+investment_terminal/application/investment_review_workflow_models.py
+tests/test_investment_review_workflow_models.py
+Architecture.md
+DataModel.md
 docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
-docs/ROADMAP_AFTER_AUDIT.md
 Roadmap.md
 NEXT_STEPS.md
 PROJECT_CONTINUATION.md
@@ -267,20 +276,22 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 89c3a706cd425c0fbe85e5321c841d297a2260ee
+develop @ 18222eea6661b76c0441ed2c9b0487b25d9657c9
 ```
 
 Architecture/product alignment:
 
-- completed domains already own refresh, analysis, Review, History, comparison,
-  Knowledge, and grounded-AI responsibilities;
-- Review generation, archival, History import, and comparison remain separate
-  explicit commands with no shared workflow run result;
-- Phase 4 and Phase 5 evidence require typed composition into Review rather than
-  orchestration-owned calculations or loosely shared dictionaries;
-- archive authority and rebuildable SQLite projection remain separate stages;
-- automatic Review-to-Knowledge promotion, AI authority, and trade execution
-  remain outside the integrated workflow;
-- focused workflow-boundary tests pass: 5 passed;
-- complete local suite passes: 2638 passed, 4 skipped;
-- the next package is the immutable, versioned workflow run contract.
+- the application-owned contract defines eight explicit stages from refresh to
+  historical comparison without performing side effects;
+- stage dependencies are canonical and executed stages require every dependency
+  to have completed successfully;
+- skipped and failed stages require visible reasons, while skipped stages cannot
+  claim produced artifacts;
+- run and stage timestamps are timezone-aware and bounded by the run interval;
+- artifact identities are immutable, normalized, unique per stage, and detached
+  from artifact payloads;
+- architecture guards confirm the contract imports no Review or History
+  internals;
+- focused workflow-model and architecture tests pass: 27 passed;
+- complete local suite passes: 2651 passed, 4 skipped;
+- the next package is deterministic evidence assembly through typed adapters.

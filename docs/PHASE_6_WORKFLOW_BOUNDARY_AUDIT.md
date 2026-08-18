@@ -94,7 +94,7 @@ provider/infrastructure refresh
 
 ## Smallest implementation sequence
 
-1. **Package 1 — Workflow run contract.** Add immutable, versioned stage and run
+1. **Package 1 — Workflow run contract — COMPLETE.** Add immutable, versioned stage and run
    result models with `COMPLETED`, `SKIPPED`, and `FAILED` outcomes, explicit
    dependencies, run time, warnings, and artifact identities without changing
    Review Package JSON.
@@ -119,4 +119,4 @@ analysis domains. It requires a thin application orchestration layer that
 composes their public boundaries and makes partial progress and failures
 explicit.
 
-The next action is **Phase 6 Package 1 — Workflow run contract**.
+The next action is **Phase 6 Package 2 — Deterministic evidence assembly**.

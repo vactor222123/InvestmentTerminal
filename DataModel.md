@@ -389,6 +389,21 @@ criterion-level evidence identifiers and distinguish `PASS`, `FAIL`, and
 `REVIEW`; missing values and unit mismatches remain visible. Screening output
 does not rank candidates, recommend investments, or authorize execution.
 
+## Integrated Investment Review Workflow
+
+`WorkflowArtifactIdentity` identifies a stage artifact by normalized type and
+stable caller-owned identity without embedding or mutating the artifact.
+
+`InvestmentReviewWorkflowStageResult` records one canonical stage as
+`COMPLETED`, `SKIPPED`, or `FAILED`. It preserves the exact dependency contract,
+timezone-aware start/completion boundaries, immutable artifact identities,
+warnings, and status-specific failure or skip reasons.
+
+`InvestmentReviewWorkflowRun` is the versioned, immutable report for one full
+workflow attempt. It requires every stage in canonical order, verifies that
+executed stages have completed dependencies, keeps every stage inside the run
+time boundary, and serializes without changing the Review Package contract.
+
 ## Authority Relationships
 
 ```text

@@ -128,6 +128,17 @@ runtime configuration
 FastAPI owns route registration. Production composition passes application
 dependencies into the FastAPI factory rather than mutating a returned app.
 
+## Integrated Review Workflow Boundary
+
+The application layer owns the versioned workflow run contract. It records the
+canonical stage order, explicit dependencies, stage outcomes, run timestamps,
+warnings, failure or skip reasons, and stable artifact identities.
+
+The contract is side-effect free and imports no Review or History internals.
+Later composition may invoke public domain services, but orchestration must not
+recalculate analysis, collapse immutable archive authority into the SQLite
+projection, promote History into Knowledge, or invoke AI implicitly.
+
 ## Runtime Persistence
 
 Dedicated SQLite stores exist for distinct responsibilities, including:

@@ -154,7 +154,7 @@ refresh data
 
 Audited implementation order:
 
-1. immutable workflow run and stage-result contract;
+1. immutable workflow run and stage-result contract — COMPLETE;
 2. typed deterministic evidence assembly across portfolio, context, and market
    discovery boundaries;
 3. Review Package generation and atomic export;
