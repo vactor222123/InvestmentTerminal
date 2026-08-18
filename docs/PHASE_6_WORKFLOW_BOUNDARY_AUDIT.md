@@ -111,9 +111,10 @@ provider/infrastructure refresh
    compatible imported snapshot deterministically, reuse the existing read-only
    comparison service, and expose first-run/unavailable states without
    fabricating a baseline.
-6. **Package 6 — User-facing workflow command.** Add `investment-terminal review`
-   after the application contract is stable, with a hermetic end-to-end test and
-   no automatic AI or trade execution.
+6. **Package 6 — User-facing workflow command — COMPLETE.** Add the
+   `investment_terminal.cli.review` composition root with a hermetic end-to-end
+   test, versioned workflow report, explicit optional-evidence gaps, and no
+   automatic AI, Knowledge promotion, broker access, or trade execution.
 7. **Phase closure audit.** Verify the complete roadmap flow and architecture.
 
 ## Audit decision
@@ -123,4 +124,4 @@ analysis domains. It requires a thin application orchestration layer that
 composes their public boundaries and makes partial progress and failures
 explicit.
 
-The next action is **Phase 6 Package 6 — User-facing workflow command**.
+The next action is the **Phase 6 closure audit**.

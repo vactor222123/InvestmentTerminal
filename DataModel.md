@@ -431,6 +431,12 @@ earlier snapshot exists; `UNAVAILABLE` records absent current import state or
 the lack of an earlier compatible imported projection. Non-completed outcomes
 carry a reason and no fabricated comparison artifact.
 
+The `review` command persists `InvestmentReviewWorkflowRun.to_dict()` as the
+workflow report and uses `WorkflowArtifactIdentity` values for the exported
+Review Package, registered snapshot, History projection, and optional
+comparison. A first-run comparison remains a completed read-only stage with an
+explicit warning and no comparison artifact.
+
 ## Authority Relationships
 
 ```text

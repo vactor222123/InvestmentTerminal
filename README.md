@@ -177,6 +177,18 @@ depend on developer-local personal portfolio files.
 
 ## Operational CLIs
 
+Integrated investment review:
+
+```text
+python -m investment_terminal.cli.review
+```
+
+The command refreshes and analyzes the configured market universe, assembles
+the current portfolio and explicit optional-evidence gaps, exports one Review
+Package, preserves and projects History, compares the previous compatible
+imported snapshot, and writes a versioned workflow report. It does not invoke
+AI, promote History into Knowledge, or execute trades.
+
 History:
 
 ```text

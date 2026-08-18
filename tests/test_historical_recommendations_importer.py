@@ -317,6 +317,42 @@ def test_importer_rejects_invalid_score(
         )
 
 
+def test_importer_projects_review_reason_list_as_text(
+    tmp_path: Path,
+) -> None:
+    importer, store, snapshot = create_importer(
+        tmp_path
+    )
+    payload = recommendation_payload()
+    payload["sections"]["machine_recommendations"][
+        "recommendations"
+    ]["items"][0]["rationale"] = [
+        "Strong quality.",
+        "Ready evidence.",
+    ]
+
+    importer.import_recommendations(
+        snapshot=snapshot,
+        payload=payload,
+    )
+
+    with store.connect() as connection:
+        row = connection.execute(
+            """
+            SELECT rationale
+            FROM recommendations
+            WHERE snapshot_id = ?
+            ORDER BY recommendation_key
+            LIMIT 1
+            """,
+            (
+                snapshot.snapshot_id,
+            ),
+        ).fetchone()
+
+    assert row["rationale"] == "Strong quality. Ready evidence."
+
+
 def test_importer_rejects_invalid_store() -> None:
     with pytest.raises(
         TypeError,

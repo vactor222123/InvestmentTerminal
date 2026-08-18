@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `e101068d95fef032a0b73d031b6cf996010f872a`
-**Current local package:** Phase 6 Package 5 — Historical Comparison Selection
+**Current GitHub baseline:** `75bc22a1ea8d3781ce2cccc26865a3d121d34dbf`
+**Current local package:** Phase 6 Package 6 — User-Facing Review Command
 **Current phase:** Phase 6 — Integrated Investment Review Workflow — IN PROGRESS
-**Current next action:** Implement Phase 6 Package 6 — User-facing workflow command
+**Current next action:** Perform the Phase 6 closure audit
 
 ---
 
@@ -200,6 +200,13 @@ earlier compatible snapshot with completed structured import. It reuses the
 existing compatibility and comparison service, distinguishes `FIRST_RUN` from
 `UNAVAILABLE`, and never fabricates a zero-change baseline.
 
+Phase 6 Package 6 adds the user-facing `investment_terminal.cli.review`
+composition root. It reuses the live typed market result, current portfolio
+snapshot, integrated Review export, canonical History preservation/projection,
+and deterministic comparison services, then persists the versioned workflow
+report. A hermetic two-run E2E verifies first-run and comparison behavior with
+no network, AI, Knowledge promotion, broker action, or trade execution.
+
 Audit document:
 
 ```text
@@ -281,14 +288,18 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 6 Package 5 — Historical Comparison Selection
+Phase 6 Package 6 — User-Facing Review Command
 ```
 
 Files:
 
 ```text
-investment_terminal/history/integrated_review_comparison_service.py
-tests/test_integrated_review_comparison_service.py
+investment_terminal/cli/review.py
+investment_terminal/cli/portfolio_ranking.py
+investment_terminal/history/historical_recommendations_importer.py
+tests/test_review_cli.py
+tests/test_historical_recommendations_importer.py
+README.md
 Architecture.md
 DataModel.md
 docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
@@ -300,22 +311,22 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ e101068d95fef032a0b73d031b6cf996010f872a
+develop @ 75bc22a1ea8d3781ce2cccc26865a3d121d34dbf
 ```
 
 Architecture/product alignment:
 
-- selection is owned by History and reuses canonical snapshot ordering, explicit
-  import state, and the existing comparison service;
-- only earlier snapshots with `IMPORTED` projection state are candidates;
-- incompatible candidates are skipped in deterministic newest-to-oldest order;
-- the first imported snapshot reports `FIRST_RUN`, while missing current import
-  state or no compatible imported predecessor reports `UNAVAILABLE`;
-- completed results carry the exact previous/current identities and canonical
-  `SnapshotComparison`;
-- comparison remains read-only and does not change archive, projection,
-  Knowledge, AI, or trade state;
-- focused integrated and affected comparison tests pass: 26 passed;
-- complete local suite passes: 2676 passed, 4 skipped;
-- the next package is the user-facing workflow command with a hermetic
-  end-to-end contract.
+- command composition reuses existing typed services instead of duplicating
+  analytical or persistence logic;
+- live ranking now returns its canonical typed export result while preserving
+  existing printing and JSON export behavior;
+- optional context and Phase 5 discovery inputs remain explicit missing
+  evidence when no runtime source is configured;
+- Review rationale lists are losslessly retained in canonical JSON and
+  deterministically projected as text for the existing History schema;
+- first and second hermetic runs verify archive/projection plus first-run and
+  read-only comparison outcomes;
+- the command never invokes Knowledge promotion, AI, brokers, or trades;
+- focused workflow and affected-boundary tests pass: 52 passed;
+- complete local suite passes: 2680 passed, 4 skipped;
+- the next action is the Phase 6 closure audit.

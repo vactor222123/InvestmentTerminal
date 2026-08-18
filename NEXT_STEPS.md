@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ e101068d95fef032a0b73d031b6cf996010f872a`
+**Current repository baseline:** `develop @ 75bc22a1ea8d3781ce2cccc26865a3d121d34dbf`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -10,6 +10,7 @@
 **Phase 6 Package 3:** COMPLETE
 **Phase 6 Package 4:** COMPLETE
 **Phase 6 Package 5:** COMPLETE
+**Phase 6 Package 6:** COMPLETE
 
 ## Current State
 
@@ -17,8 +18,7 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement Phase 6 Package 6 — add the user-facing `investment-terminal review`
-command after auditing the existing CLI composition roots and define one
-hermetic end-to-end workflow contract without automatic AI or trade execution.
+Perform the Phase 6 closure audit against the complete roadmap flow, canonical
+authority boundaries, hermetic workflow test, and full regression suite.
 
 Audit record: `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md`.

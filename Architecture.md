@@ -164,6 +164,13 @@ non-imported projections, and delegates compatibility and delta calculation to
 `HistoricalSnapshotComparisonService`. It distinguishes a true first run from
 an unavailable comparison and never invents a zero-change baseline.
 
+The user-facing `investment_terminal.cli.review` composition root executes the
+integrated deterministic workflow and writes its versioned run report. It
+reuses the live typed market-analysis result, current portfolio snapshot,
+integrated Review generator, and History services. Optional context and market
+discovery that lack runtime inputs remain explicit gaps. The command has no
+Knowledge promotion, AI-provider, broker, or trade-execution dependency.
+
 ## Runtime Persistence
 
 Dedicated SQLite stores exist for distinct responsibilities, including:

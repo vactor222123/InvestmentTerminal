@@ -408,6 +408,30 @@ class HistoricalRecommendationsImporter:
         if value is None:
             return None
 
+        if isinstance(
+            value,
+            (
+                list,
+                tuple,
+            ),
+        ):
+            if (
+                not value
+                or any(
+                    not isinstance(item, str)
+                    or not item.strip()
+                    for item in value
+                )
+            ):
+                raise ValueError(
+                    "optional text lists must contain only "
+                    "non-empty strings"
+                )
+            return " ".join(
+                item.strip()
+                for item in value
+            )
+
         if (
             not isinstance(value, str)
             or not value.strip()

@@ -14,7 +14,10 @@ from investment_terminal.clients.yahoo_fundamental_client import (
     YahooFundamentalClient,
 )
 from investment_terminal.database.database import Database
-from investment_terminal.exporters.portfolio_exporter import PortfolioExporter
+from investment_terminal.exporters.portfolio_exporter import (
+    PortfolioExporter,
+    PortfolioExportPackage,
+)
 from investment_terminal.market.company_classification_registry import (
     CompanyClassificationRegistry,
 )
@@ -86,7 +89,7 @@ class PortfolioRankingOptions:
 
 def main(
     argv: Sequence[str] | None = None,
-) -> None:
+) -> PortfolioExportPackage:
     options = parse_arguments(argv)
     database = Database()
     database.initialize()
@@ -185,6 +188,7 @@ def main(
             allocation_result=allocation_result,
             saved_path=saved_path,
         )
+        return export_package
     finally:
         database.close()
 
