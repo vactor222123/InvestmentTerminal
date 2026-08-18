@@ -373,6 +373,14 @@ status. Conflicting, duplicate, future, or out-of-universe evidence fails
 closed. Discovery assembly performs no scoring, ranking, recommendation, or
 trade selection.
 
+`SectorAnalysisEvidenceBuilder` joins existing `CompanyClassification` values
+to STOCK members of one maintained universe. It reports deterministic sector
+and industry counts, eligible/classified coverage, and canonical identities for
+unclassified instruments. ETF members are outside this company-classification
+projection. Duplicate, ambiguous exchange-scoped symbols and out-of-universe
+classifications fail closed. Sector evidence remains descriptive and grants no
+scoring, ranking, recommendation, or trading authority.
+
 ## Authority Relationships
 
 ```text

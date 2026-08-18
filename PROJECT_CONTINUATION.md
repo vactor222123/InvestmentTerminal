@@ -5,9 +5,9 @@
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
 **Current GitHub baseline:** `f630bcabd032460657fb8329e82b9cae194b5bd7`
-**Current local package:** Phase 5 Package 5
+**Current local package:** Phase 5 Package 6
 **Current phase:** Phase 5 — Market Discovery
-**Current next action:** Apply Phase 5 Package 5, then audit sector analysis evidence against maintained universes
+**Current next action:** Apply Phase 5 Package 6, then audit the deterministic screening pipeline boundary
 
 ---
 
@@ -151,6 +151,9 @@ Phase 5 Package 5 adds deterministic ETF discovery assembly from maintained
 universe membership and existing ETF characteristics/composition contracts with
 explicit missing evidence and quality, without scoring or recommendation.
 
+Phase 5 Package 6 adds descriptive sector and industry evidence for classified
+STOCK members with explicit coverage and unclassified identity accounting.
+
 Audit document:
 
 ```text
@@ -232,14 +235,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 5 Package 5 — ETF Discovery Evidence
+Phase 5 Package 6 — Sector Analysis Evidence
 ```
 
 Files:
 
 ```text
-investment_terminal/universe/etf_discovery.py
-tests/test_etf_discovery.py
+investment_terminal/universe/sector_analysis.py
+tests/test_sector_analysis.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -247,15 +250,14 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 98f516f882f0f05e19fad6465a5886a1b2d9f18f
+develop @ c45149421ed67e0ddb821872b1d579e6ba199da9
 ```
 
 Architecture/product alignment:
 
-- ETF candidates come only from maintained universe membership;
-- existing characteristics and composition evidence remain authoritative;
-- missing characteristics or composition stays explicit and partial;
-- stale, conflicting, duplicate, future, and out-of-universe evidence is visible
-  or fails closed as appropriate;
-- discovery assembly has no scoring, ranking, recommendation, or trade authority;
-- sector analysis evidence against maintained universes is the next audit.
+- sector analysis covers STOCK members and excludes ETF classification inference;
+- existing company classifications remain authoritative;
+- sector, industry, classified, and missing coverage is deterministic;
+- ambiguous exchange-scoped symbols and out-of-universe input fail closed;
+- sector evidence has no scoring, recommendation, or trade authority;
+- the deterministic screening pipeline boundary is the next focused audit.
