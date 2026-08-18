@@ -381,6 +381,14 @@ projection. Duplicate, ambiguous exchange-scoped symbols and out-of-universe
 classifications fail closed. Sector evidence remains descriptive and grants no
 scoring, ranking, recommendation, or trading authority.
 
+`ScreeningPolicy` contains versioned, effective-dated, caller-owned criteria
+with explicit operators, thresholds, units, and missing-data actions.
+`ScreeningPipeline` evaluates metric evidence for every maintained-universe
+member using indexed joins suitable for broad universes. Results preserve
+criterion-level evidence identifiers and distinguish `PASS`, `FAIL`, and
+`REVIEW`; missing values and unit mismatches remain visible. Screening output
+does not rank candidates, recommend investments, or authorize execution.
+
 ## Authority Relationships
 
 ```text

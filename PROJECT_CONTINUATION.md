@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `f630bcabd032460657fb8329e82b9cae194b5bd7`
-**Current local package:** Phase 5 Package 6
+**Current GitHub baseline:** `d8678283aa695e4b7fd6a2c3f980f5984eb34efe`
+**Current local package:** Phase 5 Package 7
 **Current phase:** Phase 5 — Market Discovery
-**Current next action:** Apply Phase 5 Package 6, then audit the deterministic screening pipeline boundary
+**Current next action:** Apply Phase 5 Package 7, then audit Phase 5 roadmap closure
 
 ---
 
@@ -154,6 +154,10 @@ explicit missing evidence and quality, without scoring or recommendation.
 Phase 5 Package 6 adds descriptive sector and industry evidence for classified
 STOCK members with explicit coverage and unclassified identity accounting.
 
+Phase 5 Package 7 adds a deterministic, versioned screening boundary with
+caller-owned thresholds, explicit missing-data handling, traceable metric
+evidence, and no ranking or recommendation authority.
+
 Audit document:
 
 ```text
@@ -235,14 +239,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 5 Package 6 — Sector Analysis Evidence
+Phase 5 Package 7 — Deterministic Screening Pipeline
 ```
 
 Files:
 
 ```text
-investment_terminal/universe/sector_analysis.py
-tests/test_sector_analysis.py
+investment_terminal/universe/screening_pipeline.py
+tests/test_screening_pipeline.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -250,14 +254,15 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ c45149421ed67e0ddb821872b1d579e6ba199da9
+develop @ d8678283aa695e4b7fd6a2c3f980f5984eb34efe
 ```
 
 Architecture/product alignment:
 
-- sector analysis covers STOCK members and excludes ETF classification inference;
-- existing company classifications remain authoritative;
-- sector, industry, classified, and missing coverage is deterministic;
-- ambiguous exchange-scoped symbols and out-of-universe input fail closed;
-- sector evidence has no scoring, recommendation, or trade authority;
-- the deterministic screening pipeline boundary is the next focused audit.
+- screening criteria are versioned, effective-dated, and fully caller-owned;
+- every universe member receives deterministic PASS, FAIL, or REVIEW evidence;
+- evidence identifiers, observed values, thresholds, operators, and units remain traceable;
+- missing metrics follow explicit policy and unit mismatches fail closed;
+- duplicate, future, irrelevant, and out-of-universe metrics fail closed;
+- screening does not rank, recommend, or authorize execution;
+- Phase 5 roadmap closure is the next focused audit.
