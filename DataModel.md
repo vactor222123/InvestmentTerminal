@@ -411,6 +411,12 @@ sector analysis, and screening evidence. Optional omissions are represented by
 deterministic `missing_evidence`; discovery inputs must share one maintained
 universe identity, and no source timestamp may exceed `assembled_at`.
 
+`IntegratedReviewPackageExportResult` binds one generated
+`InvestmentReviewPackage` to its atomically replaced output path. The package
+retains Review schema version `1.0`; integrated provenance and Phase 5 evidence
+are projected inside existing sections rather than creating a competing Review
+contract.
+
 ## Authority Relationships
 
 ```text

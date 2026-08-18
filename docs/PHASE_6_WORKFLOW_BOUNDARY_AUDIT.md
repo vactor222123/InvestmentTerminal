@@ -101,7 +101,7 @@ provider/infrastructure refresh
 2. **Package 2 — Deterministic evidence assembly — COMPLETE.** Compose existing current
    portfolio, current-state market, Phase 4 context, and Phase 5 discovery
    evidence through typed adapters with explicit missing coverage.
-3. **Package 3 — Review generation/export stage.** Generate and atomically export
+3. **Package 3 — Review generation/export stage — COMPLETE.** Generate and atomically export
    one Review Package from assembled evidence.
 4. **Package 4 — History preservation/projection stage.** Coordinate existing
    archive and import services while reporting their outcomes separately.
@@ -119,4 +119,4 @@ analysis domains. It requires a thin application orchestration layer that
 composes their public boundaries and makes partial progress and failures
 explicit.
 
-The next action is **Phase 6 Package 3 — Review generation/export stage**.
+The next action is **Phase 6 Package 4 — History preservation/projection stage**.

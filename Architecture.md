@@ -145,6 +145,11 @@ discovery outputs. Assembly validates identities, time cutoffs, readiness, and
 coverage without calculating upstream evidence or generating Review Package
 sections. Missing optional inputs remain explicit for the generation stage.
 
+Integrated Review generation reuses the established Review adapters, schema
+owner, and atomic exporter. It projects the typed aggregate into the existing
+nine-section Review Package, preserves missing evidence and non-authoritative
+discovery semantics, and performs no History persistence or comparison.
+
 ## Runtime Persistence
 
 Dedicated SQLite stores exist for distinct responsibilities, including:

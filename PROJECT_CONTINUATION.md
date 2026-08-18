@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `238375c2681fcbf5d67d5253578af18b08a03539`
-**Current local package:** Phase 6 Package 2 — Deterministic Evidence Assembly
+**Current GitHub baseline:** `b808ddb9e5bc6b8ccdb4e5777e60cc01d90d4e61`
+**Current local package:** Phase 6 Package 3 — Review Generation and Export
 **Current phase:** Phase 6 — Integrated Investment Review Workflow — IN PROGRESS
-**Current next action:** Implement Phase 6 Package 3 — Review generation/export stage
+**Current next action:** Implement Phase 6 Package 4 — History preservation/projection stage
 
 ---
 
@@ -183,6 +183,12 @@ Assembly enforces one cutoff, deterministic context ordering, unique and
 associated sentiment, shared discovery universe identity, and explicit missing
 optional evidence without recalculating upstream results.
 
+Phase 6 Package 3 adds deterministic Review Package generation and atomic file
+export from the typed integrated aggregate. It reuses the established portfolio,
+stock-analysis, and external-context adapters plus Review schema version `1.0`,
+projects Phase 5 evidence without granting ranking/recommendation authority, and
+keeps missing evidence and cost-basis-only portfolio limitations visible.
+
 Audit document:
 
 ```text
@@ -264,14 +270,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 6 Package 2 — Deterministic Evidence Assembly
+Phase 6 Package 3 — Review Generation and Atomic Export
 ```
 
 Files:
 
 ```text
-investment_terminal/review/integrated_evidence_assembly.py
-tests/test_integrated_evidence_assembly.py
+investment_terminal/review/integrated_review_package_service.py
+tests/test_integrated_review_package_service.py
 Architecture.md
 DataModel.md
 docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
@@ -283,21 +289,22 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 238375c2681fcbf5d67d5253578af18b08a03539
+develop @ b808ddb9e5bc6b8ccdb4e5777e60cc01d90d4e61
 ```
 
 Architecture/product alignment:
 
-- portfolio and current-state market evidence are mandatory typed inputs;
-- current-state market readiness is enforced by the existing canonical guard;
-- context and sentiment are immutable, deterministically ordered, unique, and
-  associated by context identity;
-- ETF discovery, sector analysis, and screening remain optional but must share
-  one maintained-universe identity when supplied;
-- every evidence timestamp is bounded by the explicit assembly cutoff;
-- missing Phase 4/5 inputs remain visible in deterministic `missing_evidence`;
-- assembly performs no analysis, Review Package generation, persistence, AI
-  invocation, or trade authorization;
-- focused integrated-evidence and affected-boundary tests pass: 45 passed;
-- complete local suite passes: 2659 passed, 4 skipped;
-- the next package is Review Package generation and atomic export.
+- generation consumes only `IntegratedInvestmentReviewEvidence` and reuses the
+  existing Review adapters and builder;
+- Review schema `1.0` and all nine required section names remain unchanged;
+- Phase 5 sector/screening evidence is descriptive inside market analysis and
+  explicitly denies ranking and recommendation authority;
+- ETF discovery evidence is connected without becoming a recommendation;
+- missing context/discovery evidence and absent portfolio market values remain
+  explicit in sections and warnings;
+- export uses the existing atomic JSON writer and preserves the previous file
+  when replacement fails;
+- generation/export performs no History, Knowledge, AI, or trade side effects;
+- focused integrated-generation and affected-boundary tests pass: 48 passed;
+- complete local suite passes: 2666 passed, 4 skipped;
+- the next package is separate History preservation and projection coordination.
