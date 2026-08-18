@@ -424,6 +424,13 @@ the registered snapshot and a `FAILED` projection outcome when either
 projection step fails, preserving canonical archive success without reporting
 the overall operation as complete.
 
+`IntegratedReviewComparisonResult` is the typed historical comparison-stage
+outcome. `COMPLETED` binds the current snapshot, selected previous snapshot,
+and a non-incompatible `SnapshotComparison`; `FIRST_RUN` records that no
+earlier snapshot exists; `UNAVAILABLE` records absent current import state or
+the lack of an earlier compatible imported projection. Non-completed outcomes
+carry a reason and no fabricated comparison artifact.
+
 ## Authority Relationships
 
 ```text

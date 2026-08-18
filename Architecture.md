@@ -157,6 +157,13 @@ details into rebuildable SQLite storage. Archive and projection outcomes stay
 separate; projection failure reports the registered snapshot and never removes
 or rewrites its canonical archive bytes.
 
+Integrated historical comparison remains read-only and History-owned.
+`IntegratedReviewComparisonService` resolves the current imported snapshot,
+walks earlier snapshots in reverse canonical order, excludes missing or
+non-imported projections, and delegates compatibility and delta calculation to
+`HistoricalSnapshotComparisonService`. It distinguishes a true first run from
+an unavailable comparison and never invents a zero-change baseline.
+
 ## Runtime Persistence
 
 Dedicated SQLite stores exist for distinct responsibilities, including:

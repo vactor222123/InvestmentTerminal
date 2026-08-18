@@ -146,9 +146,10 @@ Still deferred:
 Phases 1–5 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
-`89c3a706cd425c0fbe85e5321c841d297a2260ee`. Packages 1–4 now establish the
+`89c3a706cd425c0fbe85e5321c841d297a2260ee`. Packages 1–5 now establish the
 workflow contract, typed evidence aggregate, atomic Review export, and the
-separate canonical History preservation and rebuildable projection stage.
+separate canonical History preservation, rebuildable projection, and
+deterministic historical comparison stages.
 
 Next:
 
@@ -157,8 +158,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → Phase 6 Package 2 — typed evidence assembly — COMPLETE
 → Phase 6 Package 3 — Review export — COMPLETE
 → Phase 6 Package 4 — History preservation/projection — COMPLETE
-→ Phase 6 Package 5 — historical comparison
-→ user-facing review command
+→ Phase 6 Package 5 — historical comparison — COMPLETE
+→ Phase 6 Package 6 — user-facing review command
 ```
 
 ## Definition of Done

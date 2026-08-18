@@ -107,8 +107,10 @@ provider/infrastructure refresh
    existing archive and import services while reporting their outcomes
    separately. A projection failure preserves and identifies the registered
    canonical archive instead of rolling it back or reporting complete success.
-5. **Package 5 — Historical comparison stage.** Select the previous compatible
-   snapshot deterministically and expose first-run/unavailable states.
+5. **Package 5 — Historical comparison stage — COMPLETE.** Select the previous
+   compatible imported snapshot deterministically, reuse the existing read-only
+   comparison service, and expose first-run/unavailable states without
+   fabricating a baseline.
 6. **Package 6 — User-facing workflow command.** Add `investment-terminal review`
    after the application contract is stable, with a hermetic end-to-end test and
    no automatic AI or trade execution.
@@ -121,4 +123,4 @@ analysis domains. It requires a thin application orchestration layer that
 composes their public boundaries and makes partial progress and failures
 explicit.
 
-The next action is **Phase 6 Package 5 — Historical comparison stage**.
+The next action is **Phase 6 Package 6 — User-facing workflow command**.

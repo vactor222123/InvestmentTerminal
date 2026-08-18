@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `0baaf6171b218ba0be8f5ae4863bd4f21b9f120b`
-**Current local package:** Phase 6 Package 4 — History Preservation and Projection
+**Current GitHub baseline:** `e101068d95fef032a0b73d031b6cf996010f872a`
+**Current local package:** Phase 6 Package 5 — Historical Comparison Selection
 **Current phase:** Phase 6 — Integrated Investment Review Workflow — IN PROGRESS
-**Current next action:** Implement Phase 6 Package 5 — Historical comparison stage
+**Current next action:** Implement Phase 6 Package 6 — User-facing workflow command
 
 ---
 
@@ -195,6 +195,11 @@ detail import. Successful archive and projection outcomes remain separate, and
 projection failure identifies the registered canonical snapshot without
 rewriting or deleting its archive bytes.
 
+Phase 6 Package 5 adds deterministic, read-only selection of the nearest
+earlier compatible snapshot with completed structured import. It reuses the
+existing compatibility and comparison service, distinguishes `FIRST_RUN` from
+`UNAVAILABLE`, and never fabricates a zero-change baseline.
+
 Audit document:
 
 ```text
@@ -276,14 +281,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 6 Package 4 — History Preservation and Projection
+Phase 6 Package 5 — Historical Comparison Selection
 ```
 
 Files:
 
 ```text
-investment_terminal/history/integrated_review_history_service.py
-tests/test_integrated_review_history_service.py
+investment_terminal/history/integrated_review_comparison_service.py
+tests/test_integrated_review_comparison_service.py
 Architecture.md
 DataModel.md
 docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
@@ -295,22 +300,22 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 0baaf6171b218ba0be8f5ae4863bd4f21b9f120b
+develop @ e101068d95fef032a0b73d031b6cf996010f872a
 ```
 
 Architecture/product alignment:
 
-- coordination is owned by History and reuses the existing snapshot,
-  manifest-import, and detail-import services;
-- canonical archive registration completes before any SQLite projection work;
-- successful results report archive, manifest synchronization, and detail import
-  separately;
-- projection failure raises a typed error carrying the registered snapshot and
-  never removes or rewrites canonical archive bytes;
-- archive failure prevents all dependent projection work;
-- no Review JSON contract, Knowledge boundary, AI behavior, or trade authority
-  changes;
-- focused integrated and affected History workflow tests pass: 31 passed;
-- complete local suite passes: 2670 passed, 4 skipped;
-- the next package is deterministic historical comparison selection with
-  explicit first-run and unavailable outcomes.
+- selection is owned by History and reuses canonical snapshot ordering, explicit
+  import state, and the existing comparison service;
+- only earlier snapshots with `IMPORTED` projection state are candidates;
+- incompatible candidates are skipped in deterministic newest-to-oldest order;
+- the first imported snapshot reports `FIRST_RUN`, while missing current import
+  state or no compatible imported predecessor reports `UNAVAILABLE`;
+- completed results carry the exact previous/current identities and canonical
+  `SnapshotComparison`;
+- comparison remains read-only and does not change archive, projection,
+  Knowledge, AI, or trade state;
+- focused integrated and affected comparison tests pass: 26 passed;
+- complete local suite passes: 2676 passed, 4 skipped;
+- the next package is the user-facing workflow command with a hermetic
+  end-to-end contract.

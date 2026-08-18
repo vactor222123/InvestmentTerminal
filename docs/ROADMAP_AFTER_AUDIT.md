@@ -160,7 +160,7 @@ Audited implementation order:
 3. Review Package generation and atomic export — COMPLETE;
 4. explicit immutable archive and rebuildable History projection stages —
    COMPLETE;
-5. deterministic previous-snapshot selection and comparison;
+5. deterministic previous-snapshot selection and comparison — COMPLETE;
 6. one user-facing review command with a hermetic end-to-end contract.
 
 Boundary audit:
