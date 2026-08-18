@@ -127,7 +127,7 @@ Still deferred:
 - automatic/scheduled History-to-Knowledge ingestion;
 - shared/distributed rate-limit state;
 - deployment container/image and infrastructure manifests;
-- backup/restore operational contract;
+- scheduled backup/restore drills and measured recovery objectives;
 - TLS termination/HSTS deployment policy;
 - authorization beyond API-key authentication;
 - retry jitter;
@@ -163,8 +163,21 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → initial Phase 6 closure audit — REMEDIATION REQUIRED
 → failure-reporting remediation — COMPLETE
 → repeat Phase 6 closure audit — COMPLETE
-→ Phase 7 User Product Layer boundary audit (next)
+→ Phase 7 Operational Data and First Real Use boundary audit — COMPLETE
+→ Phase 7 Package 1 operational data baseline and coverage report — NEXT
+→ Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
+
+Phase 7 turns existing architecture into a populated and measured product. It
+must separately report architecture capability, configured provider capability,
+actual populated coverage, measured runtime performance, deterministic evidence,
+and AI/human interpretation. Approximately 20-year candle coverage and an
+approximately 1000-company universe remain targets, not current-state claims.
+
+The canonical Phase 7 boundary audit is
+`docs/PHASE_7_OPERATIONAL_DATA_BOUNDARY_AUDIT.md`. The previous UI scope is now
+Phase 8 and remains non-executing, explicit-action, evidence-visible, and
+read-only at broker boundaries.
 
 ## Definition of Done
 

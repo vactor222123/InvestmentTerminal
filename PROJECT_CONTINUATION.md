@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `259077314cb3ad6790fde59243fd8c3c28299bb8`
-**Current local package:** Phase 6 Final Closure
-**Current phase:** Phase 6 — Integrated Investment Review Workflow — CLOSED
-**Current next action:** Audit the Phase 7 User Product Layer boundary
+**Current GitHub baseline:** `072ade5627bd3eb3b9df7143a834ce390b881ba1`
+**Current local package:** Phase 7 Operational Data Boundary Audit
+**Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
+**Current next action:** Implement Phase 7 Package 1 — Operational Data Baseline and Coverage Report
 
 ---
 
@@ -267,16 +267,14 @@ Market / external data
 
 The architecture is suitable for further development.
 
-Main missing product capabilities:
+Phase 1–6 architecture includes provider adapters, candle and analytical
+repositories, maintained-universe and context boundaries, portfolio imports,
+runtime backup/restore, integrated Review/History, and grounded-AI handoff.
 
-- multi-asset intelligence
-- ETF intelligence
-- transaction-based portfolio history
-- portfolio risk/rebalancing
-- macro/news context
-- market discovery
-- user interface
-- broker integrations
+The operational Phase 7 audit found no measured basis for claiming 20-year
+candle coverage, an approximately 1000-company maintained universe, a loaded
+real user portfolio, live external-context coverage, scheduled refreshes, or
+real-data runtime/recovery performance. UI work is therefore moved to Phase 8.
 
 Architecture redesign is not required.
 
@@ -306,16 +304,15 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 6 Final Closure
+Phase 7 Operational Data Boundary Audit
 ```
 
 Files:
 
 ```text
-docs/PHASE_6_CLOSURE.md
-docs/PHASE_6_CLOSURE_AUDIT.md
-docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
+docs/PHASE_7_OPERATIONAL_DATA_BOUNDARY_AUDIT.md
 docs/ROADMAP_AFTER_AUDIT.md
+docs/PROJECT_VISION.md
 Roadmap.md
 NEXT_STEPS.md
 PROJECT_CONTINUATION.md
@@ -324,16 +321,24 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 259077314cb3ad6790fde59243fd8c3c28299bb8
+develop @ 072ade5627bd3eb3b9df7143a834ce390b881ba1
 ```
 
 Architecture/product alignment:
 
-- all six Phase 6 packages and the closure remediation are present;
-- focused Phase 6 contracts, integration, importer, architecture, persistence,
-  success, and failure tests pass: 66 passed;
-- the complete local suite passes: 2681 passed, 4 skipped;
-- canonical archive, rebuildable projection, read-only comparison, optional
-  evidence, Knowledge, AI, broker, and trade boundaries remain intact;
-- Phase 6 is closed;
-- the next action is the focused Phase 7 User Product Layer boundary audit.
+- Phase 6 remains closed and its completed history is unchanged;
+- existing provider, ingestion, candle, universe, portfolio, context, backup,
+  runtime, and grounded-AI capabilities were audited against implementation;
+- capability is now explicitly separated from configuration, populated
+  coverage, measured performance, analytical evidence, and interpretation;
+- Phase 7 replaces the previous UI phase and is open;
+- Phase 7 Package 1 is selected as a read-only operational data baseline and
+  coverage report; it is not implemented by this audit package;
+- the previous UI scope is deferred to Phase 8.
+
+Verification:
+
+- focused documentation, architecture, dependency, SQLite inventory, backup,
+  and restore checks: 63 passed;
+- complete local suite: 2681 passed, 4 skipped, 1 existing Starlette warning;
+- `git diff --check`: clean.

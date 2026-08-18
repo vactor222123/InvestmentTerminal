@@ -189,19 +189,89 @@ grant trade-execution authority.
 
 ---
 
-# Phase 7 — User Product Layer
+# Phase 7 — Operational Data and First Real Use
 
 Goal:
 
-Create user-facing application capabilities.
+Turn the implemented architectural and analytical platform into a populated,
+repeatable, operationally verified product using real data.
 
 Scope:
 
-- Windows/Desktop UI
-- portfolio dashboard
-- review navigation
-- reports
-- read-only broker integrations
-- Trade Republic integration possibility
+- audit, configure, and connect real market-data providers;
+- establish stable bulk and incremental ingestion;
+- measure approximately 20-year candle coverage for supported stocks and ETFs;
+- establish maintained universes for major companies, approximately the largest
+  1000 companies where data and licensing permit, developing/growth companies,
+  popular ETFs, and instruments not manually named in advance;
+- schedule regular updates and expose refresh status, duration, failures, and
+  freshness;
+- load and verify the user's real portfolio and transaction history;
+- connect real news and external-context sources with provenance, freshness,
+  uncertainty, and quality;
+- validate screening, discovery, trend, candle-pattern, and recommendation
+  evidence on populated datasets;
+- prepare a safe portable database or evidence package for explicit ChatGPT
+  analysis;
+- verify monitoring, backup, restore, recovery, and data-quality reporting;
+- run several complete real investment-review workflows and record runtime,
+  provider, coverage, quality, and usability gaps before UI design.
 
-Automatic trade execution remains outside scope.
+Phase 7 must distinguish:
+
+- architecture capability;
+- configured provider capability;
+- actual populated data coverage;
+- measured operational performance;
+- analytical evidence;
+- AI or human interpretation.
+
+Neither approximately 1000-company universe coverage nor approximately 20-year
+candle coverage may be claimed until measured against populated data.
+
+Package 1:
+
+```text
+Operational data baseline and coverage report
+```
+
+Package 1 is the smallest coherent prerequisite: define one deterministic,
+machine-readable operational inventory that reports configured provider
+capability, populated candle ranges/counts, maintained-universe membership,
+portfolio/context presence, refresh observations, and explicit unknown or
+unmeasured states. It must be read-only, use existing repositories and runtime
+configuration, and must not add a speculative provider, scheduler, UI, broker,
+or analytical authority.
+
+Boundary audit:
+
+```text
+docs/PHASE_7_OPERATIONAL_DATA_BOUNDARY_AUDIT.md
+```
+
+---
+
+# Phase 8 — User Product Layer
+
+Goal:
+
+Create user-facing application capabilities after real operational gaps have
+been measured.
+
+Scope:
+
+- Windows/Desktop UI;
+- portfolio dashboard;
+- portfolio and transaction editing through the UI;
+- provider and refresh configuration;
+- explicit manual workflow launch;
+- Review Package viewer;
+- warnings, freshness, quality, uncertainty, and missing-evidence views;
+- History navigation and snapshot comparison;
+- reports;
+- read-only broker integrations;
+- possible Trade Republic integration.
+
+Phase 8 must not move analytical calculations into the UI, hide missing or
+low-quality evidence, invoke AI without explicit user action, automatically
+promote History into Knowledge, give brokers write access, or execute trades.

@@ -107,15 +107,17 @@ provider, exchange, or fixed number of instruments.
 
 ## Strategic Portfolio Intent
 
-The preferred high-level portfolio structure is approximately:
+The current preferred high-level portfolio structure is approximately:
 
 ``` text
-80%  long-term core assets
-10%  individual stocks and tactical positions
-10%  cash reserve
+85%  long-term ETFs and stocks
+15%  shorter-term tactical stock/ETF opportunities
 ```
 
-These are strategic targets, not automatic trading commands.
+This policy is explicit and configurable. It is a strategic target, not a
+hard-coded decision rule or an automatic trading command. A cash reserve, when
+desired, must also be represented explicitly rather than inferred by hidden
+authority.
 
 The system must distinguish between:
 
