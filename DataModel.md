@@ -343,6 +343,14 @@ ingestion, persistence, sector classification, screening, ranking, and Review
 composition remain separate later boundaries. The legacy text-file
 `InvestmentUniverse` remains a backward-compatible local symbol-list input.
 
+`MaintainedAssetUniverseQuery` defines requested universe identities, a bounded
+half-open observation window, freshness policy, and result limit. Provider
+adapters return normalized `MaintainedAssetUniverseSourceItem` values.
+`MaintainedAssetUniverseIngestionService` rejects out-of-scope, future,
+duplicate, oversized, or malformed provider results, applies the established
+market-metadata quality policy, and returns deterministic evidence without
+persisting or screening it.
+
 ## Authority Relationships
 
 ```text

@@ -5,9 +5,9 @@
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
 **Current GitHub baseline:** `f630bcabd032460657fb8329e82b9cae194b5bd7`
-**Current local package:** Phase 5 Package 1
+**Current local package:** Phase 5 Package 2
 **Current phase:** Phase 5 — Market Discovery
-**Current next action:** Apply Phase 5 Package 1, then audit the provider-neutral universe ingestion boundary
+**Current next action:** Apply Phase 5 Package 2, then audit append-only maintained-universe repository semantics
 
 ---
 
@@ -134,6 +134,11 @@ snapshots using canonical instrument identities, effective membership time,
 source provenance, and explicit quality without changing the legacy symbol-list
 universe contract.
 
+Phase 5 Package 2 adds a provider-neutral bounded query and ingestion boundary
+that validates normalized provider snapshots, rejects scope and identity
+defects, applies freshness quality, and returns deterministic universe evidence
+without persistence or screening.
+
 Audit document:
 
 ```text
@@ -215,14 +220,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 5 Package 1 — Maintained Asset-Universe Contracts
+Phase 5 Package 2 — Maintained Asset-Universe Ingestion
 ```
 
 Files:
 
 ```text
-investment_terminal/universe/maintained_universe_models.py
-tests/test_maintained_universe_models.py
+investment_terminal/universe/maintained_universe_ingestion.py
+tests/test_maintained_universe_ingestion.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -230,14 +235,15 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 25778c64d938224ba00e6ebf536e191acb79d8b4
+develop @ 88fbb7dfb677a2c32f2ddc79266dea04389e4ea6
 ```
 
 Architecture/product alignment:
 
-- maintained universes use canonical provider-independent instrument identity;
-- immutable version and effective time make snapshot identity explicit;
-- membership is unique and deterministically ordered by instrument key;
-- existing provenance and quality contracts remain explicit end to end;
-- legacy text-file universes remain backward compatible;
-- provider-neutral universe ingestion is the next focused audit.
+- bounded queries make universe identity, observation window, freshness, and
+  result limits explicit;
+- provider adapters return normalized domain values rather than raw payloads;
+- out-of-scope, future, duplicate, oversized, and malformed results fail closed;
+- quality assessment and output ordering remain deterministic;
+- ingestion performs no persistence, screening, ranking, or recommendation;
+- append-only maintained-universe repository semantics are the next audit.
