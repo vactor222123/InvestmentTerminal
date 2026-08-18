@@ -351,6 +351,13 @@ duplicate, oversized, or malformed provider results, applies the established
 market-metadata quality policy, and returns deterministic evidence without
 persisting or screening it.
 
+`MaintainedAssetUniverseRepository` defines append-only canonical universe and
+provider-source identity semantics. It supports exact lookup, half-open
+observation-time queries, version history per universe, canonical instrument
+membership queries, and latest-snapshot access. The in-memory reference
+implementation establishes deterministic behavior before durable persistence;
+screening, ranking, and Review composition remain outside this boundary.
+
 ## Authority Relationships
 
 ```text

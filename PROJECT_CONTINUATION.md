@@ -5,9 +5,9 @@
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
 **Current GitHub baseline:** `f630bcabd032460657fb8329e82b9cae194b5bd7`
-**Current local package:** Phase 5 Package 2
+**Current local package:** Phase 5 Package 3
 **Current phase:** Phase 5 — Market Discovery
-**Current next action:** Apply Phase 5 Package 2, then audit append-only maintained-universe repository semantics
+**Current next action:** Apply Phase 5 Package 3, then audit durable SQLite maintained-universe persistence
 
 ---
 
@@ -139,6 +139,10 @@ that validates normalized provider snapshots, rejects scope and identity
 defects, applies freshness quality, and returns deterministic universe evidence
 without persistence or screening.
 
+Phase 5 Package 3 adds append-only maintained-universe repository semantics and
+an in-memory reference implementation with deterministic temporal, universe,
+and canonical instrument membership queries.
+
 Audit document:
 
 ```text
@@ -220,14 +224,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 5 Package 2 — Maintained Asset-Universe Ingestion
+Phase 5 Package 3 — Maintained Asset-Universe Repository
 ```
 
 Files:
 
 ```text
-investment_terminal/universe/maintained_universe_ingestion.py
-tests/test_maintained_universe_ingestion.py
+investment_terminal/universe/maintained_universe_repository.py
+tests/test_maintained_universe_repository.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -235,15 +239,14 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 88fbb7dfb677a2c32f2ddc79266dea04389e4ea6
+develop @ 42f9a042c4026d3fe459e5eb5b4935bb11b53057
 ```
 
 Architecture/product alignment:
 
-- bounded queries make universe identity, observation window, freshness, and
-  result limits explicit;
-- provider adapters return normalized domain values rather than raw payloads;
-- out-of-scope, future, duplicate, oversized, and malformed results fail closed;
-- quality assessment and output ordering remain deterministic;
-- ingestion performs no persistence, screening, ranking, or recommendation;
-- append-only maintained-universe repository semantics are the next audit.
+- canonical universe and provider source identities are append-only;
+- exact lookup and missing-identity behavior are explicit;
+- temporal queries use half-open intervals and deterministic ordering;
+- universe version history and latest-snapshot lookup remain separate;
+- instrument membership queries use canonical instrument keys;
+- durable SQLite maintained-universe persistence is the next focused audit.
