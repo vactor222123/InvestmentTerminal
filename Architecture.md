@@ -171,6 +171,12 @@ integrated Review generator, and History services. Optional context and market
 discovery that lack runtime inputs remain explicit gaps. The command has no
 Knowledge promotion, AI-provider, broker, or trade-execution dependency.
 
+The command also owns durable failure reporting. It constructs all canonical
+stage outcomes, preserves completed artifact identities, marks the first failed
+stage and dependent skips, atomically writes the report, and only then exits
+non-zero. Projection-after-archive failure is reported without changing the
+registered canonical snapshot.
+
 ## Runtime Persistence
 
 Dedicated SQLite stores exist for distinct responsibilities, including:

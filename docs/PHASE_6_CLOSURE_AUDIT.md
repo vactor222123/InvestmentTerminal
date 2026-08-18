@@ -83,3 +83,18 @@ Add the smallest command-level failure-reporting coordinator that:
 
 After that remediation and a green full suite, repeat this closure audit and
 create the final Phase 6 closure record.
+
+## Remediation status
+
+```text
+COMPLETE — REPEAT CLOSURE AUDIT REQUIRED
+```
+
+The command now constructs the canonical eight-stage report for handled
+operational failures, atomically writes it, and then exits non-zero. Hermetic
+tests cover validation failure after completed refresh and projection failure
+after registered archive success.
+
+Remediation verification passes: 21 focused tests; complete local suite 2681
+passed and 4 skipped, with only the existing Starlette `httpx` deprecation
+warning.

@@ -3,6 +3,7 @@
 import argparse
 import json
 from collections.abc import Sequence
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
@@ -52,6 +53,7 @@ from investment_terminal.history.integrated_review_comparison_service import (
     IntegratedReviewComparisonService,
 )
 from investment_terminal.history.integrated_review_history_service import (
+    HistoricalProjectionAfterArchiveError,
     IntegratedReviewHistoryService,
 )
 from investment_terminal.portfolio.current_portfolio_loader import (
@@ -76,6 +78,14 @@ DEFAULT_WORKFLOW_OUTPUT = Path("output") / "investment_review_workflow.json"
 DEFAULT_HISTORY_ROOT = Path("data") / "history"
 
 
+@dataclass(frozen=True, slots=True)
+class WorkflowExecution:
+    """One complete report plus an optional operational failure."""
+
+    workflow: InvestmentReviewWorkflowRun
+    error: Exception | None = None
+
+
 def main(
     argv: Sequence[str] | None = None,
 ) -> InvestmentReviewWorkflowRun:
@@ -84,7 +94,7 @@ def main(
         argv
     )
     try:
-        result = run(
+        execution = run(
             options
         )
     except (
@@ -100,6 +110,7 @@ def main(
             )
         )
 
+    result = execution.workflow
     payload = result.to_dict()
     write_json_atomic(
         options.workflow_output,
@@ -107,6 +118,14 @@ def main(
         indent=2,
         trailing_newline=True,
     )
+
+    if execution.error is not None:
+        parser.error(
+            str(
+                execution.error
+            ).strip()
+            or execution.error.__class__.__name__
+        )
 
     if options.print_json:
         print(
@@ -132,86 +151,138 @@ def main(
 
 def run(
     options: argparse.Namespace,
-) -> InvestmentReviewWorkflowRun:
+) -> WorkflowExecution:
     run_id = str(
         uuid4()
     )
     run_started = _now()
+    stages: list[InvestmentReviewWorkflowStageResult] = []
     market_started = _now()
-    market = portfolio_ranking.main(
-        _ranking_arguments(
-            options
+    try:
+        market = portfolio_ranking.main(
+            _ranking_arguments(
+                options
+            )
         )
-    )
+    except Exception as exc:
+        stages.append(
+            _failed_stage(
+                "REFRESH_DATA",
+                started_at=market_started,
+                completed_at=_now(),
+                error=exc,
+            )
+        )
+        return _failed_execution(
+            run_id=run_id,
+            run_started=run_started,
+            stages=stages,
+            error=exc,
+        )
     market_completed = _now()
-
-    portfolio_started = _now()
-    current_portfolio = CurrentPortfolioLoader.load(
-        options.portfolio
-    )
-    portfolio = PortfolioSnapshotService().build(
-        current_portfolio
-    )
-    portfolio_completed = _now()
-
-    evidence_started = _now()
-    evidence = IntegratedInvestmentReviewEvidenceAssembler.assemble(
-        assembled_at=_now(),
-        portfolio=portfolio,
-        current_state_market=market,
-    )
-    evidence_completed = _now()
-
-    review_started = _now()
-    review = IntegratedReviewPackageService.generate_and_export(
-        evidence,
-        options.review_output,
-    )
-    review_completed = _now()
-
-    history_started = _now()
-    history, comparison = _history_services(
-        options
-    )
-    history_result = history.preserve_and_project(
-        review.output_path,
-        product_version=options.product_version,
-        package_id=run_id,
-    )
-    history_completed = _now()
-
-    comparison_started = _now()
-    comparison_result = comparison.compare_previous(
-        history_result.snapshot.snapshot_id
-    )
-    comparison_completed = _now()
-    run_completed = _now()
-
-    stages = (
+    stages.append(
         _completed_stage(
             "REFRESH_DATA",
             started_at=market_started,
             completed_at=market_completed,
-        ),
-        _completed_stage(
-            "VALIDATE_EVIDENCE",
-            started_at=evidence_started,
-            completed_at=evidence_completed,
-            warnings=tuple(
-                f"Missing optional evidence: {name}"
-                for name in evidence.missing_evidence
+        )
+    )
+
+    portfolio_started = _now()
+    try:
+        current_portfolio = CurrentPortfolioLoader.load(
+            options.portfolio
+        )
+        portfolio = PortfolioSnapshotService().build(
+            current_portfolio
+        )
+    except Exception as exc:
+        stages.append(
+            _failed_stage(
+                "VALIDATE_EVIDENCE",
+                started_at=portfolio_started,
+                completed_at=_now(),
+                error=exc,
+            )
+        )
+        return _failed_execution(
+            run_id=run_id,
+            run_started=run_started,
+            stages=stages,
+            error=exc,
+        )
+    portfolio_completed = _now()
+
+    evidence_started = _now()
+    try:
+        evidence = IntegratedInvestmentReviewEvidenceAssembler.assemble(
+            assembled_at=_now(),
+            portfolio=portfolio,
+            current_state_market=market,
+        )
+    except Exception as exc:
+        stages.append(
+            _failed_stage(
+                "VALIDATE_EVIDENCE",
+                started_at=evidence_started,
+                completed_at=_now(),
+                error=exc,
+            )
+        )
+        return _failed_execution(
+            run_id=run_id,
+            run_started=run_started,
+            stages=stages,
+            error=exc,
+        )
+    evidence_completed = _now()
+    stages.extend(
+        (
+            _completed_stage(
+                "VALIDATE_EVIDENCE",
+                started_at=evidence_started,
+                completed_at=evidence_completed,
+                warnings=tuple(
+                    f"Missing optional evidence: {name}"
+                    for name in evidence.missing_evidence
+                ),
             ),
-        ),
-        _completed_stage(
-            "ANALYZE_PORTFOLIO",
-            started_at=portfolio_started,
-            completed_at=portfolio_completed,
-        ),
-        _completed_stage(
-            "ANALYZE_MARKET",
-            started_at=market_started,
-            completed_at=market_completed,
-        ),
+            _completed_stage(
+                "ANALYZE_PORTFOLIO",
+                started_at=portfolio_started,
+                completed_at=portfolio_completed,
+            ),
+            _completed_stage(
+                "ANALYZE_MARKET",
+                started_at=market_started,
+                completed_at=market_completed,
+            ),
+        )
+    )
+
+    review_started = _now()
+    try:
+        review = IntegratedReviewPackageService.generate_and_export(
+            evidence,
+            options.review_output,
+        )
+    except Exception as exc:
+        stages.append(
+            _failed_stage(
+                "GENERATE_REVIEW_PACKAGE",
+                started_at=review_started,
+                completed_at=_now(),
+                error=exc,
+            )
+        )
+        return _failed_execution(
+            run_id=run_id,
+            run_started=run_started,
+            stages=stages,
+            error=exc,
+        )
+    review_completed = _now()
+    stages.append(
         _completed_stage(
             "GENERATE_REVIEW_PACKAGE",
             started_at=review_started,
@@ -224,29 +295,113 @@ def run(
                     ),
                 ),
             ),
-        ),
-        _completed_stage(
-            "ARCHIVE_HISTORY",
-            started_at=history_started,
-            completed_at=history_completed,
-            artifacts=(
-                WorkflowArtifactIdentity(
-                    artifact_type="HISTORICAL_SNAPSHOT",
-                    artifact_id=history_result.snapshot.snapshot_id,
+        )
+    )
+
+    history_started = _now()
+    try:
+        history, comparison = _history_services(
+            options
+        )
+        history_result = history.preserve_and_project(
+            review.output_path,
+            product_version=options.product_version,
+            package_id=run_id,
+        )
+    except HistoricalProjectionAfterArchiveError as exc:
+        failed_at = _now()
+        stages.extend(
+            (
+                _completed_stage(
+                    "ARCHIVE_HISTORY",
+                    started_at=history_started,
+                    completed_at=failed_at,
+                    artifacts=(
+                        WorkflowArtifactIdentity(
+                            artifact_type="HISTORICAL_SNAPSHOT",
+                            artifact_id=exc.snapshot.snapshot_id,
+                        ),
+                    ),
+                ),
+                _failed_stage(
+                    "PROJECT_HISTORY",
+                    started_at=history_started,
+                    completed_at=failed_at,
+                    error=exc.cause,
+                ),
+            )
+        )
+        return _failed_execution(
+            run_id=run_id,
+            run_started=run_started,
+            stages=stages,
+            error=exc,
+        )
+    except Exception as exc:
+        stages.append(
+            _failed_stage(
+                "ARCHIVE_HISTORY",
+                started_at=history_started,
+                completed_at=_now(),
+                error=exc,
+            )
+        )
+        return _failed_execution(
+            run_id=run_id,
+            run_started=run_started,
+            stages=stages,
+            error=exc,
+        )
+    history_completed = _now()
+    stages.extend(
+        (
+            _completed_stage(
+                "ARCHIVE_HISTORY",
+                started_at=history_started,
+                completed_at=history_completed,
+                artifacts=(
+                    WorkflowArtifactIdentity(
+                        artifact_type="HISTORICAL_SNAPSHOT",
+                        artifact_id=history_result.snapshot.snapshot_id,
+                    ),
                 ),
             ),
-        ),
-        _completed_stage(
-            "PROJECT_HISTORY",
-            started_at=history_started,
-            completed_at=history_completed,
-            artifacts=(
-                WorkflowArtifactIdentity(
-                    artifact_type="HISTORY_PROJECTION",
-                    artifact_id=history_result.snapshot.snapshot_id,
+            _completed_stage(
+                "PROJECT_HISTORY",
+                started_at=history_started,
+                completed_at=history_completed,
+                artifacts=(
+                    WorkflowArtifactIdentity(
+                        artifact_type="HISTORY_PROJECTION",
+                        artifact_id=history_result.snapshot.snapshot_id,
+                    ),
                 ),
             ),
-        ),
+        )
+    )
+
+    comparison_started = _now()
+    try:
+        comparison_result = comparison.compare_previous(
+            history_result.snapshot.snapshot_id
+        )
+    except Exception as exc:
+        stages.append(
+            _failed_stage(
+                "COMPARE_CHANGES",
+                started_at=comparison_started,
+                completed_at=_now(),
+                error=exc,
+            )
+        )
+        return _failed_execution(
+            run_id=run_id,
+            run_started=run_started,
+            stages=stages,
+            error=exc,
+        )
+    comparison_completed = _now()
+    stages.append(
         _completed_stage(
             "COMPARE_CHANGES",
             started_at=comparison_started,
@@ -272,8 +427,58 @@ def run(
                     comparison_result.reason or comparison_result.status,
                 )
             ),
-        ),
+        )
     )
+    run_completed = _now()
+    warnings = tuple(
+        dict.fromkeys(
+            warning
+            for stage in tuple(
+                stages
+            )
+            for warning in stage.warnings
+        )
+    )
+    return WorkflowExecution(
+        workflow=InvestmentReviewWorkflowRun(
+            schema_version=InvestmentReviewWorkflowRun.SCHEMA_VERSION,
+            run_id=run_id,
+            started_at=run_started,
+            completed_at=run_completed,
+            stages=tuple(
+                stages
+            ),
+            warnings=warnings,
+        )
+    )
+
+
+def _failed_execution(
+    *,
+    run_id: str,
+    run_started: datetime,
+    stages: list[InvestmentReviewWorkflowStageResult],
+    error: Exception,
+) -> WorkflowExecution:
+    failed_stage = stages[-1].stage
+    completed_at = _now()
+    existing = {
+        stage.stage
+        for stage in stages
+    }
+    for stage_name in InvestmentReviewWorkflowStageResult.STAGE_ORDER:
+        if stage_name in existing:
+            continue
+        stages.append(
+            _skipped_stage(
+                stage_name,
+                completed_at=completed_at,
+                reason=(
+                    f"Skipped because {failed_stage} failed"
+                ),
+            )
+        )
+
     warnings = tuple(
         dict.fromkeys(
             warning
@@ -281,13 +486,18 @@ def run(
             for warning in stage.warnings
         )
     )
-    return InvestmentReviewWorkflowRun(
-        schema_version=InvestmentReviewWorkflowRun.SCHEMA_VERSION,
-        run_id=run_id,
-        started_at=run_started,
-        completed_at=run_completed,
-        stages=stages,
-        warnings=warnings,
+    return WorkflowExecution(
+        workflow=InvestmentReviewWorkflowRun(
+            schema_version=InvestmentReviewWorkflowRun.SCHEMA_VERSION,
+            run_id=run_id,
+            started_at=run_started,
+            completed_at=completed_at,
+            stages=tuple(
+                stages
+            ),
+            warnings=warnings,
+        ),
+        error=error,
     )
 
 
@@ -368,6 +578,48 @@ def _completed_stage(
         completed_at=completed_at,
         artifact_identities=artifacts,
         warnings=warnings,
+    )
+
+
+def _failed_stage(
+    stage: str,
+    *,
+    started_at: datetime,
+    completed_at: datetime,
+    error: Exception,
+) -> InvestmentReviewWorkflowStageResult:
+    return InvestmentReviewWorkflowStageResult(
+        stage=stage,
+        status="FAILED",
+        depends_on=InvestmentReviewWorkflowStageResult.STAGE_DEPENDENCIES[
+            stage
+        ],
+        started_at=started_at,
+        completed_at=completed_at,
+        failure_reason=(
+            str(
+                error
+            ).strip()
+            or error.__class__.__name__
+        ),
+    )
+
+
+def _skipped_stage(
+    stage: str,
+    *,
+    completed_at: datetime,
+    reason: str,
+) -> InvestmentReviewWorkflowStageResult:
+    return InvestmentReviewWorkflowStageResult(
+        stage=stage,
+        status="SKIPPED",
+        depends_on=InvestmentReviewWorkflowStageResult.STAGE_DEPENDENCIES[
+            stage
+        ],
+        started_at=None,
+        completed_at=completed_at,
+        skip_reason=reason,
     )
 
 

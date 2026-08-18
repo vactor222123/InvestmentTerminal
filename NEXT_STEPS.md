@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 0212fb2326012483d4beac68a97c75e2e734f276`
+**Current repository baseline:** `develop @ 1d44a95301c7a61467c51d601ccf651f5ba0c5e0`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -12,6 +12,7 @@
 **Phase 6 Package 5:** COMPLETE
 **Phase 6 Package 6:** COMPLETE
 **Phase 6 closure audit:** NOT CLOSED
+**Phase 6 failure-reporting remediation:** COMPLETE
 
 ## Current State
 
@@ -19,9 +20,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the Phase 6 closure remediation: persist explicit failed/skipped
-workflow stages and partial archive success before the `review` command exits
-non-zero. Then repeat the closure audit.
+Repeat the Phase 6 closure audit against the remediated failure paths, complete
+workflow scope, authority boundaries, and full regression suite. If green,
+create the final Phase 6 closure record.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 

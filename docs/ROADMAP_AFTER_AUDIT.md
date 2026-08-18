@@ -169,6 +169,11 @@ complete, but the command must durably report failed and dependent skipped
 stages, including successful archive registration followed by projection
 failure. See `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
+The bounded failure-reporting remediation is complete: failed reports preserve
+completed artifacts, the first failed stage, dependent skips, and archive
+success before projection failure. The next action is the repeated closure
+audit.
+
 Boundary audit:
 
 ```text

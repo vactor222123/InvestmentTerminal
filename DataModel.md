@@ -437,6 +437,11 @@ Review Package, registered snapshot, History projection, and optional
 comparison. A first-run comparison remains a completed read-only stage with an
 explicit warning and no comparison artifact.
 
+`WorkflowExecution` couples the complete `InvestmentReviewWorkflowRun` with an
+optional operational error for the CLI boundary. The normalized error reason
+belongs to the failed stage, later stages carry skip reasons, and the error is
+raised to the user only after the canonical report is durably written.
+
 ## Authority Relationships
 
 ```text

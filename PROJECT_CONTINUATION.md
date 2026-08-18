@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `0212fb2326012483d4beac68a97c75e2e734f276`
-**Current local package:** Phase 6 Closure Readiness Audit
+**Current GitHub baseline:** `1d44a95301c7a61467c51d601ccf651f5ba0c5e0`
+**Current local package:** Phase 6 Failure-Reporting Closure Remediation
 **Current phase:** Phase 6 — Integrated Investment Review Workflow — IN PROGRESS
-**Current next action:** Implement Phase 6 failure-reporting closure remediation
+**Current next action:** Repeat the Phase 6 closure audit
 
 ---
 
@@ -214,6 +214,12 @@ failure can therefore hide completed earlier work, dependent skips, or a
 canonical archive registered before projection failure. The audit and bounded
 remediation are recorded in `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
+The bounded closure remediation now builds all eight canonical stage outcomes
+on handled operational failure, atomically persists the workflow report, and
+only then exits non-zero. Completed artifacts remain visible;
+`HistoricalProjectionAfterArchiveError` becomes completed archive, failed
+projection, and skipped comparison outcomes without changing canonical bytes.
+
 Audit document:
 
 ```text
@@ -295,12 +301,16 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 6 Closure Readiness Audit — NOT CLOSED
+Phase 6 Failure-Reporting Closure Remediation
 ```
 
 Files:
 
 ```text
+investment_terminal/cli/review.py
+tests/test_review_cli.py
+Architecture.md
+DataModel.md
 docs/PHASE_6_CLOSURE_AUDIT.md
 docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
 docs/ROADMAP_AFTER_AUDIT.md
@@ -318,23 +328,21 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 0212fb2326012483d4beac68a97c75e2e734f276
+develop @ 1d44a95301c7a61467c51d601ccf651f5ba0c5e0
 ```
 
 Architecture/product alignment:
 
-- all six planned success-path packages and their ownership boundaries are
-  present;
-- the focused Phase 6 contract, integration, architecture, and persistence
-  suite passes: 56 passed;
-- the complete local suite passes: 2680 passed, 4 skipped;
-- immutable archive authority, rebuildable projection, read-only comparison,
-  and explicit optional-evidence gaps remain correct;
-- closure is blocked because operational failures do not yet produce the
-  versioned workflow report;
-- projection failure can leave a valid registered archive without a report that
-  marks archive complete, projection failed, and comparison skipped;
-- no analytical, Review, History, Knowledge, AI, broker, or trade authority
-  redesign is required;
-- the next action is the bounded command-level failure-reporting remediation,
-  followed by a repeated closure audit.
+- handled operational failures produce all eight canonical stage outcomes;
+- the first failure is explicit and every unexecuted later stage is skipped with
+  a reason;
+- completed earlier artifact identities remain visible in the failed report;
+- projection-after-archive failure records the carried snapshot identity as a
+  completed archive, the projection cause as failed, and comparison as skipped;
+- the workflow report is atomically written before the CLI exits non-zero;
+- hermetic validation- and projection-failure tests pass;
+- focused remediation and affected workflow tests pass: 21 passed;
+- the complete local suite passes: 2681 passed, 4 skipped;
+- no analytical, Review, History, Knowledge, AI, broker, or trade authority is
+  added;
+- the next action is the repeated Phase 6 closure audit.
