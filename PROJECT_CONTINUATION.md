@@ -5,9 +5,9 @@
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
 **Current GitHub baseline:** `f630bcabd032460657fb8329e82b9cae194b5bd7`
-**Current local package:** Phase 5 Package 4
+**Current local package:** Phase 5 Package 5
 **Current phase:** Phase 5 — Market Discovery
-**Current next action:** Apply Phase 5 Package 4, then audit ETF discovery evidence against existing ETF contracts
+**Current next action:** Apply Phase 5 Package 5, then audit sector analysis evidence against maintained universes
 
 ---
 
@@ -147,6 +147,10 @@ Phase 5 Package 4 adds versioned SQLite persistence and a durable append-only
 repository adapter for maintained-universe evidence with indexed queries,
 strict JSON reconstruction, rollback, and restart safety.
 
+Phase 5 Package 5 adds deterministic ETF discovery assembly from maintained
+universe membership and existing ETF characteristics/composition contracts with
+explicit missing evidence and quality, without scoring or recommendation.
+
 Audit document:
 
 ```text
@@ -228,15 +232,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 5 Package 4 — Maintained Asset-Universe SQLite Persistence
+Phase 5 Package 5 — ETF Discovery Evidence
 ```
 
 Files:
 
 ```text
-investment_terminal/universe/maintained_universe_sqlite_store.py
-investment_terminal/universe/maintained_universe_sqlite_repository.py
-tests/test_maintained_universe_sqlite_repository.py
+investment_terminal/universe/etf_discovery.py
+tests/test_etf_discovery.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -244,14 +247,15 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 27b9b1c4035d0a21321623854185d7eb8cd121d2
+develop @ 98f516f882f0f05e19fad6465a5886a1b2d9f18f
 ```
 
 Architecture/product alignment:
 
-- SQLite schema version ownership is explicit and validated;
-- append operations atomically persist evidence and member indexes;
-- canonical universe and provider source uniqueness fail closed;
-- strict JSON round-trips reconstruct complete domain evidence after restart;
-- temporal, universe, latest, and instrument queries preserve repository order;
-- ETF discovery evidence against existing ETF contracts is the next audit.
+- ETF candidates come only from maintained universe membership;
+- existing characteristics and composition evidence remain authoritative;
+- missing characteristics or composition stays explicit and partial;
+- stale, conflicting, duplicate, future, and out-of-universe evidence is visible
+  or fails closed as appropriate;
+- discovery assembly has no scoring, ranking, recommendation, or trade authority;
+- sector analysis evidence against maintained universes is the next audit.

@@ -364,6 +364,15 @@ storage, atomic append, strict JSON round-trips, indexed temporal, universe, and
 instrument queries, rollback on failure, and restart-safe reconstruction.
 Corrupt payloads fail visibly rather than being replaced or skipped.
 
+`ETFDiscoveryEvidenceBuilder` projects ETF members from one maintained universe
+and joins the existing `ETFCharacteristicsEvidence` and
+`ETFCompositionEvidence` contracts by canonical instrument identity. Every ETF
+member remains visible when either evidence section is absent, with explicit
+missing-evidence accounting and deterministic `READY`, `PARTIAL`, or `STALE`
+status. Conflicting, duplicate, future, or out-of-universe evidence fails
+closed. Discovery assembly performs no scoring, ranking, recommendation, or
+trade selection.
+
 ## Authority Relationships
 
 ```text
