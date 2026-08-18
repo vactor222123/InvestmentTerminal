@@ -5,9 +5,9 @@
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
 **Current GitHub baseline:** `f630bcabd032460657fb8329e82b9cae194b5bd7`
-**Current local package:** Phase 5 Package 3
+**Current local package:** Phase 5 Package 4
 **Current phase:** Phase 5 — Market Discovery
-**Current next action:** Apply Phase 5 Package 3, then audit durable SQLite maintained-universe persistence
+**Current next action:** Apply Phase 5 Package 4, then audit ETF discovery evidence against existing ETF contracts
 
 ---
 
@@ -143,6 +143,10 @@ Phase 5 Package 3 adds append-only maintained-universe repository semantics and
 an in-memory reference implementation with deterministic temporal, universe,
 and canonical instrument membership queries.
 
+Phase 5 Package 4 adds versioned SQLite persistence and a durable append-only
+repository adapter for maintained-universe evidence with indexed queries,
+strict JSON reconstruction, rollback, and restart safety.
+
 Audit document:
 
 ```text
@@ -224,14 +228,15 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 5 Package 3 — Maintained Asset-Universe Repository
+Phase 5 Package 4 — Maintained Asset-Universe SQLite Persistence
 ```
 
 Files:
 
 ```text
-investment_terminal/universe/maintained_universe_repository.py
-tests/test_maintained_universe_repository.py
+investment_terminal/universe/maintained_universe_sqlite_store.py
+investment_terminal/universe/maintained_universe_sqlite_repository.py
+tests/test_maintained_universe_sqlite_repository.py
 DataModel.md
 PROJECT_CONTINUATION.md
 ```
@@ -239,14 +244,14 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 42f9a042c4026d3fe459e5eb5b4935bb11b53057
+develop @ 27b9b1c4035d0a21321623854185d7eb8cd121d2
 ```
 
 Architecture/product alignment:
 
-- canonical universe and provider source identities are append-only;
-- exact lookup and missing-identity behavior are explicit;
-- temporal queries use half-open intervals and deterministic ordering;
-- universe version history and latest-snapshot lookup remain separate;
-- instrument membership queries use canonical instrument keys;
-- durable SQLite maintained-universe persistence is the next focused audit.
+- SQLite schema version ownership is explicit and validated;
+- append operations atomically persist evidence and member indexes;
+- canonical universe and provider source uniqueness fail closed;
+- strict JSON round-trips reconstruct complete domain evidence after restart;
+- temporal, universe, latest, and instrument queries preserve repository order;
+- ETF discovery evidence against existing ETF contracts is the next audit.

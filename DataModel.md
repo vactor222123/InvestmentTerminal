@@ -358,6 +358,12 @@ membership queries, and latest-snapshot access. The in-memory reference
 implementation establishes deterministic behavior before durable persistence;
 screening, ranking, and Review composition remain outside this boundary.
 
+`MaintainedAssetUniverseSQLiteStore` and
+`SQLiteMaintainedAssetUniverseRepository` provide schema-versioned durable
+storage, atomic append, strict JSON round-trips, indexed temporal, universe, and
+instrument queries, rollback on failure, and restart-safe reconstruction.
+Corrupt payloads fail visibly rather than being replaced or skipped.
+
 ## Authority Relationships
 
 ```text
