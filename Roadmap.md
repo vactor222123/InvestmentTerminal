@@ -143,20 +143,20 @@ Still deferred:
 
 ## Current Decision Point
 
-Sprint 31 is complete.
-
-Frozen Sprint 31 implementation baseline before closure documentation:
-
-```text
-develop @ c3d307f
-```
+Phases 1–5 of the post-audit product roadmap are complete. The Phase 6
+Integrated Investment Review Workflow boundary audit is recorded in
+`docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
+`89c3a706cd425c0fbe85e5321c841d297a2260ee`.
 
 Next:
 
 ```text
-Sprint 31 documentation + inventory closure
-→ focused post-Sprint-31 architecture/product audit
-→ select Sprint 32 from the reconciled baseline
+Phase 6 Package 1 — immutable workflow run contract
+→ typed evidence assembly
+→ Review export
+→ History preservation/projection
+→ historical comparison
+→ user-facing review command
 ```
 
 ## Definition of Done

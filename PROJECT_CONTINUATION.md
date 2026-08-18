@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `1eca86b33387694e04297ff93bf29b3953d4fe0d`
-**Current local package:** Phase 5 Closure
-**Current phase:** Phase 5 — Market Discovery — CLOSED
-**Current next action:** Apply Phase 5 closure, then audit the Phase 6 integrated investment review workflow boundary
+**Current GitHub baseline:** `89c3a706cd425c0fbe85e5321c841d297a2260ee`
+**Current local package:** Phase 6 Workflow Boundary Audit
+**Current phase:** Phase 6 — Integrated Investment Review Workflow — AUDITED
+**Current next action:** Implement Phase 6 Package 1 — Workflow run contract
 
 ---
 
@@ -163,6 +163,13 @@ Universe models, ingestion, repositories, discovery/analysis builders,
 screening pipeline, and green full suite. The closure record is
 `docs/PHASE_5_CLOSURE.md`.
 
+The Phase 6 workflow boundary audit verifies that refresh, deterministic
+analysis, Review generation, immutable archival, History projection, comparison,
+Knowledge, and grounded-AI capabilities already exist behind separate public
+boundaries. The missing capability is a thin application-level run contract and
+coordinator with explicit stage outcomes and fail-closed dependencies. The audit
+record is `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md`.
+
 Audit document:
 
 ```text
@@ -244,28 +251,36 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 5 — Market Discovery Closure
+Phase 6 — Integrated Investment Review Workflow Boundary Audit
 ```
 
 Files:
 
 ```text
-docs/PHASE_5_CLOSURE.md
+docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
+docs/ROADMAP_AFTER_AUDIT.md
+Roadmap.md
+NEXT_STEPS.md
 PROJECT_CONTINUATION.md
 ```
 
 Source baseline verified against GitHub:
 
 ```text
-develop @ 1eca86b33387694e04297ff93bf29b3953d4fe0d
+develop @ 89c3a706cd425c0fbe85e5321c841d297a2260ee
 ```
 
 Architecture/product alignment:
 
-- every Phase 5 roadmap item has concrete implementation and focused tests;
-- broad-universe processing uses bounded ingestion, indexed persistence, and indexed screening joins;
-- canonical identities, provenance, quality, and missing evidence remain explicit;
-- discovery, sector evidence, and screening grant no recommendation or execution authority;
-- focused Phase 5 tests pass: 51 passed;
+- completed domains already own refresh, analysis, Review, History, comparison,
+  Knowledge, and grounded-AI responsibilities;
+- Review generation, archival, History import, and comparison remain separate
+  explicit commands with no shared workflow run result;
+- Phase 4 and Phase 5 evidence require typed composition into Review rather than
+  orchestration-owned calculations or loosely shared dictionaries;
+- archive authority and rebuildable SQLite projection remain separate stages;
+- automatic Review-to-Knowledge promotion, AI authority, and trade execution
+  remain outside the integrated workflow;
+- focused workflow-boundary tests pass: 5 passed;
 - complete local suite passes: 2638 passed, 4 skipped;
-- the Phase 6 integrated investment review workflow boundary is the next focused audit.
+- the next package is the immutable, versioned workflow run contract.

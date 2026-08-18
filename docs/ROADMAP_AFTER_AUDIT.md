@@ -152,6 +152,26 @@ refresh data
 → compare changes
 → produce investment review
 
+Audited implementation order:
+
+1. immutable workflow run and stage-result contract;
+2. typed deterministic evidence assembly across portfolio, context, and market
+   discovery boundaries;
+3. Review Package generation and atomic export;
+4. explicit immutable archive and rebuildable History projection stages;
+5. deterministic previous-snapshot selection and comparison;
+6. one user-facing review command with a hermetic end-to-end contract.
+
+Boundary audit:
+
+```text
+docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
+```
+
+The workflow coordinates existing public services. It does not own analytical
+algorithms, silently promote History into Knowledge, invoke AI implicitly, or
+grant trade-execution authority.
+
 ---
 
 # Phase 7 — User Product Layer
