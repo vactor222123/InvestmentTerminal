@@ -150,6 +150,13 @@ owner, and atomic exporter. It projects the typed aggregate into the existing
 nine-section Review Package, preserves missing evidence and non-authoritative
 discovery semantics, and performs no History persistence or comparison.
 
+The History domain owns integrated Review preservation and projection.
+`IntegratedReviewHistoryService` first delegates to the existing immutable
+archive/manifest service, then synchronizes manifest metadata and imports
+details into rebuildable SQLite storage. Archive and projection outcomes stay
+separate; projection failure reports the registered snapshot and never removes
+or rewrites its canonical archive bytes.
+
 ## Runtime Persistence
 
 Dedicated SQLite stores exist for distinct responsibilities, including:

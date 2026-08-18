@@ -417,6 +417,13 @@ retains Review schema version `1.0`; integrated provenance and Phase 5 evidence
 are projected inside existing sections rather than creating a competing Review
 contract.
 
+`IntegratedReviewHistoryResult` binds a registered `HistoricalSnapshot` to the
+separate manifest-metadata and detail-import results that created its
+rebuildable SQLite projection. `HistoricalProjectionAfterArchiveError` carries
+the registered snapshot and a `FAILED` projection outcome when either
+projection step fails, preserving canonical archive success without reporting
+the overall operation as complete.
+
 ## Authority Relationships
 
 ```text

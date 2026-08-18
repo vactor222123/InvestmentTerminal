@@ -103,8 +103,10 @@ provider/infrastructure refresh
    evidence through typed adapters with explicit missing coverage.
 3. **Package 3 — Review generation/export stage — COMPLETE.** Generate and atomically export
    one Review Package from assembled evidence.
-4. **Package 4 — History preservation/projection stage.** Coordinate existing
-   archive and import services while reporting their outcomes separately.
+4. **Package 4 — History preservation/projection stage — COMPLETE.** Coordinate
+   existing archive and import services while reporting their outcomes
+   separately. A projection failure preserves and identifies the registered
+   canonical archive instead of rolling it back or reporting complete success.
 5. **Package 5 — Historical comparison stage.** Select the previous compatible
    snapshot deterministically and expose first-run/unavailable states.
 6. **Package 6 — User-facing workflow command.** Add `investment-terminal review`
@@ -119,4 +121,4 @@ analysis domains. It requires a thin application orchestration layer that
 composes their public boundaries and makes partial progress and failures
 explicit.
 
-The next action is **Phase 6 Package 4 — History preservation/projection stage**.
+The next action is **Phase 6 Package 5 — Historical comparison stage**.

@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `b808ddb9e5bc6b8ccdb4e5777e60cc01d90d4e61`
-**Current local package:** Phase 6 Package 3 — Review Generation and Export
+**Current GitHub baseline:** `0baaf6171b218ba0be8f5ae4863bd4f21b9f120b`
+**Current local package:** Phase 6 Package 4 — History Preservation and Projection
 **Current phase:** Phase 6 — Integrated Investment Review Workflow — IN PROGRESS
-**Current next action:** Implement Phase 6 Package 4 — History preservation/projection stage
+**Current next action:** Implement Phase 6 Package 5 — Historical comparison stage
 
 ---
 
@@ -189,6 +189,12 @@ stock-analysis, and external-context adapters plus Review schema version `1.0`,
 projects Phase 5 evidence without granting ranking/recommendation authority, and
 keeps missing evidence and cost-basis-only portfolio limitations visible.
 
+Phase 6 Package 4 adds History-owned coordination of immutable archive
+registration, manifest-to-SQLite metadata synchronization, and transactional
+detail import. Successful archive and projection outcomes remain separate, and
+projection failure identifies the registered canonical snapshot without
+rewriting or deleting its archive bytes.
+
 Audit document:
 
 ```text
@@ -270,14 +276,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 6 Package 3 — Review Generation and Atomic Export
+Phase 6 Package 4 — History Preservation and Projection
 ```
 
 Files:
 
 ```text
-investment_terminal/review/integrated_review_package_service.py
-tests/test_integrated_review_package_service.py
+investment_terminal/history/integrated_review_history_service.py
+tests/test_integrated_review_history_service.py
 Architecture.md
 DataModel.md
 docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
@@ -289,22 +295,22 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ b808ddb9e5bc6b8ccdb4e5777e60cc01d90d4e61
+develop @ 0baaf6171b218ba0be8f5ae4863bd4f21b9f120b
 ```
 
 Architecture/product alignment:
 
-- generation consumes only `IntegratedInvestmentReviewEvidence` and reuses the
-  existing Review adapters and builder;
-- Review schema `1.0` and all nine required section names remain unchanged;
-- Phase 5 sector/screening evidence is descriptive inside market analysis and
-  explicitly denies ranking and recommendation authority;
-- ETF discovery evidence is connected without becoming a recommendation;
-- missing context/discovery evidence and absent portfolio market values remain
-  explicit in sections and warnings;
-- export uses the existing atomic JSON writer and preserves the previous file
-  when replacement fails;
-- generation/export performs no History, Knowledge, AI, or trade side effects;
-- focused integrated-generation and affected-boundary tests pass: 48 passed;
-- complete local suite passes: 2666 passed, 4 skipped;
-- the next package is separate History preservation and projection coordination.
+- coordination is owned by History and reuses the existing snapshot,
+  manifest-import, and detail-import services;
+- canonical archive registration completes before any SQLite projection work;
+- successful results report archive, manifest synchronization, and detail import
+  separately;
+- projection failure raises a typed error carrying the registered snapshot and
+  never removes or rewrites canonical archive bytes;
+- archive failure prevents all dependent projection work;
+- no Review JSON contract, Knowledge boundary, AI behavior, or trade authority
+  changes;
+- focused integrated and affected History workflow tests pass: 31 passed;
+- complete local suite passes: 2670 passed, 4 skipped;
+- the next package is deterministic historical comparison selection with
+  explicit first-run and unavailable outcomes.
