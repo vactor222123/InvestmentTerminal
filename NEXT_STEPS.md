@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 1d44a95301c7a61467c51d601ccf651f5ba0c5e0`
+**Current repository baseline:** `develop @ 259077314cb3ad6790fde59243fd8c3c28299bb8`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -11,8 +11,9 @@
 **Phase 6 Package 4:** COMPLETE
 **Phase 6 Package 5:** COMPLETE
 **Phase 6 Package 6:** COMPLETE
-**Phase 6 closure audit:** NOT CLOSED
+**Phase 6 closure audit:** COMPLETE
 **Phase 6 failure-reporting remediation:** COMPLETE
+**Phase 6:** CLOSED
 
 ## Current State
 
@@ -20,10 +21,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Repeat the Phase 6 closure audit against the remediated failure paths, complete
-workflow scope, authority boundaries, and full regression suite. If green,
-create the final Phase 6 closure record.
+Audit the Phase 7 User Product Layer boundary against the existing CLI, API,
+Review, History, Knowledge, and runtime surfaces before selecting the smallest
+implementation package.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
+
+Closure record: `docs/PHASE_6_CLOSURE.md`.
 
 Audit record: `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md`.

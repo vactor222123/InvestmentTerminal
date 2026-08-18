@@ -7,12 +7,13 @@
 ## Closure status
 
 ```text
-NOT CLOSED
+INITIAL AUDIT: NOT CLOSED
+FINAL DISPOSITION: RESOLVED AND CLOSED
 ```
 
-The six planned implementation packages are present and their success-path
-contracts are integrated. One failure-reporting gap still violates the Phase 6
-boundary audit, so closure would be premature.
+The initial audit found all six planned implementation packages and one
+failure-reporting gap that made closure premature. That finding was remediated
+and verified by the repeated audit recorded below.
 
 ## Roadmap verification
 
@@ -24,9 +25,9 @@ boundary audit, so closure would be premature.
 | Immutable History | `IntegratedReviewHistoryService` preserves archive/manifest authority separately from SQLite projection | Implemented |
 | Historical comparison | `IntegratedReviewComparisonService` selects the previous compatible imported snapshot and distinguishes first-run/unavailable outcomes | Implemented |
 | User-facing workflow | `python -m investment_terminal.cli.review` with hermetic first-run and second-run comparison tests | Success path implemented |
-| Failure visibility | Required failure and dependent skips persisted in the versioned workflow report, including partial archive success | **Not implemented by the command** |
+| Failure visibility | Required failure and dependent skips persisted in the versioned workflow report, including partial archive success | Not implemented at the initial baseline; subsequently remediated |
 
-## Blocking finding
+## Initial blocking finding
 
 `investment_terminal.cli.review.run()` constructs
 `InvestmentReviewWorkflowRun` only after every stage succeeds. Its caller
@@ -67,7 +68,7 @@ passes: 56 passed.
 The complete local regression suite passes: 2680 passed, 4 skipped. The only
 warning is the existing Starlette `httpx` deprecation warning.
 
-## Required remediation
+## Required remediation — completed
 
 Add the smallest command-level failure-reporting coordinator that:
 
@@ -87,7 +88,7 @@ create the final Phase 6 closure record.
 ## Remediation status
 
 ```text
-COMPLETE — REPEAT CLOSURE AUDIT REQUIRED
+COMPLETE — VERIFIED BY REPEATED CLOSURE AUDIT
 ```
 
 The command now constructs the canonical eight-stage report for handled
@@ -98,3 +99,7 @@ after registered archive success.
 Remediation verification passes: 21 focused tests; complete local suite 2681
 passed and 4 skipped, with only the existing Starlette `httpx` deprecation
 warning.
+
+The repeated closure audit at baseline `2590773` verifies the remediation,
+authority boundaries, focused suite, and full regression suite. The final
+closure record is `docs/PHASE_6_CLOSURE.md`.

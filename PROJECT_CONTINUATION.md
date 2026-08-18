@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `1d44a95301c7a61467c51d601ccf651f5ba0c5e0`
-**Current local package:** Phase 6 Failure-Reporting Closure Remediation
-**Current phase:** Phase 6 — Integrated Investment Review Workflow — IN PROGRESS
-**Current next action:** Repeat the Phase 6 closure audit
+**Current GitHub baseline:** `259077314cb3ad6790fde59243fd8c3c28299bb8`
+**Current local package:** Phase 6 Final Closure
+**Current phase:** Phase 6 — Integrated Investment Review Workflow — CLOSED
+**Current next action:** Audit the Phase 7 User Product Layer boundary
 
 ---
 
@@ -220,6 +220,11 @@ only then exits non-zero. Completed artifacts remain visible;
 `HistoricalProjectionAfterArchiveError` becomes completed archive, failed
 projection, and skipped comparison outcomes without changing canonical bytes.
 
+Phase 6 is closed after the repeated audit verified every roadmap package, the
+failure-reporting remediation, authority boundaries, hermetic success/failure
+paths, and the green full suite. The final record is
+`docs/PHASE_6_CLOSURE.md`.
+
 Audit document:
 
 ```text
@@ -301,25 +306,16 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 6 Failure-Reporting Closure Remediation
+Phase 6 Final Closure
 ```
 
 Files:
 
 ```text
-investment_terminal/cli/review.py
-tests/test_review_cli.py
-Architecture.md
-DataModel.md
+docs/PHASE_6_CLOSURE.md
 docs/PHASE_6_CLOSURE_AUDIT.md
 docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
 docs/ROADMAP_AFTER_AUDIT.md
-Roadmap.md
-NEXT_STEPS.md
-PROJECT_CONTINUATION.md
-Architecture.md
-DataModel.md
-docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md
 Roadmap.md
 NEXT_STEPS.md
 PROJECT_CONTINUATION.md
@@ -328,21 +324,16 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 1d44a95301c7a61467c51d601ccf651f5ba0c5e0
+develop @ 259077314cb3ad6790fde59243fd8c3c28299bb8
 ```
 
 Architecture/product alignment:
 
-- handled operational failures produce all eight canonical stage outcomes;
-- the first failure is explicit and every unexecuted later stage is skipped with
-  a reason;
-- completed earlier artifact identities remain visible in the failed report;
-- projection-after-archive failure records the carried snapshot identity as a
-  completed archive, the projection cause as failed, and comparison as skipped;
-- the workflow report is atomically written before the CLI exits non-zero;
-- hermetic validation- and projection-failure tests pass;
-- focused remediation and affected workflow tests pass: 21 passed;
+- all six Phase 6 packages and the closure remediation are present;
+- focused Phase 6 contracts, integration, importer, architecture, persistence,
+  success, and failure tests pass: 66 passed;
 - the complete local suite passes: 2681 passed, 4 skipped;
-- no analytical, Review, History, Knowledge, AI, broker, or trade authority is
-  added;
-- the next action is the repeated Phase 6 closure audit.
+- canonical archive, rebuildable projection, read-only comparison, optional
+  evidence, Knowledge, AI, broker, and trade boundaries remain intact;
+- Phase 6 is closed;
+- the next action is the focused Phase 7 User Product Layer boundary audit.

@@ -143,7 +143,7 @@ Still deferred:
 
 ## Current Decision Point
 
-Phases 1–5 of the post-audit product roadmap are complete. The Phase 6
+Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
 `89c3a706cd425c0fbe85e5321c841d297a2260ee`. Packages 1–6 now establish the
@@ -160,9 +160,10 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → Phase 6 Package 4 — History preservation/projection — COMPLETE
 → Phase 6 Package 5 — historical comparison — COMPLETE
 → Phase 6 Package 6 — user-facing review command — COMPLETE
-→ Phase 6 closure audit — NOT CLOSED
+→ initial Phase 6 closure audit — REMEDIATION REQUIRED
 → failure-reporting remediation — COMPLETE
-→ repeat Phase 6 closure audit (next)
+→ repeat Phase 6 closure audit — COMPLETE
+→ Phase 7 User Product Layer boundary audit (next)
 ```
 
 ## Definition of Done

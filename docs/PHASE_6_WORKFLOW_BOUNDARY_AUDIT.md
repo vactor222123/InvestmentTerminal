@@ -115,10 +115,11 @@ provider/infrastructure refresh
    `investment_terminal.cli.review` composition root with a hermetic end-to-end
    test, versioned workflow report, explicit optional-evidence gaps, and no
    automatic AI, Knowledge promotion, broker access, or trade execution.
-7. **Phase closure audit — REMEDIATION COMPLETE; REPEAT REQUIRED.** The initial
+7. **Phase closure audit — COMPLETE.** The initial
    audit found missing durable failure reports. The command now persists failed
    and dependent skipped stages, including archive success before projection
-   failure. A repeated closure audit must make the final phase decision.
+   failure. The repeated audit is green and the final record is
+   `docs/PHASE_6_CLOSURE.md`.
 
 ## Audit decision
 
@@ -127,4 +128,5 @@ analysis domains. It requires a thin application orchestration layer that
 composes their public boundaries and makes partial progress and failures
 explicit.
 
-The next action is the **repeated Phase 6 closure audit**.
+Phase 6 is closed. The next action is the **Phase 7 User Product Layer boundary
+audit**.

@@ -174,6 +174,9 @@ completed artifacts, the first failed stage, dependent skips, and archive
 success before projection failure. The next action is the repeated closure
 audit.
 
+Phase 6 is closed at verified baseline `2590773`. The closure record is
+`docs/PHASE_6_CLOSURE.md`.
+
 Boundary audit:
 
 ```text
