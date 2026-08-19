@@ -299,6 +299,29 @@ def test_get_latest_returns_newest_candle(
     )
 
 
+def test_get_earliest_returns_oldest_candle(
+    repository,
+) -> None:
+    repository.save_many(
+        [
+            create_candle(2, 102.0),
+            create_candle(0, 100.0),
+            create_candle(4, 104.0),
+        ]
+    )
+
+    assert repository.get_earliest(
+        symbol="msft",
+        resolution="d",
+    ) == create_candle(0, 100.0)
+
+
+def test_get_earliest_returns_none_when_empty(
+    repository,
+) -> None:
+    assert repository.get_earliest("MSFT", "D") is None
+
+
 def test_get_latest_filters_symbol(
     repository,
 ) -> None:

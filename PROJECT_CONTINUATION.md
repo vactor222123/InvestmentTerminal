@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `e1d6571ecb4abaa53bb39b4630975d70e790f646`
-**Current local package:** Phase 7 Package 3 — Bounded Yahoo Candle Ingestion
+**Current GitHub baseline:** `b23f37267e7b84a678a4d08d049e6f36bd7caaf1`
+**Current local package:** Phase 7 Package 4 — Stored Candle Coverage Measurement
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one bounded Yahoo ingestion against explicit local runtime paths
+**Current next action:** Run one controlled one-year MSFT ingestion and review stored coverage
 
 ---
 
@@ -304,16 +304,17 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 7 Package 3 — Bounded Yahoo Candle Ingestion
+Phase 7 Package 4 — Stored Candle Coverage Measurement
 ```
 
 Files:
 
 ```text
-investment_terminal/database/database.py
 investment_terminal/cli/yahoo_candle_ingestion.py
+investment_terminal/repositories/candle_repository.py
 tests/test_yahoo_candle_ingestion_cli.py
-docs/PHASE_7_PACKAGE_3.md
+tests/test_candle_repository.py
+docs/PHASE_7_PACKAGE_4.md
 docs/YAHOO_CANDLE_INGESTION_GUIDE.md
 docs/ROADMAP_AFTER_AUDIT.md
 Architecture.md
@@ -326,22 +327,21 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ e1d6571ecb4abaa53bb39b4630975d70e790f646
+develop @ b23f37267e7b84a678a4d08d049e6f36bd7caaf1
 ```
 
 Architecture/product alignment:
 
-- user-executed qualification succeeded for one bounded MSFT request;
-- the existing Yahoo client, historical service, and candle repository remain
-  the authoritative ingestion path;
-- the CLI requires explicit cache, SQLite, and report paths;
-- repeated requests expose inserted and duplicate counts deterministically;
-- bulk/scheduled ingestion, broad coverage claims, analysis, and trading remain
-  outside this package.
+- first bounded persistence inserted 12 MSFT daily candles;
+- exact repetition inserted zero, reported 12 duplicates, and retained 12;
+- report schema version 2 measures stored earliest/latest bounds and elapsed
+  span through indexed repository queries;
+- measured span is not a completeness or gap claim;
+- bulk/scheduled ingestion, analysis, and trading remain outside this package.
 
 Verification:
 
-- focused ingestion, persistence, Yahoo client, and architecture checks:
-  48 passed;
-- complete local suite: 2714 passed, 4 skipped, 1 existing Starlette warning;
+- focused ingestion, repository, Yahoo client, and architecture checks:
+  50 passed;
+- complete local suite: 2716 passed, 4 skipped, 1 existing Starlette warning;
 - `git diff --check`: clean.

@@ -289,3 +289,7 @@ Yahoo client, historical market service, and candle repository for one symbol
 and half-open time window. Runtime owners supply cache, SQLite database, and
 atomic report paths. Downloaded, inserted, duplicate, and stored-total counts
 remain visible. This boundary does not schedule or authorize bulk ingestion.
+
+The version 2 report obtains earliest/latest stored timestamps with indexed
+repository boundary queries. It measures the persisted set without loading its
+complete candle history or inferring expected trading sessions.

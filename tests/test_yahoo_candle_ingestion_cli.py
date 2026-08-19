@@ -44,6 +44,13 @@ def test_ingestion_persists_and_reports_duplicates(monkeypatch, tmp_path, capsys
     assert payload["inserted"] == 0
     assert payload["duplicates"] == 1
     assert payload["stored_total"] == 1
+    assert payload["schema_version"] == 2
+    assert payload["coverage"] == {
+        "candle_count": 1,
+        "earliest_candle_at": "2026-08-03T00:00:00+00:00",
+        "latest_candle_at": "2026-08-03T00:00:00+00:00",
+        "observed_span_days": 0.0,
+    }
     assert '"status": "SUCCESS"' in capsys.readouterr().out
 
 
@@ -60,6 +67,7 @@ def test_failure_is_reported_before_nonzero_exit(monkeypatch, tmp_path):
     assert cli.main(_arguments(tmp_path)) == 1
     payload = json.loads((tmp_path / "report.json").read_text(encoding="utf-8"))
     assert payload["status"] == "FAILED"
+    assert payload["coverage"] is None
     assert payload["failure"] == {
         "type": "RuntimeError",
         "reason": "provider unavailable",

@@ -525,3 +525,7 @@ This schema-versioned operational report records the exact request, provider,
 explicit database path, `SUCCESS | EMPTY | FAILED`, and measured `downloaded`,
 `inserted`, `duplicates`, and `stored_total` counts. Unknown failure counts are
 `null`. The report is not analytical or trading evidence.
+
+Version 2 adds `coverage(candle_count, earliest_candle_at,
+latest_candle_at, observed_span_days)`. The span is elapsed wall-clock time
+between stored boundaries; it is not a completeness percentage or gap audit.

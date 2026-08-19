@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ e1d6571ecb4abaa53bb39b4630975d70e790f646`
+**Current repository baseline:** `develop @ b23f37267e7b84a678a4d08d049e6f36bd7caaf1`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -21,6 +21,8 @@
 **Phase 7 yfinance cache remediation:** COMPLETE
 **Phase 7 Yahoo live qualification:** SUCCESS
 **Phase 7 Package 3 bounded ingestion:** COMPLETE
+**Phase 7 Package 3 live/idempotency verification:** COMPLETE
+**Phase 7 Package 4 stored coverage measurement:** COMPLETE
 
 ## Current State
 
@@ -28,9 +30,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one bounded Yahoo ingestion with explicit cache, SQLite database, and
-report paths, then review inserted/duplicate/total counts. Do not start bulk
-ingestion until this persisted bounded result is verified.
+Run one controlled expanded-window Yahoo ingestion for MSFT and review the
+version 2 stored coverage block. Do not infer completeness from elapsed span or
+start multi-instrument ingestion before the result is measured.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -49,3 +51,5 @@ Phase 7 Package 2 record: `docs/PHASE_7_PACKAGE_2.md`.
 Yahoo rerun/remediation: `docs/PHASE_7_YAHOO_QUALIFICATION_RERUN.md`.
 
 Bounded ingestion package: `docs/PHASE_7_PACKAGE_3.md`.
+
+Stored coverage package: `docs/PHASE_7_PACKAGE_4.md`.

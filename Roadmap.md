@@ -170,7 +170,9 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → yfinance runtime cache remediation — COMPLETE
 → bounded Yahoo qualification — SUCCESS (MSFT, 12 daily candles)
 → Phase 7 Package 3 bounded Yahoo candle ingestion — COMPLETE
-→ execute Package 3 against explicit local runtime paths — NEXT
+→ Package 3 live persistence and idempotency verification — COMPLETE
+→ Phase 7 Package 4 stored coverage measurement — COMPLETE
+→ run one controlled expanded-window ingestion and review coverage — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

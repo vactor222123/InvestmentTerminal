@@ -61,11 +61,12 @@ def _payload(options: argparse.Namespace) -> dict[str, object]:
             raise ValueError("start must be earlier than end")
         database = Database(options.database)
         database.initialize()
+        repository = CandleRepository(database)
         result = HistoricalMarketService(
             client=YahooFinanceClient(
                 cache_directory=options.cache_directory,
             ),
-            repository=CandleRepository(database),
+            repository=repository,
         ).import_candles(
             symbol=request["symbol"],
             resolution=request["resolution"],
@@ -73,8 +74,21 @@ def _payload(options: argparse.Namespace) -> dict[str, object]:
             end=options.end,
             currency=request["currency"],
         )
+        earliest = repository.get_earliest(
+            result.symbol,
+            result.resolution,
+        )
+        latest = repository.get_latest(
+            result.symbol,
+            result.resolution,
+        )
+        observed_span_days = None
+        if earliest is not None and latest is not None:
+            observed_span_days = (
+                latest.timestamp - earliest.timestamp
+            ).total_seconds() / 86_400
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "provider_identity": "YAHOO_FINANCE",
             "status": "SUCCESS" if result.downloaded else "EMPTY",
             "request": request,
@@ -83,6 +97,20 @@ def _payload(options: argparse.Namespace) -> dict[str, object]:
             "inserted": result.inserted,
             "duplicates": result.duplicates,
             "stored_total": result.stored_total,
+            "coverage": {
+                "candle_count": result.stored_total,
+                "earliest_candle_at": (
+                    earliest.timestamp.isoformat()
+                    if earliest is not None
+                    else None
+                ),
+                "latest_candle_at": (
+                    latest.timestamp.isoformat()
+                    if latest is not None
+                    else None
+                ),
+                "observed_span_days": observed_span_days,
+            },
             "failure": None,
             "limitations": [
                 "one bounded ingestion does not establish general provider "
@@ -94,7 +122,7 @@ def _payload(options: argparse.Namespace) -> dict[str, object]:
         }
     except Exception as exc:
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "provider_identity": "YAHOO_FINANCE",
             "status": "FAILED",
             "request": request,
@@ -103,6 +131,7 @@ def _payload(options: argparse.Namespace) -> dict[str, object]:
             "inserted": None,
             "duplicates": None,
             "stored_total": None,
+            "coverage": None,
             "failure": {"type": type(exc).__name__, "reason": str(exc)},
             "limitations": ["failed ingestion does not authorize downstream use"],
         }

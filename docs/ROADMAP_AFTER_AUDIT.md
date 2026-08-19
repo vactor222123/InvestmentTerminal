@@ -264,6 +264,10 @@ candles. Package 3 adds one bounded persistence composition root over the
 existing Yahoo client, historical service, and SQLite candle repository.
 Broader ingestion remains deferred until its persisted result is reviewed.
 
+Package 3 then succeeded and its exact repeat proved idempotent persistence.
+Package 4 adds indexed stored-boundary measurement to report schema version 2;
+one controlled one-year MSFT expansion is next, not multi-instrument ingestion.
+
 Boundary audit:
 
 ```text

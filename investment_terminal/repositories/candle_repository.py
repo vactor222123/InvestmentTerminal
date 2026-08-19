@@ -196,6 +196,50 @@ class CandleRepository(BaseRepository):
 
         return self._row_to_candle(row)
 
+    def get_earliest(
+        self,
+        symbol: str,
+        resolution: str,
+    ) -> Candle | None:
+        """Return the earliest stored candle for an identity."""
+        normalized_symbol = self._normalize_text(
+            symbol,
+            field_name="symbol",
+        )
+        normalized_resolution = self._normalize_text(
+            resolution,
+            field_name="resolution",
+        )
+
+        row = self.database.connection.execute(
+            """
+            SELECT
+                symbol,
+                resolution,
+                timestamp,
+                open_price,
+                high_price,
+                low_price,
+                close_price,
+                volume,
+                currency
+            FROM candles
+            WHERE symbol = ?
+              AND resolution = ?
+            ORDER BY timestamp ASC
+            LIMIT 1
+            """,
+            (
+                normalized_symbol,
+                normalized_resolution,
+            ),
+        ).fetchone()
+
+        if row is None:
+            return None
+
+        return self._row_to_candle(row)
+
     def get_range(
         self,
         symbol: str,
