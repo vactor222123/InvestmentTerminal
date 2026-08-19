@@ -259,6 +259,11 @@ The fresh-clone rerun resolved yfinance cache ownership and isolated the
 remaining failure to blocked outbound Yahoo HTTPS connectivity. See
 `docs/PHASE_7_YAHOO_QUALIFICATION_RERUN.md`.
 
+The repeated local qualification then succeeded for MSFT with 12 daily
+candles. Package 3 adds one bounded persistence composition root over the
+existing Yahoo client, historical service, and SQLite candle repository.
+Broader ingestion remains deferred until its persisted result is reviewed.
+
 Boundary audit:
 
 ```text

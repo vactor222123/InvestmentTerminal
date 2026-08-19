@@ -281,3 +281,11 @@ Live CLI composition requires an explicit writable yfinance cache directory.
 The client configures yfinance to use that caller-owned location instead of an
 implicit user-profile cache. Cache ownership is operational state, not market
 evidence, and cache contents are never committed or projected into reports.
+
+## Bounded Yahoo Candle Ingestion
+
+After explicit qualification succeeds, one command composes the existing
+Yahoo client, historical market service, and candle repository for one symbol
+and half-open time window. Runtime owners supply cache, SQLite database, and
+atomic report paths. Downloaded, inserted, duplicate, and stored-total counts
+remain visible. This boundary does not schedule or authorize bulk ingestion.

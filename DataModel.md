@@ -518,3 +518,10 @@ history, analytical evidence, investment interpretation, or trading authority.
 The yfinance cache directory is runtime configuration and is deliberately not a
 field of the qualification result. It contains provider-library operational
 state rather than evidence about the requested instrument.
+
+## Yahoo Bounded Ingestion Report
+
+This schema-versioned operational report records the exact request, provider,
+explicit database path, `SUCCESS | EMPTY | FAILED`, and measured `downloaded`,
+`inserted`, `duplicates`, and `stored_total` counts. Unknown failure counts are
+`null`. The report is not analytical or trading evidence.

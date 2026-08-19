@@ -168,7 +168,9 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → first local operational baseline — COMPLETE: no populated real inputs found
 → Phase 7 Package 2 Yahoo Historical Candle Operational Qualification — IMPLEMENTED
 → yfinance runtime cache remediation — COMPLETE
-→ run bounded Yahoo qualification where outbound Yahoo HTTPS is permitted — NEXT
+→ bounded Yahoo qualification — SUCCESS (MSFT, 12 daily candles)
+→ Phase 7 Package 3 bounded Yahoo candle ingestion — COMPLETE
+→ execute Package 3 against explicit local runtime paths — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

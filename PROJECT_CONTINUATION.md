@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `a9fe38c4beddf3dbf194f698fec78e6a236bdec4`
-**Current local package:** Phase 7 Yahoo Qualification Cache Remediation and Rerun
+**Current GitHub baseline:** `e1d6571ecb4abaa53bb39b4630975d70e790f646`
+**Current local package:** Phase 7 Package 3 — Bounded Yahoo Candle Ingestion
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run bounded Yahoo qualification where outbound Yahoo HTTPS is permitted
+**Current next action:** Run one bounded Yahoo ingestion against explicit local runtime paths
 
 ---
 
@@ -304,19 +304,17 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 7 Yahoo Qualification Cache Remediation and Rerun
+Phase 7 Package 3 — Bounded Yahoo Candle Ingestion
 ```
 
 Files:
 
 ```text
-investment_terminal/clients/yahoo_finance_client.py
-investment_terminal/cli/yahoo_candle_qualification.py
-tests/test_yahoo_candle_qualification_cli.py
-tests/test_yahoo_finance_client.py
-docs/PHASE_7_YAHOO_QUALIFICATION_RERUN.md
-docs/PHASE_7_PACKAGE_2.md
-docs/YAHOO_CANDLE_QUALIFICATION_GUIDE.md
+investment_terminal/database/database.py
+investment_terminal/cli/yahoo_candle_ingestion.py
+tests/test_yahoo_candle_ingestion_cli.py
+docs/PHASE_7_PACKAGE_3.md
+docs/YAHOO_CANDLE_INGESTION_GUIDE.md
 docs/ROADMAP_AFTER_AUDIT.md
 Architecture.md
 DataModel.md
@@ -328,25 +326,22 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ a9fe38c4beddf3dbf194f698fec78e6a236bdec4
+develop @ e1d6571ecb4abaa53bb39b4630975d70e790f646
 ```
 
 Architecture/product alignment:
 
-- fresh-clone rerun reproduced the qualification failure;
-- focused diagnosis identified an implicit unwritable yfinance cache database;
-- Yahoo client now accepts an explicit runtime-owned cache directory;
-- live CLI requires `--cache-directory`, while existing callers remain
-  backward compatible;
-- post-remediation execution reached transport and failed on outbound HTTPS to
-  `fc.yahoo.com:443` with curl error 7;
-- coverage remains unknown and bulk ingestion remains blocked;
-- no provider change, retry policy, analysis, AI, broker, or trade scope was
-  introduced.
+- user-executed qualification succeeded for one bounded MSFT request;
+- the existing Yahoo client, historical service, and candle repository remain
+  the authoritative ingestion path;
+- the CLI requires explicit cache, SQLite, and report paths;
+- repeated requests expose inserted and duplicate counts deterministically;
+- bulk/scheduled ingestion, broad coverage claims, analysis, and trading remain
+  outside this package.
 
 Verification:
 
-- focused Yahoo cache, qualification, CLI, atomic-write, documentation, and
-  architecture checks: 45 passed;
-- complete local suite: 2712 passed, 4 skipped, 1 existing Starlette warning;
+- focused ingestion, persistence, Yahoo client, and architecture checks:
+  48 passed;
+- complete local suite: 2714 passed, 4 skipped, 1 existing Starlette warning;
 - `git diff --check`: clean.
