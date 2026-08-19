@@ -174,7 +174,9 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → Phase 7 Package 4 stored coverage measurement — COMPLETE
 → controlled one-year MSFT ingestion — COMPLETE (251 daily candles)
 → Phase 7 Package 5 explicit-session coverage quality — COMPLETE
-→ source explicit versioned XNAS/XNYS session evidence — NEXT
+→ bounded one-year XNAS session evidence — COMPLETE
+→ controlled five-year MSFT/XNAS coverage — COMPLETE (1,254/1,254 sessions)
+→ audit one explicitly selected second instrument/calendar — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

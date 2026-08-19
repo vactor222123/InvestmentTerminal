@@ -534,3 +534,8 @@ between stored boundaries; it is not a completeness percentage or gap audit.
 calendar identity/version, expected and observed session counts, explicit
 missing session keys, unexpected candle timestamps, a ratio that remains
 unknown for an empty calendar, and a fail-closed completeness flag.
+
+Operational session evidence keeps the existing primary `source_uri` and may
+add an ordered non-empty `source_uris` array. When present, the primary URI must
+also occur in that array. This additive provenance supports bounded `XNAS@2`
+without invalidating existing `XNAS@1` evidence.

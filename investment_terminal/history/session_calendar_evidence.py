@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-def verify_session_calendar_evidence(path: Path) -> dict[str, str]:
+def verify_session_calendar_evidence(path: Path) -> dict[str, object]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     evidence = payload.get("evidence")
     sessions = payload.get("sessions")
@@ -18,6 +18,18 @@ def verify_session_calendar_evidence(path: Path) -> dict[str, str]:
     for field in required:
         if not isinstance(evidence.get(field), str) or not evidence[field].strip():
             raise ValueError(f"evidence.{field} must be a non-empty string")
+    source_uris = evidence.get("source_uris")
+    if source_uris is not None:
+        if (
+            not isinstance(source_uris, list)
+            or not source_uris
+            or any(not isinstance(uri, str) or not uri.strip() for uri in source_uris)
+        ):
+            raise ValueError("evidence.source_uris must be a non-empty string array")
+        if evidence["source_uri"].strip() not in {
+            uri.strip() for uri in source_uris
+        }:
+            raise ValueError("evidence.source_uri must appear in evidence.source_uris")
     retrieved_at = datetime.fromisoformat(
         evidence["retrieved_at"].replace("Z", "+00:00")
     )
@@ -33,8 +45,11 @@ def verify_session_calendar_evidence(path: Path) -> dict[str, str]:
     expected = evidence["sessions_sha256"].strip().lower()
     if actual != expected:
         raise ValueError("session calendar evidence checksum mismatch")
-    return {
+    result = {
         "source_uri": evidence["source_uri"].strip(),
         "retrieved_at": retrieved_at.isoformat(),
         "sessions_sha256": actual,
     }
+    if source_uris is not None:
+        result["source_uris"] = [uri.strip() for uri in source_uris]
+    return result

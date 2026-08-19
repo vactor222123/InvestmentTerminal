@@ -273,6 +273,12 @@ Package 5 adds History-owned comparison against explicit versioned session
 evidence. Calendar sourcing remains the next prerequisite; weekday inference
 is prohibited.
 
+Packages 6–8 add the explicit coverage command, integrity validation, and
+bounded `XNAS@1` evidence. Package 9 adds separately versioned, official-source
+backed `XNAS@2` evidence for the controlled five-year MSFT window. The measured
+result is 1,254 expected and observed sessions with no missing or unexpected
+candles. Mass ingestion remains out of scope.
+
 Boundary audit:
 
 ```text

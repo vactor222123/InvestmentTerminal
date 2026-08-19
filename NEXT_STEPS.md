@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ d71936b960d749bb0017d75e0c4a02cc45962df4`
+**Current repository baseline:** `develop @ b04990d1e2f35f1b38e404cc9728e582da74647d`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -28,6 +28,7 @@
 **Phase 7 Package 6 explicit calendar coverage command:** COMPLETE
 **Phase 7 Package 7 calendar evidence integrity:** COMPLETE
 **Phase 7 Package 8 bounded XNAS session evidence:** COMPLETE
+**Phase 7 Package 9 controlled five-year MSFT history:** COMPLETE
 
 ## Current State
 
@@ -35,7 +36,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Generate the bounded XNAS JSON, then run coverage against stored MSFT candles.
+Audit one explicitly selected second instrument and its exchange/calendar
+identity before any ingestion. Do not start mass ingestion; preserve MSFT as
+the measured control and require a separate bounded coverage report.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -60,3 +63,5 @@ Stored coverage package: `docs/PHASE_7_PACKAGE_4.md`.
 Coverage quality package: `docs/PHASE_7_PACKAGE_5.md`.
 
 Coverage command package: `docs/PHASE_7_PACKAGE_6.md`.
+
+Five-year MSFT package: `docs/PHASE_7_PACKAGE_9.md`.

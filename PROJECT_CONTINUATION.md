@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `d71936b960d749bb0017d75e0c4a02cc45962df4`
-**Current local package:** Phase 7 Package 8 — Bounded XNAS Session Evidence
+**Current GitHub baseline:** `b04990d1e2f35f1b38e404cc9728e582da74647d`
+**Current local package:** Phase 7 Package 9 — Controlled Five-Year MSFT History
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Generate bounded XNAS JSON and run coverage CLI
+**Current next action:** Audit one selected second instrument/calendar before ingestion
 
 ---
 
@@ -302,6 +302,50 @@ After implementation:
 ---
 
 ## Latest Package
+
+```text
+Phase 7 Package 9 — Controlled Five-Year MSFT History
+```
+
+Files:
+
+```text
+investment_terminal/cli/xnas_session_evidence.py
+investment_terminal/history/session_calendar_evidence.py
+tests/test_xnas_session_evidence.py
+docs/PHASE_7_PACKAGE_9.md
+docs/ROADMAP_AFTER_AUDIT.md
+Architecture.md
+DataModel.md
+Roadmap.md
+NEXT_STEPS.md
+PROJECT_CONTINUATION.md
+```
+
+Source baseline verified against GitHub:
+
+```text
+develop @ b04990d1e2f35f1b38e404cc9728e582da74647d
+```
+
+Measured operational result:
+
+- 1,254 stored MSFT daily candles match 1,254 `XNAS@2` sessions;
+- missing and unexpected counts are zero; completeness is 1.0;
+- the exact repeat inserted zero rows and reported 1,254 duplicates;
+- SQLite integrity is `ok`;
+- multi-instrument and mass ingestion remain out of scope.
+
+Verification:
+
+- focused coverage/calendar/architecture checks: 54 passed;
+- complete local suite: 2,724 passed, 4 skipped;
+- one existing Starlette deprecation warning and one sandbox pytest-cache warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package
 
 ```text
 Phase 7 Package 5 — Explicit-Session Candle Coverage Quality

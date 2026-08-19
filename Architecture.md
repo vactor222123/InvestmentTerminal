@@ -300,3 +300,8 @@ History owns deterministic comparison of daily candle dates with an explicitly
 supplied, versioned local session calendar. The evaluator reports expected,
 observed, missing, and unexpected evidence. It never infers sessions from
 weekdays, exchange names, or candle presence.
+
+Bounded XNAS evidence has separate immutable calendar identities: `XNAS@1` for
+the audited one-year window and `XNAS@2` for the audited five-year MSFT window.
+Version 2 retains all official annual calendar source URIs plus the official
+exceptional-close alert. Neither version authorizes dates outside its bounds.
