@@ -164,7 +164,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → failure-reporting remediation — COMPLETE
 → repeat Phase 6 closure audit — COMPLETE
 → Phase 7 Operational Data and First Real Use boundary audit — COMPLETE
-→ Phase 7 Package 1 operational data baseline and coverage report — NEXT
+→ Phase 7 Package 1 operational data baseline and coverage report — COMPLETE
+→ run Package 1 against explicit real local inputs and review measured gaps — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

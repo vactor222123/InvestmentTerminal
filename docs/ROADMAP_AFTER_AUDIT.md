@@ -243,6 +243,9 @@ unmeasured states. It must be read-only, use existing repositories and runtime
 configuration, and must not add a speculative provider, scheduler, UI, broker,
 or analytical authority.
 
+Package 1 is COMPLETE. Its contract, implementation boundary, and verification
+record are documented in `docs/PHASE_7_PACKAGE_1.md`.
+
 Boundary audit:
 
 ```text

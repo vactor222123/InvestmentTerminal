@@ -462,3 +462,33 @@ Persisted generations do not modify the Knowledge records they cite.
 - explicit schema versions for operational SQLite stores;
 - corrupt or unsupported runtime stores fail readiness closed;
 - archived History bytes are never rewritten.
+
+## Operational Data Baseline
+
+`OperationalDataBaseline` is the versioned, immutable Phase 7 operational
+inventory. It contains:
+
+```text
+schema_version
+generated_at
+providers[]
+stores[]
+refresh_observability
+measured_performance
+authority
+```
+
+Provider entries expose only identity, roles, `CONFIGURED` or `UNCONFIGURED`,
+and the configuration source name. Credential values are never serialized.
+
+Store entries preserve configured path, `READY`/`ABSENT`/`ERROR` state, known
+schema version, measured count, deterministic coverage records, and a visible
+error when inspection fails. Candle coverage is grouped by symbol, resolution,
+and currency. Maintained-universe coverage preserves snapshot identity,
+observation time, member count, and asset-type counts. Portfolio, transaction,
+valuation, context, workflow, and backup inputs expose aggregate presence and
+ranges without record contents.
+
+`UNMEASURED` is not zero, absent, stale, or failed. The baseline does not claim
+freshness, approximately 20-year candle coverage, approximately 1000-company
+universe coverage, analytical meaning, or execution authority.

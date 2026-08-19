@@ -235,3 +235,24 @@ Real network-free E2E tests cover:
 The current system does not grant autonomous trading authority, broker
 execution, causal inference authority, or automatic promotion of AI output into
 History/Knowledge.
+
+## Operational Data Baseline
+
+The Phase 7 operational baseline is a read-only application boundary. It opens
+configured SQLite inputs in read-only mode, validates known schemas, summarizes
+populated ranges and counts, and inspects current portfolio, workflow, and
+backup metadata without changing source evidence.
+
+```text
+provider configuration names (never secret values)
++ existing operational files and SQLite stores
+→ OperationalDataBaselineService
+→ versioned deterministic coverage report
+```
+
+`CONFIGURED`, `UNCONFIGURED`, `READY`, `ABSENT`, `ERROR`, and `UNMEASURED`
+remain distinct. Configured provider capability does not imply populated data;
+populated data does not imply freshness, completeness, or approximately
+20-year/1000-company coverage. Workflow timing becomes measured only when an
+explicit durable workflow report is supplied. The report is operational
+evidence, not investment analysis, AI interpretation, or trading authority.

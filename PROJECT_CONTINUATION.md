@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `072ade5627bd3eb3b9df7143a834ce390b881ba1`
-**Current local package:** Phase 7 Operational Data Boundary Audit
+**Current GitHub baseline:** `b7094a3123694596bee2ec046ca0ff7bea9f114a`
+**Current local package:** Phase 7 Package 1 — Operational Data Baseline and Coverage Report
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement Phase 7 Package 1 — Operational Data Baseline and Coverage Report
+**Current next action:** Run Package 1 against explicit real local inputs and review measured gaps
 
 ---
 
@@ -304,15 +304,22 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 7 Operational Data Boundary Audit
+Phase 7 Package 1 — Operational Data Baseline and Coverage Report
 ```
 
 Files:
 
 ```text
-docs/PHASE_7_OPERATIONAL_DATA_BOUNDARY_AUDIT.md
+investment_terminal/operations/__init__.py
+investment_terminal/operations/operational_data_baseline.py
+investment_terminal/cli/operational_data_baseline.py
+tests/test_operational_data_baseline.py
+tests/test_operational_data_baseline_cli.py
+docs/PHASE_7_PACKAGE_1.md
+docs/OPERATIONAL_DATA_BASELINE_GUIDE.md
 docs/ROADMAP_AFTER_AUDIT.md
-docs/PROJECT_VISION.md
+Architecture.md
+DataModel.md
 Roadmap.md
 NEXT_STEPS.md
 PROJECT_CONTINUATION.md
@@ -321,24 +328,23 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 072ade5627bd3eb3b9df7143a834ce390b881ba1
+develop @ b7094a3123694596bee2ec046ca0ff7bea9f114a
 ```
 
 Architecture/product alignment:
 
-- Phase 6 remains closed and its completed history is unchanged;
-- existing provider, ingestion, candle, universe, portfolio, context, backup,
-  runtime, and grounded-AI capabilities were audited against implementation;
-- capability is now explicitly separated from configuration, populated
-  coverage, measured performance, analytical evidence, and interpretation;
-- Phase 7 replaces the previous UI phase and is open;
-- Phase 7 Package 1 is selected as a read-only operational data baseline and
-  coverage report; it is not implemented by this audit package;
-- the previous UI scope is deferred to Phase 8.
+- Phase 7 Package 1 adds a versioned immutable operational baseline contract;
+- SQLite sources are inspected read-only and absent paths are not created;
+- provider configuration exposes variable names but never credential values;
+- candle, universe, portfolio, transaction, valuation, context, workflow, and
+  backup coverage remain explicit and deterministic;
+- absent, unconfigured, unmeasured, ready, and error states do not collapse;
+- analytical, AI, broker, and trade authority boundaries remain unchanged;
+- the next package must be selected from a real locally generated baseline.
 
 Verification:
 
-- focused documentation, architecture, dependency, SQLite inventory, backup,
-  and restore checks: 63 passed;
-- complete local suite: 2681 passed, 4 skipped, 1 existing Starlette warning;
+- focused Package 1, architecture, atomic-write, and covered-store checks:
+  72 passed;
+- complete local suite: 2694 passed, 4 skipped, 1 existing Starlette warning;
 - `git diff --check`: clean.
