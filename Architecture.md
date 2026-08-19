@@ -276,3 +276,8 @@ meaning, or qualify other symbols/windows. A `FAILED` report is written before
 the CLI exits non-zero. A single `SUCCESS` would establish only that request's
 coverage facts, not general reliability, licensing suitability, or long-range
 coverage.
+
+Live CLI composition requires an explicit writable yfinance cache directory.
+The client configures yfinance to use that caller-owned location instead of an
+implicit user-profile cache. Cache ownership is operational state, not market
+evidence, and cache contents are never committed or projected into reports.

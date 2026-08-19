@@ -255,6 +255,10 @@ Package 2 implementation is COMPLETE. Its first explicit live request returned
 a durably reported `FAILED` result, so operational Yahoo qualification and bulk
 ingestion remain incomplete. See `docs/PHASE_7_PACKAGE_2.md`.
 
+The fresh-clone rerun resolved yfinance cache ownership and isolated the
+remaining failure to blocked outbound Yahoo HTTPS connectivity. See
+`docs/PHASE_7_YAHOO_QUALIFICATION_RERUN.md`.
+
 Boundary audit:
 
 ```text

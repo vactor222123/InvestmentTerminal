@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `503717122f56680d4d7e725b2f616333a89e7a94`
-**Current local package:** Phase 7 Package 2 — Yahoo Historical Candle Operational Qualification
+**Current GitHub baseline:** `a9fe38c4beddf3dbf194f698fec78e6a236bdec4`
+**Current local package:** Phase 7 Yahoo Qualification Cache Remediation and Rerun
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Rerun bounded Yahoo qualification with permitted network access
+**Current next action:** Run bounded Yahoo qualification where outbound Yahoo HTTPS is permitted
 
 ---
 
@@ -304,17 +304,17 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 7 Package 2 — Yahoo Historical Candle Operational Qualification
+Phase 7 Yahoo Qualification Cache Remediation and Rerun
 ```
 
 Files:
 
 ```text
-investment_terminal/operations/__init__.py
-investment_terminal/operations/yahoo_candle_qualification.py
+investment_terminal/clients/yahoo_finance_client.py
 investment_terminal/cli/yahoo_candle_qualification.py
-tests/test_yahoo_candle_qualification.py
 tests/test_yahoo_candle_qualification_cli.py
+tests/test_yahoo_finance_client.py
+docs/PHASE_7_YAHOO_QUALIFICATION_RERUN.md
 docs/PHASE_7_PACKAGE_2.md
 docs/YAHOO_CANDLE_QUALIFICATION_GUIDE.md
 docs/ROADMAP_AFTER_AUDIT.md
@@ -328,23 +328,25 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ 503717122f56680d4d7e725b2f616333a89e7a94
+develop @ a9fe38c4beddf3dbf194f698fec78e6a236bdec4
 ```
 
 Architecture/product alignment:
 
-- Package 2 adds an immutable, versioned Yahoo qualification report;
-- the existing Yahoo client remains the only provider boundary;
-- returned candles must match request identity, window, and deterministic order;
-- `SUCCESS`, `EMPTY`, and `FAILED` remain explicit;
-- failure reports are atomically written before CLI non-zero exit;
-- one explicit MSFT live request returned `FAILED` with `APIError`, so coverage
-  remains unknown and bulk ingestion remains blocked;
-- analytical, AI, broker, and trading boundaries remain unchanged.
+- fresh-clone rerun reproduced the qualification failure;
+- focused diagnosis identified an implicit unwritable yfinance cache database;
+- Yahoo client now accepts an explicit runtime-owned cache directory;
+- live CLI requires `--cache-directory`, while existing callers remain
+  backward compatible;
+- post-remediation execution reached transport and failed on outbound HTTPS to
+  `fc.yahoo.com:443` with curl error 7;
+- coverage remains unknown and bulk ingestion remains blocked;
+- no provider change, retry policy, analysis, AI, broker, or trade scope was
+  introduced.
 
 Verification:
 
-- focused Package 2, Yahoo client, CLI, atomic-write, documentation, and
-  architecture checks: 42 passed;
-- complete local suite: 2709 passed, 4 skipped, 1 existing Starlette warning;
+- focused Yahoo cache, qualification, CLI, atomic-write, documentation, and
+  architecture checks: 45 passed;
+- complete local suite: 2712 passed, 4 skipped, 1 existing Starlette warning;
 - `git diff --check`: clean.

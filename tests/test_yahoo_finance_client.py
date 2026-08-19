@@ -98,6 +98,31 @@ def test_get_candles_returns_candle_models() -> None:
     )
 
 
+def test_explicit_cache_directory_is_prepared_and_configured(tmp_path) -> None:
+    configured = []
+    directory = tmp_path / "runtime" / "yfinance-cache"
+
+    YahooFinanceClient(
+        ticker_factory=lambda symbol: object(),
+        cache_directory=directory,
+        cache_location_setter=configured.append,
+    )
+
+    assert directory.is_dir()
+    assert configured == [str(directory.resolve())]
+
+
+def test_explicit_cache_directory_rejects_existing_file(tmp_path) -> None:
+    path = tmp_path / "not-a-directory"
+    path.write_text("occupied", encoding="utf-8")
+
+    with pytest.raises(OSError):
+        YahooFinanceClient(
+            ticker_factory=lambda symbol: object(),
+            cache_directory=path,
+        )
+
+
 def test_get_candles_returns_empty_list() -> None:
     ticker = Mock()
     ticker.history.return_value = pd.DataFrame()

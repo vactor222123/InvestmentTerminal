@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 503717122f56680d4d7e725b2f616333a89e7a94`
+**Current repository baseline:** `develop @ a9fe38c4beddf3dbf194f698fec78e6a236bdec4`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -18,7 +18,8 @@
 **Phase 7 Package 1:** COMPLETE
 **Phase 7 first local operational baseline:** COMPLETE
 **Phase 7 Package 2 implementation:** COMPLETE
-**Phase 7 Yahoo live qualification:** FAILED — COVERAGE UNKNOWN
+**Phase 7 yfinance cache remediation:** COMPLETE
+**Phase 7 Yahoo live qualification:** FAILED — OUTBOUND HTTPS BLOCKED
 
 ## Current State
 
@@ -26,9 +27,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Rerun the bounded Yahoo qualification command from an environment with
-permitted Yahoo network access and review the exported result. Do not select or
-implement bulk ingestion until a bounded request returns `SUCCESS`.
+Run the bounded Yahoo qualification command from an environment that permits
+outbound HTTPS to Yahoo, using an explicit writable `--cache-directory`, and
+review the exported result. Do not select or implement bulk ingestion until a
+bounded request returns `SUCCESS`.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -43,3 +45,5 @@ Phase 7 Package 1 record: `docs/PHASE_7_PACKAGE_1.md`.
 First measured baseline: `docs/PHASE_7_OPERATIONAL_BASELINE_1.md`.
 
 Phase 7 Package 2 record: `docs/PHASE_7_PACKAGE_2.md`.
+
+Yahoo rerun/remediation: `docs/PHASE_7_YAHOO_QUALIFICATION_RERUN.md`.

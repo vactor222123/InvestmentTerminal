@@ -6,6 +6,7 @@ from collections.abc import Callable
 from datetime import datetime, timezone
 from math import isfinite
 from numbers import Real
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -29,13 +30,25 @@ class YahooFinanceClient:
     def __init__(
         self,
         ticker_factory: Callable[[str], Any] | None = None,
+        *,
+        cache_directory: str | Path | None = None,
+        cache_location_setter: Callable[[str], None] | None = None,
     ) -> None:
         """
         Create the client.
 
         ticker_factory is injectable so unit tests never use live data.
+        A caller may explicitly place yfinance's operational cache in a
+        writable runtime-owned directory.
         """
         self._ticker_factory = ticker_factory or yf.Ticker
+        if cache_directory is not None:
+            directory = Path(cache_directory)
+            directory.mkdir(parents=True, exist_ok=True)
+            if not directory.is_dir():
+                raise ValueError("cache_directory must identify a directory")
+            setter = cache_location_setter or yf.set_tz_cache_location
+            setter(str(directory.resolve()))
 
     def get_candles(
         self,

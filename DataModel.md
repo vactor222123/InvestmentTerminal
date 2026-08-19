@@ -514,3 +514,7 @@ currency, resolution, and half-open window and must be unique and ordered.
 
 The result is operational provider evidence only. It is not canonical market
 history, analytical evidence, investment interpretation, or trading authority.
+
+The yfinance cache directory is runtime configuration and is deliberately not a
+field of the qualification result. It contains provider-library operational
+state rather than evidence about the requested instrument.

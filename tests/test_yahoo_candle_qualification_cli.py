@@ -98,3 +98,10 @@ def test_cli_rejects_naive_datetime(tmp_path: Path) -> None:
         main(values, client=Client([]), clock=run_clock())
 
     assert error.value.code == 2
+
+
+def test_live_cli_requires_explicit_cache_directory(tmp_path: Path) -> None:
+    with pytest.raises(SystemExit) as error:
+        main(arguments(tmp_path / "report.json"))
+
+    assert error.value.code == 2

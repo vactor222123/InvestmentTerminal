@@ -39,6 +39,11 @@ def build_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument("--start", type=_aware_datetime, required=True)
     parser.add_argument("--end", type=_aware_datetime, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--cache-directory",
+        type=Path,
+        help="Explicit writable runtime directory for yfinance cache files.",
+    )
     parser.add_argument("--json", action="store_true")
     return parser
 
@@ -49,9 +54,18 @@ def main(
     client=None,
     clock=None,
 ) -> None:
-    options = build_argument_parser().parse_args(argv)
+    parser = build_argument_parser()
+    options = parser.parse_args(argv)
+    if client is None and options.cache_directory is None:
+        parser.error(
+            "--cache-directory is required for a live Yahoo request"
+        )
     result = YahooCandleQualificationService(
-        client=client or YahooFinanceClient(),
+        client=(
+            client
+            if client is not None
+            else YahooFinanceClient(cache_directory=options.cache_directory)
+        ),
         clock=clock or (lambda: datetime.now(timezone.utc)),
     ).qualify(
         YahooCandleQualificationRequest(
