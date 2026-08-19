@@ -172,7 +172,9 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → Phase 7 Package 3 bounded Yahoo candle ingestion — COMPLETE
 → Package 3 live persistence and idempotency verification — COMPLETE
 → Phase 7 Package 4 stored coverage measurement — COMPLETE
-→ run one controlled expanded-window ingestion and review coverage — NEXT
+→ controlled one-year MSFT ingestion — COMPLETE (251 daily candles)
+→ Phase 7 Package 5 explicit-session coverage quality — COMPLETE
+→ source explicit versioned XNAS/XNYS session evidence — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

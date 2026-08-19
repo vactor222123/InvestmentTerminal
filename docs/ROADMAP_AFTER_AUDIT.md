@@ -268,6 +268,11 @@ Package 3 then succeeded and its exact repeat proved idempotent persistence.
 Package 4 adds indexed stored-boundary measurement to report schema version 2;
 one controlled one-year MSFT expansion is next, not multi-instrument ingestion.
 
+That expansion stored 251 daily candles across a 364-day observed span.
+Package 5 adds History-owned comparison against explicit versioned session
+evidence. Calendar sourcing remains the next prerequisite; weekday inference
+is prohibited.
+
 Boundary audit:
 
 ```text

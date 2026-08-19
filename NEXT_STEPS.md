@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ b23f37267e7b84a678a4d08d049e6f36bd7caaf1`
+**Current repository baseline:** `develop @ 9819ef92091626810f2d10407e8cc074b94a51a5`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -23,6 +23,8 @@
 **Phase 7 Package 3 bounded ingestion:** COMPLETE
 **Phase 7 Package 3 live/idempotency verification:** COMPLETE
 **Phase 7 Package 4 stored coverage measurement:** COMPLETE
+**Phase 7 one-year MSFT ingestion:** COMPLETE
+**Phase 7 Package 5 explicit-session coverage quality:** COMPLETE
 
 ## Current State
 
@@ -30,9 +32,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled expanded-window Yahoo ingestion for MSFT and review the
-version 2 stored coverage block. Do not infer completeness from elapsed span or
-start multi-instrument ingestion before the result is measured.
+Select and preserve an explicit, versioned XNAS/XNYS trading-session evidence
+source before evaluating the stored MSFT daily candles. Do not infer sessions
+from weekdays, exchange names, or the candles themselves.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -53,3 +55,5 @@ Yahoo rerun/remediation: `docs/PHASE_7_YAHOO_QUALIFICATION_RERUN.md`.
 Bounded ingestion package: `docs/PHASE_7_PACKAGE_3.md`.
 
 Stored coverage package: `docs/PHASE_7_PACKAGE_4.md`.
+
+Coverage quality package: `docs/PHASE_7_PACKAGE_5.md`.

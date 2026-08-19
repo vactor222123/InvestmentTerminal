@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `b23f37267e7b84a678a4d08d049e6f36bd7caaf1`
-**Current local package:** Phase 7 Package 4 — Stored Candle Coverage Measurement
+**Current GitHub baseline:** `9819ef92091626810f2d10407e8cc074b94a51a5`
+**Current local package:** Phase 7 Package 5 — Explicit-Session Candle Coverage Quality
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one controlled one-year MSFT ingestion and review stored coverage
+**Current next action:** Source explicit versioned XNAS/XNYS session evidence
 
 ---
 
@@ -304,18 +304,15 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 7 Package 4 — Stored Candle Coverage Measurement
+Phase 7 Package 5 — Explicit-Session Candle Coverage Quality
 ```
 
 Files:
 
 ```text
-investment_terminal/cli/yahoo_candle_ingestion.py
-investment_terminal/repositories/candle_repository.py
-tests/test_yahoo_candle_ingestion_cli.py
-tests/test_candle_repository.py
-docs/PHASE_7_PACKAGE_4.md
-docs/YAHOO_CANDLE_INGESTION_GUIDE.md
+investment_terminal/history/candle_coverage_quality.py
+tests/test_candle_coverage_quality.py
+docs/PHASE_7_PACKAGE_5.md
 docs/ROADMAP_AFTER_AUDIT.md
 Architecture.md
 DataModel.md
@@ -327,21 +324,19 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ b23f37267e7b84a678a4d08d049e6f36bd7caaf1
+develop @ 9819ef92091626810f2d10407e8cc074b94a51a5
 ```
 
 Architecture/product alignment:
 
-- first bounded persistence inserted 12 MSFT daily candles;
-- exact repetition inserted zero, reported 12 duplicates, and retained 12;
-- report schema version 2 measures stored earliest/latest bounds and elapsed
-  span through indexed repository queries;
-- measured span is not a completeness or gap claim;
-- bulk/scheduled ingestion, analysis, and trading remain outside this package.
+- one-year MSFT ingestion stored 251 daily candles across 364 observed days;
+- row count and elapsed span do not establish trading-session completeness;
+- History-owned evaluation requires explicit versioned session evidence;
+- missing sessions and unexpected candles remain visible and deterministic;
+- calendar inference, bulk ingestion, analysis, and trading remain out of scope.
 
 Verification:
 
-- focused ingestion, repository, Yahoo client, and architecture checks:
-  50 passed;
-- complete local suite: 2716 passed, 4 skipped, 1 existing Starlette warning;
+- focused coverage, calendar, model, and architecture checks: 40 passed;
+- complete local suite: 2720 passed, 4 skipped, 1 existing Starlette warning;
 - `git diff --check`: clean.

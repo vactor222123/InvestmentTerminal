@@ -293,3 +293,10 @@ remain visible. This boundary does not schedule or authorize bulk ingestion.
 The version 2 report obtains earliest/latest stored timestamps with indexed
 repository boundary queries. It measures the persisted set without loading its
 complete candle history or inferring expected trading sessions.
+
+## Explicit-Session Candle Coverage Quality
+
+History owns deterministic comparison of daily candle dates with an explicitly
+supplied, versioned local session calendar. The evaluator reports expected,
+observed, missing, and unexpected evidence. It never infers sessions from
+weekdays, exchange names, or candle presence.

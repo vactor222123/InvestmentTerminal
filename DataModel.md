@@ -529,3 +529,8 @@ explicit database path, `SUCCESS | EMPTY | FAILED`, and measured `downloaded`,
 Version 2 adds `coverage(candle_count, earliest_candle_at,
 latest_candle_at, observed_span_days)`. The span is elapsed wall-clock time
 between stored boundaries; it is not a completeness percentage or gap audit.
+
+`CandleCoverageQualityResult` records the requested daily identity/window,
+calendar identity/version, expected and observed session counts, explicit
+missing session keys, unexpected candle timestamps, a ratio that remains
+unknown for an empty calendar, and a fail-closed completeness flag.
