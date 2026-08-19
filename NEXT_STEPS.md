@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ aad6cc8a157346ce4cbdccfa633dad91f7b800b3`
+**Current repository baseline:** `develop @ d71936b960d749bb0017d75e0c4a02cc45962df4`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -27,6 +27,7 @@
 **Phase 7 Package 5 explicit-session coverage quality:** COMPLETE
 **Phase 7 Package 6 explicit calendar coverage command:** COMPLETE
 **Phase 7 Package 7 calendar evidence integrity:** COMPLETE
+**Phase 7 Package 8 bounded XNAS session evidence:** COMPLETE
 
 ## Current State
 
@@ -34,8 +35,7 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Create the checksummed XNAS session JSON from preserved official Nasdaq
-evidence, then run the coverage command against stored MSFT candles.
+Generate the bounded XNAS JSON, then run coverage against stored MSFT candles.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 

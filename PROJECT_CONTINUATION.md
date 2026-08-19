@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `aad6cc8a157346ce4cbdccfa633dad91f7b800b3`
-**Current local package:** Phase 7 Package 7 — Session Calendar Evidence Integrity
+**Current GitHub baseline:** `d71936b960d749bb0017d75e0c4a02cc45962df4`
+**Current local package:** Phase 7 Package 8 — Bounded XNAS Session Evidence
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Create checksummed official XNAS JSON and run coverage CLI
+**Current next action:** Generate bounded XNAS JSON and run coverage CLI
 
 ---
 
