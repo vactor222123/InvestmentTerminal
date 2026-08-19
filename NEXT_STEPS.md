@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ b7094a3123694596bee2ec046ca0ff7bea9f114a`
+**Current repository baseline:** `develop @ f01abc0eb3b2d1c0cf6435c7486c20d50cb8dcc6`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -16,6 +16,8 @@
 **Phase 6:** CLOSED
 **Phase 7 operational-data boundary:** AUDITED
 **Phase 7 Package 1:** COMPLETE
+**Phase 7 first local operational baseline:** COMPLETE
+**Phase 7 Package 2:** SELECTED — NOT IMPLEMENTED
 
 ## Current State
 
@@ -23,10 +25,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run Phase 7 Package 1 against explicit real local runtime inputs, preserve the
-report outside source control, and review its measured gaps before selecting
-Phase 7 Package 2. Do not infer provider, 20-year, broad-universe, portfolio,
-context, refresh, or recovery readiness from architecture capability.
+Implement Phase 7 Package 2 — Yahoo Historical Candle Operational
+Qualification — as bounded by `docs/PHASE_7_OPERATIONAL_BASELINE_1.md`.
+
+The package must verify one explicit provider request and report coverage facts
+without starting bulk ingestion or claiming general reliability, licensing,
+approximately 20-year history, or broad-universe coverage.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -37,3 +41,5 @@ Audit record: `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md`.
 Phase 7 audit record: `docs/PHASE_7_OPERATIONAL_DATA_BOUNDARY_AUDIT.md`.
 
 Phase 7 Package 1 record: `docs/PHASE_7_PACKAGE_1.md`.
+
+First measured baseline: `docs/PHASE_7_OPERATIONAL_BASELINE_1.md`.

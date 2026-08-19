@@ -246,6 +246,11 @@ or analytical authority.
 Package 1 is COMPLETE. Its contract, implementation boundary, and verification
 record are documented in `docs/PHASE_7_PACKAGE_1.md`.
 
+The first local Package 1 run found no real populated operational inputs and is
+recorded in `docs/PHASE_7_OPERATIONAL_BASELINE_1.md`. It selects Package 2 —
+Yahoo Historical Candle Operational Qualification — to verify one bounded real
+provider request before any bulk ingestion work.
+
 Boundary audit:
 
 ```text

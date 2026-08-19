@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `b7094a3123694596bee2ec046ca0ff7bea9f114a`
-**Current local package:** Phase 7 Package 1 — Operational Data Baseline and Coverage Report
+**Current GitHub baseline:** `f01abc0eb3b2d1c0cf6435c7486c20d50cb8dcc6`
+**Current local package:** Phase 7 First Local Operational Baseline
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run Package 1 against explicit real local inputs and review measured gaps
+**Current next action:** Implement Phase 7 Package 2 — Yahoo Historical Candle Operational Qualification
 
 ---
 
@@ -304,22 +304,14 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 7 Package 1 — Operational Data Baseline and Coverage Report
+Phase 7 First Local Operational Baseline
 ```
 
 Files:
 
 ```text
-investment_terminal/operations/__init__.py
-investment_terminal/operations/operational_data_baseline.py
-investment_terminal/cli/operational_data_baseline.py
-tests/test_operational_data_baseline.py
-tests/test_operational_data_baseline_cli.py
-docs/PHASE_7_PACKAGE_1.md
-docs/OPERATIONAL_DATA_BASELINE_GUIDE.md
+docs/PHASE_7_OPERATIONAL_BASELINE_1.md
 docs/ROADMAP_AFTER_AUDIT.md
-Architecture.md
-DataModel.md
 Roadmap.md
 NEXT_STEPS.md
 PROJECT_CONTINUATION.md
@@ -328,23 +320,22 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ b7094a3123694596bee2ec046ca0ff7bea9f114a
+develop @ f01abc0eb3b2d1c0cf6435c7486c20d50cb8dcc6
 ```
 
 Architecture/product alignment:
 
-- Phase 7 Package 1 adds a versioned immutable operational baseline contract;
-- SQLite sources are inspected read-only and absent paths are not created;
-- provider configuration exposes variable names but never credential values;
-- candle, universe, portfolio, transaction, valuation, context, workflow, and
-  backup coverage remain explicit and deterministic;
-- absent, unconfigured, unmeasured, ready, and error states do not collapse;
-- analytical, AI, broker, and trade authority boundaries remain unchanged;
-- the next package must be selected from a real locally generated baseline.
+- Package 1 ran from a fresh clone without treating example data as real;
+- all eight operational store inputs reported `ABSENT`;
+- refresh observability and measured performance reported `UNMEASURED`;
+- Finnhub, OpenAI, and external context reported `UNCONFIGURED`;
+- Yahoo reported only credentialless adapter configuration, not verified live
+  availability, reliability, licensing, or populated coverage;
+- Package 2 is selected as one bounded Yahoo historical-candle operational
+  qualification before bulk ingestion.
 
 Verification:
 
-- focused Package 1, architecture, atomic-write, and covered-store checks:
-  72 passed;
+- focused documentation, Package 1, and architecture checks: 29 passed;
 - complete local suite: 2694 passed, 4 skipped, 1 existing Starlette warning;
 - `git diff --check`: clean.
