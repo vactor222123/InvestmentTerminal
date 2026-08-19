@@ -12,6 +12,9 @@ from investment_terminal.database.database import Database
 from investment_terminal.history.candle_coverage_quality import (
     CandleCoverageQualityService,
 )
+from investment_terminal.history.session_calendar_evidence import (
+    verify_session_calendar_evidence,
+)
 from investment_terminal.repositories.candle_repository import CandleRepository
 from investment_terminal.utils.atomic_write import write_json_atomic
 
@@ -34,6 +37,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     options = build_argument_parser().parse_args(argv)
     if not options.database.is_file():
         raise ValueError(f"Database does not exist: {options.database}")
+    evidence = verify_session_calendar_evidence(options.session_calendar)
     calendar = _load_session_calendar(options.session_calendar)
     database = Database(options.database)
     try:
@@ -51,7 +55,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             candles=candles,
             calendar=calendar,
         )
-        write_json_atomic(options.output, result.to_dict())
+        payload = result.to_dict()
+        payload["calendar_evidence"] = evidence
+        write_json_atomic(options.output, payload)
     finally:
         database.close()
     return 0
