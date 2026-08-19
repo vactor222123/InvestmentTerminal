@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `f01abc0eb3b2d1c0cf6435c7486c20d50cb8dcc6`
-**Current local package:** Phase 7 First Local Operational Baseline
+**Current GitHub baseline:** `503717122f56680d4d7e725b2f616333a89e7a94`
+**Current local package:** Phase 7 Package 2 — Yahoo Historical Candle Operational Qualification
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement Phase 7 Package 2 — Yahoo Historical Candle Operational Qualification
+**Current next action:** Rerun bounded Yahoo qualification with permitted network access
 
 ---
 
@@ -304,14 +304,22 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 7 First Local Operational Baseline
+Phase 7 Package 2 — Yahoo Historical Candle Operational Qualification
 ```
 
 Files:
 
 ```text
-docs/PHASE_7_OPERATIONAL_BASELINE_1.md
+investment_terminal/operations/__init__.py
+investment_terminal/operations/yahoo_candle_qualification.py
+investment_terminal/cli/yahoo_candle_qualification.py
+tests/test_yahoo_candle_qualification.py
+tests/test_yahoo_candle_qualification_cli.py
+docs/PHASE_7_PACKAGE_2.md
+docs/YAHOO_CANDLE_QUALIFICATION_GUIDE.md
 docs/ROADMAP_AFTER_AUDIT.md
+Architecture.md
+DataModel.md
 Roadmap.md
 NEXT_STEPS.md
 PROJECT_CONTINUATION.md
@@ -320,22 +328,23 @@ PROJECT_CONTINUATION.md
 Source baseline verified against GitHub:
 
 ```text
-develop @ f01abc0eb3b2d1c0cf6435c7486c20d50cb8dcc6
+develop @ 503717122f56680d4d7e725b2f616333a89e7a94
 ```
 
 Architecture/product alignment:
 
-- Package 1 ran from a fresh clone without treating example data as real;
-- all eight operational store inputs reported `ABSENT`;
-- refresh observability and measured performance reported `UNMEASURED`;
-- Finnhub, OpenAI, and external context reported `UNCONFIGURED`;
-- Yahoo reported only credentialless adapter configuration, not verified live
-  availability, reliability, licensing, or populated coverage;
-- Package 2 is selected as one bounded Yahoo historical-candle operational
-  qualification before bulk ingestion.
+- Package 2 adds an immutable, versioned Yahoo qualification report;
+- the existing Yahoo client remains the only provider boundary;
+- returned candles must match request identity, window, and deterministic order;
+- `SUCCESS`, `EMPTY`, and `FAILED` remain explicit;
+- failure reports are atomically written before CLI non-zero exit;
+- one explicit MSFT live request returned `FAILED` with `APIError`, so coverage
+  remains unknown and bulk ingestion remains blocked;
+- analytical, AI, broker, and trading boundaries remain unchanged.
 
 Verification:
 
-- focused documentation, Package 1, and architecture checks: 29 passed;
-- complete local suite: 2694 passed, 4 skipped, 1 existing Starlette warning;
+- focused Package 2, Yahoo client, CLI, atomic-write, documentation, and
+  architecture checks: 42 passed;
+- complete local suite: 2709 passed, 4 skipped, 1 existing Starlette warning;
 - `git diff --check`: clean.

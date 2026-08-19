@@ -492,3 +492,25 @@ ranges without record contents.
 `UNMEASURED` is not zero, absent, stale, or failed. The baseline does not claim
 freshness, approximately 20-year candle coverage, approximately 1000-company
 universe coverage, analytical meaning, or execution authority.
+
+## Yahoo Candle Qualification Result
+
+`YahooCandleQualificationResult` is immutable and schema-versioned. It records:
+
+```text
+provider_identity = YAHOO_FINANCE
+status = SUCCESS | EMPTY | FAILED
+request(symbol, resolution, currency, requested_start, requested_end)
+started_at / completed_at / duration_seconds
+coverage(candle_count, earliest_candle_at, latest_candle_at)
+failure(type, reason)
+limitations[]
+```
+
+`SUCCESS` requires positive ordered in-window coverage. `EMPTY` requires an
+explicit zero count. `FAILED` preserves unknown coverage and normalized visible
+failure details. Returned candles must exactly match the requested identity,
+currency, resolution, and half-open window and must be unique and ordered.
+
+The result is operational provider evidence only. It is not canonical market
+history, analytical evidence, investment interpretation, or trading authority.

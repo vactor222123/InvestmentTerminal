@@ -166,7 +166,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → Phase 7 Operational Data and First Real Use boundary audit — COMPLETE
 → Phase 7 Package 1 operational data baseline and coverage report — COMPLETE
 → first local operational baseline — COMPLETE: no populated real inputs found
-→ Phase 7 Package 2 Yahoo Historical Candle Operational Qualification — NEXT
+→ Phase 7 Package 2 Yahoo Historical Candle Operational Qualification — IMPLEMENTED
+→ rerun bounded Yahoo qualification with permitted provider network access — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

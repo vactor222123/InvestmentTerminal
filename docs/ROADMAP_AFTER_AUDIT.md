@@ -251,6 +251,10 @@ recorded in `docs/PHASE_7_OPERATIONAL_BASELINE_1.md`. It selects Package 2 —
 Yahoo Historical Candle Operational Qualification — to verify one bounded real
 provider request before any bulk ingestion work.
 
+Package 2 implementation is COMPLETE. Its first explicit live request returned
+a durably reported `FAILED` result, so operational Yahoo qualification and bulk
+ingestion remain incomplete. See `docs/PHASE_7_PACKAGE_2.md`.
+
 Boundary audit:
 
 ```text

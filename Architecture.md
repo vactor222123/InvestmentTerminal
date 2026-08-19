@@ -256,3 +256,23 @@ populated data does not imply freshness, completeness, or approximately
 20-year/1000-company coverage. Workflow timing becomes measured only when an
 explicit durable workflow report is supplied. The report is operational
 evidence, not investment analysis, AI interpretation, or trading authority.
+
+## Yahoo Historical Candle Qualification
+
+Package 2 composes the existing `YahooFinanceClient` behind a narrow
+operational service. One explicit instrument, resolution, currency, and
+half-open date window produce one immutable qualification result.
+
+```text
+explicit bounded request
+→ existing YahooFinanceClient
+→ identity/window/order validation
+→ SUCCESS | EMPTY | FAILED
+→ atomic operational report
+```
+
+The boundary does not persist candles, retry, schedule, infer analytical
+meaning, or qualify other symbols/windows. A `FAILED` report is written before
+the CLI exits non-zero. A single `SUCCESS` would establish only that request's
+coverage facts, not general reliability, licensing suitability, or long-range
+coverage.

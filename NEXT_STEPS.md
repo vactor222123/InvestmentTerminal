@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ f01abc0eb3b2d1c0cf6435c7486c20d50cb8dcc6`
+**Current repository baseline:** `develop @ 503717122f56680d4d7e725b2f616333a89e7a94`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -17,7 +17,8 @@
 **Phase 7 operational-data boundary:** AUDITED
 **Phase 7 Package 1:** COMPLETE
 **Phase 7 first local operational baseline:** COMPLETE
-**Phase 7 Package 2:** SELECTED — NOT IMPLEMENTED
+**Phase 7 Package 2 implementation:** COMPLETE
+**Phase 7 Yahoo live qualification:** FAILED — COVERAGE UNKNOWN
 
 ## Current State
 
@@ -25,12 +26,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement Phase 7 Package 2 — Yahoo Historical Candle Operational
-Qualification — as bounded by `docs/PHASE_7_OPERATIONAL_BASELINE_1.md`.
-
-The package must verify one explicit provider request and report coverage facts
-without starting bulk ingestion or claiming general reliability, licensing,
-approximately 20-year history, or broad-universe coverage.
+Rerun the bounded Yahoo qualification command from an environment with
+permitted Yahoo network access and review the exported result. Do not select or
+implement bulk ingestion until a bounded request returns `SUCCESS`.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -43,3 +41,5 @@ Phase 7 audit record: `docs/PHASE_7_OPERATIONAL_DATA_BOUNDARY_AUDIT.md`.
 Phase 7 Package 1 record: `docs/PHASE_7_PACKAGE_1.md`.
 
 First measured baseline: `docs/PHASE_7_OPERATIONAL_BASELINE_1.md`.
+
+Phase 7 Package 2 record: `docs/PHASE_7_PACKAGE_2.md`.
