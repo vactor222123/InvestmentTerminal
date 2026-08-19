@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 9819ef92091626810f2d10407e8cc074b94a51a5`
+**Current repository baseline:** `develop @ baca2c58125e842142b332b4884859298a68714f`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -25,6 +25,7 @@
 **Phase 7 Package 4 stored coverage measurement:** COMPLETE
 **Phase 7 one-year MSFT ingestion:** COMPLETE
 **Phase 7 Package 5 explicit-session coverage quality:** COMPLETE
+**Phase 7 Package 6 explicit calendar coverage command:** COMPLETE
 
 ## Current State
 
@@ -32,9 +33,8 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Select and preserve an explicit, versioned XNAS/XNYS trading-session evidence
-source before evaluating the stored MSFT daily candles. Do not infer sessions
-from weekdays, exchange names, or the candles themselves.
+Preserve an explicit versioned XNAS session-calendar JSON from official Nasdaq
+evidence, then run the coverage command against the stored MSFT daily candles.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -57,3 +57,5 @@ Bounded ingestion package: `docs/PHASE_7_PACKAGE_3.md`.
 Stored coverage package: `docs/PHASE_7_PACKAGE_4.md`.
 
 Coverage quality package: `docs/PHASE_7_PACKAGE_5.md`.
+
+Coverage command package: `docs/PHASE_7_PACKAGE_6.md`.

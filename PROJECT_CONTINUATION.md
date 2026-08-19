@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `9819ef92091626810f2d10407e8cc074b94a51a5`
-**Current local package:** Phase 7 Package 5 — Explicit-Session Candle Coverage Quality
+**Current GitHub baseline:** `baca2c58125e842142b332b4884859298a68714f`
+**Current local package:** Phase 7 Package 6 — Explicit Calendar Coverage Command
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Source explicit versioned XNAS/XNYS session evidence
+**Current next action:** Preserve official XNAS session JSON and run coverage CLI
 
 ---
 
