@@ -181,7 +181,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → generate and verify XNYS@1 — COMPLETE (workspace-staged)
 → bounded IBM Yahoo qualification — SUCCESS (1,254 daily candles)
 → controlled IBM/XNYS ingestion, repeat, and coverage — COMPLETE (1,254/1,254 sessions)
-→ focused measured-state audit before further expansion — NEXT
+→ focused measured-state audit — COMPLETE (3,762 candles; freshness unmeasured)
+→ bounded single-instrument refresh observability — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `e9a652abe3af7c2adc6cade6a9a713be8623bf83`
-**Current local package:** Phase 7 Package 14 — Controlled Five-Year IBM/XNYS History
+**Current GitHub baseline:** `59a89b4d2c5c315fc74bd065ab8ea762a2c1fbcd`
+**Current local package:** Phase 7 Package 15 — Measured-State Refresh Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit measured Phase 7 state before further expansion
+**Current next action:** Implement bounded single-instrument refresh observability
 
 ---
 
@@ -302,6 +302,47 @@ After implementation:
 ---
 
 ## Latest Package
+
+```text
+Phase 7 Package 15 — Measured-State Refresh Audit
+```
+
+Files:
+
+```text
+docs/PHASE_7_PACKAGE_15.md
+docs/ROADMAP_AFTER_AUDIT.md
+Roadmap.md
+NEXT_STEPS.md
+PROJECT_CONTINUATION.md
+```
+
+Source baseline verified exactly:
+
+```text
+develop @ 59a89b4d2c5c315fc74bd065ab8ea762a2c1fbcd
+```
+
+Measured audit result:
+
+- market store: `READY`, 3,762 daily candles;
+- MSFT, AAPL, and IBM each contain 1,254 candles over the same bounded window;
+- per-series freshness: `UNMEASURED`;
+- refresh observability and measured performance: `UNMEASURED`;
+- refresh/freshness services exist, but no dedicated operational CLI/report;
+- next package: bounded single-instrument refresh observability;
+- scheduler, mass ingestion, and another instrument remain out of scope.
+
+Verification:
+
+- focused baseline/freshness/refresh/architecture checks: 66 passed;
+- complete local suite: 2,726 passed, 4 skipped;
+- one existing Starlette deprecation warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package 14
 
 ```text
 Phase 7 Package 14 — Controlled Five-Year IBM/XNYS History

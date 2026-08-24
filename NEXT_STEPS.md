@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ e9a652abe3af7c2adc6cade6a9a713be8623bf83`
+**Current repository baseline:** `develop @ 59a89b4d2c5c315fc74bd065ab8ea762a2c1fbcd`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -34,6 +34,7 @@
 **Phase 7 Package 12 XNYS evidence generation checkpoint:** COMPLETE
 **Phase 7 Package 13 IBM qualification success handoff:** COMPLETE
 **Phase 7 Package 14 controlled five-year IBM/XNYS history:** COMPLETE
+**Phase 7 Package 15 measured-state refresh audit:** COMPLETE
 
 ## Current State
 
@@ -41,9 +42,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Perform a focused audit of the now-measured Phase 7 operational state and
-select one smallest evidence-backed gap. Do not start mass ingestion or another
-instrument before that audit.
+Implement one bounded single-instrument refresh-observability CLI and atomic
+report over the existing freshness and refresh services. Do not add scheduling,
+multi-instrument refresh, or mass ingestion.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -80,3 +81,5 @@ XNYS generation checkpoint: `docs/PHASE_7_PACKAGE_12.md`.
 IBM qualification success handoff: `docs/PHASE_7_PACKAGE_13.md`.
 
 Controlled IBM/XNYS history: `docs/PHASE_7_PACKAGE_14.md`.
+
+Measured-state refresh audit: `docs/PHASE_7_PACKAGE_15.md`.

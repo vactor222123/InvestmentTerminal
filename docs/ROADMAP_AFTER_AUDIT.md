@@ -311,6 +311,14 @@ reports 1,254 duplicates. All 1,254 stored candles match all 1,254 explicit
 and SQLite integrity `ok`. A focused measured-state audit is required before
 another instrument or broader ingestion is selected.
 
+Package 15 re-runs the read-only operational baseline against the populated
+market store. MSFT, AAPL, and IBM each contain 1,254 bounded daily candles, for
+3,762 total, while per-series freshness, refresh observability, and measured
+performance remain `UNMEASURED`. Existing freshness and refresh services have
+no dedicated bounded operational CLI/report. The selected next package is a
+single-instrument refresh-observability composition root; scheduling,
+multi-instrument refresh, and mass ingestion remain deferred.
+
 Boundary audit:
 
 ```text
