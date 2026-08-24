@@ -304,6 +304,13 @@ inspection confirms `IBM_TOTAL=0` and SQLite integrity `ok`. The current
 execution profile still cannot place the calendar or modify runtime SQLite, so
 no ingestion was attempted and no other instrument may bypass this step.
 
+Package 14 completes the controlled IBM/XNYS operational step. The initial
+ingestion stores 1,254 daily candles; its exact repeat inserts zero rows and
+reports 1,254 duplicates. All 1,254 stored candles match all 1,254 explicit
+`XNYS@1` sessions with no missing or unexpected evidence, completeness 1.0,
+and SQLite integrity `ok`. A focused measured-state audit is required before
+another instrument or broader ingestion is selected.
+
 Boundary audit:
 
 ```text

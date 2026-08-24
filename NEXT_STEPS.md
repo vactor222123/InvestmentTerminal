@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 69affb8ba7f3a31cadecaf8fea183e75b26341fd`
+**Current repository baseline:** `develop @ e9a652abe3af7c2adc6cade6a9a713be8623bf83`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -33,6 +33,7 @@
 **Phase 7 Package 11 bounded XNYS session evidence:** COMPLETE
 **Phase 7 Package 12 XNYS evidence generation checkpoint:** COMPLETE
 **Phase 7 Package 13 IBM qualification success handoff:** COMPLETE
+**Phase 7 Package 14 controlled five-year IBM/XNYS history:** COMPLETE
 
 ## Current State
 
@@ -40,10 +41,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-With explicit write access to `C:\runtime\reports` and the operational SQLite,
-place and re-verify the generated `XNYS@1` JSON, then run one controlled IBM
-five-year ingestion, its exact idempotency repeat, and coverage measurement.
-Do not start another instrument.
+Perform a focused audit of the now-measured Phase 7 operational state and
+select one smallest evidence-backed gap. Do not start mass ingestion or another
+instrument before that audit.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -78,3 +78,5 @@ Bounded XNYS evidence package: `docs/PHASE_7_PACKAGE_11.md`.
 XNYS generation checkpoint: `docs/PHASE_7_PACKAGE_12.md`.
 
 IBM qualification success handoff: `docs/PHASE_7_PACKAGE_13.md`.
+
+Controlled IBM/XNYS history: `docs/PHASE_7_PACKAGE_14.md`.

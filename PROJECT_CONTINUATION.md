@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `69affb8ba7f3a31cadecaf8fea183e75b26341fd`
-**Current local package:** Phase 7 Package 13 — IBM Qualification Success Handoff
+**Current GitHub baseline:** `e9a652abe3af7c2adc6cade6a9a713be8623bf83`
+**Current local package:** Phase 7 Package 14 — Controlled Five-Year IBM/XNYS History
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Place XNYS@1, then ingest/repeat/measure IBM
+**Current next action:** Audit measured Phase 7 state before further expansion
 
 ---
 
@@ -302,6 +302,46 @@ After implementation:
 ---
 
 ## Latest Package
+
+```text
+Phase 7 Package 14 — Controlled Five-Year IBM/XNYS History
+```
+
+Files:
+
+```text
+docs/PHASE_7_PACKAGE_14.md
+docs/ROADMAP_AFTER_AUDIT.md
+Roadmap.md
+NEXT_STEPS.md
+PROJECT_CONTINUATION.md
+```
+
+Source baseline verified exactly:
+
+```text
+develop @ e9a652abe3af7c2adc6cade6a9a713be8623bf83
+```
+
+Measured operational result:
+
+- initial IBM ingestion: 1,254 inserted from 1,254 downloaded;
+- exact repeat: zero inserted, 1,254 duplicates, stored total unchanged;
+- IBM/XNYS coverage: 1,254 expected and observed sessions;
+- missing and unexpected counts: zero; completeness: 1.0;
+- SQLite integrity: `ok`;
+- mass ingestion and another instrument remain out of scope.
+
+Verification:
+
+- focused ingestion/coverage/calendar/architecture checks: 31 passed;
+- complete local suite: 2,726 passed, 4 skipped;
+- one existing Starlette deprecation warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package 13
 
 ```text
 Phase 7 Package 13 — IBM Qualification Success Handoff
