@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `59a89b4d2c5c315fc74bd065ab8ea762a2c1fbcd`
-**Current local package:** Phase 7 Package 15 — Measured-State Refresh Audit
+**Current GitHub baseline:** `01b8a88c9030e168159c66a5bc51c644fab153a0`
+**Current local package:** Phase 7 Package 16 — Single-Instrument Refresh Observability
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement bounded single-instrument refresh observability
+**Current next action:** Run one live MSFT refresh measurement
 
 ---
 
@@ -302,6 +302,51 @@ After implementation:
 ---
 
 ## Latest Package
+
+```text
+Phase 7 Package 16 — Single-Instrument Refresh Observability
+```
+
+Files:
+
+```text
+investment_terminal/cli/market_data_refresh.py
+tests/test_market_data_refresh_cli.py
+docs/PHASE_7_PACKAGE_16.md
+docs/ROADMAP_AFTER_AUDIT.md
+Architecture.md
+DataModel.md
+Roadmap.md
+NEXT_STEPS.md
+PROJECT_CONTINUATION.md
+```
+
+Source baseline verified exactly:
+
+```text
+develop @ 01b8a88c9030e168159c66a5bc51c644fab153a0
+```
+
+Architecture and behavior:
+
+- one explicit instrument and checked-at time only;
+- composes existing Yahoo, repository, freshness, and refresh boundaries;
+- atomic schema-version-1 operational report;
+- separate `SUCCESS`, `NOT_READY`, and `FAILED` outcomes;
+- preserves before/after freshness, exact import evidence, and duration;
+- provider/database failures and still-stale results exit non-zero;
+- scheduler, retries, multi-instrument refresh, analysis, and trading excluded.
+
+Verification:
+
+- focused CLI/freshness/refresh/baseline/architecture checks: 69 passed;
+- complete local suite: 2,731 passed, 4 skipped;
+- one existing Starlette deprecation warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package 15
 
 ```text
 Phase 7 Package 15 — Measured-State Refresh Audit

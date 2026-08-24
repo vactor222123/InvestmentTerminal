@@ -319,6 +319,13 @@ no dedicated bounded operational CLI/report. The selected next package is a
 single-instrument refresh-observability composition root; scheduling,
 multi-instrument refresh, and mass ingestion remain deferred.
 
+Package 16 adds the dedicated single-instrument refresh-observability CLI and
+atomic versioned report over the existing Yahoo, repository, freshness, and
+refresh boundaries. `SUCCESS`, `NOT_READY`, and `FAILED` outcomes preserve
+before/after freshness, exact import evidence, duration, and visible failures.
+One explicit live MSFT run is next; no other instrument, scheduler, or mass
+refresh is authorized before its result is reviewed.
+
 Boundary audit:
 
 ```text

@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 59a89b4d2c5c315fc74bd065ab8ea762a2c1fbcd`
+**Current repository baseline:** `develop @ 01b8a88c9030e168159c66a5bc51c644fab153a0`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -35,6 +35,7 @@
 **Phase 7 Package 13 IBM qualification success handoff:** COMPLETE
 **Phase 7 Package 14 controlled five-year IBM/XNYS history:** COMPLETE
 **Phase 7 Package 15 measured-state refresh audit:** COMPLETE
+**Phase 7 Package 16 single-instrument refresh observability:** COMPLETE
 
 ## Current State
 
@@ -42,9 +43,8 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement one bounded single-instrument refresh-observability CLI and atomic
-report over the existing freshness and refresh services. Do not add scheduling,
-multi-instrument refresh, or mass ingestion.
+Run one explicit live MSFT refresh-observability command and review its atomic
+report. Do not run another instrument, scheduling, or mass refresh first.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -83,3 +83,5 @@ IBM qualification success handoff: `docs/PHASE_7_PACKAGE_13.md`.
 Controlled IBM/XNYS history: `docs/PHASE_7_PACKAGE_14.md`.
 
 Measured-state refresh audit: `docs/PHASE_7_PACKAGE_15.md`.
+
+Single-instrument refresh observability: `docs/PHASE_7_PACKAGE_16.md`.

@@ -294,6 +294,20 @@ The version 2 report obtains earliest/latest stored timestamps with indexed
 repository boundary queries. It measures the persisted set without loading its
 complete candle history or inferring expected trading sessions.
 
+## Bounded Market-Data Refresh Observability
+
+The single-instrument refresh command composes the existing Yahoo client,
+repository, freshness service, and refresh service for one explicit identity
+and checked-at time. Its versioned atomic report preserves freshness before and
+after, whether refresh was attempted, the exact import result, duration, and a
+visible failure.
+
+`SUCCESS`, `NOT_READY`, and `FAILED` remain distinct. A refresh that completes
+without making the series fresh exits non-zero as `NOT_READY`; provider and
+persistence exceptions are reported before a non-zero exit. The boundary does
+not schedule, retry, refresh multiple instruments, analyze prices, or authorize
+trading.
+
 ## Explicit-Session Candle Coverage Quality
 
 History owns deterministic comparison of daily candle dates with an explicitly

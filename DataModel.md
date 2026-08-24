@@ -543,3 +543,17 @@ without invalidating existing `XNAS@1` evidence.
 `XNYS@1` is a distinct bounded calendar document with `XNYS:<date>` session
 keys and ICE/NYSE provenance. Equal dates across XNAS and XNYS do not make
 their calendar identities, source evidence, or checksums interchangeable.
+
+## Single-Instrument Refresh Report
+
+The version 1 operational refresh report records the provider identity, exact
+symbol/resolution/currency/checked-at request, database path, start/completion
+times, duration, and `SUCCESS | NOT_READY | FAILED` status. A successful result
+embeds the existing `MarketDataRefreshResult`, including freshness before and
+after plus the exact optional import statistics. A failed result preserves a
+normalized failure and no partial success-shaped result.
+
+`NOT_READY` means the bounded refresh attempt returned normally but the
+post-refresh freshness contract is still not ready. It is a non-zero fail-closed
+outcome, not a provider exception. The report grants no scheduling,
+multi-instrument refresh, analytical, or trading authority.
