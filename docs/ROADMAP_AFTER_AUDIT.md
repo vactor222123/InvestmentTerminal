@@ -349,6 +349,15 @@ refresh observability/performance `READY`; malformed, unsupported, or
 inconsistent evidence must remain visible and fail closed. This package runs no
 refresh and authorizes no broader ingestion.
 
+Package 20 implements that conditional projection without changing baseline
+schema version 1 or the omitted-input eight-store shape. Valid `SUCCESS`,
+`NOT_READY`, and `FAILED` reports become bounded operational evidence;
+malformed, unsupported, inconsistent, naive-time, or invalid-duration reports
+remain visible `ERROR` stores and cannot produce measured readiness. A read-only
+run against the existing live MSFT report projects nine stores and reports both
+refresh observability and measured performance as `READY`. No refresh,
+scheduling, multi-instrument aggregation, analysis, or trading is added.
+
 Boundary audit:
 
 ```text

@@ -240,8 +240,8 @@ History/Knowledge.
 
 The Phase 7 operational baseline is a read-only application boundary. It opens
 configured SQLite inputs in read-only mode, validates known schemas, summarizes
-populated ranges and counts, and inspects current portfolio, workflow, and
-backup metadata without changing source evidence.
+populated ranges and counts, and inspects current portfolio, workflow, backup,
+and optional single-instrument refresh metadata without changing source evidence.
 
 ```text
 provider configuration names (never secret values)
@@ -253,9 +253,13 @@ provider configuration names (never secret values)
 `CONFIGURED`, `UNCONFIGURED`, `READY`, `ABSENT`, `ERROR`, and `UNMEASURED`
 remain distinct. Configured provider capability does not imply populated data;
 populated data does not imply freshness, completeness, or approximately
-20-year/1000-company coverage. Workflow timing becomes measured only when an
-explicit durable workflow report is supplied. The report is operational
-evidence, not investment analysis, AI interpretation, or trading authority.
+20-year/1000-company coverage. Refresh observability and performance become
+measured only when an explicit valid durable workflow or refresh report is
+supplied. Omitting the refresh input preserves the schema-version-1 eight-store
+shape; an explicit refresh input conditionally adds `REFRESH_REPORT`. Invalid
+evidence remains visible as `ERROR` and cannot produce `READY`. These reports
+are operational evidence, not investment analysis, AI interpretation, or
+trading authority.
 
 ## Yahoo Historical Candle Qualification
 

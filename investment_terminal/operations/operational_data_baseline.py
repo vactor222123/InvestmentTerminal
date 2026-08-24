@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import sqlite3
 from collections import Counter
 from collections.abc import Mapping
@@ -94,7 +95,7 @@ class CoverageRecord:
     count: int
     earliest_at: str | None = None
     latest_at: str | None = None
-    attributes: tuple[tuple[str, str | int], ...] = ()
+    attributes: tuple[tuple[str, str | int | float], ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -174,6 +175,7 @@ class OperationalDataBaselineInputs:
     external_context_database: Path | None = None
     backup_root: Path | None = None
     workflow_report: Path | None = None
+    refresh_report: Path | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -240,7 +242,7 @@ class OperationalDataBaselineService:
             )
         )
         workflow = self._inspect_workflow_report()
-        stores = (
+        stores = [
             self._inspect_backup_root(),
             self._inspect_candles(),
             self._inspect_external_context(),
@@ -249,6 +251,15 @@ class OperationalDataBaselineService:
             self._inspect_transactions(),
             self._inspect_valuations(),
             workflow,
+        ]
+        refresh = None
+        if self._inputs.refresh_report is not None:
+            refresh = self._inspect_refresh_report()
+            stores.append(refresh)
+        measured_refresh = any(
+            store.state is OperationalState.READY
+            for store in (workflow, refresh)
+            if store is not None
         )
         return OperationalDataBaseline(
             generated_at=generated_at,
@@ -256,12 +267,12 @@ class OperationalDataBaselineService:
             stores=tuple(sorted(stores, key=lambda item: item.store_identity)),
             refresh_observability=(
                 OperationalState.READY
-                if workflow.state is OperationalState.READY
+                if measured_refresh
                 else OperationalState.UNMEASURED
             ),
             measured_performance=(
                 OperationalState.READY
-                if workflow.state is OperationalState.READY
+                if measured_refresh
                 else OperationalState.UNMEASURED
             ),
         )
@@ -538,6 +549,181 @@ class OperationalDataBaselineService:
             )
         except (KeyError, OSError, TypeError, ValueError) as exc:
             return self._error("WORKFLOW_REPORT", path, exc)
+
+    def _inspect_refresh_report(self) -> OperationalStoreCoverage:
+        path = self._inputs.refresh_report
+        if path is None or not path.is_file():
+            return self._absent("REFRESH_REPORT", path)
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            schema_version = payload.get("schema_version")
+            if isinstance(schema_version, bool) or schema_version != 1:
+                raise ValueError("schema_version must be 1")
+            provider = normalize_required_text(
+                payload["provider_identity"],
+                field_name="provider_identity",
+                uppercase=True,
+            )
+            if provider != "YAHOO_FINANCE":
+                raise ValueError("provider_identity must be YAHOO_FINANCE")
+            status = normalize_required_text(
+                payload["status"], field_name="status", uppercase=True
+            )
+            if status not in {"SUCCESS", "NOT_READY", "FAILED"}:
+                raise ValueError("status must be SUCCESS, NOT_READY, or FAILED")
+            request = self._refresh_mapping(payload["request"], "request")
+            symbol = normalize_required_text(
+                request["symbol"], field_name="request.symbol", uppercase=True
+            )
+            resolution = normalize_required_text(
+                request["resolution"],
+                field_name="request.resolution",
+                uppercase=True,
+            )
+            currency = normalize_required_text(
+                request["currency"],
+                field_name="request.currency",
+                uppercase=True,
+            )
+            if request["symbol"] != symbol:
+                raise ValueError("request.symbol must be normalized")
+            if request["resolution"] != resolution:
+                raise ValueError("request.resolution must be normalized")
+            if request["currency"] != currency:
+                raise ValueError("request.currency must be normalized")
+            checked_at = self._refresh_datetime(
+                request["checked_at"], "request.checked_at"
+            )
+            started_at = self._refresh_datetime(payload["started_at"], "started_at")
+            completed_at = self._refresh_datetime(
+                payload["completed_at"], "completed_at"
+            )
+            if completed_at < started_at:
+                raise ValueError("completed_at must not be earlier than started_at")
+            duration = payload["duration_seconds"]
+            if isinstance(duration, bool) or not isinstance(duration, (int, float)):
+                raise TypeError("duration_seconds must be a number")
+            if not math.isfinite(duration) or duration < 0:
+                raise ValueError("duration_seconds must be finite and non-negative")
+
+            result = payload.get("result")
+            failure = payload.get("failure")
+            if status == "FAILED":
+                if result is not None:
+                    raise ValueError("FAILED report must not contain result")
+                failure_payload = self._refresh_mapping(failure, "failure")
+                normalize_required_text(failure_payload["type"], field_name="failure.type")
+                normalize_required_text(
+                    failure_payload["reason"], field_name="failure.reason"
+                )
+                refresh_attempted = False
+                is_ready = False
+                result_attributes: tuple[tuple[str, str | int], ...] = ()
+            else:
+                if failure is not None:
+                    raise ValueError(f"{status} report must not contain failure")
+                result_payload = self._refresh_mapping(result, "result")
+                result_symbol = normalize_required_text(
+                    result_payload["symbol"], field_name="result.symbol", uppercase=True
+                )
+                result_resolution = normalize_required_text(
+                    result_payload["resolution"],
+                    field_name="result.resolution",
+                    uppercase=True,
+                )
+                result_checked_at = self._refresh_datetime(
+                    result_payload["checked_at"], "result.checked_at"
+                )
+                if (result_symbol, result_resolution, result_checked_at) != (
+                    symbol,
+                    resolution,
+                    checked_at,
+                ):
+                    raise ValueError("result identity must match request identity")
+                refresh_attempted = result_payload["refresh_attempted"]
+                is_ready = result_payload["is_ready"]
+                if not isinstance(refresh_attempted, bool):
+                    raise TypeError("result.refresh_attempted must be a boolean")
+                if not isinstance(is_ready, bool):
+                    raise TypeError("result.is_ready must be a boolean")
+                if (status == "SUCCESS") is not is_ready:
+                    raise ValueError("status must match result.is_ready")
+                downloaded = self._refresh_count(result_payload, "downloaded")
+                inserted = self._refresh_count(result_payload, "inserted")
+                duplicates = self._refresh_count(result_payload, "duplicates")
+                if inserted + duplicates != downloaded:
+                    raise ValueError(
+                        "result inserted and duplicates must equal downloaded"
+                    )
+                if not refresh_attempted and any(
+                    value != 0 for value in (downloaded, inserted, duplicates)
+                ):
+                    raise ValueError(
+                        "result without refresh attempt must have zero transfer counts"
+                    )
+                result_attributes = (
+                    ("downloaded", downloaded),
+                    ("duplicates", duplicates),
+                    ("inserted", inserted),
+                    ("is_ready", str(is_ready).upper()),
+                    ("refresh_attempted", str(refresh_attempted).upper()),
+                )
+
+            record = CoverageRecord(
+                identity=f"{provider}:{symbol}:{resolution}:{currency}",
+                count=1,
+                earliest_at=payload["started_at"],
+                latest_at=payload["completed_at"],
+                attributes=tuple(
+                    sorted(
+                        (
+                            ("checked_at", request["checked_at"]),
+                            ("duration_seconds", duration),
+                            ("status", status),
+                        )
+                        + result_attributes
+                    )
+                ),
+            )
+            return OperationalStoreCoverage(
+                store_identity="REFRESH_REPORT",
+                configured_path=str(path),
+                state=OperationalState.READY,
+                schema_version=1,
+                record_count=1,
+                records=(record,),
+            )
+        except (
+            json.JSONDecodeError,
+            KeyError,
+            OSError,
+            TypeError,
+            ValueError,
+        ) as exc:
+            return self._error("REFRESH_REPORT", path, exc)
+
+    @staticmethod
+    def _refresh_mapping(value: object, field_name: str) -> Mapping[str, Any]:
+        if not isinstance(value, Mapping):
+            raise TypeError(f"{field_name} must be a JSON object")
+        return value
+
+    @staticmethod
+    def _refresh_datetime(value: object, field_name: str) -> datetime:
+        if not isinstance(value, str):
+            raise TypeError(f"{field_name} must be an ISO-8601 string")
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        validate_aware_datetime(parsed, field_name=field_name)
+        return parsed
+
+    @staticmethod
+    def _refresh_count(payload: Mapping[str, Any], field_name: str) -> int:
+        value = payload[field_name]
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise TypeError(f"result.{field_name} must be an integer")
+        if value < 0:
+            raise ValueError(f"result.{field_name} must not be negative")
+        return value
 
     def _inspect_sqlite(
         self,

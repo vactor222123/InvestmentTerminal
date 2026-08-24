@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `1c0d247123d9a5d1aec11f4b2ba92e96dd181073`
-**Current local package:** Phase 7 Package 19 — Refresh-Report Projection Audit
+**Current GitHub baseline:** `e151a457ff8869119195c0ad03c7e0e7729a7613`
+**Current local package:** Phase 7 Package 20 — Refresh-Report Projection
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement optional refresh-report baseline projection
+**Current next action:** Perform focused Phase 7 closure-readiness audit
 
 ---
 
@@ -302,6 +302,55 @@ After implementation:
 ---
 
 ## Latest Package
+
+```text
+Phase 7 Package 20 — Refresh-Report Projection
+```
+
+Files:
+
+```text
+investment_terminal/operations/operational_data_baseline.py
+investment_terminal/cli/operational_data_baseline.py
+tests/test_operational_data_baseline.py
+tests/test_operational_data_baseline_cli.py
+docs/PHASE_7_PACKAGE_20.md
+docs/ROADMAP_AFTER_AUDIT.md
+Architecture.md
+DataModel.md
+Roadmap.md
+NEXT_STEPS.md
+PROJECT_CONTINUATION.md
+```
+
+Source baseline verified exactly:
+
+```text
+develop @ e151a457ff8869119195c0ad03c7e0e7729a7613
+```
+
+Result:
+
+- omitted refresh input preserves the exact schema-version-1 eight-store shape;
+- an explicit valid report adds one deterministic `REFRESH_REPORT` store;
+- valid `SUCCESS`, `NOT_READY`, and `FAILED` evidence is measured without
+  inventing failed-result transfer counters;
+- malformed, unsupported, inconsistent, naive-time, and invalid-duration
+  evidence remains visible and cannot produce `READY`;
+- read-only MSFT projection measured nine stores, `REFRESH_REPORT=READY`, and
+  refresh/performance `READY` without modifying runtime evidence;
+- scheduler, multi-instrument refresh, analysis, and trading remain excluded.
+
+Verification:
+
+- focused baseline/refresh/architecture checks: 44 passed;
+- complete local suite: 2,743 passed, 4 skipped;
+- one existing Starlette deprecation warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package 19
 
 ```text
 Phase 7 Package 19 — Refresh-Report Projection Audit

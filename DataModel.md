@@ -487,7 +487,11 @@ error when inspection fails. Candle coverage is grouped by symbol, resolution,
 and currency. Maintained-universe coverage preserves snapshot identity,
 observation time, member count, and asset-type counts. Portfolio, transaction,
 valuation, context, workflow, and backup inputs expose aggregate presence and
-ranges without record contents.
+ranges without record contents. An explicitly supplied valid schema-version-1
+single-instrument refresh report conditionally adds `REFRESH_REPORT` with only
+its normalized identity, timing, status, readiness/attempt flags, and transfer
+counters. Omitted input preserves the exact eight-store default shape; invalid
+input is an `ERROR` store and leaves refresh/performance `UNMEASURED`.
 
 `UNMEASURED` is not zero, absent, stale, or failed. The baseline does not claim
 freshness, approximately 20-year candle coverage, approximately 1000-company

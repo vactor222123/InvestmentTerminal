@@ -28,6 +28,7 @@ def build_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument("--external-context-database", type=Path)
     parser.add_argument("--backup-root", type=Path)
     parser.add_argument("--workflow-report", type=Path)
+    parser.add_argument("--refresh-report", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument(
         "--json",
@@ -49,6 +50,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             external_context_database=options.external_context_database,
             backup_root=options.backup_root,
             workflow_report=options.workflow_report,
+            refresh_report=options.refresh_report,
         ),
         environment=os.environ,
         clock=lambda: datetime.now(timezone.utc),

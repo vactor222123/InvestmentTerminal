@@ -49,6 +49,48 @@ def by_provider(report, identity: str):
     )
 
 
+def refresh_payload(*, status: str = "SUCCESS") -> dict[str, object]:
+    ready = status == "SUCCESS"
+    result = None
+    failure = None
+    if status != "FAILED":
+        result = {
+            "symbol": "MSFT",
+            "resolution": "D",
+            "checked_at": "2026-08-24T22:00:00+00:00",
+            "refresh_attempted": True,
+            "is_ready": ready,
+            "downloaded": 10,
+            "inserted": 4,
+            "duplicates": 6,
+        }
+    else:
+        failure = {"type": "RuntimeError", "reason": "provider unavailable"}
+    return {
+        "schema_version": 1,
+        "provider_identity": "YAHOO_FINANCE",
+        "status": status,
+        "request": {
+            "symbol": "MSFT",
+            "resolution": "D",
+            "currency": "USD",
+            "checked_at": "2026-08-24T22:00:00+00:00",
+        },
+        "database": "C:/runtime/data/investment_terminal.db",
+        "started_at": "2026-08-24T22:00:01+00:00",
+        "completed_at": "2026-08-24T22:00:02+00:00",
+        "duration_seconds": 1.0,
+        "result": result,
+        "failure": failure,
+    }
+
+
+def write_refresh(tmp_path: Path, payload: object) -> Path:
+    path = tmp_path / "refresh.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
 def test_empty_baseline_preserves_absent_and_unmeasured_states() -> None:
     report = build()
 
@@ -252,3 +294,98 @@ def test_workflow_report_turns_observability_into_measured_evidence(
         "duration_seconds": 9,
         "failed_stage_count": 1,
     }
+
+
+def test_omitted_refresh_report_preserves_exact_default_store_inventory() -> None:
+    report = build()
+
+    assert len(report.stores) == 8
+    assert "REFRESH_REPORT" not in {
+        store.store_identity for store in report.stores
+    }
+
+
+@pytest.mark.parametrize("status", ["SUCCESS", "NOT_READY", "FAILED"])
+def test_valid_refresh_report_projects_bounded_operational_evidence(
+    tmp_path: Path,
+    status: str,
+) -> None:
+    path = write_refresh(tmp_path, refresh_payload(status=status))
+
+    report = build(inputs=OperationalDataBaselineInputs(refresh_report=path))
+    store = by_store(report, "REFRESH_REPORT")
+    attributes = dict(store.records[0].attributes)
+
+    assert store.state is OperationalState.READY
+    assert store.schema_version == 1
+    assert store.record_count == 1
+    assert store.records[0].identity == "YAHOO_FINANCE:MSFT:D:USD"
+    assert attributes["status"] == status
+    assert attributes["duration_seconds"] == 1.0
+    if status == "FAILED":
+        assert "downloaded" not in attributes
+        assert "is_ready" not in attributes
+    else:
+        assert attributes["downloaded"] == 10
+        assert attributes["inserted"] == 4
+        assert attributes["duplicates"] == 6
+    assert "database" not in json.dumps(store.to_dict())
+    assert report.refresh_observability is OperationalState.READY
+    assert report.measured_performance is OperationalState.READY
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        (lambda payload: payload.update(schema_version=2), "schema_version"),
+        (lambda payload: payload.update(duration_seconds=-1), "non-negative"),
+        (lambda payload: payload.update(duration_seconds=float("inf")), "finite"),
+        (
+            lambda payload: payload["request"].update(
+                checked_at="2026-08-24T22:00:00"
+            ),
+            "timezone-aware",
+        ),
+        (
+            lambda payload: payload.update(
+                status="FAILED",
+                failure={"type": "RuntimeError", "reason": "failed"},
+            ),
+            "must not contain result",
+        ),
+        (
+            lambda payload: payload.update(
+                failure={"type": "RuntimeError", "reason": "failed"}
+            ),
+            "must not contain failure",
+        ),
+    ],
+)
+def test_invalid_refresh_report_is_visible_and_not_measured(
+    tmp_path: Path,
+    mutation,
+    message: str,
+) -> None:
+    payload = refresh_payload()
+    mutation(payload)
+    path = write_refresh(tmp_path, payload)
+
+    report = build(inputs=OperationalDataBaselineInputs(refresh_report=path))
+    store = by_store(report, "REFRESH_REPORT")
+
+    assert store.state is OperationalState.ERROR
+    assert message in (store.error or "")
+    assert report.refresh_observability is OperationalState.UNMEASURED
+    assert report.measured_performance is OperationalState.UNMEASURED
+
+
+def test_malformed_refresh_report_is_visible_and_not_measured(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "refresh.json"
+    path.write_text("{", encoding="utf-8")
+
+    report = build(inputs=OperationalDataBaselineInputs(refresh_report=path))
+
+    assert by_store(report, "REFRESH_REPORT").state is OperationalState.ERROR
+    assert report.refresh_observability is OperationalState.UNMEASURED
