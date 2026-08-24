@@ -333,6 +333,14 @@ MSFT then contains 1,258 daily candles through 2026-08-24 and SQLite integrity
 is `ok`. An exact same-checked-at repeat is required to measure the
 already-fresh provider bypass before any broader refresh.
 
+Package 18 confirms that exact same-checked-at repeat: both freshness states
+are `FRESH`, refresh is not attempted, import is null, all transfer counters
+are zero, and SQLite remains unchanged and healthy. The canonical operational
+baseline still cannot consume an explicit refresh report, so its refresh and
+performance fields remain `UNMEASURED`. A focused backward-compatibility audit
+of that projection is next; another instrument and broader refresh remain
+deferred.
+
 Boundary audit:
 
 ```text

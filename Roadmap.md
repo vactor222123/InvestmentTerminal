@@ -184,7 +184,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → focused measured-state audit — COMPLETE (3,762 candles; freshness unmeasured)
 → bounded single-instrument refresh observability — COMPLETE
 → one live MSFT stale-to-fresh measurement — COMPLETE (4 inserted)
-→ exact already-fresh MSFT repeat — NEXT
+→ exact already-fresh MSFT repeat — COMPLETE (provider bypassed)
+→ audit refresh-report projection into operational baseline — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 
