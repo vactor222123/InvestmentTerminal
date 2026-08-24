@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `01b8a88c9030e168159c66a5bc51c644fab153a0`
-**Current local package:** Phase 7 Package 16 — Single-Instrument Refresh Observability
+**Current GitHub baseline:** `6ed92f05d92d0fa0431ba743f27695c68e48051d`
+**Current local package:** Phase 7 Package 17 — Live MSFT Refresh Measurement
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one live MSFT refresh measurement
+**Current next action:** Repeat exact MSFT checked-at to measure provider bypass
 
 ---
 
@@ -302,6 +302,47 @@ After implementation:
 ---
 
 ## Latest Package
+
+```text
+Phase 7 Package 17 — Live MSFT Refresh Measurement
+```
+
+Files:
+
+```text
+docs/PHASE_7_PACKAGE_17.md
+docs/ROADMAP_AFTER_AUDIT.md
+Roadmap.md
+NEXT_STEPS.md
+PROJECT_CONTINUATION.md
+```
+
+Source baseline verified exactly:
+
+```text
+develop @ 6ed92f05d92d0fa0431ba743f27695c68e48051d
+```
+
+Measured operational result:
+
+- status: `SUCCESS`; duration: 1.149708 seconds;
+- MSFT freshness: `STALE` to `FRESH`;
+- 10 downloaded, four inserted, six duplicates;
+- stored MSFT total: 1,258 through `2026-08-24T04:00:00Z`;
+- market-store total: 3,766; SQLite integrity: `ok`;
+- exact same-checked-at repeat selected next;
+- another instrument, scheduler, and mass refresh remain out of scope.
+
+Verification:
+
+- focused CLI/freshness/refresh/baseline/architecture checks: 69 passed;
+- complete local suite: 2,731 passed, 4 skipped;
+- one existing Starlette deprecation warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package 16
 
 ```text
 Phase 7 Package 16 — Single-Instrument Refresh Observability

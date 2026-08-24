@@ -326,6 +326,13 @@ before/after freshness, exact import evidence, duration, and visible failures.
 One explicit live MSFT run is next; no other instrument, scheduler, or mass
 refresh is authorized before its result is reviewed.
 
+Package 17 records the first live MSFT refresh report. Trading-session
+freshness transitions from `STALE` to `FRESH`; the bounded overlap downloads
+10 candles, inserts four, and identifies six duplicates in 1.149708 seconds.
+MSFT then contains 1,258 daily candles through 2026-08-24 and SQLite integrity
+is `ok`. An exact same-checked-at repeat is required to measure the
+already-fresh provider bypass before any broader refresh.
+
 Boundary audit:
 
 ```text

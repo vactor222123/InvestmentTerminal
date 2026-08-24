@@ -183,7 +183,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → controlled IBM/XNYS ingestion, repeat, and coverage — COMPLETE (1,254/1,254 sessions)
 → focused measured-state audit — COMPLETE (3,762 candles; freshness unmeasured)
 → bounded single-instrument refresh observability — COMPLETE
-→ one live MSFT refresh measurement — NEXT
+→ one live MSFT stale-to-fresh measurement — COMPLETE (4 inserted)
+→ exact already-fresh MSFT repeat — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 
