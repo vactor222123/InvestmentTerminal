@@ -279,6 +279,12 @@ backed `XNAS@2` evidence for the controlled five-year MSFT window. The measured
 result is 1,254 expected and observed sessions with no missing or unexpected
 candles. Mass ingestion remains out of scope.
 
+Package 10 selects AAPL only after official Nasdaq-listed identity
+confirmation, reuses the exact bounded `XNAS@2` evidence, and measures 1,254
+observed candles against 1,254 expected sessions with no gaps or unexpected
+candles. The exact repeat inserts zero rows. The next boundary is a separate
+XNYS instrument/evidence audit; no XNAS calendar may be silently reused.
+
 Boundary audit:
 
 ```text

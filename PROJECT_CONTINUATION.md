@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `b04990d1e2f35f1b38e404cc9728e582da74647d`
-**Current local package:** Phase 7 Package 9 — Controlled Five-Year MSFT History
+**Current GitHub baseline:** `9ff76a69c4cf0cdc2468ee35fac273eb15dadebe`
+**Current local package:** Phase 7 Package 10 — Controlled Second XNAS Instrument
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit one selected second instrument/calendar before ingestion
+**Current next action:** Audit one XNYS instrument and official XNYS evidence before ingestion
 
 ---
 
@@ -302,6 +302,47 @@ After implementation:
 ---
 
 ## Latest Package
+
+```text
+Phase 7 Package 10 — Controlled Second XNAS Instrument
+```
+
+Files:
+
+```text
+docs/PHASE_7_PACKAGE_10.md
+docs/ROADMAP_AFTER_AUDIT.md
+Roadmap.md
+NEXT_STEPS.md
+PROJECT_CONTINUATION.md
+```
+
+Source baseline verified against GitHub:
+
+```text
+develop @ 9ff76a69c4cf0cdc2468ee35fac273eb15dadebe
+```
+
+Measured operational result:
+
+- official Nasdaq evidence identifies AAPL as Nasdaq Listed;
+- the operational SQLite contained zero AAPL daily candles before ingestion;
+- 1,254 stored AAPL candles match 1,254 `XNAS@2` sessions;
+- missing and unexpected counts are zero; completeness is 1.0;
+- the exact repeat inserted zero rows and reported 1,254 duplicates;
+- SQLite integrity is `ok`;
+- mass ingestion remains out of scope.
+
+Verification:
+
+- focused operational/coverage/architecture checks: 34 passed;
+- complete local suite: 2,724 passed, 4 skipped;
+- one existing Starlette deprecation warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package 9
 
 ```text
 Phase 7 Package 9 — Controlled Five-Year MSFT History

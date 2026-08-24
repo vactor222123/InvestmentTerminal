@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ b04990d1e2f35f1b38e404cc9728e582da74647d`
+**Current repository baseline:** `develop @ 9ff76a69c4cf0cdc2468ee35fac273eb15dadebe`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -29,6 +29,7 @@
 **Phase 7 Package 7 calendar evidence integrity:** COMPLETE
 **Phase 7 Package 8 bounded XNAS session evidence:** COMPLETE
 **Phase 7 Package 9 controlled five-year MSFT history:** COMPLETE
+**Phase 7 Package 10 controlled second XNAS instrument:** COMPLETE
 
 ## Current State
 
@@ -36,9 +37,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit one explicitly selected second instrument and its exchange/calendar
-identity before any ingestion. Do not start mass ingestion; preserve MSFT as
-the measured control and require a separate bounded coverage report.
+Audit one explicitly selected XNYS-listed instrument and source bounded,
+official, versioned XNYS calendar evidence before any ingestion. Do not reuse
+XNAS evidence for XNYS and do not start mass ingestion.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -65,3 +66,5 @@ Coverage quality package: `docs/PHASE_7_PACKAGE_5.md`.
 Coverage command package: `docs/PHASE_7_PACKAGE_6.md`.
 
 Five-year MSFT package: `docs/PHASE_7_PACKAGE_9.md`.
+
+Second XNAS instrument package: `docs/PHASE_7_PACKAGE_10.md`.
