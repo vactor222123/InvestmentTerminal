@@ -305,3 +305,8 @@ Bounded XNAS evidence has separate immutable calendar identities: `XNAS@1` for
 the audited one-year window and `XNAS@2` for the audited five-year MSFT window.
 Version 2 retains all official annual calendar source URIs plus the official
 exceptional-close alert. Neither version authorizes dates outside its bounds.
+
+XNYS evidence is separately owned and versioned. `XNYS@1` covers only the
+audited 2021-08-19 through 2026-08-18 window, cites official ICE/NYSE calendar
+announcements and the exceptional-close memorandum, and never reuses XNAS
+identity or provenance even where observed session dates coincide.

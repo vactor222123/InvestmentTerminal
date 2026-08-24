@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `9ff76a69c4cf0cdc2468ee35fac273eb15dadebe`
-**Current local package:** Phase 7 Package 10 — Controlled Second XNAS Instrument
+**Current GitHub baseline:** `1f2f46f80b5d52d3b7a0ac7d2f2db7a1701e0ca3`
+**Current local package:** Phase 7 Package 11 — Bounded XNYS Session Evidence
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit one XNYS instrument and official XNYS evidence before ingestion
+**Current next action:** Generate XNYS@1, then measure one bounded IBM ingestion
 
 ---
 
@@ -302,6 +302,49 @@ After implementation:
 ---
 
 ## Latest Package
+
+```text
+Phase 7 Package 11 — Bounded XNYS Session Evidence
+```
+
+Files:
+
+```text
+investment_terminal/cli/xnys_session_evidence.py
+tests/test_xnys_session_evidence.py
+docs/PHASE_7_PACKAGE_11.md
+docs/ROADMAP_AFTER_AUDIT.md
+Architecture.md
+DataModel.md
+Roadmap.md
+NEXT_STEPS.md
+PROJECT_CONTINUATION.md
+```
+
+Source baseline verified against GitHub:
+
+```text
+develop @ 1f2f46f80b5d52d3b7a0ac7d2f2db7a1701e0ca3
+```
+
+Architecture/product alignment:
+
+- IBM is selected through explicit official `XNYS:IBM` identity;
+- official ICE/NYSE schedules cover the complete bounded five-year window;
+- the January 9, 2025 exceptional closure remains explicit;
+- `XNYS@1` emits 1,254 sessions with its own provenance and checksum;
+- IBM and mass ingestion remain out of scope for this package.
+
+Verification:
+
+- focused calendar/coverage/architecture checks: 56 passed;
+- complete local suite: 2,726 passed, 4 skipped;
+- one existing Starlette deprecation warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package 10
 
 ```text
 Phase 7 Package 10 — Controlled Second XNAS Instrument

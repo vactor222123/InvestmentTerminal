@@ -539,3 +539,7 @@ Operational session evidence keeps the existing primary `source_uri` and may
 add an ordered non-empty `source_uris` array. When present, the primary URI must
 also occur in that array. This additive provenance supports bounded `XNAS@2`
 without invalidating existing `XNAS@1` evidence.
+
+`XNYS@1` is a distinct bounded calendar document with `XNYS:<date>` session
+keys and ICE/NYSE provenance. Equal dates across XNAS and XNYS do not make
+their calendar identities, source evidence, or checksums interchangeable.

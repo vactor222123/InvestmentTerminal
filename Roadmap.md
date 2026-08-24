@@ -177,7 +177,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → bounded one-year XNAS session evidence — COMPLETE
 → controlled five-year MSFT/XNAS coverage — COMPLETE (1,254/1,254 sessions)
 → controlled second XNAS instrument (AAPL) — COMPLETE (1,254/1,254 sessions)
-→ audit one selected XNYS instrument and official XNYS evidence — NEXT
+→ bounded official XNYS session evidence — COMPLETE
+→ generate XNYS@1 and measure one controlled IBM ingestion — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

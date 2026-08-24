@@ -285,6 +285,12 @@ observed candles against 1,254 expected sessions with no gaps or unexpected
 candles. The exact repeat inserts zero rows. The next boundary is a separate
 XNYS instrument/evidence audit; no XNAS calendar may be silently reused.
 
+Package 11 selects `XNYS:IBM` for the later operational run and adds bounded
+`XNYS@1` evidence backed only by official ICE/NYSE schedules and the January 9,
+2025 exceptional-close memorandum. It emits 1,254 deterministic sessions but
+does not ingest IBM. Generating/verifying the JSON and measuring one IBM request
+are the next separate operational action.
+
 Boundary audit:
 
 ```text
