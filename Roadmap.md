@@ -179,8 +179,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → controlled second XNAS instrument (AAPL) — COMPLETE (1,254/1,254 sessions)
 → bounded official XNYS session evidence — COMPLETE
 → generate and verify XNYS@1 — COMPLETE (workspace-staged)
-→ IBM Yahoo qualification — BLOCKED BY OUTBOUND HTTPS
-→ place XNYS@1 and measure one IBM ingestion — BLOCKED BY RUNTIME WRITE PERMISSION
+→ bounded IBM Yahoo qualification — SUCCESS (1,254 daily candles)
+→ place XNYS@1 in runtime and measure one controlled IBM ingestion — BLOCKED BY WRITE PERMISSION
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

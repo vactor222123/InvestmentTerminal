@@ -32,7 +32,7 @@
 **Phase 7 Package 10 controlled second XNAS instrument:** COMPLETE
 **Phase 7 Package 11 bounded XNYS session evidence:** COMPLETE
 **Phase 7 Package 12 XNYS evidence generation checkpoint:** COMPLETE
-**Phase 7 Package 13 IBM operational preflight:** COMPLETE — BLOCKED
+**Phase 7 Package 13 IBM qualification success handoff:** COMPLETE
 
 ## Current State
 
@@ -40,9 +40,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-With outbound Yahoo HTTPS access, repeat the exact bounded IBM qualification.
-Only after `SUCCESS`, obtain runtime write access, place and re-verify
-`XNYS@1`, and run one IBM ingestion. Do not start another instrument.
+With explicit write access to `C:\runtime\reports` and the operational SQLite,
+place and re-verify the generated `XNYS@1` JSON, then run one controlled IBM
+five-year ingestion, its exact idempotency repeat, and coverage measurement.
+Do not start another instrument.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -76,4 +77,4 @@ Bounded XNYS evidence package: `docs/PHASE_7_PACKAGE_11.md`.
 
 XNYS generation checkpoint: `docs/PHASE_7_PACKAGE_12.md`.
 
-IBM preflight record: `docs/PHASE_7_PACKAGE_13.md`.
+IBM qualification success handoff: `docs/PHASE_7_PACKAGE_13.md`.

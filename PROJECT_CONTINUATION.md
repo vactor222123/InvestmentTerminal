@@ -5,9 +5,9 @@
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
 **Current GitHub baseline:** `69affb8ba7f3a31cadecaf8fea183e75b26341fd`
-**Current local package:** Phase 7 Package 13 — IBM Operational Preflight
+**Current local package:** Phase 7 Package 13 — IBM Qualification Success Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Restore Yahoo HTTPS, repeat IBM qualification, then ingest
+**Current next action:** Place XNYS@1, then ingest/repeat/measure IBM
 
 ---
 
@@ -304,7 +304,7 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 7 Package 13 — IBM Operational Preflight
+Phase 7 Package 13 — IBM Qualification Success Handoff
 ```
 
 Files:
@@ -317,23 +317,25 @@ NEXT_STEPS.md
 PROJECT_CONTINUATION.md
 ```
 
-Source baseline verified against GitHub:
+Source baseline verified exactly:
 
 ```text
 develop @ 69affb8ba7f3a31cadecaf8fea183e75b26341fd
 ```
 
-Measured result and blockers:
+Measured result and blocker:
 
-- staged `XNYS@1` passes checksum verification;
-- IBM Yahoo qualification failed before persistence with curl error 7;
-- outbound `fc.yahoo.com:443` was unavailable;
-- runtime write access remains unavailable;
-- no IBM candle was downloaded or stored.
+- bounded IBM Yahoo qualification: `SUCCESS`, 1,254 daily candles;
+- qualification failure: null;
+- staged `XNYS@1` checksum verification: passed;
+- pre-ingestion `IBM_TOTAL=0`; SQLite integrity: `ok`;
+- runtime calendar is absent and this execution profile has no runtime write;
+- no ingestion was attempted and operational SQLite was not modified.
 
 Verification:
 
-- focused qualification/evidence/ingestion/architecture suite: 43 passed;
+- focused qualification/evidence/ingestion/coverage/architecture checks:
+  47 passed;
 - complete local suite: 2,726 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.

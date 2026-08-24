@@ -1,33 +1,40 @@
-# Phase 7 Package 13 — IBM Operational Preflight
+# Phase 7 Package 13 — IBM Qualification Success Handoff
 
 Baseline: `develop @ 69affb8ba7f3a31cadecaf8fea183e75b26341fd`.
 
-The staged `XNYS@1` document was re-verified successfully with session checksum
-`83d70a90bb334fac740a209a20bcfbfcb685de805130655cfef31134ab48e2fb`.
-The operational SQLite remains read-only in this execution profile and still
-contains zero IBM daily candles.
-
-A separate non-persisting Yahoo qualification request was then attempted for
-IBM, USD daily candles, and the exact half-open 2021-08-19 through 2026-08-19
-window. It failed closed before ingestion:
+The user-executed, non-persisting Yahoo qualification succeeded for the exact
+bounded IBM request:
 
 ```text
-status: FAILED
-failure type: APIError
-transport detail: curl error 7
-endpoint: fc.yahoo.com:443
-cause: outbound connection unavailable
+provider: YAHOO_FINANCE
+symbol: IBM
+resolution: D
+currency: USD
+requested half-open window: 2021-08-19T00:00:00Z — 2026-08-19T00:00:00Z
+status: SUCCESS
+candle count: 1,254
+earliest candle: 2021-08-19T04:00:00Z
+latest candle: 2026-08-18T04:00:00Z
+failure: null
+report SHA-256: 8e7ae298178fbb0fcd2e23a88fa6e36401cb55aa11f9e172aba1a03b30abd080
 ```
 
-The failure report was written atomically in the workspace output directory.
-No IBM candles were downloaded or persisted, and the operational database was
-not modified. The next run must first obtain outbound Yahoo HTTPS access and
-repeat this exact qualification. Runtime write access is required only after a
-successful qualification, for evidence placement and bounded ingestion.
+The staged `XNYS@1` evidence was independently re-verified with session
+checksum `83d70a90bb334fac740a209a20bcfbfcb685de805130655cfef31134ab48e2fb`.
+Read-only inspection found `IBM_TOTAL=0` and SQLite integrity `ok` before
+ingestion.
 
-## Verification
+The execution profile cannot write `C:\runtime`, and the required calendar is
+not yet present at its runtime path. No ingestion was attempted and the
+operational database was not modified. The next explicitly permissioned run
+must place and verify `XNYS@1`, perform one bounded IBM ingestion, repeat it to
+measure idempotency, and measure coverage before selecting another instrument.
 
-- focused qualification/evidence/ingestion/architecture suite: 43 passed;
-- complete local suite: 2,726 passed, 4 skipped;
-- one existing Starlette deprecation warning;
-- `git diff --check`: clean.
+Verification:
+
+```text
+focused: 47 passed
+full: 2,726 passed, 4 skipped
+existing warnings: 1 Starlette deprecation warning
+git diff --check: clean
+```
