@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `8fde6a0fab31a0ae1ee891741dea158219b786a8`
-**Current local package:** Phase 7 Package 12 — XNYS Evidence Generation Checkpoint
+**Current GitHub baseline:** `69affb8ba7f3a31cadecaf8fea183e75b26341fd`
+**Current local package:** Phase 7 Package 13 — IBM Operational Preflight
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Place XNYS@1 in runtime, then measure bounded IBM ingestion
+**Current next action:** Restore Yahoo HTTPS, repeat IBM qualification, then ingest
 
 ---
 
@@ -302,6 +302,45 @@ After implementation:
 ---
 
 ## Latest Package
+
+```text
+Phase 7 Package 13 — IBM Operational Preflight
+```
+
+Files:
+
+```text
+docs/PHASE_7_PACKAGE_13.md
+docs/ROADMAP_AFTER_AUDIT.md
+Roadmap.md
+NEXT_STEPS.md
+PROJECT_CONTINUATION.md
+```
+
+Source baseline verified against GitHub:
+
+```text
+develop @ 69affb8ba7f3a31cadecaf8fea183e75b26341fd
+```
+
+Measured result and blockers:
+
+- staged `XNYS@1` passes checksum verification;
+- IBM Yahoo qualification failed before persistence with curl error 7;
+- outbound `fc.yahoo.com:443` was unavailable;
+- runtime write access remains unavailable;
+- no IBM candle was downloaded or stored.
+
+Verification:
+
+- focused qualification/evidence/ingestion/architecture suite: 43 passed;
+- complete local suite: 2,726 passed, 4 skipped;
+- one existing Starlette deprecation warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package 12
 
 ```text
 Phase 7 Package 12 — XNYS Evidence Generation Checkpoint

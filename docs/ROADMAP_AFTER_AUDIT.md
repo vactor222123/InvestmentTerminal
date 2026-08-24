@@ -297,6 +297,12 @@ operational SQLite. `IBM_TOTAL=0` was confirmed read-only. IBM ingestion remains
 blocked until explicit runtime write access is available; no other instrument
 may bypass this step.
 
+Package 13 re-verifies staged `XNYS@1` and attempts the separate bounded IBM
+Yahoo qualification without persistence. The request fails closed because
+outbound HTTPS to `fc.yahoo.com:443` is unavailable. Runtime write access also
+remains absent. No IBM candle was downloaded or stored; qualification must be
+`SUCCESS` before the ingestion step is retried.
+
 Boundary audit:
 
 ```text
