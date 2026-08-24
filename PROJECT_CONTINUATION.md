@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `1f2f46f80b5d52d3b7a0ac7d2f2db7a1701e0ca3`
-**Current local package:** Phase 7 Package 11 — Bounded XNYS Session Evidence
+**Current GitHub baseline:** `8fde6a0fab31a0ae1ee891741dea158219b786a8`
+**Current local package:** Phase 7 Package 12 — XNYS Evidence Generation Checkpoint
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Generate XNYS@1, then measure one bounded IBM ingestion
+**Current next action:** Place XNYS@1 in runtime, then measure bounded IBM ingestion
 
 ---
 
@@ -302,6 +302,45 @@ After implementation:
 ---
 
 ## Latest Package
+
+```text
+Phase 7 Package 12 — XNYS Evidence Generation Checkpoint
+```
+
+Files:
+
+```text
+docs/PHASE_7_PACKAGE_12.md
+docs/ROADMAP_AFTER_AUDIT.md
+Roadmap.md
+NEXT_STEPS.md
+PROJECT_CONTINUATION.md
+```
+
+Source baseline verified against GitHub:
+
+```text
+develop @ 8fde6a0fab31a0ae1ee891741dea158219b786a8
+```
+
+Measured result and blocker:
+
+- `XNYS@1` generated 1,254 sessions and passed checksum verification;
+- checksum is `83d70a90bb334fac740a209a20bcfbfcb685de805130655cfef31134ab48e2fb`;
+- the operational SQLite contains zero IBM daily candles;
+- runtime write access was unavailable and escalation was disabled;
+- no IBM request was sent and the operational database was not modified.
+
+Verification:
+
+- focused evidence/ingestion/coverage/architecture checks: 35 passed;
+- complete local suite: 2,726 passed, 4 skipped;
+- one existing Starlette deprecation warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package 11
 
 ```text
 Phase 7 Package 11 — Bounded XNYS Session Evidence

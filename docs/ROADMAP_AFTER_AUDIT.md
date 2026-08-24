@@ -291,6 +291,12 @@ Package 11 selects `XNYS:IBM` for the later operational run and adds bounded
 does not ingest IBM. Generating/verifying the JSON and measuring one IBM request
 are the next separate operational action.
 
+Package 12 executes and verifies the exact `XNYS@1` document, but the current
+permission profile prevents writing it to `C:\runtime\reports` or modifying the
+operational SQLite. `IBM_TOTAL=0` was confirmed read-only. IBM ingestion remains
+blocked until explicit runtime write access is available; no other instrument
+may bypass this step.
+
 Boundary audit:
 
 ```text

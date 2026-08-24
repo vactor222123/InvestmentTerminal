@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 1f2f46f80b5d52d3b7a0ac7d2f2db7a1701e0ca3`
+**Current repository baseline:** `develop @ 8fde6a0fab31a0ae1ee891741dea158219b786a8`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -31,6 +31,7 @@
 **Phase 7 Package 9 controlled five-year MSFT history:** COMPLETE
 **Phase 7 Package 10 controlled second XNAS instrument:** COMPLETE
 **Phase 7 Package 11 bounded XNYS session evidence:** COMPLETE
+**Phase 7 Package 12 XNYS evidence generation checkpoint:** COMPLETE
 
 ## Current State
 
@@ -38,9 +39,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Generate and verify the bounded `XNYS@1` JSON, then run one controlled IBM
-five-year ingestion and coverage measurement. Do not ingest another instrument
-or start mass ingestion before reviewing the IBM result.
+With explicit write access to `C:\runtime\reports` and the operational SQLite,
+place and re-verify the generated `XNYS@1` JSON, then run one controlled IBM
+five-year ingestion and coverage measurement. Do not start another instrument.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -71,3 +72,5 @@ Five-year MSFT package: `docs/PHASE_7_PACKAGE_9.md`.
 Second XNAS instrument package: `docs/PHASE_7_PACKAGE_10.md`.
 
 Bounded XNYS evidence package: `docs/PHASE_7_PACKAGE_11.md`.
+
+XNYS generation checkpoint: `docs/PHASE_7_PACKAGE_12.md`.
