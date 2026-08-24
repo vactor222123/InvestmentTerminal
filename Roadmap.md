@@ -185,7 +185,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → bounded single-instrument refresh observability — COMPLETE
 → one live MSFT stale-to-fresh measurement — COMPLETE (4 inserted)
 → exact already-fresh MSFT repeat — COMPLETE (provider bypassed)
-→ audit refresh-report projection into operational baseline — NEXT
+→ audit refresh-report projection into operational baseline — COMPLETE
+→ optional backward-compatible refresh-report projection — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

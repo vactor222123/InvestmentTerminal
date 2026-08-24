@@ -341,6 +341,14 @@ performance fields remain `UNMEASURED`. A focused backward-compatibility audit
 of that projection is next; another instrument and broader refresh remain
 deferred.
 
+Package 19 audits every operational-baseline consumer and selects an optional,
+conditional `REFRESH_REPORT` store as the smallest backward-compatible seam.
+When no refresh path is supplied, the existing schema-version-1 JSON and its
+eight-store inventory must remain unchanged. Explicit valid evidence may make
+refresh observability/performance `READY`; malformed, unsupported, or
+inconsistent evidence must remain visible and fail closed. This package runs no
+refresh and authorizes no broader ingestion.
+
 Boundary audit:
 
 ```text

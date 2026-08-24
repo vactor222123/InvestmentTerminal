@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 513cc311eea795ed63a7be74adf258c66951681f`
+**Current repository baseline:** `develop @ 1c0d247123d9a5d1aec11f4b2ba92e96dd181073`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -38,6 +38,7 @@
 **Phase 7 Package 16 single-instrument refresh observability:** COMPLETE
 **Phase 7 Package 17 live MSFT refresh measurement:** COMPLETE
 **Phase 7 Package 18 MSFT already-fresh provider bypass:** COMPLETE
+**Phase 7 Package 19 refresh-report projection audit:** COMPLETE
 
 ## Current State
 
@@ -45,9 +46,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit the smallest backward-compatible projection of one explicit refresh
-report into the canonical operational baseline. Do not run another instrument,
-scheduling, or mass refresh first.
+Implement the audited optional refresh-report projection while preserving the
+exact default schema-v1 baseline shape. Do not execute another instrument,
+scheduling, or mass refresh.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -92,3 +93,5 @@ Single-instrument refresh observability: `docs/PHASE_7_PACKAGE_16.md`.
 Live MSFT refresh measurement: `docs/PHASE_7_PACKAGE_17.md`.
 
 MSFT already-fresh provider bypass: `docs/PHASE_7_PACKAGE_18.md`.
+
+Refresh-report projection audit: `docs/PHASE_7_PACKAGE_19.md`.

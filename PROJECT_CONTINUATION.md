@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `513cc311eea795ed63a7be74adf258c66951681f`
-**Current local package:** Phase 7 Package 18 — MSFT Already-Fresh Provider Bypass
+**Current GitHub baseline:** `1c0d247123d9a5d1aec11f4b2ba92e96dd181073`
+**Current local package:** Phase 7 Package 19 — Refresh-Report Projection Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit refresh-report projection into operational baseline
+**Current next action:** Implement optional refresh-report baseline projection
 
 ---
 
@@ -302,6 +302,48 @@ After implementation:
 ---
 
 ## Latest Package
+
+```text
+Phase 7 Package 19 — Refresh-Report Projection Audit
+```
+
+Files:
+
+```text
+docs/PHASE_7_PACKAGE_19.md
+docs/ROADMAP_AFTER_AUDIT.md
+Roadmap.md
+NEXT_STEPS.md
+PROJECT_CONTINUATION.md
+```
+
+Source baseline verified exactly:
+
+```text
+develop @ 1c0d247123d9a5d1aec11f4b2ba92e96dd181073
+```
+
+Audit result:
+
+- baseline schema version 1 has eight deterministic stores by default;
+- refresh/performance state currently derives only from workflow evidence;
+- standalone refresh reports have no baseline input or projection;
+- optional conditional `REFRESH_REPORT` is the smallest compatible seam;
+- omitted input must preserve the exact existing default shape;
+- invalid explicit input must be visible and must not produce `READY`;
+- implementation and failure-path tests selected next;
+- refresh execution, scheduler, and broader ingestion remain out of scope.
+
+Verification:
+
+- focused baseline/refresh/architecture checks: 40 passed;
+- complete local suite: 2,731 passed, 4 skipped;
+- one existing Starlette deprecation warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package 18
 
 ```text
 Phase 7 Package 18 — MSFT Already-Fresh Provider Bypass
