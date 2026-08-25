@@ -348,3 +348,12 @@ failure rolls back every new row from that batch. `TransactionImportService`
 maps these outcomes into the existing import-result JSON without changing its
 schema. No CLI, runtime database mutation, valuation, workflow, or trading
 authority is implied by this persistence boundary.
+
+The bounded `transaction_csv_import` composition root parses before database
+initialization, binds explicit immutable ledger metadata, delegates the complete
+batch to that atomic boundary, and atomically writes a schema-version-1 redacted
+operational report. Reports contain aggregate counts and stored time coverage
+only. Source/database paths and transaction, ledger, portfolio, instrument, and
+monetary identities remain private. SQLite commit and report replacement are
+separate side effects: a post-commit report failure is raised distinctly and is
+reconciled by rerunning the same immutable identities after repairing output.

@@ -196,7 +196,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → atomic transaction batch-import audit — COMPLETE
 → atomic repository batch-append boundary — COMPLETE
 → bounded durable transaction-import CLI/report audit — COMPLETE
-→ bounded durable transaction-import CLI/report — NEXT
+→ bounded durable transaction-import CLI/report — COMPLETE
+→ controlled private transaction import — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

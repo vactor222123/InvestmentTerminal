@@ -67,9 +67,21 @@ def test_parser_failure_becomes_redacted_failed_result(tmp_path: Path) -> None:
     payload = json.dumps(result.to_dict())
     assert result.status is TransactionCsvQualificationStatus.FAILED
     assert result.failure_type == "ValueError"
-    assert "CSV line 2" in (result.failure_reason or "")
+    assert result.failure_reason == "transaction CSV validation failed"
     assert "private-id" not in payload
     assert "private-ref" not in payload
+
+
+def test_missing_input_failure_does_not_leak_private_path(tmp_path: Path) -> None:
+    path = tmp_path / "private-name.csv"
+    result = TransactionCsvQualificationService(clock=clock()).qualify(
+        path, qualified_at=QUALIFIED_AT
+    )
+    payload = json.dumps(result.to_dict())
+
+    assert result.failure_reason == "transaction CSV is unavailable"
+    assert str(path) not in payload
+    assert "private-name" not in payload
 
 
 def test_naive_qualification_time_fails_before_read(tmp_path: Path) -> None:

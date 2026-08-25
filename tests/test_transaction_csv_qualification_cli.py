@@ -50,6 +50,7 @@ def test_cli_persists_failure_before_nonzero_exit(tmp_path: Path) -> None:
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert payload["status"] == "FAILED"
     assert payload["failure"]["type"] == "FileNotFoundError"
+    assert str(tmp_path) not in json.dumps(payload)
 
 
 def test_cli_rejects_naive_qualification_time(tmp_path: Path) -> None:

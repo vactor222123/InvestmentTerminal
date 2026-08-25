@@ -103,6 +103,15 @@ batch; expected identity conflicts remain duplicates, and unexpected failures
 preserve all state that existed before the batch. This adds no SQLite migration
 and does not change `TransactionImportResult.to_dict()`.
 
+`TransactionCsvImportResult` is the separate schema-version-1 redacted
+operational contract. `SUCCESS`, `EMPTY`, and `FAILED` preserve explicit run
+time and import time; aggregate submitted/imported/duplicate/stored counts and
+stored occurrence bounds are present only when authoritative. It excludes all
+source/database paths and transaction, ledger, portfolio, instrument, and
+monetary identities. A post-commit report-write failure is not represented as a
+rolled-back `FAILED` result; the CLI exposes it separately for idempotent
+reconciliation.
+
 `PortfolioTransactionCsvParser` is the provider-neutral UTF-8 ingestion
 boundary. It validates one explicit canonical schema, preserves source order and
 duplicate rows, constructs canonical instrument identities, and reports invalid

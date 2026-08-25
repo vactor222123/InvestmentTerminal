@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 2c8b5bfeb528dc7e8a902008d184382779de20b1`
+**Current repository baseline:** `develop @ 8ec2f2f8c203c68b6f7dee6cb1a146f2bb1e3b73`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -50,6 +50,7 @@
 **Phase 7 Package 26 atomic transaction batch-import audit:** COMPLETE
 **Phase 7 Package 27 atomic repository batch append:** COMPLETE
 **Phase 7 Package 28 durable transaction-import CLI/report audit:** COMPLETE
+**Phase 7 Package 29 bounded durable transaction import:** COMPLETE
 
 ## Current State
 
@@ -57,12 +58,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement one bounded durable transaction-import CLI and versioned redacted
-report over the existing parser and atomic repository batch boundary. Preserve
-privacy-safe failure reasons, parse-before-database initialization, metadata
-mismatch visibility, exact-repeat evidence, durable rollback, and explicit
-post-commit report-write failure/reconciliation. Do not run the private import,
-generate valuations, or execute a workflow.
+After Package 29 is pushed, run one controlled user-executed private transaction
+import with explicit ledger metadata and return only its redacted report. Do not
+send the private CSV or transaction database. Review aggregate imported,
+duplicate, stored, and occurrence coverage before any exact repeat, valuation
+generation, or workflow execution.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -131,3 +131,5 @@ Atomic transaction batch-import audit: `docs/PHASE_7_PACKAGE_26.md`.
 Atomic repository batch append: `docs/PHASE_7_PACKAGE_27.md`.
 
 Durable transaction-import CLI/report audit: `docs/PHASE_7_PACKAGE_28.md`.
+
+Bounded durable transaction import: `docs/PHASE_7_PACKAGE_29.md`.

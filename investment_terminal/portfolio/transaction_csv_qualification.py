@@ -153,7 +153,7 @@ class TransactionCsvQualificationService:
                 duration_seconds=(completed_at - started_at).total_seconds(),
                 transaction_count=None,
                 failure_type=type(exc).__name__,
-                failure_reason=str(exc).strip() or "transaction CSV qualification failed",
+                failure_reason=_privacy_safe_failure_reason(exc),
             )
 
         completed_at = self._completed_at(started_at)
@@ -186,3 +186,13 @@ class TransactionCsvQualificationService:
         if completed_at < started_at:
             raise ValueError("qualification clock moved backwards")
         return completed_at
+
+
+def _privacy_safe_failure_reason(exc: Exception) -> str:
+    if isinstance(exc, FileNotFoundError):
+        return "transaction CSV is unavailable"
+    if isinstance(exc, PermissionError):
+        return "transaction CSV is not accessible"
+    if isinstance(exc, UnicodeError):
+        return "transaction CSV is not valid UTF-8"
+    return "transaction CSV validation failed"

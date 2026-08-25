@@ -441,6 +441,15 @@ reconciled by repairing the output and rerunning the same immutable identities,
 not by claiming rollback. Package 29 implements this boundary before any
 private runtime import.
 
+Package 29 implements the bounded durable import command and immutable redacted
+report without changing SQLite schema 1 or the operational baseline. Parsing
+precedes database initialization; batch persistence is atomic; metadata and
+persistence failures are privacy-safe; exact repeat is explicitly idempotent.
+The SQLite-commit/report-write boundary has a distinct visible error and an
+exact-repeat reconciliation path. One controlled user-executed private import
+is next; valuation and workflow execution remain deferred until its report is
+reviewed.
+
 Boundary audit:
 
 ```text

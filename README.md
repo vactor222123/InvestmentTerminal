@@ -226,6 +226,16 @@ python -m investment_terminal.cli.transaction_csv_qualification
 Its redacted atomic report contains aggregate qualification evidence only and
 does not persist transactions.
 
+Bounded durable transaction import:
+
+```text
+python -m investment_terminal.cli.transaction_csv_import
+```
+
+The command uses explicit immutable ledger metadata, atomic batch persistence,
+and an atomic redacted aggregate report. It does not generate valuations,
+execute the integrated workflow, invoke AI, or authorize trading.
+
 ## Historical Source-of-Truth Rule
 
 ```text
