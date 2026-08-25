@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ e151a457ff8869119195c0ad03c7e0e7729a7613`
+**Current repository baseline:** `develop @ 1c64a849e2e256f03140c57cc437368417045daa`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -40,6 +40,7 @@
 **Phase 7 Package 18 MSFT already-fresh provider bypass:** COMPLETE
 **Phase 7 Package 19 refresh-report projection audit:** COMPLETE
 **Phase 7 Package 20 refresh-report projection:** COMPLETE
+**Phase 7 Package 21 closure-readiness audit:** COMPLETE — NOT READY
 
 ## Current State
 
@@ -47,9 +48,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Perform a focused Phase 7 closure-readiness audit using the now measured
-coverage and refresh evidence. Do not execute another instrument, scheduling,
-or mass refresh before that audit selects the smallest safe next package.
+Audit the existing current-portfolio JSON/CSV input, validation, persistence,
+privacy, and baseline-projection boundaries before requesting or writing real
+user portfolio data. Do not execute another instrument, scheduling, or mass
+refresh.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
@@ -98,3 +100,5 @@ MSFT already-fresh provider bypass: `docs/PHASE_7_PACKAGE_18.md`.
 Refresh-report projection audit: `docs/PHASE_7_PACKAGE_19.md`.
 
 Refresh-report projection implementation: `docs/PHASE_7_PACKAGE_20.md`.
+
+Phase 7 closure-readiness audit: `docs/PHASE_7_PACKAGE_21.md`.

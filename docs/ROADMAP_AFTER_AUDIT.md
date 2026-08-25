@@ -358,6 +358,18 @@ run against the existing live MSFT report projects nine stores and reports both
 refresh observability and measured performance as `READY`. No refresh,
 scheduling, multi-instrument aggregation, analysis, or trading is added.
 
+Package 21 repeats the Phase 7 closure-readiness audit against the actual
+runtime inventory and the implemented operational boundaries. Phase 7 is not
+ready to close: only the market-candle store and one explicit refresh report
+are `READY`; current portfolio, transactions, valuations, maintained universe,
+external context, backups, and workflow evidence are absent, and broad Phase 7
+coverage targets remain unmeasured. The database remains healthy with 3,766
+daily candles across MSFT, AAPL, and IBM. The smallest safe next package is a
+focused audit of the existing current-portfolio JSON/CSV input, validation,
+persistence, privacy, and baseline-projection seams before any private data is
+requested or written. Another instrument, scheduler, and mass refresh remain
+deferred.
+
 Boundary audit:
 
 ```text

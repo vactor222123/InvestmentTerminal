@@ -187,7 +187,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → exact already-fresh MSFT repeat — COMPLETE (provider bypassed)
 → audit refresh-report projection into operational baseline — COMPLETE
 → optional backward-compatible refresh-report projection — COMPLETE
-→ focused Phase 7 closure-readiness audit — NEXT
+→ focused Phase 7 closure-readiness audit — COMPLETE: NOT READY
+→ current-portfolio operational input audit — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 
