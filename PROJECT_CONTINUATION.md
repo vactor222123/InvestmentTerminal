@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `544ee79f5c231199339c780ee84481aea38c531b`
-**Current local package:** Phase 7 Package 24 — Transaction Operational Input Audit
+**Current GitHub baseline:** `8c718ca22495dc34ee70e3dd58038884a6ce8378`
+**Current local package:** Phase 7 Package 25 — Bounded Transaction CSV Qualification
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Bounded transaction CSV qualification
+**Current next action:** Controlled private transaction CSV qualification
 
 ---
 
@@ -299,14 +299,24 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 24 — Portfolio-Transaction Operational Input Audit
+Phase 7 Package 25 — Bounded Transaction CSV Qualification
 ```
 
 Files:
 
 ```text
-docs/PHASE_7_PACKAGE_24.md
+investment_terminal/portfolio/transaction_csv_qualification.py
+investment_terminal/cli/transaction_csv_qualification.py
+data/portfolios/portfolio_transactions.example.csv
+tests/test_transaction_csv_qualification.py
+tests/test_transaction_csv_qualification_cli.py
+tests/test_repository_privacy.py
+.gitignore
+docs/PHASE_7_PACKAGE_25.md
 docs/ROADMAP_AFTER_AUDIT.md
+Architecture.md
+DataModel.md
+README.md
 Roadmap.md
 NEXT_STEPS.md
 PROJECT_CONTINUATION.md
@@ -315,27 +325,22 @@ PROJECT_CONTINUATION.md
 Source baseline verified exactly:
 
 ```text
-develop @ 544ee79f5c231199339c780ee84481aea38c531b
+develop @ 8c718ca22495dc34ee70e3dd58038884a6ce8378
 ```
 
-Audit result:
+Result:
 
-- canonical typed CSV parsing, import accounting, schema-version-1 SQLite
-  persistence, and aggregate baseline inspection already exist;
-- no transaction CLI, tracked example CSV, or redacted durable qualification
-  report exists;
-- existing import results expose transaction IDs and are not shareable;
-- SQLite repository adds are individually atomic, but the current import loop
-  is not an all-or-nothing durable batch;
-- the runtime transaction store remains absent and no private input was read or
-  written;
-- Package 25 is a parse-only redacted qualification, not ingestion.
+- one parse-only transaction qualification CLI now exists;
+- its atomic schema-version-1 report is redacted and fail-closed;
+- `SUCCESS`, `EMPTY`, and `FAILED` preserve only aggregate facts;
+- a synthetic example is tracked and the private filename is ignored;
+- SQLite initialization/import remains absent by design;
+- one private user-executed qualification is next.
 
 Verification:
 
-- focused transaction/parser/persistence/baseline/privacy/architecture:
-  81 passed;
-- complete local suite: 2,743 passed, 4 skipped;
+- focused qualification/parser/import/models/privacy/architecture: 49 passed;
+- complete local suite: 2,752 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.
 
@@ -344,20 +349,20 @@ Verification:
 ## Previous Package
 
 ```text
-AI-Assisted Delivery Workflow Optimization
+Phase 7 Package 24 — Portfolio-Transaction Operational Input Audit
 ```
 
 Source baseline verified exactly:
 
 ```text
-develop @ 54a1abeba46859e3b9bd889024d026dc9b8be009
+develop @ 544ee79f5c231199339c780ee84481aea38c531b
 ```
 
-The delivery workflow now requires exact-baseline fresh clones, explicit
-package types, bounded operational blocks with `SEND`/`DO NOT SEND`, private
-runtime separation, repository-local pytest temp roots, and verified ZIP
-contents. Focused checks passed 34 tests; the complete suite passed 2,743 tests
-with four skipped and one existing Starlette warning.
+The audit verified parser, import accounting, SQLite, privacy, and baseline
+capabilities, then selected parse-only qualification because no transaction CLI
+or redacted report existed and durable batch import was not atomic. Focused
+checks passed 81 tests; the complete suite passed 2,743 tests with four skipped
+and one existing Starlette warning.
 
 ---
 

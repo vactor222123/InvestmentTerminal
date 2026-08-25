@@ -405,6 +405,13 @@ parse-only transaction CSV qualification CLI and synthetic example with an
 atomic redacted report. No private input or database mutation is authorized
 until that result and the later atomic batch-import boundary are reviewed.
 
+Package 25 adds that parse-only qualification boundary. The CLI reuses the
+canonical parser, atomically writes a redacted schema-version-1 report, and
+includes a synthetic example plus a privacy-protected working filename. It
+exposes only aggregate count, type counts, and occurrence range and never
+initializes SQLite. One private user-executed qualification is next; durable
+import remains prohibited pending a later atomic batch boundary.
+
 Boundary audit:
 
 ```text

@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 544ee79f5c231199339c780ee84481aea38c531b`
+**Current repository baseline:** `develop @ 8c718ca22495dc34ee70e3dd58038884a6ce8378`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -45,6 +45,7 @@
 **Phase 7 Package 23 current-portfolio runtime qualification:** COMPLETE
 **AI-assisted delivery workflow optimization:** COMPLETE
 **Phase 7 Package 24 transaction operational-input audit:** COMPLETE
+**Phase 7 Package 25 bounded transaction CSV qualification:** COMPLETE
 
 ## Current State
 
@@ -52,10 +53,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement one bounded parse-only transaction CSV qualification CLI with a
-synthetic example and atomic redacted report. Do not request private data,
-initialize or modify a transaction database, generate valuations, execute a
-workflow, add another instrument, schedule refreshes, or broaden ingestion.
+Execute one private canonical transaction CSV qualification and return only its
+redacted report. Do not return the CSV or initialize/modify a transaction
+database. Do not generate valuations, execute a workflow, add another
+instrument, schedule refreshes, or broaden ingestion.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -116,3 +117,5 @@ Current-portfolio operational input audit: `docs/PHASE_7_PACKAGE_22.md`.
 Current-portfolio runtime qualification: `docs/PHASE_7_PACKAGE_23.md`.
 
 Transaction operational-input audit: `docs/PHASE_7_PACKAGE_24.md`.
+
+Bounded transaction CSV qualification: `docs/PHASE_7_PACKAGE_25.md`.

@@ -1,0 +1,4 @@
+transaction_id,transaction_type,occurred_at,settlement_currency,symbol,name,instrument_type,instrument_currency,isin,exchange_ticker,exchange_code,quantity,unit_price,cash_amount,source_reference
+example-buy-1,BUY,2026-01-02T10:00:00+00:00,EUR,WORLD,Example World ETF,ETF,EUR,IE00B4L5Y983,IWDA,XAMS,1.5,100,,example-reference-1
+example-dividend-1,DIVIDEND,2026-02-02T10:00:00+00:00,EUR,WORLD,Example World ETF,ETF,EUR,IE00B4L5Y983,IWDA,XAMS,,,2.5,example-reference-2
+example-fee-1,FEE,2026-02-03T10:00:00+00:00,EUR,,,,,,,,,,1.0,example-reference-3

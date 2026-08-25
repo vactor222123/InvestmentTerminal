@@ -328,3 +328,12 @@ XNYS evidence is separately owned and versioned. `XNYS@1` covers only the
 audited 2021-08-19 through 2026-08-18 window, cites official ICE/NYSE calendar
 announcements and the exceptional-close memorandum, and never reuses XNAS
 identity or provenance even where observed session dates coincide.
+
+## Transaction CSV Qualification
+
+The bounded transaction qualification command composes the canonical CSV
+parser into a parse-only operational boundary. It atomically exports a redacted
+schema-version-1 `SUCCESS`, `EMPTY`, or `FAILED` report before any non-zero
+failure exit. Aggregate type/count/time coverage is visible; source paths,
+identities, instruments, monetary values, references, and raw rows are excluded.
+The boundary has no SQLite, valuation, workflow, AI, or trading dependency.

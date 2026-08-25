@@ -14,6 +14,7 @@ def test_personal_portfolio_files_are_gitignored() -> None:
         "data/portfolios/current_portfolio.json",
         "data/portfolios/portfolio_holdings.csv",
         "data/portfolios/portfolio_quotes.json",
+        "data/portfolios/portfolio_transactions.csv",
         "output/investment_review_package.json",
     }
 
@@ -25,6 +26,13 @@ def test_example_portfolio_exists() -> None:
     path = Path(
         "data/portfolios/current_portfolio.example.json"
     )
+
+    assert path.exists()
+    assert path.is_file()
+
+
+def test_example_transaction_csv_exists() -> None:
+    path = Path("data/portfolios/portfolio_transactions.example.csv")
 
     assert path.exists()
     assert path.is_file()

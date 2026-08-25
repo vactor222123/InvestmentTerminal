@@ -561,3 +561,12 @@ normalized failure and no partial success-shaped result.
 post-refresh freshness contract is still not ready. It is a non-zero fail-closed
 outcome, not a provider exception. The report grants no scheduling,
 multi-instrument refresh, analytical, or trading authority.
+
+## Transaction CSV Qualification Report
+
+`TransactionCsvQualificationResult` is an immutable schema-version-1 report
+with `SUCCESS`, `EMPTY`, and `FAILED` states. It preserves qualification/run
+times, aggregate count, deterministic type counts, and earliest/latest
+occurrence times. Failed coverage remains unknown with a normalized error. The
+report excludes source and transaction identities, instruments, amounts,
+references, and raw rows and grants no persistence or execution authority.

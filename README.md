@@ -217,6 +217,15 @@ Generated evidence:
 python -m investment_terminal.cli.grounded_generations
 ```
 
+Parse-only transaction CSV qualification:
+
+```text
+python -m investment_terminal.cli.transaction_csv_qualification
+```
+
+Its redacted atomic report contains aggregate qualification evidence only and
+does not persist transactions.
+
 ## Historical Source-of-Truth Rule
 
 ```text
