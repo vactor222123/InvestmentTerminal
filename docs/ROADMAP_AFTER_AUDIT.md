@@ -450,6 +450,14 @@ exact-repeat reconciliation path. One controlled user-executed private import
 is next; valuation and workflow execution remain deferred until its report is
 reviewed.
 
+Package 30 records the controlled user-executed private import. The redacted
+report is `SUCCESS`: all 62 qualified rows were inserted, duplicates are zero,
+stored total is 62, and occurrence coverage remains 2026-05-05T16:38:00Z
+through 2026-08-21T16:28:00Z. Failure is null and the returned report contains
+no private identities or values. One exact repeat is required before valuation
+or workflow work; it must preserve stored total and coverage while reporting
+all 62 submitted rows as duplicates.
+
 Boundary audit:
 
 ```text

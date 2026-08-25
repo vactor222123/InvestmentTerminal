@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `8ec2f2f8c203c68b6f7dee6cb1a146f2bb1e3b73`
-**Current local package:** Phase 7 Package 29 - Bounded Durable Transaction Import
+**Current GitHub baseline:** `87abc019e90c3fe8186cbcde023a271f860048cc`
+**Current local package:** Phase 7 Package 30 - Controlled Private Transaction Import
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Controlled private transaction import
+**Current next action:** Exact-repeat private transaction import
 
 ---
 
@@ -299,24 +299,14 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 29 - Bounded Durable Transaction Import
+Phase 7 Package 30 - Controlled Private Transaction Import
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/transaction_csv_import.py
-investment_terminal/portfolio/transaction_csv_qualification.py
-investment_terminal/cli/transaction_csv_import.py
-tests/test_transaction_csv_import.py
-tests/test_transaction_csv_import_cli.py
-tests/test_transaction_csv_qualification.py
-tests/test_transaction_csv_qualification_cli.py
-docs/PHASE_7_PACKAGE_29.md
+docs/PHASE_7_PACKAGE_30.md
 docs/ROADMAP_AFTER_AUDIT.md
-Architecture.md
-DataModel.md
-README.md
 Roadmap.md
 NEXT_STEPS.md
 PROJECT_CONTINUATION.md
@@ -325,24 +315,22 @@ PROJECT_CONTINUATION.md
 Source baseline verified exactly:
 
 ```text
-develop @ 8ec2f2f8c203c68b6f7dee6cb1a146f2bb1e3b73
+develop @ 87abc019e90c3fe8186cbcde023a271f860048cc
 ```
 
 Result:
 
-- one explicit CLI composes parse-first input validation and atomic SQLite batch
-  import;
-- the schema-version-1 report exposes aggregate counts and stored time coverage
-  without private identities, values, or paths;
-- qualification and import failure reasons are privacy-safe;
-- metadata mismatch and later SQLite failure are visible and preserve rollback;
-- exact repeat reports only duplicates and unchanged stored coverage;
-- post-commit report failure is distinct and reconciled by exact repeat;
-- no private runtime input or operational database was touched.
+- the user-executed bounded import returned `SUCCESS`;
+- all 62 submitted qualified transactions were inserted;
+- duplicate count is zero and stored total is 62;
+- occurrence coverage is 2026-05-05T16:38:00Z through
+  2026-08-21T16:28:00Z, matching qualification evidence;
+- failure is null and the redacted report is privacy-safe;
+- private CSV/database/current-portfolio inputs were not reviewed or packaged.
 
 Verification:
 
-- focused transaction/baseline/privacy/atomic-write/architecture: 100 passed;
+- focused transaction/baseline/privacy/architecture: 95 passed;
 - complete local suite: 2,767 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.
@@ -352,13 +340,13 @@ Verification:
 ## Previous Package
 
 ```text
-Phase 7 Package 28 - Durable Transaction Import CLI/Report Audit
+Phase 7 Package 29 - Bounded Durable Transaction Import
 ```
 
-Package 28 selected one redacted CLI/report contract, privacy-safe failures,
-and explicit post-commit report recovery without a schema or baseline change.
-Focused checks passed 90 tests and the complete suite passed 2,757 tests with
-four skipped.
+Package 29 added the bounded atomic import CLI and redacted report, closed
+qualification path leakage, and proved exact-repeat and post-commit report
+recovery behavior. Focused checks passed 100 tests and the complete suite passed
+2,767 tests with four skipped.
 
 ---
 
