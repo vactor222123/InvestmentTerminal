@@ -4,8 +4,8 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `5d8294c3c839f947044308ffe1693a5c203a98e7`
-**Current local package:** Phase 7 Package 23 — Current-Portfolio Runtime Qualification
+**Current GitHub baseline:** `54a1abeba46859e3b9bd889024d026dc9b8be009`
+**Current local package:** AI-Assisted Delivery Workflow Optimization
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
 **Current next action:** Portfolio-transaction operational input audit
 
@@ -282,39 +282,71 @@ Architecture redesign is not required.
 
 ## Working Protocol
 
-Before every code package:
+Canonical package and operational handoff protocol:
 
-1. Read current files from GitHub.
-2. Perform focused audit only for affected subsystem.
-3. Analyze real repository state only.
-4. Do not make assumptions.
-5. Validate against PROJECT_VISION.md and architecture.
-6. Provide complete changed files.
-7. Update this checkpoint document.
+```text
+docs/AI_ASSISTED_DELIVERY_WORKFLOW.md
+```
 
-After implementation:
-
-- git add
-- commit
-- tests
-- CI analysis after user confirmation.
+Every package uses an exact-baseline fresh clone, one primary package type, one
+smallest coherent change, focused and full tests with repository-local
+`--basetemp` where required, `git diff --check`, one conventional local commit,
+and a verified structured ZIP. User-executed operational blocks explicitly mark
+shareable and private paths.
 
 ---
 
 ## Latest Package
 
 ```text
-Phase 7 Package 23 — Controlled Current-Portfolio Runtime Qualification
+AI-Assisted Delivery Workflow Optimization
 ```
 
 Files:
 
 ```text
-docs/PHASE_7_PACKAGE_23.md
-docs/ROADMAP_AFTER_AUDIT.md
-Roadmap.md
+AGENTS.md
+docs/AI_ASSISTED_DELIVERY_WORKFLOW.md
+docs/AI_CONTEXT.md
+docs/README.md
 NEXT_STEPS.md
 PROJECT_CONTINUATION.md
+```
+
+Source baseline verified exactly:
+
+```text
+develop @ 54a1abeba46859e3b9bd889024d026dc9b8be009
+```
+
+Result:
+
+- exact-baseline fresh-clone startup is now explicit and fail-closed;
+- packages are classified as `AUDIT`, `IMPLEMENTATION`, or `OPERATIONAL`;
+- user Terminal work uses one bounded block with explicit `SEND` and
+  `DO NOT SEND` paths;
+- runtime data remains private by default and ZIP contents have explicit
+  exclusions and verification;
+- repository-local pytest temporary roots avoid the measured Windows system
+  temp permission failure;
+- checkpoint history is concise while detailed evidence remains in package
+  records and Git;
+- a packaging script is recorded only as a future audited tooling candidate;
+- Phase 7 Package 24 remains the next product package.
+
+Verification:
+
+- focused architecture/delivery/privacy/documentation checks: 34 passed;
+- complete local suite: 2,743 passed, 4 skipped;
+- one existing Starlette deprecation warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package 23
+
+```text
+Phase 7 Package 23 — Controlled Current-Portfolio Runtime Qualification
 ```
 
 Source baseline verified exactly:
@@ -323,48 +355,11 @@ Source baseline verified exactly:
 develop @ 5d8294c3c839f947044308ffe1693a5c203a98e7
 ```
 
-Measured result:
-
-- the private runtime current portfolio loads successfully;
-- the redacted schema-version-1 baseline reports `CURRENT_PORTFOLIO=READY`,
-  three holdings, and EUR without holding identities, quantities, costs, cash,
-  contribution, or policy;
-- market candles remain `READY` with 3,766 rows and the MSFT refresh report
-  remains `READY`;
-- transactions, valuations, maintained universe, external context, backups,
-  and workflow evidence remain absent;
-- no implementation or JSON-contract change is justified;
-- Package 24 is a focused transaction operational-input audit before any
-  private transaction data is requested or written.
-
-Verification:
-
-- focused portfolio/transaction/privacy/baseline/architecture checks:
-  108 passed;
-- complete local suite: 2,743 passed, 4 skipped;
-- one existing Starlette deprecation warning;
-- the initial system-temp focused attempt encountered only pytest fixture
-  permission errors; the identical repository-local-basetemp rerun passed;
-- `git diff --check`: clean.
-
----
-
-## Previous Package 22
-
-```text
-Phase 7 Package 22 — Current-Portfolio Operational Input Audit
-```
-
-Source baseline verified exactly:
-
-```text
-develop @ 944dad2d048ecdef21b9727408b767e231d93841
-```
-
-The audit selected the existing typed loader and redacted operational baseline
-as the controlled qualification path, with private JSON and CSV previews kept
-outside repository evidence. Focused checks passed 72 tests; the complete suite
-passed 2,743 tests with four skipped and one existing Starlette warning.
+The private runtime snapshot qualified as `CURRENT_PORTFOLIO=READY` with three
+holdings and EUR through the redacted baseline. No holding identities,
+quantities, costs, cash, contribution, or policy entered repository evidence.
+Focused checks passed 108 tests; the complete suite passed 2,743 tests with
+four skipped and one existing Starlette warning.
 
 ---
 

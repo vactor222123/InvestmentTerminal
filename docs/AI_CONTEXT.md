@@ -31,6 +31,13 @@ architecture/product conflict.
 `PROJECT_CONTINUATION.md` does not replace Architecture/DataModel authority; it
 owns current execution state, audit path, failure lessons, and next action.
 
+AI-assisted package preparation and user-executed runtime handoffs additionally
+follow:
+
+```text
+docs/AI_ASSISTED_DELIVERY_WORKFLOW.md
+```
+
 ## Mission
 
 InvestmentTerminal is a private, local-first investment intelligence platform

@@ -56,6 +56,7 @@ Supporting operational documentation:
 ```text
 docs/DEPENDENCY_REPRODUCIBILITY.md
 docs/CI.md
+docs/AI_ASSISTED_DELIVERY_WORKFLOW.md
 ```
 
 ## Production Surface

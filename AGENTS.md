@@ -11,7 +11,8 @@ Before changing code, read:
 3. `docs/README.md`
 4. `docs/DOMAIN_MAP.md`
 5. `docs/ARCHITECTURE_REVIEW_SPRINT_12.md`
-6. relevant domain documentation and tests
+6. `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md`
+7. relevant domain documentation and tests
 
 ## Repository
 
@@ -82,6 +83,25 @@ Do not change tests merely to hide a regression.
 - Record major architectural decisions in ADRs.
 - Do not invent missing facts from absent data.
 - Do not silently normalize away errors that should remain visible.
+
+## Package delivery discipline
+
+- Start every package from a fresh `develop` clone at the exact caller-supplied
+  GitHub SHA; stop on a baseline, branch, or clean-worktree mismatch.
+- Classify the package as `AUDIT`, `IMPLEMENTATION`, or `OPERATIONAL` and keep
+  it to one smallest coherent change and one conventional local commit.
+- For user-executed runtime work, provide one bounded PowerShell block and mark
+  explicit `SEND` and `DO NOT SEND` paths.
+- Treat `C:\runtime\data` as private by default. Review only explicitly returned
+  redacted operational reports; never include runtime inputs in Git or ZIP.
+- Use unique repository-local pytest `--basetemp` paths when the system temp
+  root is inaccessible, and exclude them from commits and ZIP artifacts.
+- Package complete changed files at repository-relative paths, verify ZIP
+  contents, and report the final SHA-256.
+- Keep `PROJECT_CONTINUATION.md` concise; preserve detailed historical package
+  evidence in its owning `docs/PHASE_*` record and Git history.
+
+The complete handoff protocol is `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md`.
 
 ## Expected workflow
 

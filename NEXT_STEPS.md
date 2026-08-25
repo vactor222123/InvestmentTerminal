@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 5d8294c3c839f947044308ffe1693a5c203a98e7`
+**Current repository baseline:** `develop @ 54a1abeba46859e3b9bd889024d026dc9b8be009`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -43,6 +43,7 @@
 **Phase 7 Package 21 closure-readiness audit:** COMPLETE — NOT READY
 **Phase 7 Package 22 current-portfolio input audit:** COMPLETE
 **Phase 7 Package 23 current-portfolio runtime qualification:** COMPLETE
+**AI-assisted delivery workflow optimization:** COMPLETE
 
 ## Current State
 
@@ -54,6 +55,10 @@ Audit the existing portfolio-transaction CSV/parser, import, SQLite, CLI,
 privacy, and operational-baseline seams before requesting or writing private
 transaction data. Do not execute transaction import, valuation generation,
 workflow execution, another instrument, scheduling, or mass refresh.
+
+Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
+package classification, private/runtime handoff labels, repository-local pytest
+temporary roots, ZIP verification, and final delivery contents.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
 
