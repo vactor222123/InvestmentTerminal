@@ -383,6 +383,17 @@ validate it locally, and return only the redacted baseline report. Transactions,
 valuations, workflow execution, another instrument, scheduling, and mass
 refresh remain deferred.
 
+Package 23 records the successful user-executed current-portfolio runtime
+qualification. The schema-version-1 redacted baseline reports
+`CURRENT_PORTFOLIO=READY`, three holdings, and EUR without exposing holding
+identities, quantities, costs, cash, contribution, or policy. Market candles
+and the bounded MSFT refresh evidence remain `READY`; transaction and valuation
+stores remain absent. The next smallest package is a focused audit of the
+existing portfolio-transaction CSV, import, SQLite, CLI, privacy, and baseline
+seams before any private transaction data is requested or written. Valuation
+generation, workflow execution, another instrument, scheduling, and mass
+refresh remain deferred.
+
 Boundary audit:
 
 ```text

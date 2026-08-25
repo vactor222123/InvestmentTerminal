@@ -189,7 +189,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → optional backward-compatible refresh-report projection — COMPLETE
 → focused Phase 7 closure-readiness audit — COMPLETE: NOT READY
 → current-portfolio operational input audit — COMPLETE
-→ controlled current-portfolio runtime qualification — NEXT
+→ controlled current-portfolio runtime qualification — COMPLETE
+→ portfolio-transaction operational input audit — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

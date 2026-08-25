@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 944dad2d048ecdef21b9727408b767e231d93841`
+**Current repository baseline:** `develop @ 5d8294c3c839f947044308ffe1693a5c203a98e7`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -42,6 +42,7 @@
 **Phase 7 Package 20 refresh-report projection:** COMPLETE
 **Phase 7 Package 21 closure-readiness audit:** COMPLETE — NOT READY
 **Phase 7 Package 22 current-portfolio input audit:** COMPLETE
+**Phase 7 Package 23 current-portfolio runtime qualification:** COMPLETE
 
 ## Current State
 
@@ -49,9 +50,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Prepare and validate one user-owned runtime current-portfolio JSON, then return
-only the redacted operational-baseline report. Do not return the private source
-JSON or CSV preview. Do not execute transaction import, valuation generation,
+Audit the existing portfolio-transaction CSV/parser, import, SQLite, CLI,
+privacy, and operational-baseline seams before requesting or writing private
+transaction data. Do not execute transaction import, valuation generation,
 workflow execution, another instrument, scheduling, or mass refresh.
 
 Closure-readiness record: `docs/PHASE_6_CLOSURE_AUDIT.md`.
@@ -105,3 +106,5 @@ Refresh-report projection implementation: `docs/PHASE_7_PACKAGE_20.md`.
 Phase 7 closure-readiness audit: `docs/PHASE_7_PACKAGE_21.md`.
 
 Current-portfolio operational input audit: `docs/PHASE_7_PACKAGE_22.md`.
+
+Current-portfolio runtime qualification: `docs/PHASE_7_PACKAGE_23.md`.

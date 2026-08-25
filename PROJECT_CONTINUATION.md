@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `944dad2d048ecdef21b9727408b767e231d93841`
-**Current local package:** Phase 7 Package 22 — Current-Portfolio Input Audit
+**Current GitHub baseline:** `5d8294c3c839f947044308ffe1693a5c203a98e7`
+**Current local package:** Phase 7 Package 23 — Current-Portfolio Runtime Qualification
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Controlled current-portfolio runtime qualification
+**Current next action:** Portfolio-transaction operational input audit
 
 ---
 
@@ -304,13 +304,13 @@ After implementation:
 ## Latest Package
 
 ```text
-Phase 7 Package 22 — Current-Portfolio Operational Input Audit
+Phase 7 Package 23 — Controlled Current-Portfolio Runtime Qualification
 ```
 
 Files:
 
 ```text
-docs/PHASE_7_PACKAGE_22.md
+docs/PHASE_7_PACKAGE_23.md
 docs/ROADMAP_AFTER_AUDIT.md
 Roadmap.md
 NEXT_STEPS.md
@@ -320,33 +320,51 @@ PROJECT_CONTINUATION.md
 Source baseline verified exactly:
 
 ```text
-develop @ 944dad2d048ecdef21b9727408b767e231d93841
+develop @ 5d8294c3c839f947044308ffe1693a5c203a98e7
 ```
 
-Audit result:
+Measured result:
 
-- `C:\runtime\data\current_portfolio.json` and its baseline report are absent;
-- the typed loader validates portfolio policy, holdings, identities, strategies,
-  uniqueness, finite amounts, and cash without requiring new code;
-- the CSV importer has line-specific validation and the writer uses atomic
-  replacement while preserving user-owned name, policy, and cash;
-- the default portfolio path is repository-relative and must not silently own
-  the runtime path;
-- canonical repository-local personal filenames are ignored and privacy guards
-  pass;
-- CSV `--preview` contains complete holdings and costs, so it must not be used
-  as the returned/shareable evidence;
-- the operational baseline is the existing redacted qualification seam: it
-  exposes only configured path, portfolio name, holding count, and base currency;
-- no implementation change is justified; Package 23 is a user-executed private
-  runtime preparation followed by redacted baseline qualification.
+- the private runtime current portfolio loads successfully;
+- the redacted schema-version-1 baseline reports `CURRENT_PORTFOLIO=READY`,
+  three holdings, and EUR without holding identities, quantities, costs, cash,
+  contribution, or policy;
+- market candles remain `READY` with 3,766 rows and the MSFT refresh report
+  remains `READY`;
+- transactions, valuations, maintained universe, external context, backups,
+  and workflow evidence remain absent;
+- no implementation or JSON-contract change is justified;
+- Package 24 is a focused transaction operational-input audit before any
+  private transaction data is requested or written.
 
 Verification:
 
-- focused portfolio/privacy/baseline/architecture checks: 72 passed;
+- focused portfolio/transaction/privacy/baseline/architecture checks:
+  108 passed;
 - complete local suite: 2,743 passed, 4 skipped;
 - one existing Starlette deprecation warning;
+- the initial system-temp focused attempt encountered only pytest fixture
+  permission errors; the identical repository-local-basetemp rerun passed;
 - `git diff --check`: clean.
+
+---
+
+## Previous Package 22
+
+```text
+Phase 7 Package 22 — Current-Portfolio Operational Input Audit
+```
+
+Source baseline verified exactly:
+
+```text
+develop @ 944dad2d048ecdef21b9727408b767e231d93841
+```
+
+The audit selected the existing typed loader and redacted operational baseline
+as the controlled qualification path, with private JSON and CSV previews kept
+outside repository evidence. Focused checks passed 72 tests; the complete suite
+passed 2,743 tests with four skipped and one existing Starlette warning.
 
 ---
 
