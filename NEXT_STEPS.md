@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 87abc019e90c3fe8186cbcde023a271f860048cc`
+**Current repository baseline:** `develop @ 144b29edf99c88f5d0c67377433725f1bfbe090e`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -52,6 +52,7 @@
 **Phase 7 Package 28 durable transaction-import CLI/report audit:** COMPLETE
 **Phase 7 Package 29 bounded durable transaction import:** COMPLETE
 **Phase 7 Package 30 controlled private transaction import:** COMPLETE - 62 inserted
+**Phase 7 Package 31 exact-repeat private transaction import:** COMPLETE - 62 duplicates
 
 ## Current State
 
@@ -59,11 +60,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one exact repeat of the same private transaction CSV through the bounded
-import command and write a separate redacted report. It must show zero imported,
-62 duplicates, stored total 62, and unchanged occurrence coverage. Return only
-the repeat report; do not send the CSV, database, or current portfolio. Do not
-generate valuations or execute a workflow before reviewing the repeat.
+Audit the existing transaction-derived valuation path before any private
+valuation is generated. Verify its required quote, currency, cutoff,
+persistence, atomicity, privacy, and redacted-report boundaries, then select the
+smallest safe operational handoff. Do not execute a private valuation or the
+integrated workflow during the audit.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -136,3 +137,5 @@ Durable transaction-import CLI/report audit: `docs/PHASE_7_PACKAGE_28.md`.
 Bounded durable transaction import: `docs/PHASE_7_PACKAGE_29.md`.
 
 Controlled private transaction import: `docs/PHASE_7_PACKAGE_30.md`.
+
+Exact-repeat private transaction import: `docs/PHASE_7_PACKAGE_31.md`.

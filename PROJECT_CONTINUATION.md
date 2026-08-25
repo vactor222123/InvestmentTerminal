@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `87abc019e90c3fe8186cbcde023a271f860048cc`
-**Current local package:** Phase 7 Package 30 - Controlled Private Transaction Import
+**Current GitHub baseline:** `144b29edf99c88f5d0c67377433725f1bfbe090e`
+**Current local package:** Phase 7 Package 31 - Exact-Repeat Private Transaction Import
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Exact-repeat private transaction import
+**Current next action:** Transaction-derived valuation operational audit
 
 ---
 
@@ -299,13 +299,13 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 30 - Controlled Private Transaction Import
+Phase 7 Package 31 - Exact-Repeat Private Transaction Import
 ```
 
 Files:
 
 ```text
-docs/PHASE_7_PACKAGE_30.md
+docs/PHASE_7_PACKAGE_31.md
 docs/ROADMAP_AFTER_AUDIT.md
 Roadmap.md
 NEXT_STEPS.md
@@ -315,22 +315,23 @@ PROJECT_CONTINUATION.md
 Source baseline verified exactly:
 
 ```text
-develop @ 87abc019e90c3fe8186cbcde023a271f860048cc
+develop @ 144b29edf99c88f5d0c67377433725f1bfbe090e
 ```
 
 Result:
 
-- the user-executed bounded import returned `SUCCESS`;
-- all 62 submitted qualified transactions were inserted;
-- duplicate count is zero and stored total is 62;
-- occurrence coverage is 2026-05-05T16:38:00Z through
-  2026-08-21T16:28:00Z, matching qualification evidence;
+- the user-executed exact repeat returned `SUCCESS`;
+- all 62 submitted transaction identities were duplicates and zero were
+  inserted;
+- stored total remained 62;
+- occurrence coverage remained 2026-05-05T16:38:00Z through
+  2026-08-21T16:28:00Z;
 - failure is null and the redacted report is privacy-safe;
 - private CSV/database/current-portfolio inputs were not reviewed or packaged.
 
 Verification:
 
-- focused transaction/baseline/privacy/architecture: 95 passed;
+- focused transaction/baseline/privacy/architecture: 59 passed;
 - complete local suite: 2,767 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.
@@ -340,13 +341,13 @@ Verification:
 ## Previous Package
 
 ```text
-Phase 7 Package 29 - Bounded Durable Transaction Import
+Phase 7 Package 30 - Controlled Private Transaction Import
 ```
 
-Package 29 added the bounded atomic import CLI and redacted report, closed
-qualification path leakage, and proved exact-repeat and post-commit report
-recovery behavior. Focused checks passed 100 tests and the complete suite passed
-2,767 tests with four skipped.
+Package 30 recorded the successful controlled private import: all 62 qualified
+transactions were inserted, stored total became 62, and occurrence bounds
+matched qualification evidence. Focused checks passed 95 tests and the complete
+suite passed 2,767 tests with four skipped.
 
 ---
 

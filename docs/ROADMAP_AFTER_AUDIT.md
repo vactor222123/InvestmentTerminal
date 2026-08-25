@@ -458,6 +458,15 @@ no private identities or values. One exact repeat is required before valuation
 or workflow work; it must preserve stored total and coverage while reporting
 all 62 submitted rows as duplicates.
 
+Package 31 records the exact repeat. The redacted report is `SUCCESS`: all 62
+submitted immutable transaction identities were duplicates, zero rows were
+inserted, stored total remained 62, and occurrence coverage remained
+2026-05-05T16:38:00Z through 2026-08-21T16:28:00Z. Failure is null and no
+private identities or values were returned. The next smallest safe package is a
+focused audit of the existing transaction-derived valuation path and its quote,
+currency, cutoff, persistence, atomicity, privacy, and redacted-report
+boundaries before any private valuation or integrated workflow execution.
+
 Boundary audit:
 
 ```text
