@@ -46,6 +46,8 @@
 **AI-assisted delivery workflow optimization:** COMPLETE
 **Phase 7 Package 24 transaction operational-input audit:** COMPLETE
 **Phase 7 Package 25 bounded transaction CSV qualification:** COMPLETE
+**Phase 7 controlled private transaction CSV qualification:** COMPLETE - 62 events
+**Phase 7 Package 26 atomic transaction batch-import audit:** COMPLETE
 
 ## Current State
 
@@ -53,10 +55,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute one private canonical transaction CSV qualification and return only its
-redacted report. Do not return the CSV or initialize/modify a transaction
-database. Do not generate valuations, execute a workflow, add another
-instrument, schedule refreshes, or broaden ingestion.
+Implement one repository-level atomic transaction batch-append boundary for the
+in-memory and SQLite adapters, then route `TransactionImportService` through it.
+Preserve row-aligned duplicate accounting and the existing public import-result
+JSON. Prove rollback after a later unexpected SQLite failure and exact-repeat
+idempotency. Do not add an import CLI/report or initialize/modify the operational
+database. Do not generate valuations or execute a workflow.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -119,3 +123,5 @@ Current-portfolio runtime qualification: `docs/PHASE_7_PACKAGE_23.md`.
 Transaction operational-input audit: `docs/PHASE_7_PACKAGE_24.md`.
 
 Bounded transaction CSV qualification: `docs/PHASE_7_PACKAGE_25.md`.
+
+Atomic transaction batch-import audit: `docs/PHASE_7_PACKAGE_26.md`.

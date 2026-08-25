@@ -412,6 +412,16 @@ exposes only aggregate count, type counts, and occurrence range and never
 initializes SQLite. One private user-executed qualification is next; durable
 import remains prohibited pending a later atomic batch boundary.
 
+The controlled private qualification then completed successfully for 62 events
+without database mutation. Package 26 audits the durable import seam and
+reproduces partial persistence when an unexpected failure occurs after an
+earlier per-row commit. Schema version 1 is sufficient, but the repository
+contract has no atomic batch operation. The smallest safe next package is a
+persistence-agnostic batch append implemented atomically by both in-memory and
+SQLite repositories, with row-aligned duplicate accounting and durable rollback
+tests. A user-facing import CLI and operational database mutation remain
+deferred.
+
 Boundary audit:
 
 ```text

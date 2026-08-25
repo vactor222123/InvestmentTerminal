@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `8c718ca22495dc34ee70e3dd58038884a6ce8378`
-**Current local package:** Phase 7 Package 25 — Bounded Transaction CSV Qualification
+**Current GitHub baseline:** `5cba060e45fa39c8889b8bcedc2683d091dd3c96`
+**Current local package:** Phase 7 Package 26 - Atomic Transaction Batch Import Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Controlled private transaction CSV qualification
+**Current next action:** Atomic repository batch-append implementation
 
 ---
 
@@ -299,24 +299,14 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 25 — Bounded Transaction CSV Qualification
+Phase 7 Package 26 - Atomic Transaction Batch Import Audit
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/transaction_csv_qualification.py
-investment_terminal/cli/transaction_csv_qualification.py
-data/portfolios/portfolio_transactions.example.csv
-tests/test_transaction_csv_qualification.py
-tests/test_transaction_csv_qualification_cli.py
-tests/test_repository_privacy.py
-.gitignore
-docs/PHASE_7_PACKAGE_25.md
+docs/PHASE_7_PACKAGE_26.md
 docs/ROADMAP_AFTER_AUDIT.md
-Architecture.md
-DataModel.md
-README.md
 Roadmap.md
 NEXT_STEPS.md
 PROJECT_CONTINUATION.md
@@ -325,21 +315,22 @@ PROJECT_CONTINUATION.md
 Source baseline verified exactly:
 
 ```text
-develop @ 8c718ca22495dc34ee70e3dd58038884a6ce8378
+develop @ 5cba060e45fa39c8889b8bcedc2683d091dd3c96
 ```
 
 Result:
 
-- one parse-only transaction qualification CLI now exists;
-- its atomic schema-version-1 report is redacted and fail-closed;
-- `SUCCESS`, `EMPTY`, and `FAILED` preserve only aggregate facts;
-- a synthetic example is tracked and the private filename is ignored;
-- SQLite initialization/import remains absent by design;
-- one private user-executed qualification is next.
+- controlled private qualification succeeded for 62 redacted aggregate events;
+- the import service still commits one repository add at a time;
+- a simulated later failure preserved the first row and reproduced the atomicity
+  gap;
+- schema version 1 needs no migration for the remediation;
+- one repository-level atomic batch append is the smallest safe next package;
+- no private input or operational database was read or modified by this audit.
 
 Verification:
 
-- focused qualification/parser/import/models/privacy/architecture: 49 passed;
+- focused transaction/persistence/qualification/architecture: 52 passed;
 - complete local suite: 2,752 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.
@@ -347,6 +338,18 @@ Verification:
 ---
 
 ## Previous Package
+
+```text
+Phase 7 Package 25 — Bounded Transaction CSV Qualification
+```
+
+Package 25 added the parse-only CLI and atomic redacted report without SQLite
+initialization. Focused checks passed 49 tests and the complete suite passed
+2,752 tests with four skipped and one existing Starlette warning.
+
+---
+
+## Previous Package 24
 
 ```text
 Phase 7 Package 24 — Portfolio-Transaction Operational Input Audit
