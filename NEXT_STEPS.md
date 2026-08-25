@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 54a1abeba46859e3b9bd889024d026dc9b8be009`
+**Current repository baseline:** `develop @ 544ee79f5c231199339c780ee84481aea38c531b`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -44,6 +44,7 @@
 **Phase 7 Package 22 current-portfolio input audit:** COMPLETE
 **Phase 7 Package 23 current-portfolio runtime qualification:** COMPLETE
 **AI-assisted delivery workflow optimization:** COMPLETE
+**Phase 7 Package 24 transaction operational-input audit:** COMPLETE
 
 ## Current State
 
@@ -51,10 +52,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit the existing portfolio-transaction CSV/parser, import, SQLite, CLI,
-privacy, and operational-baseline seams before requesting or writing private
-transaction data. Do not execute transaction import, valuation generation,
-workflow execution, another instrument, scheduling, or mass refresh.
+Implement one bounded parse-only transaction CSV qualification CLI with a
+synthetic example and atomic redacted report. Do not request private data,
+initialize or modify a transaction database, generate valuations, execute a
+workflow, add another instrument, schedule refreshes, or broaden ingestion.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -113,3 +114,5 @@ Phase 7 closure-readiness audit: `docs/PHASE_7_PACKAGE_21.md`.
 Current-portfolio operational input audit: `docs/PHASE_7_PACKAGE_22.md`.
 
 Current-portfolio runtime qualification: `docs/PHASE_7_PACKAGE_23.md`.
+
+Transaction operational-input audit: `docs/PHASE_7_PACKAGE_24.md`.

@@ -394,6 +394,17 @@ seams before any private transaction data is requested or written. Valuation
 generation, workflow execution, another instrument, scheduling, and mass
 refresh remain deferred.
 
+Package 24 audits the transaction input and persistence surface. The canonical
+CSV parser, immutable ledger models, idempotent import accounting, schema-
+versioned SQLite repository, and redacted operational-baseline projection
+exist, but no transaction CLI, tracked example CSV, or versioned redacted
+qualification/import report exists. The current import service commits one
+repository add at a time, so an unexpected later failure does not provide an
+all-or-nothing durable batch guarantee. The smallest safe next package is a
+parse-only transaction CSV qualification CLI and synthetic example with an
+atomic redacted report. No private input or database mutation is authorized
+until that result and the later atomic batch-import boundary are reviewed.
+
 Boundary audit:
 
 ```text

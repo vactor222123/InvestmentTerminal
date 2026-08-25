@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `54a1abeba46859e3b9bd889024d026dc9b8be009`
-**Current local package:** AI-Assisted Delivery Workflow Optimization
+**Current GitHub baseline:** `544ee79f5c231199339c780ee84481aea38c531b`
+**Current local package:** Phase 7 Package 24 — Transaction Operational Input Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Portfolio-transaction operational input audit
+**Current next action:** Bounded transaction CSV qualification
 
 ---
 
@@ -299,18 +299,52 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-AI-Assisted Delivery Workflow Optimization
+Phase 7 Package 24 — Portfolio-Transaction Operational Input Audit
 ```
 
 Files:
 
 ```text
-AGENTS.md
-docs/AI_ASSISTED_DELIVERY_WORKFLOW.md
-docs/AI_CONTEXT.md
-docs/README.md
+docs/PHASE_7_PACKAGE_24.md
+docs/ROADMAP_AFTER_AUDIT.md
+Roadmap.md
 NEXT_STEPS.md
 PROJECT_CONTINUATION.md
+```
+
+Source baseline verified exactly:
+
+```text
+develop @ 544ee79f5c231199339c780ee84481aea38c531b
+```
+
+Audit result:
+
+- canonical typed CSV parsing, import accounting, schema-version-1 SQLite
+  persistence, and aggregate baseline inspection already exist;
+- no transaction CLI, tracked example CSV, or redacted durable qualification
+  report exists;
+- existing import results expose transaction IDs and are not shareable;
+- SQLite repository adds are individually atomic, but the current import loop
+  is not an all-or-nothing durable batch;
+- the runtime transaction store remains absent and no private input was read or
+  written;
+- Package 25 is a parse-only redacted qualification, not ingestion.
+
+Verification:
+
+- focused transaction/parser/persistence/baseline/privacy/architecture:
+  81 passed;
+- complete local suite: 2,743 passed, 4 skipped;
+- one existing Starlette deprecation warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package
+
+```text
+AI-Assisted Delivery Workflow Optimization
 ```
 
 Source baseline verified exactly:
@@ -319,47 +353,11 @@ Source baseline verified exactly:
 develop @ 54a1abeba46859e3b9bd889024d026dc9b8be009
 ```
 
-Result:
-
-- exact-baseline fresh-clone startup is now explicit and fail-closed;
-- packages are classified as `AUDIT`, `IMPLEMENTATION`, or `OPERATIONAL`;
-- user Terminal work uses one bounded block with explicit `SEND` and
-  `DO NOT SEND` paths;
-- runtime data remains private by default and ZIP contents have explicit
-  exclusions and verification;
-- repository-local pytest temporary roots avoid the measured Windows system
-  temp permission failure;
-- checkpoint history is concise while detailed evidence remains in package
-  records and Git;
-- a packaging script is recorded only as a future audited tooling candidate;
-- Phase 7 Package 24 remains the next product package.
-
-Verification:
-
-- focused architecture/delivery/privacy/documentation checks: 34 passed;
-- complete local suite: 2,743 passed, 4 skipped;
-- one existing Starlette deprecation warning;
-- `git diff --check`: clean.
-
----
-
-## Previous Package 23
-
-```text
-Phase 7 Package 23 — Controlled Current-Portfolio Runtime Qualification
-```
-
-Source baseline verified exactly:
-
-```text
-develop @ 5d8294c3c839f947044308ffe1693a5c203a98e7
-```
-
-The private runtime snapshot qualified as `CURRENT_PORTFOLIO=READY` with three
-holdings and EUR through the redacted baseline. No holding identities,
-quantities, costs, cash, contribution, or policy entered repository evidence.
-Focused checks passed 108 tests; the complete suite passed 2,743 tests with
-four skipped and one existing Starlette warning.
+The delivery workflow now requires exact-baseline fresh clones, explicit
+package types, bounded operational blocks with `SEND`/`DO NOT SEND`, private
+runtime separation, repository-local pytest temp roots, and verified ZIP
+contents. Focused checks passed 34 tests; the complete suite passed 2,743 tests
+with four skipped and one existing Starlette warning.
 
 ---
 
