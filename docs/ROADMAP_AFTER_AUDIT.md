@@ -529,3 +529,8 @@ required private quotes, but matching could not start because immutable ledger
 instrument identities lack exchange tickers. Valuation remained untouched. A
 bounded provenance-aware metadata enrichment audit is next; historical payload
 rewrites and guessed venue mappings are excluded.
+Package 37 confirms that immutable transaction payloads must not be rewritten
+and that neither the private quote file nor the unprovenanced current-portfolio
+file can serve as metadata authority. The smallest safe next package is a
+provider-neutral, provenance-aware metadata evidence document and detached
+read-only position projection, composed first into quote qualification only.

@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 72716af002ca036367b09399d99480393c217dcb`
+**Current repository baseline:** `develop @ 8dbf5e336d98b9e8c656c8be122f93af5ab0353e`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -58,6 +58,7 @@
 **Phase 7 Package 34 offline quote qualification audit:** COMPLETE
 **Phase 7 Package 35 bounded offline quote qualification:** COMPLETE
 **Phase 7 Package 36 controlled private offline quote qualification:** COMPLETE - BLOCKED
+**Phase 7 Package 37 transaction instrument-metadata enrichment audit:** COMPLETE
 
 ## Current State
 
@@ -65,10 +66,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit a bounded provenance-aware instrument metadata enrichment boundary for
-transaction-derived positions whose immutable ledger identities lack exchange
-tickers. Do not rewrite transaction history, guess venue tickers, or execute
-valuation.
+Implement a bounded provenance-aware instrument-metadata evidence and read-only
+projection boundary, then compose it optionally into offline quote qualification.
+Use synthetic tests only; do not rewrite transaction history, guess venue
+tickers, request private metadata, or execute valuation.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -153,3 +154,5 @@ Offline quote qualification audit: `docs/PHASE_7_PACKAGE_34.md`.
 Bounded offline quote qualification: `docs/PHASE_7_PACKAGE_35.md`.
 
 Controlled private offline quote qualification: `docs/PHASE_7_PACKAGE_36.md`.
+
+Transaction instrument-metadata enrichment audit: `docs/PHASE_7_PACKAGE_37.md`.

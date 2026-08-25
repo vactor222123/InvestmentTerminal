@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `72716af002ca036367b09399d99480393c217dcb`
-**Current local package:** Phase 7 Package 36 - Controlled Private Offline Quote Qualification
+**Current GitHub baseline:** `8dbf5e336d98b9e8c656c8be122f93af5ab0353e`
+**Current local package:** Phase 7 Package 37 - Transaction Instrument-Metadata Enrichment Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Transaction instrument-metadata enrichment audit
+**Current next action:** Bounded provenance-aware instrument-metadata enrichment
 
 ---
 
@@ -299,13 +299,13 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 36 - Controlled Private Offline Quote Qualification
+Phase 7 Package 37 - Transaction Instrument-Metadata Enrichment Audit
 ```
 
 Files:
 
 ```text
-docs/PHASE_7_PACKAGE_36.md
+docs/PHASE_7_PACKAGE_37.md
 docs/ROADMAP_AFTER_AUDIT.md
 Roadmap.md
 NEXT_STEPS.md
@@ -315,23 +315,22 @@ PROJECT_CONTINUATION.md
 Source baseline verified exactly:
 
 ```text
-develop @ 72716af002ca036367b09399d99480393c217dcb
+develop @ 8dbf5e336d98b9e8c656c8be122f93af5ab0353e
 ```
 
 Result:
 
-- the initial private quote input failed local field validation; after correction,
-  diagnostics passed for 10 unique items;
-- the repeat report measured 62 transactions, 10 open positions, and 10 required
-  quotes, then failed before matching because ledger identities lack exchange
-  tickers;
-- matched-quote and currency counts therefore remain unavailable;
-- no valuation database or snapshot was created, and no private input was
-  committed or packaged.
+- immutable transaction identities and SQLite payloads cannot be enriched by
+  rewriting historical rows;
+- current-portfolio and quote inputs are not provenance-bearing metadata
+  authorities, and no populated maintained-universe resolver is demonstrated;
+- existing market-metadata provenance and quality contracts can be reused;
+- the smallest safe implementation is detached, exact-coverage metadata
+  evidence and read-only position projection, first composed into qualification.
 
 Verification:
 
-- focused qualification/ledger/identity/privacy/architecture: 52 passed;
+- focused identity/metadata/transaction/reconstruction/qualification/privacy/architecture: 87 passed;
 - complete local suite: 2,780 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.
