@@ -534,3 +534,8 @@ and that neither the private quote file nor the unprovenanced current-portfolio
 file can serve as metadata authority. The smallest safe next package is a
 provider-neutral, provenance-aware metadata evidence document and detached
 read-only position projection, composed first into quote qualification only.
+Package 38 implements that strict private metadata document and detached
+projection. Qualification may now opt into exact `READY` metadata coverage with
+a caller-owned age limit while preserving its redacted schema-version-1 report
+and leaving immutable transaction evidence untouched. One controlled private
+metadata-backed qualification is next; valuation remains excluded.

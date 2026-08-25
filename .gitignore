@@ -72,6 +72,7 @@ output/
 data/portfolios/current_portfolio.json
 data/portfolios/portfolio_holdings.csv
 data/portfolios/portfolio_quotes.json
+data/portfolios/instrument_metadata.json
 data/portfolios/portfolio_transactions.csv
 
 # Generated investment outputs

@@ -6,6 +6,10 @@ from enum import Enum
 from typing import Any, Callable
 
 from investment_terminal.portfolio.portfolio_market_value_models import PortfolioPriceQuote
+from investment_terminal.portfolio.instrument_metadata_enrichment import (
+    InstrumentMetadataDocument,
+    InstrumentMetadataEnrichmentService,
+)
 from investment_terminal.portfolio.position_reconstruction import PositionReconstructor
 from investment_terminal.portfolio.transaction_ledger_repository import PortfolioTransactionRepository
 from investment_terminal.utils.validation import validate_aware_datetime
@@ -56,10 +60,14 @@ class OfflineQuoteQualificationResult:
 
 class OfflineQuoteQualificationService:
     def __init__(self, transactions: PortfolioTransactionRepository, price_provider,
-                 *, clock: Callable[[], datetime]) -> None:
+                 *, clock: Callable[[], datetime],
+                 instrument_metadata: InstrumentMetadataDocument | None = None,
+                 metadata_maximum_age_days: float | None = None) -> None:
         self.transactions = transactions
         self.price_provider = price_provider
         self.clock = clock
+        self.instrument_metadata = instrument_metadata
+        self.metadata_maximum_age_days = metadata_maximum_age_days
 
     def qualify(self, *, valued_at: datetime) -> OfflineQuoteQualificationResult:
         cutoff = validate_aware_datetime(valued_at, field_name="valued_at")
@@ -70,7 +78,19 @@ class OfflineQuoteQualificationService:
             counts[0] = len(ledger.transactions)
             if any(item.occurred_at > cutoff for item in ledger.transactions):
                 raise ValueError("transaction ledger contains activity later than valued_at")
-            positions = PositionReconstructor.reconstruct(ledger).positions
+            reconstruction = PositionReconstructor.reconstruct(ledger)
+            if self.instrument_metadata is not None:
+                if self.metadata_maximum_age_days is None:
+                    raise ValueError("metadata_maximum_age_days is required with instrument metadata")
+                reconstruction = InstrumentMetadataEnrichmentService.enrich(
+                    reconstruction,
+                    self.instrument_metadata,
+                    checked_at=cutoff,
+                    maximum_age_days=self.metadata_maximum_age_days,
+                ).reconstruction
+            elif self.metadata_maximum_age_days is not None:
+                raise ValueError("instrument metadata is required with metadata_maximum_age_days")
+            positions = reconstruction.positions
             counts[1] = counts[2] = len(positions)
             required = {item.instrument_key for item in positions}
             available = set(self.price_provider.instrument_keys)

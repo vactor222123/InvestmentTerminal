@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from investment_terminal.portfolio.offline_quote_qualification import OfflineQuoteQualificationResult, OfflineQuoteQualificationService, OfflineQuoteQualificationStatus
+from investment_terminal.portfolio.instrument_metadata_enrichment import InstrumentMetadataJsonLoader
 from investment_terminal.portfolio.portfolio_quote_json_provider import JsonPortfolioPriceProvider
 from investment_terminal.portfolio.transaction_ledger_sqlite_repository import SQLitePortfolioTransactionRepository
 from investment_terminal.portfolio.transaction_ledger_sqlite_store import PortfolioTransactionSQLiteStore
@@ -27,6 +28,8 @@ def parser() -> argparse.ArgumentParser:
     value = argparse.ArgumentParser(description="Qualify offline quotes without valuation persistence.")
     value.add_argument("--transaction-database", type=Path, required=True)
     value.add_argument("--quotes", type=Path, required=True)
+    value.add_argument("--instrument-metadata", type=Path)
+    value.add_argument("--metadata-maximum-age-days", type=float)
     value.add_argument("--ledger-id", required=True)
     value.add_argument("--portfolio-name", required=True)
     value.add_argument("--base-currency", required=True)
@@ -44,8 +47,15 @@ def main(argv: Sequence[str] | None = None, *, clock=None) -> int:
     runtime_clock = clock or (lambda: datetime.now(timezone.utc))
     try:
         provider = JsonPortfolioPriceProvider.load(o.quotes)
+        metadata = (
+            InstrumentMetadataJsonLoader.load(o.instrument_metadata)
+            if o.instrument_metadata is not None
+            else None
+        )
         result = OfflineQuoteQualificationService(
-            repository, provider, clock=runtime_clock
+            repository, provider, clock=runtime_clock,
+            instrument_metadata=metadata,
+            metadata_maximum_age_days=o.metadata_maximum_age_days,
         ).qualify(valued_at=o.valued_at)
     except Exception as exc:
         started = runtime_clock()

@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `8dbf5e336d98b9e8c656c8be122f93af5ab0353e`
-**Current local package:** Phase 7 Package 37 - Transaction Instrument-Metadata Enrichment Audit
+**Current GitHub baseline:** `0f55a7c724ba0083148799f8b7df17f074e20342`
+**Current local package:** Phase 7 Package 38 - Provenance-Aware Instrument Metadata Enrichment
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Bounded provenance-aware instrument-metadata enrichment
+**Current next action:** Controlled private metadata-backed quote qualification
 
 ---
 
@@ -299,13 +299,24 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 37 - Transaction Instrument-Metadata Enrichment Audit
+Phase 7 Package 38 - Provenance-Aware Instrument Metadata Enrichment
 ```
 
 Files:
 
 ```text
-docs/PHASE_7_PACKAGE_37.md
+.gitignore
+investment_terminal/portfolio/instrument_metadata_enrichment.py
+investment_terminal/portfolio/offline_quote_qualification.py
+investment_terminal/cli/offline_quote_qualification.py
+tests/test_instrument_metadata_enrichment.py
+tests/test_offline_quote_qualification.py
+tests/test_offline_quote_qualification_cli.py
+tests/test_repository_privacy.py
+docs/PHASE_7_PACKAGE_38.md
+Architecture.md
+DataModel.md
+README.md
 docs/ROADMAP_AFTER_AUDIT.md
 Roadmap.md
 NEXT_STEPS.md
@@ -315,23 +326,23 @@ PROJECT_CONTINUATION.md
 Source baseline verified exactly:
 
 ```text
-develop @ 8dbf5e336d98b9e8c656c8be122f93af5ab0353e
+develop @ 0f55a7c724ba0083148799f8b7df17f074e20342
 ```
 
 Result:
 
-- immutable transaction identities and SQLite payloads cannot be enriched by
-  rewriting historical rows;
-- current-portfolio and quote inputs are not provenance-bearing metadata
-  authorities, and no populated maintained-universe resolver is demonstrated;
-- existing market-metadata provenance and quality contracts can be reused;
-- the smallest safe implementation is detached, exact-coverage metadata
-  evidence and read-only position projection, first composed into qualification.
+- strict schema-version-1 metadata evidence preserves per-instrument source
+  provenance and deterministic canonical keys;
+- exact `READY` coverage creates a detached enriched position projection;
+- stale, partial, future, duplicate, conflicting, and key-changing evidence
+  fails closed without mutating ledger transactions;
+- offline qualification accepts metadata and caller-owned age as an optional
+  pair while preserving its redacted schema-version-1 report.
 
 Verification:
 
-- focused identity/metadata/transaction/reconstruction/qualification/privacy/architecture: 87 passed;
-- complete local suite: 2,780 passed, 4 skipped;
+- focused metadata/qualification/identity/reconstruction/privacy/architecture: 73 passed;
+- complete local suite: 2,793 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.
 

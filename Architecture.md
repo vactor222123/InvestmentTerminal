@@ -363,3 +363,7 @@ The CLI owns explicit runtime paths and atomic redacted reporting; private
 valuation evidence remains in the valuation database.
 Offline quote qualification is a read-only Portfolio boundary that produces
 redacted aggregate evidence and never valuation persistence.
+Optional schema-version-1 instrument metadata is a separate private evidence
+input with explicit source provenance and caller-owned maximum age. Enrichment
+creates a detached open-position projection, requires exact `READY` coverage,
+and never rewrites immutable transaction payloads.

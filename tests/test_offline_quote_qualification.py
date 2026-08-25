@@ -4,6 +4,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from investment_terminal.market.instrument_identity_models import InstrumentIdentity
+from investment_terminal.market.market_metadata_quality import MarketMetadataProvenance
+from investment_terminal.portfolio.instrument_metadata_enrichment import InstrumentMetadataDocument, InstrumentMetadataEvidence
 from investment_terminal.portfolio.offline_quote_qualification import OfflineQuoteQualificationService, OfflineQuoteQualificationStatus
 from investment_terminal.portfolio.portfolio_market_value_models import PortfolioPriceQuote
 from investment_terminal.portfolio.portfolio_price_provider import InMemoryPortfolioPriceProvider
@@ -55,4 +57,35 @@ def test_future_transaction_fails_closed(tmp_path: Path):
     repo = repository(tmp_path)
     repo.add(buy(NOW + timedelta(seconds=1)))
     result = OfflineQuoteQualificationService(repo, provider(), clock=lambda: NOW).qualify(valued_at=NOW)
+    assert result.status is OfflineQuoteQualificationStatus.FAILED
+
+
+def test_missing_ticker_can_use_ready_detached_metadata(tmp_path: Path):
+    identity = InstrumentIdentity("MSFT", "Microsoft", "STOCK", "USD", isin="US5949181045")
+    repo = repository(tmp_path)
+    repo.add(PortfolioTransaction("b1", "BUY", NOW - timedelta(days=1), "USD", identity, 1, 100))
+    quote = PortfolioPriceQuote(identity.instrument_key, "MSFT", 120, "USD", NOW, "TEST")
+    metadata = InstrumentMetadataDocument((InstrumentMetadataEvidence(
+        identity.instrument_key, "MSFT", "XNAS",
+        MarketMetadataProvenance(
+            "EXCHANGE_REFERENCE", NOW - timedelta(days=1), NOW - timedelta(days=1),
+            source_record_id="MSFT", checksum_sha256="a" * 64,
+        ),
+    ),))
+    result = OfflineQuoteQualificationService(
+        repo, InMemoryPortfolioPriceProvider({identity.instrument_key: quote}),
+        clock=lambda: NOW, instrument_metadata=metadata,
+        metadata_maximum_age_days=7,
+    ).qualify(valued_at=NOW)
+    assert result.status is OfflineQuoteQualificationStatus.SUCCESS
+    assert result.matched_quote_count == 1
+    assert repo.snapshot().transactions[0].instrument.exchange_ticker is None
+
+
+def test_metadata_arguments_must_be_supplied_together(tmp_path: Path):
+    repo = repository(tmp_path)
+    repo.add(buy())
+    result = OfflineQuoteQualificationService(
+        repo, provider(), clock=lambda: NOW, metadata_maximum_age_days=7
+    ).qualify(valued_at=NOW)
     assert result.status is OfflineQuoteQualificationStatus.FAILED

@@ -591,3 +591,7 @@ snapshot counts, normalized failure, and limitations without private identities,
 paths, quantities, prices, or monetary values.
 `OfflineQuoteQualificationResult` schema version 1 preserves timing, aggregate
 coverage, normalized failure, and limitations without private values.
+`InstrumentMetadataDocument` schema version 1 contains deterministically ordered
+per-instrument exchange metadata and `MarketMetadataProvenance`. The enrichment
+result preserves the evidence and quality alongside a detached reconstructed
+position projection; it is never a transaction-ledger mutation.

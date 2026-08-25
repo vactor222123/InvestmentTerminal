@@ -14,6 +14,7 @@ def test_personal_portfolio_files_are_gitignored() -> None:
         "data/portfolios/current_portfolio.json",
         "data/portfolios/portfolio_holdings.csv",
         "data/portfolios/portfolio_quotes.json",
+        "data/portfolios/instrument_metadata.json",
         "data/portfolios/portfolio_transactions.csv",
         "output/investment_review_package.json",
     }
