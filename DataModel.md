@@ -589,3 +589,5 @@ references, and raw rows and grants no persistence or execution authority.
 request/run timing, aggregate transaction/open-position/quote/currency/stored
 snapshot counts, normalized failure, and limitations without private identities,
 paths, quantities, prices, or monetary values.
+`OfflineQuoteQualificationResult` schema version 1 preserves timing, aggregate
+coverage, normalized failure, and limitations without private values.

@@ -263,3 +263,4 @@ The bounded transaction-derived valuation CLI is
 `python -m investment_terminal.cli.transaction_derived_valuation`. Its quote
 JSON, transaction database, and valuation database are private runtime inputs;
 only the redacted operational report is shareable after inspection.
+Read-only quote qualification: `python -m investment_terminal.cli.offline_quote_qualification`.

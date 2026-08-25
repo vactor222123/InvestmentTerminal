@@ -522,3 +522,5 @@ Package 34 finds no read-only offline quote qualification boundary. The JSON
 loader and valuation calculation guards are reusable, but the only composition
 CLI can append a private snapshot. A bounded parse/reconstruct-only qualifier
 with a privacy-safe aggregate report is required before private quote review.
+Package 35 adds read-only exact quote-coverage qualification with privacy-safe
+reporting and no valuation persistence. Controlled private qualification is next.

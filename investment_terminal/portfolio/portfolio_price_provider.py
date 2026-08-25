@@ -56,3 +56,8 @@ class InMemoryPortfolioPriceProvider:
                 "No portfolio price quote found for "
                 f"{normalized_key}"
             ) from exc
+
+    @property
+    def instrument_keys(self) -> tuple[str, ...]:
+        """Return deterministic canonical quote coverage without values."""
+        return tuple(sorted(self._quotes))

@@ -361,3 +361,5 @@ Bounded transaction-derived valuation composes Portfolio-owned ledger,
 reconstruction, realised/unrealised, quote, snapshot, and SQLite boundaries.
 The CLI owns explicit runtime paths and atomic redacted reporting; private
 valuation evidence remains in the valuation database.
+Offline quote qualification is a read-only Portfolio boundary that produces
+redacted aggregate evidence and never valuation persistence.
