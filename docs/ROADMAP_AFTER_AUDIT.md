@@ -370,6 +370,19 @@ persistence, privacy, and baseline-projection seams before any private data is
 requested or written. Another instrument, scheduler, and mass refresh remain
 deferred.
 
+Package 22 audits the complete current-portfolio input surface. The typed JSON
+loader, CSV importer, atomic holdings writer, snapshot CLI, repository privacy
+guards, and redacted operational-baseline projection already provide the
+smallest coherent path; no duplicate qualification code is justified. The
+runtime portfolio is absent, the default path is repository-relative, and a
+holdings import requires an existing portfolio whose policy and cash balance
+remain user-owned. CSV `--preview` exposes full holdings and is not a shareable
+operational artifact. Package 23 is therefore a user-executed controlled
+runtime qualification: prepare one private portfolio JSON under `C:\runtime`,
+validate it locally, and return only the redacted baseline report. Transactions,
+valuations, workflow execution, another instrument, scheduling, and mass
+refresh remain deferred.
+
 Boundary audit:
 
 ```text

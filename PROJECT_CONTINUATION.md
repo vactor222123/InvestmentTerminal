@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `1c64a849e2e256f03140c57cc437368417045daa`
-**Current local package:** Phase 7 Package 21 — Closure-Readiness Audit
+**Current GitHub baseline:** `944dad2d048ecdef21b9727408b767e231d93841`
+**Current local package:** Phase 7 Package 22 — Current-Portfolio Input Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit current-portfolio operational input contract
+**Current next action:** Controlled current-portfolio runtime qualification
 
 ---
 
@@ -302,6 +302,55 @@ After implementation:
 ---
 
 ## Latest Package
+
+```text
+Phase 7 Package 22 — Current-Portfolio Operational Input Audit
+```
+
+Files:
+
+```text
+docs/PHASE_7_PACKAGE_22.md
+docs/ROADMAP_AFTER_AUDIT.md
+Roadmap.md
+NEXT_STEPS.md
+PROJECT_CONTINUATION.md
+```
+
+Source baseline verified exactly:
+
+```text
+develop @ 944dad2d048ecdef21b9727408b767e231d93841
+```
+
+Audit result:
+
+- `C:\runtime\data\current_portfolio.json` and its baseline report are absent;
+- the typed loader validates portfolio policy, holdings, identities, strategies,
+  uniqueness, finite amounts, and cash without requiring new code;
+- the CSV importer has line-specific validation and the writer uses atomic
+  replacement while preserving user-owned name, policy, and cash;
+- the default portfolio path is repository-relative and must not silently own
+  the runtime path;
+- canonical repository-local personal filenames are ignored and privacy guards
+  pass;
+- CSV `--preview` contains complete holdings and costs, so it must not be used
+  as the returned/shareable evidence;
+- the operational baseline is the existing redacted qualification seam: it
+  exposes only configured path, portfolio name, holding count, and base currency;
+- no implementation change is justified; Package 23 is a user-executed private
+  runtime preparation followed by redacted baseline qualification.
+
+Verification:
+
+- focused portfolio/privacy/baseline/architecture checks: 72 passed;
+- complete local suite: 2,743 passed, 4 skipped;
+- one existing Starlette deprecation warning;
+- `git diff --check`: clean.
+
+---
+
+## Previous Package 21
 
 ```text
 Phase 7 Package 21 — Closure-Readiness Audit
