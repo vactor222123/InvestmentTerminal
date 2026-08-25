@@ -431,6 +431,16 @@ rows after reopen. The import-result JSON and schema version 1 remain unchanged.
 A focused audit of the bounded durable import CLI/report and private-runtime
 handoff is next; no operational database has been initialized or modified.
 
+Package 28 audits the bounded durable import composition. Existing parser,
+atomic batch repository, SQLite store, and read-only baseline projection are
+sufficient; no schema or baseline extension is needed. The missing boundary is
+one versioned redacted CLI report with explicit metadata, privacy-safe failure
+normalization, exact-repeat evidence, rollback tests, and visible ownership of
+the unavoidable SQLite-commit/report-write gap. A post-commit report failure is
+reconciled by repairing the output and rerunning the same immutable identities,
+not by claiming rollback. Package 29 implements this boundary before any
+private runtime import.
+
 Boundary audit:
 
 ```text

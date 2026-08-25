@@ -195,7 +195,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → controlled private transaction CSV qualification — COMPLETE (62 events)
 → atomic transaction batch-import audit — COMPLETE
 → atomic repository batch-append boundary — COMPLETE
-→ bounded durable transaction-import CLI/report audit — NEXT
+→ bounded durable transaction-import CLI/report audit — COMPLETE
+→ bounded durable transaction-import CLI/report — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 
