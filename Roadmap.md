@@ -203,7 +203,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → bounded transaction-derived valuation CLI/report — COMPLETE
 → offline quote qualification audit — COMPLETE
 → bounded offline quote qualification CLI/report — COMPLETE
-→ controlled private offline quote qualification — NEXT
+→ controlled private offline quote qualification — COMPLETE: BLOCKED
+→ transaction instrument-metadata enrichment audit — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

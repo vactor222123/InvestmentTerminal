@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `b539cbcde8c16d3dfbba38cbb595b31769cafdbe`
-**Current local package:** Phase 7 Package 35 - Bounded Offline Quote Qualification
+**Current GitHub baseline:** `72716af002ca036367b09399d99480393c217dcb`
+**Current local package:** Phase 7 Package 36 - Controlled Private Offline Quote Qualification
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Controlled private offline quote qualification
+**Current next action:** Transaction instrument-metadata enrichment audit
 
 ---
 
@@ -299,17 +299,13 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 35 - Bounded Offline Quote Qualification
+Phase 7 Package 36 - Controlled Private Offline Quote Qualification
 ```
 
 Files:
 
 ```text
-investment_terminal/portfolio/offline_quote_qualification.py
-investment_terminal/cli/offline_quote_qualification.py
-tests/test_offline_quote_qualification.py
-tests/test_offline_quote_qualification_cli.py
-docs/PHASE_7_PACKAGE_35.md
+docs/PHASE_7_PACKAGE_36.md
 docs/ROADMAP_AFTER_AUDIT.md
 Roadmap.md
 NEXT_STEPS.md
@@ -319,20 +315,23 @@ PROJECT_CONTINUATION.md
 Source baseline verified exactly:
 
 ```text
-develop @ b539cbcde8c16d3dfbba38cbb595b31769cafdbe
+develop @ 72716af002ca036367b09399d99480393c217dcb
 ```
 
 Result:
 
-- read-only qualification reconstructs open positions and requires exact quote
-  coverage with matching identity, ticker, currency, and time;
-- malformed, missing, extra, future, and mismatched evidence fails closed;
-- the atomic report exposes aggregate counts without private values;
-- no valuation database or snapshot is created.
+- the initial private quote input failed local field validation; after correction,
+  diagnostics passed for 10 unique items;
+- the repeat report measured 62 transactions, 10 open positions, and 10 required
+  quotes, then failed before matching because ledger identities lack exchange
+  tickers;
+- matched-quote and currency counts therefore remain unavailable;
+- no valuation database or snapshot was created, and no private input was
+  committed or packaged.
 
 Verification:
 
-- focused valuation/transaction/quote/persistence/privacy/architecture: 54 passed;
+- focused qualification/ledger/identity/privacy/architecture: 52 passed;
 - complete local suite: 2,780 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.

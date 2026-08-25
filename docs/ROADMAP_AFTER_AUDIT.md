@@ -524,3 +524,8 @@ CLI can append a private snapshot. A bounded parse/reconstruct-only qualifier
 with a privacy-safe aggregate report is required before private quote review.
 Package 35 adds read-only exact quote-coverage qualification with privacy-safe
 reporting and no valuation persistence. Controlled private qualification is next.
+Package 36 measured 62 transactions, 10 reconstructed open positions, and 10
+required private quotes, but matching could not start because immutable ledger
+instrument identities lack exchange tickers. Valuation remained untouched. A
+bounded provenance-aware metadata enrichment audit is next; historical payload
+rewrites and guessed venue mappings are excluded.

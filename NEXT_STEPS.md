@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ b539cbcde8c16d3dfbba38cbb595b31769cafdbe`
+**Current repository baseline:** `develop @ 72716af002ca036367b09399d99480393c217dcb`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -57,6 +57,7 @@
 **Phase 7 Package 33 bounded transaction-derived valuation:** COMPLETE
 **Phase 7 Package 34 offline quote qualification audit:** COMPLETE
 **Phase 7 Package 35 bounded offline quote qualification:** COMPLETE
+**Phase 7 Package 36 controlled private offline quote qualification:** COMPLETE - BLOCKED
 
 ## Current State
 
@@ -64,8 +65,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled private offline quote qualification and return only its
-redacted report. Do not send private inputs and do not execute valuation yet.
+Audit a bounded provenance-aware instrument metadata enrichment boundary for
+transaction-derived positions whose immutable ledger identities lack exchange
+tickers. Do not rewrite transaction history, guess venue tickers, or execute
+valuation.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -148,3 +151,5 @@ Bounded transaction-derived valuation: `docs/PHASE_7_PACKAGE_33.md`.
 Offline quote qualification audit: `docs/PHASE_7_PACKAGE_34.md`.
 
 Bounded offline quote qualification: `docs/PHASE_7_PACKAGE_35.md`.
+
+Controlled private offline quote qualification: `docs/PHASE_7_PACKAGE_36.md`.
