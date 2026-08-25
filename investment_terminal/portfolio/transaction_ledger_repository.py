@@ -21,6 +21,13 @@ class PortfolioTransactionRepository(ABC):
         """Append one transaction or reject its immutable identity."""
 
     @abstractmethod
+    def add_batch(
+        self,
+        transactions: tuple[PortfolioTransaction, ...],
+    ) -> tuple[bool, ...]:
+        """Atomically append transactions and report each inserted identity."""
+
+    @abstractmethod
     def get(self, transaction_id: str) -> PortfolioTransaction | None:
         """Return one exact transaction, or None when absent."""
 
@@ -82,12 +89,31 @@ class InMemoryPortfolioTransactionRepository(
     def add(self, transaction: PortfolioTransaction) -> PortfolioTransaction:
         if not isinstance(transaction, PortfolioTransaction):
             raise TypeError("transaction must be a PortfolioTransaction")
-        if transaction.transaction_id in self._transactions:
+        if not self.add_batch((transaction,))[0]:
             raise ValueError(
                 "Portfolio transaction identity already exists"
             )
-        self._transactions[transaction.transaction_id] = transaction
         return transaction
+
+    def add_batch(
+        self,
+        transactions: tuple[PortfolioTransaction, ...],
+    ) -> tuple[bool, ...]:
+        if not isinstance(transactions, tuple):
+            raise TypeError("transactions must be a tuple")
+        if any(not isinstance(item, PortfolioTransaction) for item in transactions):
+            raise TypeError(
+                "transactions must contain only PortfolioTransaction objects"
+            )
+        staged = self._transactions.copy()
+        inserted: list[bool] = []
+        for transaction in transactions:
+            is_new = transaction.transaction_id not in staged
+            inserted.append(is_new)
+            if is_new:
+                staged[transaction.transaction_id] = transaction
+        self._transactions = staged
+        return tuple(inserted)
 
     def get(self, transaction_id: str) -> PortfolioTransaction | None:
         normalized_id = normalize_required_text(

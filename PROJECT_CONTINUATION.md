@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `5cba060e45fa39c8889b8bcedc2683d091dd3c96`
-**Current local package:** Phase 7 Package 26 - Atomic Transaction Batch Import Audit
+**Current GitHub baseline:** `e84b0c91ca4d752db1ced22e8ab8539181d3fa1f`
+**Current local package:** Phase 7 Package 27 - Atomic Repository Batch Append
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Atomic repository batch-append implementation
+**Current next action:** Bounded durable transaction-import CLI/report audit
 
 ---
 
@@ -299,14 +299,21 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 26 - Atomic Transaction Batch Import Audit
+Phase 7 Package 27 - Atomic Repository Batch Append
 ```
 
 Files:
 
 ```text
-docs/PHASE_7_PACKAGE_26.md
+investment_terminal/portfolio/transaction_import.py
+investment_terminal/portfolio/transaction_ledger_repository.py
+investment_terminal/portfolio/transaction_ledger_sqlite_repository.py
+tests/test_transaction_ledger_repository.py
+tests/test_transaction_ledger_sqlite.py
+docs/PHASE_7_PACKAGE_27.md
 docs/ROADMAP_AFTER_AUDIT.md
+Architecture.md
+DataModel.md
 Roadmap.md
 NEXT_STEPS.md
 PROJECT_CONTINUATION.md
@@ -315,23 +322,25 @@ PROJECT_CONTINUATION.md
 Source baseline verified exactly:
 
 ```text
-develop @ 5cba060e45fa39c8889b8bcedc2683d091dd3c96
+develop @ e84b0c91ca4d752db1ced22e8ab8539181d3fa1f
 ```
 
 Result:
 
-- controlled private qualification succeeded for 62 redacted aggregate events;
-- the import service still commits one repository add at a time;
-- a simulated later failure preserved the first row and reproduced the atomicity
-  gap;
-- schema version 1 needs no migration for the remediation;
-- one repository-level atomic batch append is the smallest safe next package;
-- no private input or operational database was read or modified by this audit.
+- repository batch outcomes remain aligned to every submitted row;
+- in-memory writes stage and publish the complete batch atomically;
+- SQLite uses one transaction for the complete batch;
+- existing and repeated identities remain explicit duplicates without replacing
+  original evidence;
+- a simulated later SQLite failure rolls back earlier candidate rows and
+  preserves pre-existing rows after reopen;
+- public import-result JSON and SQLite schema version 1 remain unchanged;
+- no private input or operational database was read or modified.
 
 Verification:
 
-- focused transaction/persistence/qualification/architecture: 52 passed;
-- complete local suite: 2,752 passed, 4 skipped;
+- focused transaction/import/qualification/architecture: 57 passed;
+- complete local suite: 2,757 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.
 
@@ -340,12 +349,13 @@ Verification:
 ## Previous Package
 
 ```text
-Phase 7 Package 25 — Bounded Transaction CSV Qualification
+Phase 7 Package 26 - Atomic Transaction Batch Import Audit
 ```
 
-Package 25 added the parse-only CLI and atomic redacted report without SQLite
-initialization. Focused checks passed 49 tests and the complete suite passed
-2,752 tests with four skipped and one existing Starlette warning.
+Package 26 reproduced partial persistence after a later failure and selected
+one repository-level atomic batch append as the smallest schema-compatible
+remediation. Focused checks passed 52 tests and the complete suite passed 2,752
+tests with four skipped and one existing Starlette warning.
 
 ---
 

@@ -422,6 +422,15 @@ SQLite repositories, with row-aligned duplicate accounting and durable rollback
 tests. A user-facing import CLI and operational database mutation remain
 deferred.
 
+Package 27 adds the repository-level atomic batch append selected by that
+audit. Row-aligned outcomes preserve every imported and duplicate input,
+including repeats inside one batch. The in-memory adapter stages before
+publication, while SQLite owns one transaction for the whole batch; a simulated
+later trigger failure rolls back earlier candidates and preserves pre-existing
+rows after reopen. The import-result JSON and schema version 1 remain unchanged.
+A focused audit of the bounded durable import CLI/report and private-runtime
+handoff is next; no operational database has been initialized or modified.
+
 Boundary audit:
 
 ```text

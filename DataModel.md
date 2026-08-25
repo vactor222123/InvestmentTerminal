@@ -97,6 +97,12 @@ keys, preserving the repository contract across process restarts.
 import time while accounting separately for every imported and duplicate input
 identity. Re-import is idempotent without silently removing duplicate evidence.
 
+Repository `add_batch` outcomes align one-for-one with submitted rows. Both the
+in-memory and SQLite adapters publish new identities atomically for the complete
+batch; expected identity conflicts remain duplicates, and unexpected failures
+preserve all state that existed before the batch. This adds no SQLite migration
+and does not change `TransactionImportResult.to_dict()`.
+
 `PortfolioTransactionCsvParser` is the provider-neutral UTF-8 ingestion
 boundary. It validates one explicit canonical schema, preserves source order and
 duplicate rows, constructs canonical instrument identities, and reports invalid

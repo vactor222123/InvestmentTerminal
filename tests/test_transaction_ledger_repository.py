@@ -87,6 +87,30 @@ def test_duplicate_identity_is_rejected_and_original_is_preserved() -> None:
     assert repo.require("tx-1") is original
 
 
+def test_batch_append_reports_each_row_and_preserves_original() -> None:
+    repo = repository()
+    original = transaction("existing", day=1)
+    new = transaction("new", day=2)
+    repo.add(original)
+
+    assert repo.add_batch((new, transaction("existing", day=3), new)) == (
+        True,
+        False,
+        False,
+    )
+    assert repo.require("existing") is original
+    assert repo.require("new") is new
+
+
+def test_batch_append_validates_complete_input_before_publishing() -> None:
+    repo = repository()
+
+    with pytest.raises(TypeError, match="PortfolioTransaction"):
+        repo.add_batch((transaction("new", day=1), object()))  # type: ignore[arg-type]
+
+    assert repo.list_all() == ()
+
+
 def test_add_rejects_wrong_type() -> None:
     with pytest.raises(TypeError, match="PortfolioTransaction"):
         repository().add(object())  # type: ignore[arg-type]

@@ -34,33 +34,34 @@ class SQLitePortfolioTransactionRepository(PortfolioTransactionRepository):
     def add(self, transaction: PortfolioTransaction) -> PortfolioTransaction:
         if not isinstance(transaction, PortfolioTransaction):
             raise TypeError("transaction must be a PortfolioTransaction")
-        payload = json.dumps(
-            transaction.to_dict(),
-            ensure_ascii=False,
-            allow_nan=False,
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        try:
-            with self.store.transaction() as connection:
-                connection.execute(
-                    "INSERT INTO portfolio_transactions "
-                    "(transaction_id, occurred_at, instrument_key, payload_json) "
-                    "VALUES (?, ?, ?, ?)",
-                    (
-                        transaction.transaction_id,
-                        transaction.occurred_at.isoformat(),
-                        transaction.instrument.instrument_key
-                        if transaction.instrument is not None
-                        else None,
-                        payload,
-                    ),
-                )
-        except sqlite3.IntegrityError as exc:
+        if not self.add_batch((transaction,))[0]:
             raise ValueError(
                 "Portfolio transaction identity already exists"
-            ) from exc
+            )
         return transaction
+
+    def add_batch(
+        self,
+        transactions: tuple[PortfolioTransaction, ...],
+    ) -> tuple[bool, ...]:
+        if not isinstance(transactions, tuple):
+            raise TypeError("transactions must be a tuple")
+        if any(not isinstance(item, PortfolioTransaction) for item in transactions):
+            raise TypeError(
+                "transactions must contain only PortfolioTransaction objects"
+            )
+        rows = tuple(self._to_row(transaction) for transaction in transactions)
+        inserted: list[bool] = []
+        with self.store.transaction() as connection:
+            for row in rows:
+                cursor = connection.execute(
+                    "INSERT OR IGNORE INTO portfolio_transactions "
+                    "(transaction_id, occurred_at, instrument_key, payload_json) "
+                    "VALUES (?, ?, ?, ?)",
+                    row,
+                )
+                inserted.append(cursor.rowcount == 1)
+        return tuple(inserted)
 
     def get(self, transaction_id: str) -> PortfolioTransaction | None:
         normalized_id = normalize_required_text(
@@ -128,6 +129,24 @@ class SQLitePortfolioTransactionRepository(PortfolioTransactionRepository):
         self.store.initialize()
         with self.store.connect() as connection:
             return connection.execute(sql, parameters).fetchall()
+
+    @staticmethod
+    def _to_row(transaction: PortfolioTransaction) -> tuple[object, ...]:
+        payload = json.dumps(
+            transaction.to_dict(),
+            ensure_ascii=False,
+            allow_nan=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        return (
+            transaction.transaction_id,
+            transaction.occurred_at.isoformat(),
+            transaction.instrument.instrument_key
+            if transaction.instrument is not None
+            else None,
+            payload,
+        )
 
     @staticmethod
     def _from_row(row: sqlite3.Row) -> PortfolioTransaction:

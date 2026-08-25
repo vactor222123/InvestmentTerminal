@@ -337,3 +337,14 @@ schema-version-1 `SUCCESS`, `EMPTY`, or `FAILED` report before any non-zero
 failure exit. Aggregate type/count/time coverage is visible; source paths,
 identities, instruments, monetary values, references, and raw rows are excluded.
 The boundary has no SQLite, valuation, workflow, AI, or trading dependency.
+
+## Atomic Portfolio Transaction Import
+
+The Portfolio repository contract owns row-aligned atomic batch append. The
+in-memory adapter stages the complete candidate state before publishing it; the
+SQLite adapter uses one store transaction for the complete batch. Existing and
+repeated identities are deterministic duplicates, while any unexpected durable
+failure rolls back every new row from that batch. `TransactionImportService`
+maps these outcomes into the existing import-result JSON without changing its
+schema. No CLI, runtime database mutation, valuation, workflow, or trading
+authority is implied by this persistence boundary.

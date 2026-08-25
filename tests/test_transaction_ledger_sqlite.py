@@ -69,6 +69,70 @@ def test_duplicate_is_rejected_and_original_preserved(tmp_path: Path) -> None:
     assert repository.require("tx-1") == original
 
 
+def test_batch_append_reports_new_existing_and_repeated_rows(tmp_path: Path) -> None:
+    repository = repo(tmp_path / "transactions.db")
+    original = tx("existing", 1)
+    new = tx("new", 2)
+    repository.add(original)
+
+    assert repository.add_batch((new, tx("existing", 3), new)) == (
+        True,
+        False,
+        False,
+    )
+    assert repository.require("existing") == original
+    assert repository.require("new") == new
+
+    assert repository.add_batch((new, original)) == (False, False)
+    assert repo(tmp_path / "transactions.db").list_all() == (original, new)
+
+
+def test_batch_append_rolls_back_after_later_unexpected_failure(
+    tmp_path: Path,
+) -> None:
+    database = tmp_path / "transactions.db"
+    value = store(database)
+    value.initialize()
+    with value.connect() as connection:
+        connection.execute(
+            "CREATE TRIGGER fail_second_transaction "
+            "BEFORE INSERT ON portfolio_transactions "
+            "WHEN NEW.transaction_id = 'fail' "
+            "BEGIN SELECT RAISE(ABORT, 'simulated persistence failure'); END"
+        )
+        connection.commit()
+
+    with pytest.raises(sqlite3.IntegrityError, match="simulated persistence failure"):
+        SQLitePortfolioTransactionRepository(value).add_batch(
+            (tx("candidate", 1), tx("fail", 2))
+        )
+
+    recreated = repo(database)
+    assert recreated.get("candidate") is None
+    assert recreated.get("fail") is None
+
+
+def test_batch_failure_preserves_preexisting_transaction(tmp_path: Path) -> None:
+    database = tmp_path / "transactions.db"
+    original = tx("original", 1)
+    repository = repo(database)
+    repository.add(original)
+    with repository.store.connect() as connection:
+        connection.execute(
+            "CREATE TRIGGER fail_later_transaction "
+            "BEFORE INSERT ON portfolio_transactions "
+            "WHEN NEW.transaction_id = 'fail' "
+            "BEGIN SELECT RAISE(ABORT, 'simulated persistence failure'); END"
+        )
+        connection.commit()
+
+    with pytest.raises(sqlite3.IntegrityError):
+        repository.add_batch((tx("candidate", 2), tx("original", 3), tx("fail", 4)))
+
+    recreated = repo(database)
+    assert recreated.list_all() == (original,)
+
+
 def test_queries_match_repository_contract(tmp_path: Path) -> None:
     repository = repo(tmp_path / "transactions.db")
     emerging = asset("EM", "IE00BKM4GZ66")

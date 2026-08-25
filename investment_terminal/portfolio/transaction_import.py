@@ -72,18 +72,21 @@ class TransactionImportService:
     def import_batch(self, batch: TransactionImportBatch) -> TransactionImportResult:
         if not isinstance(batch, TransactionImportBatch):
             raise TypeError("batch must be a TransactionImportBatch")
-        imported: list[str] = []
-        duplicates: list[str] = []
-        for transaction in batch.transactions:
-            if self.repository.get(transaction.transaction_id) is not None:
-                duplicates.append(transaction.transaction_id)
-                continue
-            try:
-                self.repository.add(transaction)
-            except ValueError:
-                duplicates.append(transaction.transaction_id)
-            else:
-                imported.append(transaction.transaction_id)
+        inserted = self.repository.add_batch(batch.transactions)
+        imported = [
+            transaction.transaction_id
+            for transaction, was_inserted in zip(
+                batch.transactions, inserted, strict=True
+            )
+            if was_inserted
+        ]
+        duplicates = [
+            transaction.transaction_id
+            for transaction, was_inserted in zip(
+                batch.transactions, inserted, strict=True
+            )
+            if not was_inserted
+        ]
         return TransactionImportResult(
             source_name=batch.source_name,
             imported_at=batch.imported_at,
