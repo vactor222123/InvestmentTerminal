@@ -467,6 +467,20 @@ focused audit of the existing transaction-derived valuation path and its quote,
 currency, cutoff, persistence, atomicity, privacy, and redacted-report
 boundaries before any private valuation or integrated workflow execution.
 
+Package 32 audits the transaction-derived valuation path. Position
+reconstruction, realised and quote-backed unrealised performance, immutable
+valuation snapshots, and append-only SQLite persistence already exist with
+identity, currency, temporal, ownership, rollback, duplicate, and strict-JSON
+guards. No service or CLI composes those boundaries from the operational
+transaction store, and no redacted valuation report exists. The calculators do
+not independently exclude transactions later than `valued_at`, while the JSON
+quote input defines no freshness threshold. The next package is therefore one
+bounded service and CLI/report implementation with an explicit fail-closed
+transaction cutoff, complete matching offline quotes, atomic snapshot append,
+post-commit report-failure distinction, and privacy-safe aggregate evidence.
+Live quote fetching, FX conversion, freshness policy, private execution, and
+integrated workflow execution remain deferred.
+
 Boundary audit:
 
 ```text

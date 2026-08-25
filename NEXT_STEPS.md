@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 144b29edf99c88f5d0c67377433725f1bfbe090e`
+**Current repository baseline:** `develop @ d4df2f56ac64aa6bd49b399f4dc197246e792b06`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -53,6 +53,7 @@
 **Phase 7 Package 29 bounded durable transaction import:** COMPLETE
 **Phase 7 Package 30 controlled private transaction import:** COMPLETE - 62 inserted
 **Phase 7 Package 31 exact-repeat private transaction import:** COMPLETE - 62 duplicates
+**Phase 7 Package 32 transaction-derived valuation operational audit:** COMPLETE
 
 ## Current State
 
@@ -60,11 +61,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit the existing transaction-derived valuation path before any private
-valuation is generated. Verify its required quote, currency, cutoff,
-persistence, atomicity, privacy, and redacted-report boundaries, then select the
-smallest safe operational handoff. Do not execute a private valuation or the
-integrated workflow during the audit.
+Implement one bounded transaction-derived valuation service and CLI with an
+atomic schema-version-1 redacted report. It must compose the established
+transaction, position, realised/unrealised, quote, snapshot, and SQLite
+boundaries; fail closed on future transactions, quote/currency/ownership defects
+and persistence failures; and distinguish post-commit report failure. Use only
+synthetic tests. Do not execute a private valuation or integrated workflow yet.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -139,3 +141,5 @@ Bounded durable transaction import: `docs/PHASE_7_PACKAGE_29.md`.
 Controlled private transaction import: `docs/PHASE_7_PACKAGE_30.md`.
 
 Exact-repeat private transaction import: `docs/PHASE_7_PACKAGE_31.md`.
+
+Transaction-derived valuation operational audit: `docs/PHASE_7_PACKAGE_32.md`.

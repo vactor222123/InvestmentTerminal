@@ -199,7 +199,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → bounded durable transaction-import CLI/report — COMPLETE
 → controlled private transaction import — COMPLETE (62/62 inserted)
 → exact-repeat private transaction import — COMPLETE (0 inserted, 62 duplicates)
-→ transaction-derived valuation operational audit — NEXT
+→ transaction-derived valuation operational audit — COMPLETE
+→ bounded transaction-derived valuation CLI/report — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 
