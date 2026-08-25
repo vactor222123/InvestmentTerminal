@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ d4df2f56ac64aa6bd49b399f4dc197246e792b06`
+**Current repository baseline:** `develop @ 0169bdf0c49a7f58c607a5eeed6b299144f1965a`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -54,6 +54,7 @@
 **Phase 7 Package 30 controlled private transaction import:** COMPLETE - 62 inserted
 **Phase 7 Package 31 exact-repeat private transaction import:** COMPLETE - 62 duplicates
 **Phase 7 Package 32 transaction-derived valuation operational audit:** COMPLETE
+**Phase 7 Package 33 bounded transaction-derived valuation:** COMPLETE
 
 ## Current State
 
@@ -61,12 +62,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement one bounded transaction-derived valuation service and CLI with an
-atomic schema-version-1 redacted report. It must compose the established
-transaction, position, realised/unrealised, quote, snapshot, and SQLite
-boundaries; fail closed on future transactions, quote/currency/ownership defects
-and persistence failures; and distinguish post-commit report failure. Use only
-synthetic tests. Do not execute a private valuation or integrated workflow yet.
+Audit and qualify one private offline quote JSON against the reconstructed open
+positions using a redacted report, without creating a valuation snapshot. Do
+not execute private valuation or the integrated workflow until quote coverage,
+identity, currency, and temporal evidence is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -143,3 +142,5 @@ Controlled private transaction import: `docs/PHASE_7_PACKAGE_30.md`.
 Exact-repeat private transaction import: `docs/PHASE_7_PACKAGE_31.md`.
 
 Transaction-derived valuation operational audit: `docs/PHASE_7_PACKAGE_32.md`.
+
+Bounded transaction-derived valuation: `docs/PHASE_7_PACKAGE_33.md`.

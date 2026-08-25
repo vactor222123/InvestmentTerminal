@@ -513,3 +513,8 @@ Scope:
 Phase 8 must not move analytical calculations into the UI, hide missing or
 low-quality evidence, invoke AI without explicit user action, automatically
 promote History into Knowledge, give brokers write access, or execute trades.
+Package 33 implements the bounded transaction-derived valuation service and CLI.
+It enforces an explicit transaction cutoff, complete matching offline quotes,
+currency/time validation, immutable SQLite append, privacy-safe failure, and a
+distinct post-commit report-write error. Private quote qualification is next;
+no private valuation or workflow execution has occurred.

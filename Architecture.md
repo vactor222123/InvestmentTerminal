@@ -357,3 +357,7 @@ only. Source/database paths and transaction, ledger, portfolio, instrument, and
 monetary identities remain private. SQLite commit and report replacement are
 separate side effects: a post-commit report failure is raised distinctly and is
 reconciled by rerunning the same immutable identities after repairing output.
+Bounded transaction-derived valuation composes Portfolio-owned ledger,
+reconstruction, realised/unrealised, quote, snapshot, and SQLite boundaries.
+The CLI owns explicit runtime paths and atomic redacted reporting; private
+valuation evidence remains in the valuation database.

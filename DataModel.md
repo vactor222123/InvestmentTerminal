@@ -585,3 +585,7 @@ times, aggregate count, deterministic type counts, and earliest/latest
 occurrence times. Failed coverage remains unknown with a normalized error. The
 report excludes source and transaction identities, instruments, amounts,
 references, and raw rows and grants no persistence or execution authority.
+`TransactionDerivedValuationResult` is schema version 1 and records status,
+request/run timing, aggregate transaction/open-position/quote/currency/stored
+snapshot counts, normalized failure, and limitations without private identities,
+paths, quantities, prices, or monetary values.

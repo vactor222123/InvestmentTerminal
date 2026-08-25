@@ -259,3 +259,7 @@ Authority Must Be Explicit. Delivery Must Be Reproducible.**
 Investment Terminal is research and decision-support software. It does not
 execute trades and does not transfer final investment authority away from the
 user.
+The bounded transaction-derived valuation CLI is
+`python -m investment_terminal.cli.transaction_derived_valuation`. Its quote
+JSON, transaction database, and valuation database are private runtime inputs;
+only the redacted operational report is shareable after inspection.

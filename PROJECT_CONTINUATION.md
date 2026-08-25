@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `d4df2f56ac64aa6bd49b399f4dc197246e792b06`
-**Current local package:** Phase 7 Package 32 - Transaction-Derived Valuation Operational Audit
+**Current GitHub baseline:** `0169bdf0c49a7f58c607a5eeed6b299144f1965a`
+**Current local package:** Phase 7 Package 33 - Bounded Transaction-Derived Valuation
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Bounded transaction-derived valuation CLI/report
+**Current next action:** Private offline quote qualification
 
 ---
 
@@ -299,13 +299,17 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 32 - Transaction-Derived Valuation Operational Audit
+Phase 7 Package 33 - Bounded Transaction-Derived Valuation
 ```
 
 Files:
 
 ```text
-docs/PHASE_7_PACKAGE_32.md
+investment_terminal/portfolio/transaction_derived_valuation.py
+investment_terminal/cli/transaction_derived_valuation.py
+tests/test_transaction_derived_valuation.py
+tests/test_transaction_derived_valuation_cli.py
+docs/PHASE_7_PACKAGE_33.md
 docs/ROADMAP_AFTER_AUDIT.md
 Roadmap.md
 NEXT_STEPS.md
@@ -315,24 +319,23 @@ PROJECT_CONTINUATION.md
 Source baseline verified exactly:
 
 ```text
-develop @ d4df2f56ac64aa6bd49b399f4dc197246e792b06
+develop @ 0169bdf0c49a7f58c607a5eeed6b299144f1965a
 ```
 
 Result:
 
-- position reconstruction, realised/unrealised calculation, immutable snapshots,
-  and append-only SQLite valuation persistence already exist;
-- no service/CLI composes them from the operational transaction database and no
-  redacted valuation report exists;
-- transaction cutoff, complete matching quotes, currency and ownership checks,
-  atomic persistence, and post-commit report failure must be explicit;
-- quote freshness remains caller-owned and cannot be invented;
-- no private runtime input was read and no valuation was executed.
+- one bounded service composes the established transaction, reconstruction,
+  performance, quote, snapshot, and SQLite boundaries;
+- transactions after `valued_at`, missing/mismatched quotes, unsupported
+  currencies, ownership defects, and duplicates fail closed;
+- the atomic schema-version-1 report exposes aggregate counts without private
+  paths, identities, instruments, quantities, prices, or monetary values;
+- post-commit report failure is distinct; no private valuation was executed.
 
 Verification:
 
-- focused valuation/transaction/quote/persistence/privacy/architecture: 94 passed;
-- complete local suite: 2,767 passed, 4 skipped;
+- focused valuation/transaction/quote/persistence/privacy/architecture: 59 passed;
+- complete local suite: 2,775 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.
 
