@@ -11,6 +11,7 @@ from investment_terminal.market.instrument_identity_models import InstrumentIden
 from investment_terminal.portfolio.openfigi_metadata_bootstrap import (
     OpenFigiBootstrapFailure,
     OpenFigiHttpClient,
+    OpenFigiFailureCategory,
     OpenFigiMetadataBootstrapService,
 )
 from investment_terminal.portfolio.portfolio_market_value_models import PortfolioPriceQuote
@@ -96,20 +97,24 @@ def test_duplicate_same_ticker_rows_are_accepted_and_figis_preserved(tmp_path: P
     assert result.metadata.instruments[0].provenance.source_record_id == "A,B"
 
 
-@pytest.mark.parametrize("raw", [
-    json.dumps([{"warning": "no match"}]).encode(),
-    json.dumps([{"error": "bad job"}]).encode(),
-    json.dumps([{"data": [{"figi": "A", "ticker": "OTHER"}]}]).encode(),
-    json.dumps([{"data": [
+@pytest.mark.parametrize(("raw", "category"), [
+    (json.dumps([{"warning": "no match"}]).encode(), OpenFigiFailureCategory.PROVIDER_WARNING),
+    (json.dumps([{"error": "bad job"}]).encode(), OpenFigiFailureCategory.PROVIDER_ERROR),
+    (json.dumps([{"data": [{"figi": "A", "ticker": "OTHER"}]}]).encode(),
+     OpenFigiFailureCategory.TICKER_MISMATCH_OR_AMBIGUOUS),
+    (json.dumps([{"data": [
         {"figi": "A", "ticker": "T1"}, {"figi": "B", "ticker": "OTHER"}
-    ]}]).encode(),
-    b"not-json",
-    json.dumps([]).encode(),
+    ]}]).encode(), OpenFigiFailureCategory.TICKER_MISMATCH_OR_AMBIGUOUS),
+    (b"not-json", OpenFigiFailureCategory.RESPONSE_INVALID),
+    (json.dumps([]).encode(), OpenFigiFailureCategory.RESPONSE_INVALID),
 ])
-def test_unavailable_ambiguous_and_malformed_results_fail_after_archive(tmp_path: Path, raw: bytes):
+def test_failures_have_privacy_safe_category_after_archive(
+    tmp_path: Path, raw: bytes, category: OpenFigiFailureCategory
+):
     with pytest.raises(OpenFigiBootstrapFailure) as captured:
         run(tmp_path, Client([raw]), count=1)
     assert captured.value.archived_response_count == 1
+    assert captured.value.failure_category is category
     assert (tmp_path / "archive/run-1.batch-001.json").read_bytes() == raw
     assert not (tmp_path / "metadata.json").exists()
 
@@ -119,6 +124,7 @@ def test_transport_failure_preserves_previous_batch_archive(tmp_path: Path):
         run(tmp_path, Client([response("T1"), TimeoutError()]), count=2, batch_size=1)
     assert captured.value.archived_response_count == 1
     assert captured.value.batch_count == 2
+    assert captured.value.failure_category is OpenFigiFailureCategory.PROVIDER_REQUEST_FAILED
 
 
 def test_existing_archive_fails_closed_without_replacement(tmp_path: Path):
@@ -126,9 +132,30 @@ def test_existing_archive_fails_closed_without_replacement(tmp_path: Path):
     archive.mkdir()
     existing = archive / "run-1.batch-001.json"
     existing.write_bytes(b"original")
-    with pytest.raises(OpenFigiBootstrapFailure):
+    with pytest.raises(OpenFigiBootstrapFailure) as captured:
         run(tmp_path, Client([response("T1")]), count=1)
     assert existing.read_bytes() == b"original"
+    assert captured.value.failure_category is OpenFigiFailureCategory.RESPONSE_ARCHIVE_FAILED
+
+
+def test_matching_ticker_without_figi_has_safe_category(tmp_path: Path):
+    raw = json.dumps([{"data": [{"ticker": "T1"}]}]).encode()
+    with pytest.raises(OpenFigiBootstrapFailure) as captured:
+        run(tmp_path, Client([raw]), count=1)
+    assert captured.value.failure_category is OpenFigiFailureCategory.FIGI_MISSING
+
+
+def test_metadata_write_failure_has_safe_category(tmp_path: Path, monkeypatch):
+    def fail(*args, **kwargs):
+        raise OSError("private path detail")
+
+    monkeypatch.setattr(
+        "investment_terminal.portfolio.openfigi_metadata_bootstrap.write_json_atomic",
+        fail,
+    )
+    with pytest.raises(OpenFigiBootstrapFailure) as captured:
+        run(tmp_path, Client([response("T1")]), count=1)
+    assert captured.value.failure_category is OpenFigiFailureCategory.METADATA_WRITE_FAILED
 
 
 def test_http_client_builds_v3_request_and_optional_api_key(monkeypatch):

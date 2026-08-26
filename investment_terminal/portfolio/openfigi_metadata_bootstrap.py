@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 from hashlib import sha256
 import json
 import os
@@ -63,13 +64,36 @@ class OpenFigiBootstrapResult:
     metadata: InstrumentMetadataDocument
 
 
+class OpenFigiFailureCategory(str, Enum):
+    """Privacy-safe failure categories for the versioned operational report."""
+
+    INPUT_OR_RUNTIME_FAILURE = "INPUT_OR_RUNTIME_FAILURE"
+    PROVIDER_REQUEST_FAILED = "PROVIDER_REQUEST_FAILED"
+    RESPONSE_ARCHIVE_FAILED = "RESPONSE_ARCHIVE_FAILED"
+    RESPONSE_INVALID = "RESPONSE_INVALID"
+    PROVIDER_ERROR = "PROVIDER_ERROR"
+    PROVIDER_WARNING = "PROVIDER_WARNING"
+    TICKER_MISMATCH_OR_AMBIGUOUS = "TICKER_MISMATCH_OR_AMBIGUOUS"
+    FIGI_MISSING = "FIGI_MISSING"
+    METADATA_WRITE_FAILED = "METADATA_WRITE_FAILED"
+    UNEXPECTED = "UNEXPECTED"
+
+
+class _CategorizedBootstrapError(RuntimeError):
+    def __init__(self, category: OpenFigiFailureCategory) -> None:
+        super().__init__(category.value)
+        self.category = category
+
+
 class OpenFigiBootstrapFailure(RuntimeError):
     def __init__(self, message: str, *, requested_count: int,
-                 batch_count: int, archived_response_count: int) -> None:
+                 batch_count: int, archived_response_count: int,
+                 failure_category: OpenFigiFailureCategory) -> None:
         super().__init__(message)
         self.requested_count = requested_count
         self.batch_count = batch_count
         self.archived_response_count = archived_response_count
+        self.failure_category = failure_category
 
 
 class OpenFigiMetadataBootstrapService:
@@ -111,15 +135,27 @@ class OpenFigiMetadataBootstrapService:
         archived = 0
         try:
             for batch_number, batch in enumerate(batches, start=1):
-                raw = self.client.map_isins(tuple(item.instrument_key for item in batch))
+                try:
+                    raw = self.client.map_isins(tuple(item.instrument_key for item in batch))
+                except Exception as exc:
+                    raise _CategorizedBootstrapError(
+                        OpenFigiFailureCategory.PROVIDER_REQUEST_FAILED
+                    ) from exc
                 if not isinstance(raw, bytes):
-                    raise TypeError("OpenFIGI client must return bytes")
-                archive_root.mkdir(parents=True, exist_ok=True)
-                archive_path = archive_root / f"{normalized_run}.batch-{batch_number:03d}.json"
-                with archive_path.open("xb") as stream:
-                    stream.write(raw)
-                    stream.flush()
-                    os.fsync(stream.fileno())
+                    raise _CategorizedBootstrapError(
+                        OpenFigiFailureCategory.RESPONSE_INVALID
+                    )
+                try:
+                    archive_root.mkdir(parents=True, exist_ok=True)
+                    archive_path = archive_root / f"{normalized_run}.batch-{batch_number:03d}.json"
+                    with archive_path.open("xb") as stream:
+                        stream.write(raw)
+                        stream.flush()
+                        os.fsync(stream.fileno())
+                except OSError as exc:
+                    raise _CategorizedBootstrapError(
+                        OpenFigiFailureCategory.RESPONSE_ARCHIVE_FAILED
+                    ) from exc
                 archived += 1
                 checksum = sha256(raw).hexdigest()
                 responses = self._responses(raw, expected=len(batch))
@@ -135,12 +171,16 @@ class OpenFigiMetadataBootstrapService:
                         for row in rows if str(row.get("ticker", "")).strip()
                     }
                     if tickers != {quote.exchange_ticker}:
-                        raise ValueError("OpenFIGI ticker result is missing or ambiguous")
+                        raise _CategorizedBootstrapError(
+                            OpenFigiFailureCategory.TICKER_MISMATCH_OR_AMBIGUOUS
+                        )
                     figis = sorted({str(row.get("figi", "")).strip() for row in rows
                                     if str(row.get("ticker", "")).strip().upper() == quote.exchange_ticker
                                     and str(row.get("figi", "")).strip()})
                     if not figis:
-                        raise ValueError("OpenFIGI matching rows contain no FIGI")
+                        raise _CategorizedBootstrapError(
+                            OpenFigiFailureCategory.FIGI_MISSING
+                        )
                     evidence.append(InstrumentMetadataEvidence(
                         instrument_key=position.instrument_key,
                         exchange_ticker=quote.exchange_ticker,
@@ -154,14 +194,25 @@ class OpenFigiMetadataBootstrapService:
                         ),
                     ))
             document = InstrumentMetadataDocument(tuple(sorted(evidence, key=lambda item: item.instrument_key)))
-            write_json_atomic(metadata_output, document.to_dict(), ensure_ascii=False)
+            try:
+                write_json_atomic(metadata_output, document.to_dict(), ensure_ascii=False)
+            except OSError as exc:
+                raise _CategorizedBootstrapError(
+                    OpenFigiFailureCategory.METADATA_WRITE_FAILED
+                ) from exc
             return OpenFigiBootstrapResult(requested_count, len(evidence), len(batches), archived, document)
         except Exception as exc:
+            category = (
+                exc.category
+                if isinstance(exc, _CategorizedBootstrapError)
+                else OpenFigiFailureCategory.UNEXPECTED
+            )
             raise OpenFigiBootstrapFailure(
                 "OpenFIGI metadata bootstrap failed",
                 requested_count=requested_count,
                 batch_count=len(batches),
                 archived_response_count=archived,
+                failure_category=category,
             ) from exc
 
     @staticmethod
@@ -169,27 +220,34 @@ class OpenFigiMetadataBootstrapService:
         try:
             payload = json.loads(raw.decode("utf-8"))
         except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-            raise ValueError("OpenFIGI response is invalid JSON") from exc
+            raise _CategorizedBootstrapError(
+                OpenFigiFailureCategory.RESPONSE_INVALID
+            ) from exc
         if not isinstance(payload, list) or len(payload) != expected:
-            raise ValueError("OpenFIGI response does not align with request")
+            raise _CategorizedBootstrapError(OpenFigiFailureCategory.RESPONSE_INVALID)
         return payload
 
     @staticmethod
     def _rows(response: object) -> list[dict[str, object]]:
-        if not isinstance(response, dict) or "error" in response or "warning" in response:
-            raise ValueError("OpenFIGI mapping result is unavailable")
+        if not isinstance(response, dict):
+            raise _CategorizedBootstrapError(OpenFigiFailureCategory.RESPONSE_INVALID)
+        if "error" in response:
+            raise _CategorizedBootstrapError(OpenFigiFailureCategory.PROVIDER_ERROR)
+        if "warning" in response:
+            raise _CategorizedBootstrapError(OpenFigiFailureCategory.PROVIDER_WARNING)
         rows = response.get("data")
         if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
-            raise ValueError("OpenFIGI mapping data is malformed")
+            raise _CategorizedBootstrapError(OpenFigiFailureCategory.RESPONSE_INVALID)
         return rows
 
 
 def bootstrap_report(*, status: str, started_at: datetime, completed_at: datetime,
                      requested_count: int | None, matched_count: int | None,
                      batch_count: int | None, archived_response_count: int | None,
-                     failure_type: str | None = None) -> dict[str, object]:
+                     failure_type: str | None = None,
+                     failure_category: OpenFigiFailureCategory | None = None) -> dict[str, object]:
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": status,
         "started_at": started_at.isoformat(),
         "completed_at": completed_at.isoformat(),
@@ -201,7 +259,11 @@ def bootstrap_report(*, status: str, started_at: datetime, completed_at: datetim
             "archived_response_count": archived_response_count,
         },
         "failure": None if failure_type is None else {
-            "type": failure_type, "reason": "OpenFIGI metadata bootstrap failed"
+            "type": failure_type,
+            "category": (
+                failure_category or OpenFigiFailureCategory.INPUT_OR_RUNTIME_FAILURE
+            ).value,
+            "reason": "OpenFIGI metadata bootstrap failed",
         },
         "limitations": [
             "report excludes paths, ISINs, tickers, FIGIs, response bodies, and credentials",

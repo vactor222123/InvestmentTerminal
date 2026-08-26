@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `dd1b34d24a8a41f19a71b46686341d54fa272e80`
-**Current local package:** Phase 7 Package 41 - Controlled Private OpenFIGI Bootstrap
+**Current GitHub baseline:** `baec0444990ee59650d160b7bbff649ab92c968b`
+**Current local package:** Phase 7 Package 42 - Privacy-Safe OpenFIGI Failure Categories
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Privacy-safe OpenFIGI failure categorization
+**Current next action:** Categorized controlled private OpenFIGI bootstrap
 
 ---
 
@@ -299,31 +299,32 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 41 - Controlled Private OpenFIGI Bootstrap
+Phase 7 Package 42 - Privacy-Safe OpenFIGI Failure Categories
 ```
 
-Files: `docs/PHASE_7_PACKAGE_41.md`, `docs/ROADMAP_AFTER_AUDIT.md`,
-`Roadmap.md`, `NEXT_STEPS.md`, and `PROJECT_CONTINUATION.md`.
+Files: OpenFIGI bootstrap service and CLI, their focused tests, canonical
+architecture/data-model/roadmap/handoff documents, and
+`docs/PHASE_7_PACKAGE_42.md`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ dd1b34d24a8a41f19a71b46686341d54fa272e80
+develop @ baec0444990ee59650d160b7bbff649ab92c968b
 ```
 
 Result:
 
-- the controlled private bootstrap requested 10 mappings in two batches and
-  stopped after archiving the first response;
-- the redacted report status is `FAILED`, with no matched count published;
-- schema version 1 does not expose a safe failure category, so remediation
-  cannot be selected without guessing or inspecting private response data;
-- qualification and valuation were not run.
+- schema version 2 adds one bounded privacy-safe failure category;
+- provider text, exception messages, identities, paths, and credentials remain
+  excluded;
+- exact-byte archives, atomic metadata, batching, and fail-closed behavior are
+  unchanged;
+- no private runtime action, qualification, or valuation was performed.
 
 Verification:
 
-- focused OpenFIGI/privacy/architecture checks: 29 passed;
-- complete local suite: 2,808 passed, 4 skipped;
+- focused OpenFIGI/metadata/architecture checks: 42 passed;
+- complete local suite: 2,811 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.
 

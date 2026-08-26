@@ -9,6 +9,7 @@ from pathlib import Path
 
 from investment_terminal.portfolio.openfigi_metadata_bootstrap import (
     OpenFigiBootstrapFailure,
+    OpenFigiFailureCategory,
     OpenFigiHttpClient,
     OpenFigiMetadataBootstrapService,
     bootstrap_report,
@@ -41,6 +42,7 @@ def main(argv: Sequence[str] | None = None, *, client=None, clock=None) -> int:
     runtime_clock = clock or (lambda: datetime.now(timezone.utc))
     started = runtime_clock()
     counts: list[int | None] = [None] * 4
+    failure_category: OpenFigiFailureCategory | None = None
     try:
         if not options.transaction_database.is_file():
             raise FileNotFoundError("Transaction database does not exist")
@@ -71,12 +73,14 @@ def main(argv: Sequence[str] | None = None, *, client=None, clock=None) -> int:
         if isinstance(exc, OpenFigiBootstrapFailure):
             counts = [exc.requested_count, None, exc.batch_count,
                       exc.archived_response_count]
+            failure_category = exc.failure_category
     completed = runtime_clock()
     payload = bootstrap_report(
         status=status, started_at=started, completed_at=completed,
         requested_count=counts[0], matched_count=counts[1],
         batch_count=counts[2], archived_response_count=counts[3],
         failure_type=failure_type,
+        failure_category=failure_category,
     )
     write_json_atomic(options.report_output, payload)
     if options.json:

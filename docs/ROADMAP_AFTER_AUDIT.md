@@ -557,3 +557,9 @@ behavior but does not safely distinguish provider rejection, malformed data,
 missing FIGI, or ticker ambiguity. A versioned privacy-safe failure category is
 the smallest next package; private response inspection, rerun, qualification,
 and valuation remain excluded.
+Package 42 advances the redacted OpenFIGI report to schema version 2 with one
+bounded privacy-safe failure category. Provider request, archive, response,
+provider error/warning, ticker, FIGI, metadata-write, and unexpected failures
+remain distinguishable without exposing response text or private identities.
+One categorized controlled private rerun is next; qualification and valuation
+remain excluded until its result is reviewed.

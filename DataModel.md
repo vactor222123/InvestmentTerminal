@@ -597,5 +597,6 @@ result preserves the evidence and quality alongside a detached reconstructed
 position projection; it is never a transaction-ledger mutation.
 `OpenFigiBootstrapResult` records aggregate request/match/batch/archive counts
 and the generated metadata document. Exact raw response bytes remain separate
-private provenance evidence; the redacted schema-version-1 report contains no
-instrument or provider-record identities.
+private provenance evidence. The redacted schema-version-2 report adds one
+bounded failure-category enum but contains no provider text, exception message,
+path, credential, instrument identity, or provider-record identity.
