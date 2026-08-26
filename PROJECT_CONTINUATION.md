@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `7b424ff2efa9cc91e084e11d25a8109ff5e91855`
-**Current local package:** Phase 7 Package 47 - Filtered Private OpenFIGI Bootstrap
+**Current GitHub baseline:** `069a8fd43a60fc77d63a4c26961ba93677baab23`
+**Current local package:** Phase 7 Package 48 - Local-Only Candidate-Absence Diagnostic Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Local-only candidate-absence diagnostic audit
+**Current next action:** Implement the local-only candidate-absence diagnostic
 
 ---
 
@@ -299,25 +299,27 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 47 - Filtered Private OpenFIGI Bootstrap
+Phase 7 Package 48 - Local-Only Candidate-Absence Diagnostic Audit
 ```
 
-Files: `docs/PHASE_7_PACKAGE_47.md`, `docs/ROADMAP_AFTER_AUDIT.md`,
+Files: `docs/PHASE_7_PACKAGE_48.md`, `docs/ROADMAP_AFTER_AUDIT.md`,
 `Roadmap.md`, `NEXT_STEPS.md`, and `PROJECT_CONTINUATION.md`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ 7b424ff2efa9cc91e084e11d25a8109ff5e91855
+develop @ 069a8fd43a60fc77d63a4c26961ba93677baab23
 ```
 
 Result:
 
-- filtered bootstrap progressed past alternative listings but failed in the
-  first batch with `CANDIDATE_TICKER_ABSENT`;
-- the shareable report correctly excludes the affected identity and tickers;
-- automatic provider-ticker adoption is not justified;
-- qualification and valuation were not run.
+- the existing service already owns every fact needed to diagnose
+  `CANDIDATE_TICKER_ABSENT` without another provider request;
+- a separate schema-version-1 local-only diagnostic with an explicit output
+  path is the smallest safe boundary;
+- the shareable report remains schema version 3 and acceptance remains
+  fail-closed;
+- automatic correction, rerun, qualification, and valuation remain excluded.
 
 Verification:
 

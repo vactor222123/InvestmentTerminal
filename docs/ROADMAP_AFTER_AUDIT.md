@@ -591,3 +591,9 @@ but another candidate ticker has no matching provider row. Automatic provider
 ticker adoption is not justified, and the redacted report cannot identify the
 private entry. A focused audit of a separate local-only remediation diagnostic
 is next; rerun, qualification, and valuation remain excluded.
+Package 48 selects a separate schema-version-1 local-only candidate-absence
+diagnostic behind an explicit CLI path. It contains only failure facts already
+available at the service boundary. The shareable report remains schema version
+3, ticker acceptance stays fail-closed, and automatic correction remains
+excluded. Bounded implementation is next; rerun, qualification, and valuation
+remain excluded.
