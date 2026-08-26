@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `b7f5cc5906111233581849aa805f71776821e130`
-**Current local package:** Phase 7 Package 46 - Candidate-Ticker OpenFIGI Row Filtering
+**Current GitHub baseline:** `7b424ff2efa9cc91e084e11d25a8109ff5e91855`
+**Current local package:** Phase 7 Package 47 - Filtered Private OpenFIGI Bootstrap
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Filtered controlled private OpenFIGI bootstrap
+**Current next action:** Local-only candidate-absence diagnostic audit
 
 ---
 
@@ -299,29 +299,29 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 46 - Candidate-Ticker OpenFIGI Row Filtering
+Phase 7 Package 47 - Filtered Private OpenFIGI Bootstrap
 ```
 
-Files: OpenFIGI bootstrap service and focused tests, canonical
-architecture/data-model/roadmap/handoff documents, and
-`docs/PHASE_7_PACKAGE_46.md`.
+Files: `docs/PHASE_7_PACKAGE_47.md`, `docs/ROADMAP_AFTER_AUDIT.md`,
+`Roadmap.md`, `NEXT_STEPS.md`, and `PROJECT_CONTINUATION.md`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ b7f5cc5906111233581849aa805f71776821e130
+develop @ 7b424ff2efa9cc91e084e11d25a8109ff5e91855
 ```
 
 Result:
 
-- alternative listing rows no longer reject a confirmed candidate ticker;
-- metadata retains all and only sorted candidate-ticker FIGIs;
-- candidate absence and missing candidate FIGIs remain fail-closed;
-- no private runtime action, qualification, or valuation was performed.
+- filtered bootstrap progressed past alternative listings but failed in the
+  first batch with `CANDIDATE_TICKER_ABSENT`;
+- the shareable report correctly excludes the affected identity and tickers;
+- automatic provider-ticker adoption is not justified;
+- qualification and valuation were not run.
 
 Verification:
 
-- focused OpenFIGI/metadata/architecture checks: 42 passed;
+- focused OpenFIGI/privacy/architecture checks: 32 passed;
 - complete local suite: 2,811 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.

@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ b7f5cc5906111233581849aa805f71776821e130`
+**Current repository baseline:** `develop @ 7b424ff2efa9cc91e084e11d25a8109ff5e91855`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -68,6 +68,7 @@
 **Phase 7 Package 44 split OpenFIGI ticker categories:** COMPLETE
 **Phase 7 Package 45 schema-3 private OpenFIGI bootstrap:** COMPLETE - BLOCKED
 **Phase 7 Package 46 candidate-ticker OpenFIGI filtering:** COMPLETE
+**Phase 7 Package 47 filtered private OpenFIGI bootstrap:** COMPLETE - BLOCKED
 
 ## Current State
 
@@ -75,10 +76,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled filtered OpenFIGI bootstrap with a unique run ID and return
-only its schema-version-3 redacted report. Keep transaction, quote, metadata,
-and exact response files private. Do not run quote qualification or valuation
-before the bootstrap result is reviewed.
+Audit a local-only candidate-absence diagnostic contract. The filtered private
+bootstrap progressed past alternative listings but stopped in the first batch
+with `CANDIDATE_TICKER_ABSENT`. Identifying details must stay outside the
+shareable report; do not rerun, qualify, or value yet.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -183,3 +184,5 @@ Split OpenFIGI ticker categories: `docs/PHASE_7_PACKAGE_44.md`.
 Schema-3 private OpenFIGI bootstrap: `docs/PHASE_7_PACKAGE_45.md`.
 
 Candidate-ticker OpenFIGI filtering: `docs/PHASE_7_PACKAGE_46.md`.
+
+Filtered private OpenFIGI bootstrap: `docs/PHASE_7_PACKAGE_47.md`.

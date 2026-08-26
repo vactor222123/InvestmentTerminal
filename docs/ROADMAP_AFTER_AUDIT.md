@@ -585,3 +585,9 @@ candidate ticker is present, then deterministically retains all and only
 candidate-ticker FIGIs. Candidate absence and missing candidate FIGIs remain
 fail-closed. One controlled filtered bootstrap is next; private response
 inspection, qualification, and valuation remain excluded.
+Package 47 records the filtered run as blocked in the first batch with
+`CANDIDATE_TICKER_ABSENT`. Alternative listings no longer terminate the run,
+but another candidate ticker has no matching provider row. Automatic provider
+ticker adoption is not justified, and the redacted report cannot identify the
+private entry. A focused audit of a separate local-only remediation diagnostic
+is next; rerun, qualification, and valuation remain excluded.
