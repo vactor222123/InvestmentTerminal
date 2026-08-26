@@ -206,7 +206,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → controlled private offline quote qualification — COMPLETE: BLOCKED
 → transaction instrument-metadata enrichment audit — COMPLETE
 → bounded provenance-aware instrument-metadata enrichment — COMPLETE
-→ controlled private metadata-backed quote qualification — NEXT
+→ automated instrument-metadata bootstrap audit — COMPLETE
+→ bounded OpenFIGI v3 metadata bootstrap — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

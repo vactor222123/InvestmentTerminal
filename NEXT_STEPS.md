@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 0f55a7c724ba0083148799f8b7df17f074e20342`
+**Current repository baseline:** `develop @ 022075c15c77c81b755b545ecee0c3f34a71cc6c`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -60,6 +60,7 @@
 **Phase 7 Package 36 controlled private offline quote qualification:** COMPLETE - BLOCKED
 **Phase 7 Package 37 transaction instrument-metadata enrichment audit:** COMPLETE
 **Phase 7 Package 38 provenance-aware instrument-metadata enrichment:** COMPLETE
+**Phase 7 Package 39 automated instrument-metadata bootstrap audit:** COMPLETE
 
 ## Current State
 
@@ -67,10 +68,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled private offline quote qualification with explicit verified
-instrument-metadata evidence and a caller-selected maximum age. Return only the
-redacted report; do not send private metadata/quotes/database or execute
-valuation.
+Implement a bounded OpenFIGI v3 ISIN-to-ticker metadata bootstrap with exact
+private response-byte preservation and a redacted aggregate report. Use
+synthetic tests only; do not send private ISINs, run qualification, or execute
+valuation yet.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -159,3 +160,5 @@ Controlled private offline quote qualification: `docs/PHASE_7_PACKAGE_36.md`.
 Transaction instrument-metadata enrichment audit: `docs/PHASE_7_PACKAGE_37.md`.
 
 Provenance-aware instrument-metadata enrichment: `docs/PHASE_7_PACKAGE_38.md`.
+
+Automated instrument-metadata bootstrap audit: `docs/PHASE_7_PACKAGE_39.md`.

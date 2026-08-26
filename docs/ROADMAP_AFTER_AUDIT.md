@@ -539,3 +539,10 @@ projection. Qualification may now opt into exact `READY` metadata coverage with
 a caller-owned age limit while preserving its redacted schema-version-1 report
 and leaving immutable transaction evidence untouched. One controlled private
 metadata-backed qualification is next; valuation remains excluded.
+Package 39 stops that manual operational handoff before runtime execution. The
+existing private metadata document is sufficient as a reusable local registry,
+but its initial mappings require independent evidence. Official OpenFIGI v3 can
+map ISIN jobs without an API key, although multi-listing results must not be
+resolved by first-row selection and provider exchange codes must not be treated
+as MICs. A bounded exact-ticker-confirming bootstrap with private raw-response
+preservation and redacted reporting is next.

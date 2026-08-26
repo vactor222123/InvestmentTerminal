@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `0f55a7c724ba0083148799f8b7df17f074e20342`
-**Current local package:** Phase 7 Package 38 - Provenance-Aware Instrument Metadata Enrichment
+**Current GitHub baseline:** `022075c15c77c81b755b545ecee0c3f34a71cc6c`
+**Current local package:** Phase 7 Package 39 - Automated Instrument-Metadata Bootstrap Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Controlled private metadata-backed quote qualification
+**Current next action:** Bounded OpenFIGI v3 instrument-metadata bootstrap
 
 ---
 
@@ -299,24 +299,13 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 38 - Provenance-Aware Instrument Metadata Enrichment
+Phase 7 Package 39 - Automated Instrument-Metadata Bootstrap Audit
 ```
 
 Files:
 
 ```text
-.gitignore
-investment_terminal/portfolio/instrument_metadata_enrichment.py
-investment_terminal/portfolio/offline_quote_qualification.py
-investment_terminal/cli/offline_quote_qualification.py
-tests/test_instrument_metadata_enrichment.py
-tests/test_offline_quote_qualification.py
-tests/test_offline_quote_qualification_cli.py
-tests/test_repository_privacy.py
-docs/PHASE_7_PACKAGE_38.md
-Architecture.md
-DataModel.md
-README.md
+docs/PHASE_7_PACKAGE_39.md
 docs/ROADMAP_AFTER_AUDIT.md
 Roadmap.md
 NEXT_STEPS.md
@@ -326,18 +315,17 @@ PROJECT_CONTINUATION.md
 Source baseline verified exactly:
 
 ```text
-develop @ 0f55a7c724ba0083148799f8b7df17f074e20342
+develop @ 022075c15c77c81b755b545ecee0c3f34a71cc6c
 ```
 
 Result:
 
-- strict schema-version-1 metadata evidence preserves per-instrument source
-  provenance and deterministic canonical keys;
-- exact `READY` coverage creates a detached enriched position projection;
-- stale, partial, future, duplicate, conflicting, and key-changing evidence
-  fails closed without mutating ledger transactions;
-- offline qualification accepts metadata and caller-owned age as an optional
-  pair while preserving its redacted schema-version-1 report.
+- the manual metadata handoff was stopped before runtime execution;
+- the existing private metadata document is sufficient as a reusable registry;
+- official OpenFIGI v3 supports ISIN mapping without an API key, but may return
+  multiple listings and provider exchange codes are not internal MICs;
+- the smallest safe bootstrap confirms the existing quote ticker independently,
+  archives exact private response bytes, and emits a redacted report.
 
 Verification:
 
