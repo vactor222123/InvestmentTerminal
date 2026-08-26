@@ -569,3 +569,8 @@ candidate ticker from a confirmed candidate accompanied by alternative listing
 tickers, so changing acceptance would require guessing. Splitting those two
 privacy-safe categories is next; raw-response inspection, rerun, qualification,
 and valuation remain excluded.
+Package 44 advances the redacted report to schema version 3 and splits the
+combined ticker outcome into candidate absent and candidate present with
+alternative listings. Both remain fail-closed and expose no ticker values or
+response details. One controlled schema-3 rerun is next; raw-response
+inspection, qualification, and valuation remain excluded.

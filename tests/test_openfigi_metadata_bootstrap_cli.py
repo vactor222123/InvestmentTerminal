@@ -46,7 +46,7 @@ def test_cli_success_writes_private_metadata_and_redacted_report(tmp_path: Path)
     setup(tmp_path)
     assert main(arguments(tmp_path), client=Client(), clock=lambda: NOW) == 0
     report = json.loads((tmp_path / "report.json").read_text())
-    assert report["schema_version"] == 2
+    assert report["schema_version"] == 3
     assert report["status"] == "SUCCESS"
     assert report["coverage"] == {
         "requested_count": 1, "matched_count": 1,

@@ -101,10 +101,10 @@ def test_duplicate_same_ticker_rows_are_accepted_and_figis_preserved(tmp_path: P
     (json.dumps([{"warning": "no match"}]).encode(), OpenFigiFailureCategory.PROVIDER_WARNING),
     (json.dumps([{"error": "bad job"}]).encode(), OpenFigiFailureCategory.PROVIDER_ERROR),
     (json.dumps([{"data": [{"figi": "A", "ticker": "OTHER"}]}]).encode(),
-     OpenFigiFailureCategory.TICKER_MISMATCH_OR_AMBIGUOUS),
+     OpenFigiFailureCategory.CANDIDATE_TICKER_ABSENT),
     (json.dumps([{"data": [
         {"figi": "A", "ticker": "T1"}, {"figi": "B", "ticker": "OTHER"}
-    ]}]).encode(), OpenFigiFailureCategory.TICKER_MISMATCH_OR_AMBIGUOUS),
+    ]}]).encode(), OpenFigiFailureCategory.CANDIDATE_TICKER_WITH_ALTERNATIVES),
     (b"not-json", OpenFigiFailureCategory.RESPONSE_INVALID),
     (json.dumps([]).encode(), OpenFigiFailureCategory.RESPONSE_INVALID),
 ])

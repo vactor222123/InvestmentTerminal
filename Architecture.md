@@ -371,6 +371,6 @@ The bounded OpenFIGI bootstrap independently confirms ISIN-to-ticker candidates,
 preserves exact provider response bytes privately, and publishes the existing
 metadata document plus a redacted aggregate report. Provider exchange codes are
 not treated as MICs, and ambiguous listings fail closed.
-Its schema-version-2 report exposes only a stable privacy-safe failure category;
+Its versioned report exposes only a stable privacy-safe failure category;
 provider text, exception messages, identities, paths, and credentials remain
 private.

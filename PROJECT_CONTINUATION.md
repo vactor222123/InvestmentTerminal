@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `e1d9af668a59e187e727d21ba43abe0a9f180000`
-**Current local package:** Phase 7 Package 43 - Categorized Private OpenFIGI Bootstrap
+**Current GitHub baseline:** `278bd5e601fd576e80994c6a6094b7d4641d0e0e`
+**Current local package:** Phase 7 Package 44 - Split OpenFIGI Ticker Failure Categories
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Split privacy-safe OpenFIGI ticker categories
+**Current next action:** Schema-3 controlled private OpenFIGI bootstrap
 
 ---
 
@@ -299,30 +299,30 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 43 - Categorized Private OpenFIGI Bootstrap
+Phase 7 Package 44 - Split OpenFIGI Ticker Failure Categories
 ```
 
-Files: `docs/PHASE_7_PACKAGE_43.md`, `docs/ROADMAP_AFTER_AUDIT.md`,
-`Roadmap.md`, `NEXT_STEPS.md`, and `PROJECT_CONTINUATION.md`.
+Files: OpenFIGI bootstrap service and focused tests, canonical
+architecture/data-model/roadmap/handoff documents, and
+`docs/PHASE_7_PACKAGE_44.md`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ e1d9af668a59e187e727d21ba43abe0a9f180000
+develop @ 278bd5e601fd576e80994c6a6094b7d4641d0e0e
 ```
 
 Result:
 
-- schema-version-2 bootstrap failed in the first batch with
-  `TICKER_MISMATCH_OR_AMBIGUOUS`;
-- the report cannot distinguish candidate absence from a candidate confirmed
-  alongside alternative listings;
-- private inputs and exact responses were not reviewed;
-- qualification and valuation were not run.
+- schema version 3 distinguishes candidate absence from a confirmed candidate
+  accompanied by alternative listing tickers;
+- both cases remain fail-closed and expose no ticker values;
+- all other privacy, archive, metadata, and coverage behavior is unchanged;
+- no private runtime action, qualification, or valuation was performed.
 
 Verification:
 
-- focused OpenFIGI/privacy/architecture checks: 32 passed;
+- focused OpenFIGI/metadata/architecture checks: 42 passed;
 - complete local suite: 2,811 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.

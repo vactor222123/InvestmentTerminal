@@ -73,7 +73,8 @@ class OpenFigiFailureCategory(str, Enum):
     RESPONSE_INVALID = "RESPONSE_INVALID"
     PROVIDER_ERROR = "PROVIDER_ERROR"
     PROVIDER_WARNING = "PROVIDER_WARNING"
-    TICKER_MISMATCH_OR_AMBIGUOUS = "TICKER_MISMATCH_OR_AMBIGUOUS"
+    CANDIDATE_TICKER_ABSENT = "CANDIDATE_TICKER_ABSENT"
+    CANDIDATE_TICKER_WITH_ALTERNATIVES = "CANDIDATE_TICKER_WITH_ALTERNATIVES"
     FIGI_MISSING = "FIGI_MISSING"
     METADATA_WRITE_FAILED = "METADATA_WRITE_FAILED"
     UNEXPECTED = "UNEXPECTED"
@@ -170,9 +171,13 @@ class OpenFigiMetadataBootstrapService:
                         str(row.get("ticker", "")).strip().upper()
                         for row in rows if str(row.get("ticker", "")).strip()
                     }
+                    if quote.exchange_ticker not in tickers:
+                        raise _CategorizedBootstrapError(
+                            OpenFigiFailureCategory.CANDIDATE_TICKER_ABSENT
+                        )
                     if tickers != {quote.exchange_ticker}:
                         raise _CategorizedBootstrapError(
-                            OpenFigiFailureCategory.TICKER_MISMATCH_OR_AMBIGUOUS
+                            OpenFigiFailureCategory.CANDIDATE_TICKER_WITH_ALTERNATIVES
                         )
                     figis = sorted({str(row.get("figi", "")).strip() for row in rows
                                     if str(row.get("ticker", "")).strip().upper() == quote.exchange_ticker
@@ -247,7 +252,7 @@ def bootstrap_report(*, status: str, started_at: datetime, completed_at: datetim
                      failure_type: str | None = None,
                      failure_category: OpenFigiFailureCategory | None = None) -> dict[str, object]:
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "status": status,
         "started_at": started_at.isoformat(),
         "completed_at": completed_at.isoformat(),

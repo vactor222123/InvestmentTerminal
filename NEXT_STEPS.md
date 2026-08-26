@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ e1d9af668a59e187e727d21ba43abe0a9f180000`
+**Current repository baseline:** `develop @ 278bd5e601fd576e80994c6a6094b7d4641d0e0e`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -65,6 +65,7 @@
 **Phase 7 Package 41 controlled private OpenFIGI bootstrap:** COMPLETE - BLOCKED
 **Phase 7 Package 42 privacy-safe OpenFIGI failure categories:** COMPLETE
 **Phase 7 Package 43 categorized private OpenFIGI bootstrap:** COMPLETE - BLOCKED
+**Phase 7 Package 44 split OpenFIGI ticker categories:** COMPLETE
 
 ## Current State
 
@@ -72,10 +73,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Split the privacy-safe `TICKER_MISMATCH_OR_AMBIGUOUS` category into candidate
-absent and candidate present with alternative listings. The controlled schema-2
-bootstrap stopped in the first batch at ticker confirmation. Do not inspect raw
-responses, rerun bootstrap, qualify quotes, or value the portfolio yet.
+Run one controlled schema-version-3 OpenFIGI bootstrap with a unique run ID and
+return only its redacted report. Keep transaction, quote, metadata, and exact
+response files private. Do not run quote qualification or valuation before the
+split ticker-category result is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -174,3 +175,5 @@ Controlled private OpenFIGI bootstrap: `docs/PHASE_7_PACKAGE_41.md`.
 Privacy-safe OpenFIGI failure categories: `docs/PHASE_7_PACKAGE_42.md`.
 
 Categorized private OpenFIGI bootstrap: `docs/PHASE_7_PACKAGE_43.md`.
+
+Split OpenFIGI ticker categories: `docs/PHASE_7_PACKAGE_44.md`.
