@@ -574,3 +574,9 @@ combined ticker outcome into candidate absent and candidate present with
 alternative listings. Both remain fail-closed and expose no ticker values or
 response details. One controlled schema-3 rerun is next; raw-response
 inspection, qualification, and valuation remain excluded.
+Package 45 records the schema-3 run as blocked in the first batch with
+`CANDIDATE_TICKER_WITH_ALTERNATIVES`. This proves the candidate is present and
+that alternate listing rows cause the strict set-equality rejection. The
+smallest remediation is deterministic filtering to all candidate-ticker FIGIs,
+while candidate absence and missing candidate FIGIs remain fail-closed.
+Qualification and valuation remain excluded.
