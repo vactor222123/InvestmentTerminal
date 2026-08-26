@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 069a8fd43a60fc77d63a4c26961ba93677baab23`
+**Current repository baseline:** `develop @ 4fa45387964ac38ec1d973ab0642d6696d3f0cd8`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -70,6 +70,7 @@
 **Phase 7 Package 46 candidate-ticker OpenFIGI filtering:** COMPLETE
 **Phase 7 Package 47 filtered private OpenFIGI bootstrap:** COMPLETE - BLOCKED
 **Phase 7 Package 48 local-only candidate-absence diagnostic audit:** COMPLETE
+**Phase 7 Package 49 bounded local-only candidate-absence diagnostic:** COMPLETE
 
 ## Current State
 
@@ -77,11 +78,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the audited local-only candidate-absence diagnostic contract. Add a
-typed schema-version-1 private artifact behind an explicit output path while
-leaving the shareable OpenFIGI report at schema version 3. Preserve fail-closed
-ticker acceptance, atomic writes, redaction, and metadata immutability. Do not
-rerun, qualify, or value yet.
+Run one controlled private OpenFIGI bootstrap with a unique
+`--private-diagnostic-output` under `C:\runtime\data`. Return only the redacted
+schema-version-3 report. Keep the diagnostic, response archive, quotes,
+metadata, and transaction database private. Do not qualify or value yet.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -190,3 +190,5 @@ Candidate-ticker OpenFIGI filtering: `docs/PHASE_7_PACKAGE_46.md`.
 Filtered private OpenFIGI bootstrap: `docs/PHASE_7_PACKAGE_47.md`.
 
 Local-only candidate-absence diagnostic audit: `docs/PHASE_7_PACKAGE_48.md`.
+
+Bounded local-only candidate-absence diagnostic: `docs/PHASE_7_PACKAGE_49.md`.

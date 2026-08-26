@@ -603,3 +603,8 @@ It contains no provider text, exception message, path, credential, instrument
 identity, ticker value, or provider-record identity.
 Multiple OpenFIGI listing rows do not expand metadata identity: provenance
 retains only the sorted FIGIs of rows matching the confirmed candidate ticker.
+`OpenFigiCandidateAbsenceDiagnostic` is a separate private schema-version-1
+document. It records one run/time, one-based request and batch ordinals, the
+affected instrument key and candidate ticker, sorted unique provider tickers,
+and the archived response checksum. It excludes raw responses, FIGIs, exchange
+codes, paths, and unrelated instruments and never changes the redacted report.

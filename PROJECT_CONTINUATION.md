@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `069a8fd43a60fc77d63a4c26961ba93677baab23`
-**Current local package:** Phase 7 Package 48 - Local-Only Candidate-Absence Diagnostic Audit
+**Current GitHub baseline:** `4fa45387964ac38ec1d973ab0642d6696d3f0cd8`
+**Current local package:** Phase 7 Package 49 - Bounded Local-Only Candidate-Absence Diagnostic
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement the local-only candidate-absence diagnostic
+**Current next action:** Controlled diagnostic-producing private OpenFIGI rerun
 
 ---
 
@@ -299,32 +299,31 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 48 - Local-Only Candidate-Absence Diagnostic Audit
+Phase 7 Package 49 - Bounded Local-Only Candidate-Absence Diagnostic
 ```
 
-Files: `docs/PHASE_7_PACKAGE_48.md`, `docs/ROADMAP_AFTER_AUDIT.md`,
-`Roadmap.md`, `NEXT_STEPS.md`, and `PROJECT_CONTINUATION.md`.
+Files: implementation/service/CLI tests, `docs/PHASE_7_PACKAGE_49.md`,
+architecture/data-model/roadmap/readme documents, `NEXT_STEPS.md`, and
+`PROJECT_CONTINUATION.md`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ 069a8fd43a60fc77d63a4c26961ba93677baab23
+develop @ 4fa45387964ac38ec1d973ab0642d6696d3f0cd8
 ```
 
 Result:
 
-- the existing service already owns every fact needed to diagnose
-  `CANDIDATE_TICKER_ABSENT` without another provider request;
-- a separate schema-version-1 local-only diagnostic with an explicit output
-  path is the smallest safe boundary;
-- the shareable report remains schema version 3 and acceptance remains
-  fail-closed;
-- automatic correction, rerun, qualification, and valuation remain excluded.
+- candidate absence carries a typed schema-version-1 private diagnostic;
+- the CLI atomically writes it to an explicit path before the redacted report;
+- report schema version 3 and fail-closed ticker acceptance remain unchanged;
+- diagnostic-write failure is redacted, non-zero, and leaves metadata absent;
+- controlled rerun, qualification, and valuation were not performed.
 
 Verification:
 
-- focused OpenFIGI/privacy/architecture checks: 32 passed;
-- complete local suite: 2,811 passed, 4 skipped;
+- focused OpenFIGI/privacy/architecture checks: 36 passed;
+- complete local suite: 2,815 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.
 

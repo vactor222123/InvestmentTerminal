@@ -31,6 +31,7 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--run-id", required=True)
     value.add_argument("--response-archive", type=Path, required=True)
     value.add_argument("--metadata-output", type=Path, required=True)
+    value.add_argument("--private-diagnostic-output", type=Path, required=True)
     value.add_argument("--report-output", type=Path, required=True)
     value.add_argument("--timeout-seconds", type=float, default=30.0)
     value.add_argument("--json", action="store_true")
@@ -74,6 +75,15 @@ def main(argv: Sequence[str] | None = None, *, client=None, clock=None) -> int:
             counts = [exc.requested_count, None, exc.batch_count,
                       exc.archived_response_count]
             failure_category = exc.failure_category
+            if exc.private_diagnostic is not None:
+                try:
+                    write_json_atomic(
+                        options.private_diagnostic_output,
+                        exc.private_diagnostic.to_dict(),
+                    )
+                except Exception as diagnostic_exc:
+                    failure_type = type(diagnostic_exc).__name__
+                    failure_category = OpenFigiFailureCategory.INPUT_OR_RUNTIME_FAILURE
     completed = runtime_clock()
     payload = bootstrap_report(
         status=status, started_at=started, completed_at=completed,

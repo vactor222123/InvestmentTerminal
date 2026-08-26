@@ -216,7 +216,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → deterministic candidate-ticker row filtering — COMPLETE
 → filtered controlled private OpenFIGI bootstrap — COMPLETE: BLOCKED
 → local-only candidate-absence diagnostic audit — COMPLETE
-→ bounded local-only candidate-absence diagnostic — NEXT
+→ bounded local-only candidate-absence diagnostic — COMPLETE
+→ controlled diagnostic-producing OpenFIGI rerun — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

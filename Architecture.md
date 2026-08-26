@@ -377,3 +377,7 @@ private.
 When the confirmed candidate ticker is present among multiple listings,
 metadata construction filters to all candidate-ticker FIGIs deterministically;
 candidate absence and missing candidate FIGIs remain fail-closed.
+Candidate absence optionally carries a typed private diagnostic to the CLI.
+The CLI writes that schema-version-1 document atomically to an explicit local
+path before the unchanged schema-version-3 redacted report. Diagnostic-write
+failure remains non-zero and cannot mutate metadata or expose private values.

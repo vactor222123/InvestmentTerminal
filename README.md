@@ -270,4 +270,6 @@ explicit private provenance-bearing evidence without changing the ledger.
 Automated metadata bootstrap: `python -m investment_terminal.cli.openfigi_metadata_bootstrap`.
 It uses OpenFIGI v3, preserves raw responses privately, and emits only a
 redacted aggregate report with privacy-safe failure categories;
-`OPENFIGI_API_KEY` is optional.
+`OPENFIGI_API_KEY` is optional. The required `--private-diagnostic-output`
+points to a local-only JSON file written only when the candidate ticker is
+absent; that file must not be shared.

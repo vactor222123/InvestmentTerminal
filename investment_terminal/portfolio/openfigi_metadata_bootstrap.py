@@ -64,6 +64,34 @@ class OpenFigiBootstrapResult:
     metadata: InstrumentMetadataDocument
 
 
+@dataclass(frozen=True, slots=True)
+class OpenFigiCandidateAbsenceDiagnostic:
+    """Private local-only facts for remediating one absent candidate ticker."""
+
+    run_id: str
+    retrieved_at: datetime
+    request_ordinal: int
+    batch_number: int
+    instrument_key: str
+    candidate_ticker: str
+    provider_tickers: tuple[str, ...]
+    response_sha256: str
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": 1,
+            "run_id": self.run_id,
+            "retrieved_at": self.retrieved_at.isoformat(),
+            "failure_category": OpenFigiFailureCategory.CANDIDATE_TICKER_ABSENT.value,
+            "request_ordinal": self.request_ordinal,
+            "batch_number": self.batch_number,
+            "instrument_key": self.instrument_key,
+            "candidate_ticker": self.candidate_ticker,
+            "provider_tickers": list(self.provider_tickers),
+            "response_sha256": self.response_sha256,
+        }
+
+
 class OpenFigiFailureCategory(str, Enum):
     """Privacy-safe failure categories for the versioned operational report."""
 
@@ -81,20 +109,24 @@ class OpenFigiFailureCategory(str, Enum):
 
 
 class _CategorizedBootstrapError(RuntimeError):
-    def __init__(self, category: OpenFigiFailureCategory) -> None:
+    def __init__(self, category: OpenFigiFailureCategory, *,
+                 private_diagnostic: OpenFigiCandidateAbsenceDiagnostic | None = None) -> None:
         super().__init__(category.value)
         self.category = category
+        self.private_diagnostic = private_diagnostic
 
 
 class OpenFigiBootstrapFailure(RuntimeError):
     def __init__(self, message: str, *, requested_count: int,
                  batch_count: int, archived_response_count: int,
-                 failure_category: OpenFigiFailureCategory) -> None:
+                 failure_category: OpenFigiFailureCategory,
+                 private_diagnostic: OpenFigiCandidateAbsenceDiagnostic | None = None) -> None:
         super().__init__(message)
         self.requested_count = requested_count
         self.batch_count = batch_count
         self.archived_response_count = archived_response_count
         self.failure_category = failure_category
+        self.private_diagnostic = private_diagnostic
 
 
 class OpenFigiMetadataBootstrapService:
@@ -160,7 +192,10 @@ class OpenFigiMetadataBootstrapService:
                 archived += 1
                 checksum = sha256(raw).hexdigest()
                 responses = self._responses(raw, expected=len(batch))
-                for position, response in zip(batch, responses, strict=True):
+                first_request_ordinal = (batch_number - 1) * self.batch_size + 1
+                for batch_ordinal, (position, response) in enumerate(
+                    zip(batch, responses, strict=True), start=0
+                ):
                     candidates = {
                         quote.instrument_key: quote
                         for quote in price_provider.quotes
@@ -173,7 +208,17 @@ class OpenFigiMetadataBootstrapService:
                     }
                     if quote.exchange_ticker not in tickers:
                         raise _CategorizedBootstrapError(
-                            OpenFigiFailureCategory.CANDIDATE_TICKER_ABSENT
+                            OpenFigiFailureCategory.CANDIDATE_TICKER_ABSENT,
+                            private_diagnostic=OpenFigiCandidateAbsenceDiagnostic(
+                                run_id=normalized_run,
+                                retrieved_at=observed,
+                                request_ordinal=first_request_ordinal + batch_ordinal,
+                                batch_number=batch_number,
+                                instrument_key=position.instrument_key,
+                                candidate_ticker=quote.exchange_ticker,
+                                provider_tickers=tuple(sorted(tickers)),
+                                response_sha256=checksum,
+                            ),
                         )
                     figis = sorted({str(row.get("figi", "")).strip() for row in rows
                                     if str(row.get("ticker", "")).strip().upper() == quote.exchange_ticker
@@ -208,12 +253,18 @@ class OpenFigiMetadataBootstrapService:
                 if isinstance(exc, _CategorizedBootstrapError)
                 else OpenFigiFailureCategory.UNEXPECTED
             )
+            private_diagnostic = (
+                exc.private_diagnostic
+                if isinstance(exc, _CategorizedBootstrapError)
+                else None
+            )
             raise OpenFigiBootstrapFailure(
                 "OpenFIGI metadata bootstrap failed",
                 requested_count=requested_count,
                 batch_count=len(batches),
                 archived_response_count=archived,
                 failure_category=category,
+                private_diagnostic=private_diagnostic,
             ) from exc
 
     @staticmethod

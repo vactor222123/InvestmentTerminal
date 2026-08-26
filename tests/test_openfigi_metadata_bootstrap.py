@@ -137,6 +137,41 @@ def test_transport_failure_preserves_previous_batch_archive(tmp_path: Path):
     assert captured.value.failure_category is OpenFigiFailureCategory.PROVIDER_REQUEST_FAILED
 
 
+def test_candidate_absence_carries_exact_private_diagnostic(tmp_path: Path):
+    raw = json.dumps([{"data": [
+        {"figi": "PRIVATE-FIGI", "ticker": "OTHER", "exchCode": "PRIVATE"},
+        {"ticker": "other"},
+        {"ticker": "SECOND"},
+        {"ticker": ""},
+    ]}], separators=(",", ":")).encode()
+    with pytest.raises(OpenFigiBootstrapFailure) as captured:
+        run(tmp_path, Client([response("T1"), raw]), count=2, batch_size=1)
+    diagnostic = captured.value.private_diagnostic
+    assert diagnostic is not None
+    assert diagnostic.to_dict() == {
+        "schema_version": 1,
+        "run_id": "run-1",
+        "retrieved_at": NOW.isoformat(),
+        "failure_category": "CANDIDATE_TICKER_ABSENT",
+        "request_ordinal": 2,
+        "batch_number": 2,
+        "instrument_key": "DE0000000002",
+        "candidate_ticker": "T2",
+        "provider_tickers": ["OTHER", "SECOND"],
+        "response_sha256": sha256(raw).hexdigest(),
+    }
+    diagnostic_text = json.dumps(diagnostic.to_dict())
+    assert "PRIVATE-FIGI" not in diagnostic_text
+    assert "exchCode" not in diagnostic_text
+    assert "PRIVATE" not in diagnostic_text
+
+
+def test_other_failure_has_no_private_diagnostic(tmp_path: Path):
+    with pytest.raises(OpenFigiBootstrapFailure) as captured:
+        run(tmp_path, Client([b"not-json"]), count=1)
+    assert captured.value.private_diagnostic is None
+
+
 def test_existing_archive_fails_closed_without_replacement(tmp_path: Path):
     archive = tmp_path / "archive"
     archive.mkdir()

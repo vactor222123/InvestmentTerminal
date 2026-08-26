@@ -1,6 +1,7 @@
 """CLI and privacy tests for OpenFIGI metadata bootstrap."""
 
 from datetime import datetime, timezone
+from hashlib import sha256
 import json
 from pathlib import Path
 
@@ -26,6 +27,7 @@ def arguments(tmp_path):
         "--base-currency", "EUR", "--run-id", "run-1",
         "--response-archive", str(tmp_path / "private-responses"),
         "--metadata-output", str(tmp_path / "metadata.json"),
+        "--private-diagnostic-output", str(tmp_path / "private-diagnostic.json"),
         "--report-output", str(tmp_path / "report.json"),
     ]
 
@@ -55,6 +57,7 @@ def test_cli_success_writes_private_metadata_and_redacted_report(tmp_path: Path)
     text = (tmp_path / "report.json").read_text()
     assert "ACME" not in text and "DE0000000001" not in text
     assert "PRIVATE-FIGI" not in text and str(tmp_path) not in text
+    assert not (tmp_path / "private-diagnostic.json").exists()
 
 
 def test_cli_failure_is_redacted_and_reports_archived_response(tmp_path: Path):
@@ -79,6 +82,79 @@ def test_cli_failure_category_does_not_expose_provider_text(tmp_path: Path):
     report = json.loads(text)
     assert report["failure"]["category"] == "PROVIDER_ERROR"
     assert "PRIVATE provider detail" not in text
+    assert not (tmp_path / "private-diagnostic.json").exists()
+
+
+def test_candidate_absence_writes_private_diagnostic_and_redacted_report(
+    tmp_path: Path, capsys
+):
+    setup(tmp_path)
+
+    class Absent:
+        def map_isins(self, isins):
+            return json.dumps([{"data": [
+                {"figi": "PRIVATE-FIGI", "ticker": "OTHER", "exchCode": "US"}
+            ]}]).encode()
+
+    assert main(arguments(tmp_path), client=Absent(), clock=lambda: NOW) == 1
+    diagnostic = json.loads((tmp_path / "private-diagnostic.json").read_text())
+    assert diagnostic == {
+        "schema_version": 1,
+        "run_id": "run-1",
+        "retrieved_at": NOW.isoformat(),
+        "failure_category": "CANDIDATE_TICKER_ABSENT",
+        "request_ordinal": 1,
+        "batch_number": 1,
+        "instrument_key": "DE0000000001",
+        "candidate_ticker": "ACME",
+        "provider_tickers": ["OTHER"],
+        "response_sha256": sha256(
+            json.dumps([{"data": [
+                {"figi": "PRIVATE-FIGI", "ticker": "OTHER", "exchCode": "US"}
+            ]}]).encode()
+        ).hexdigest(),
+    }
+    report_text = (tmp_path / "report.json").read_text()
+    assert json.loads(report_text)["failure"]["category"] == "CANDIDATE_TICKER_ABSENT"
+    stdout = capsys.readouterr().out
+    for private_value in (
+        "DE0000000001", "ACME", "OTHER", "PRIVATE-FIGI",
+        "private-diagnostic.json", str(tmp_path),
+    ):
+        assert private_value not in report_text
+        assert private_value not in stdout
+
+
+def test_private_diagnostic_write_failure_is_redacted_and_nonzero(
+    tmp_path: Path, monkeypatch
+):
+    setup(tmp_path)
+
+    class Absent:
+        def map_isins(self, isins):
+            return json.dumps([{"data": [{"figi": "PRIVATE-FIGI", "ticker": "OTHER"}]}]).encode()
+
+    from investment_terminal.cli import openfigi_metadata_bootstrap as command
+    real_writer = command.write_json_atomic
+
+    def fail_private(path, payload, **kwargs):
+        if Path(path).name == "private-diagnostic.json":
+            raise OSError("PRIVATE path failure")
+        return real_writer(path, payload, **kwargs)
+
+    monkeypatch.setattr(command, "write_json_atomic", fail_private)
+    assert main(arguments(tmp_path), client=Absent(), clock=lambda: NOW) == 1
+    assert not (tmp_path / "private-diagnostic.json").exists()
+    assert not (tmp_path / "metadata.json").exists()
+    report_text = (tmp_path / "report.json").read_text()
+    report = json.loads(report_text)
+    assert report["failure"] == {
+        "type": "OSError",
+        "category": "INPUT_OR_RUNTIME_FAILURE",
+        "reason": "OpenFIGI metadata bootstrap failed",
+    }
+    assert "PRIVATE path failure" not in report_text
+    assert str(tmp_path) not in report_text
 
 
 def test_missing_transaction_database_does_not_create_it(tmp_path: Path):

@@ -597,3 +597,8 @@ available at the service boundary. The shareable report remains schema version
 3, ticker acceptance stays fail-closed, and automatic correction remains
 excluded. Bounded implementation is next; rerun, qualification, and valuation
 remain excluded.
+Package 49 implements the typed candidate-absence diagnostic and its explicit
+atomic CLI output while leaving the shareable report at schema version 3.
+Diagnostic persistence failure remains redacted and non-zero, and metadata is
+unchanged. One controlled private rerun is next; only the redacted report may
+be returned, while the diagnostic and raw archive remain local-only.
