@@ -563,3 +563,9 @@ provider error/warning, ticker, FIGI, metadata-write, and unexpected failures
 remain distinguishable without exposing response text or private identities.
 One categorized controlled private rerun is next; qualification and valuation
 remain excluded until its result is reviewed.
+Package 43 records that rerun as blocked in the first batch with
+`TICKER_MISMATCH_OR_AMBIGUOUS`. The safe report cannot distinguish a missing
+candidate ticker from a confirmed candidate accompanied by alternative listing
+tickers, so changing acceptance would require guessing. Splitting those two
+privacy-safe categories is next; raw-response inspection, rerun, qualification,
+and valuation remain excluded.

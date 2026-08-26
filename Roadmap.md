@@ -210,7 +210,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → bounded OpenFIGI v3 metadata bootstrap — COMPLETE
 → controlled private OpenFIGI metadata bootstrap — COMPLETE: BLOCKED
 → privacy-safe OpenFIGI failure categorization — COMPLETE
-→ categorized controlled private OpenFIGI bootstrap — NEXT
+→ categorized controlled private OpenFIGI bootstrap — COMPLETE: BLOCKED
+→ split privacy-safe OpenFIGI ticker categories — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 
