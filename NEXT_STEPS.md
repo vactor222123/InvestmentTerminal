@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 8b5b5b84eda15b8e723462ee756abd6ee6ed61ea`
+**Current repository baseline:** `develop @ dd1b34d24a8a41f19a71b46686341d54fa272e80`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -62,6 +62,7 @@
 **Phase 7 Package 38 provenance-aware instrument-metadata enrichment:** COMPLETE
 **Phase 7 Package 39 automated instrument-metadata bootstrap audit:** COMPLETE
 **Phase 7 Package 40 bounded OpenFIGI metadata bootstrap:** COMPLETE
+**Phase 7 Package 41 controlled private OpenFIGI bootstrap:** COMPLETE - BLOCKED
 
 ## Current State
 
@@ -69,9 +70,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled private OpenFIGI metadata bootstrap and return only its
-redacted aggregate report. Do not send transaction/quote/metadata inputs, raw
-provider responses, or credentials; do not run qualification or valuation yet.
+Implement a versioned privacy-safe OpenFIGI failure-category diagnostic. The
+controlled bootstrap stopped after archiving its first of two planned batch
+responses, but schema version 1 does not identify the safe failure category.
+Do not inspect private raw responses, rerun the bootstrap, qualify quotes, or
+value the portfolio before the diagnostic contract is available.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -164,3 +167,5 @@ Provenance-aware instrument-metadata enrichment: `docs/PHASE_7_PACKAGE_38.md`.
 Automated instrument-metadata bootstrap audit: `docs/PHASE_7_PACKAGE_39.md`.
 
 Bounded OpenFIGI metadata bootstrap: `docs/PHASE_7_PACKAGE_40.md`.
+
+Controlled private OpenFIGI bootstrap: `docs/PHASE_7_PACKAGE_41.md`.

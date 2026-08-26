@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `8b5b5b84eda15b8e723462ee756abd6ee6ed61ea`
-**Current local package:** Phase 7 Package 40 - Bounded OpenFIGI Metadata Bootstrap
+**Current GitHub baseline:** `dd1b34d24a8a41f19a71b46686341d54fa272e80`
+**Current local package:** Phase 7 Package 41 - Controlled Private OpenFIGI Bootstrap
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Controlled private OpenFIGI metadata bootstrap
+**Current next action:** Privacy-safe OpenFIGI failure categorization
 
 ---
 
@@ -299,46 +299,30 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 40 - Bounded OpenFIGI Metadata Bootstrap
+Phase 7 Package 41 - Controlled Private OpenFIGI Bootstrap
 ```
 
-Files:
-
-```text
-investment_terminal/portfolio/openfigi_metadata_bootstrap.py
-investment_terminal/portfolio/portfolio_price_provider.py
-investment_terminal/cli/openfigi_metadata_bootstrap.py
-tests/test_openfigi_metadata_bootstrap.py
-tests/test_openfigi_metadata_bootstrap_cli.py
-docs/PHASE_7_PACKAGE_40.md
-Architecture.md
-DataModel.md
-README.md
-docs/ROADMAP_AFTER_AUDIT.md
-Roadmap.md
-NEXT_STEPS.md
-PROJECT_CONTINUATION.md
-```
+Files: `docs/PHASE_7_PACKAGE_41.md`, `docs/ROADMAP_AFTER_AUDIT.md`,
+`Roadmap.md`, `NEXT_STEPS.md`, and `PROJECT_CONTINUATION.md`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ 8b5b5b84eda15b8e723462ee756abd6ee6ed61ea
+develop @ dd1b34d24a8a41f19a71b46686341d54fa272e80
 ```
 
 Result:
 
-- deterministic OpenFIGI v3 batching confirms candidate tickers for ISIN-keyed
-  positions and fails closed on missing or conflicting results;
-- exact raw responses are privately archived before parsing and checksummed;
-- the existing metadata document is atomically published with traceable FIGIs
-  while provider exchange codes remain outside the MIC field;
-- the aggregate report excludes private identities, response bodies, and paths.
+- the controlled private bootstrap requested 10 mappings in two batches and
+  stopped after archiving the first response;
+- the redacted report status is `FAILED`, with no matched count published;
+- schema version 1 does not expose a safe failure category, so remediation
+  cannot be selected without guessing or inspecting private response data;
+- qualification and valuation were not run.
 
 Verification:
 
-- initial focused: no tests collected due to an incorrect nonexistent test path;
-- focused rerun: 48 passed;
+- focused OpenFIGI/privacy/architecture checks: 29 passed;
 - complete local suite: 2,808 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.

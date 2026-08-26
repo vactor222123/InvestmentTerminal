@@ -551,3 +551,9 @@ exact private response archives, strict ticker confirmation, atomic metadata,
 and a privacy-safe aggregate report. Synthetic success and failure paths are
 green. One controlled private bootstrap is next; quote qualification and
 valuation remain excluded until that evidence is reviewed.
+Package 41 records that controlled bootstrap as blocked after the first of two
+planned responses was archived. The schema-version-1 report proves fail-closed
+behavior but does not safely distinguish provider rejection, malformed data,
+missing FIGI, or ticker ambiguity. A versioned privacy-safe failure category is
+the smallest next package; private response inspection, rerun, qualification,
+and valuation remain excluded.
