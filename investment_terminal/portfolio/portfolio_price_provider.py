@@ -21,6 +21,12 @@ class PortfolioPriceProvider(Protocol):
     ) -> PortfolioPriceQuote:
         ...
 
+    @property
+    def instrument_keys(self) -> tuple[str, ...]: ...
+
+    @property
+    def quotes(self) -> tuple[PortfolioPriceQuote, ...]: ...
+
 
 class InMemoryPortfolioPriceProvider:
     """Deterministic quote provider used by tests and offline runs."""
@@ -61,3 +67,8 @@ class InMemoryPortfolioPriceProvider:
     def instrument_keys(self) -> tuple[str, ...]:
         """Return deterministic canonical quote coverage without values."""
         return tuple(sorted(self._quotes))
+
+    @property
+    def quotes(self) -> tuple[PortfolioPriceQuote, ...]:
+        """Return quotes in deterministic canonical-key order."""
+        return tuple(self._quotes[key] for key in sorted(self._quotes))

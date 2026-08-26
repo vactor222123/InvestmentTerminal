@@ -367,3 +367,7 @@ Optional schema-version-1 instrument metadata is a separate private evidence
 input with explicit source provenance and caller-owned maximum age. Enrichment
 creates a detached open-position projection, requires exact `READY` coverage,
 and never rewrites immutable transaction payloads.
+The bounded OpenFIGI bootstrap independently confirms ISIN-to-ticker candidates,
+preserves exact provider response bytes privately, and publishes the existing
+metadata document plus a redacted aggregate report. Provider exchange codes are
+not treated as MICs, and ambiguous listings fail closed.

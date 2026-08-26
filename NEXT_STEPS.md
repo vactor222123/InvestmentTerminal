@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 022075c15c77c81b755b545ecee0c3f34a71cc6c`
+**Current repository baseline:** `develop @ 8b5b5b84eda15b8e723462ee756abd6ee6ed61ea`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -61,6 +61,7 @@
 **Phase 7 Package 37 transaction instrument-metadata enrichment audit:** COMPLETE
 **Phase 7 Package 38 provenance-aware instrument-metadata enrichment:** COMPLETE
 **Phase 7 Package 39 automated instrument-metadata bootstrap audit:** COMPLETE
+**Phase 7 Package 40 bounded OpenFIGI metadata bootstrap:** COMPLETE
 
 ## Current State
 
@@ -68,10 +69,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement a bounded OpenFIGI v3 ISIN-to-ticker metadata bootstrap with exact
-private response-byte preservation and a redacted aggregate report. Use
-synthetic tests only; do not send private ISINs, run qualification, or execute
-valuation yet.
+Run one controlled private OpenFIGI metadata bootstrap and return only its
+redacted aggregate report. Do not send transaction/quote/metadata inputs, raw
+provider responses, or credentials; do not run qualification or valuation yet.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -162,3 +162,5 @@ Transaction instrument-metadata enrichment audit: `docs/PHASE_7_PACKAGE_37.md`.
 Provenance-aware instrument-metadata enrichment: `docs/PHASE_7_PACKAGE_38.md`.
 
 Automated instrument-metadata bootstrap audit: `docs/PHASE_7_PACKAGE_39.md`.
+
+Bounded OpenFIGI metadata bootstrap: `docs/PHASE_7_PACKAGE_40.md`.

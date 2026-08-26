@@ -267,3 +267,6 @@ Read-only quote qualification: `python -m investment_terminal.cli.offline_quote_
 It optionally accepts `--instrument-metadata` together with
 `--metadata-maximum-age-days` to enrich transaction-derived positions from
 explicit private provenance-bearing evidence without changing the ledger.
+Automated metadata bootstrap: `python -m investment_terminal.cli.openfigi_metadata_bootstrap`.
+It uses OpenFIGI v3, preserves raw responses privately, and emits only a
+redacted aggregate report; `OPENFIGI_API_KEY` is optional.

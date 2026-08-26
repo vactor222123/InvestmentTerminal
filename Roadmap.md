@@ -207,7 +207,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → transaction instrument-metadata enrichment audit — COMPLETE
 → bounded provenance-aware instrument-metadata enrichment — COMPLETE
 → automated instrument-metadata bootstrap audit — COMPLETE
-→ bounded OpenFIGI v3 metadata bootstrap — NEXT
+→ bounded OpenFIGI v3 metadata bootstrap — COMPLETE
+→ controlled private OpenFIGI metadata bootstrap — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

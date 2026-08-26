@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `022075c15c77c81b755b545ecee0c3f34a71cc6c`
-**Current local package:** Phase 7 Package 39 - Automated Instrument-Metadata Bootstrap Audit
+**Current GitHub baseline:** `8b5b5b84eda15b8e723462ee756abd6ee6ed61ea`
+**Current local package:** Phase 7 Package 40 - Bounded OpenFIGI Metadata Bootstrap
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Bounded OpenFIGI v3 instrument-metadata bootstrap
+**Current next action:** Controlled private OpenFIGI metadata bootstrap
 
 ---
 
@@ -299,13 +299,21 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 39 - Automated Instrument-Metadata Bootstrap Audit
+Phase 7 Package 40 - Bounded OpenFIGI Metadata Bootstrap
 ```
 
 Files:
 
 ```text
-docs/PHASE_7_PACKAGE_39.md
+investment_terminal/portfolio/openfigi_metadata_bootstrap.py
+investment_terminal/portfolio/portfolio_price_provider.py
+investment_terminal/cli/openfigi_metadata_bootstrap.py
+tests/test_openfigi_metadata_bootstrap.py
+tests/test_openfigi_metadata_bootstrap_cli.py
+docs/PHASE_7_PACKAGE_40.md
+Architecture.md
+DataModel.md
+README.md
 docs/ROADMAP_AFTER_AUDIT.md
 Roadmap.md
 NEXT_STEPS.md
@@ -315,22 +323,23 @@ PROJECT_CONTINUATION.md
 Source baseline verified exactly:
 
 ```text
-develop @ 022075c15c77c81b755b545ecee0c3f34a71cc6c
+develop @ 8b5b5b84eda15b8e723462ee756abd6ee6ed61ea
 ```
 
 Result:
 
-- the manual metadata handoff was stopped before runtime execution;
-- the existing private metadata document is sufficient as a reusable registry;
-- official OpenFIGI v3 supports ISIN mapping without an API key, but may return
-  multiple listings and provider exchange codes are not internal MICs;
-- the smallest safe bootstrap confirms the existing quote ticker independently,
-  archives exact private response bytes, and emits a redacted report.
+- deterministic OpenFIGI v3 batching confirms candidate tickers for ISIN-keyed
+  positions and fails closed on missing or conflicting results;
+- exact raw responses are privately archived before parsing and checksummed;
+- the existing metadata document is atomically published with traceable FIGIs
+  while provider exchange codes remain outside the MIC field;
+- the aggregate report excludes private identities, response bodies, and paths.
 
 Verification:
 
-- focused metadata/qualification/identity/reconstruction/privacy/architecture: 73 passed;
-- complete local suite: 2,793 passed, 4 skipped;
+- initial focused: no tests collected due to an incorrect nonexistent test path;
+- focused rerun: 48 passed;
+- complete local suite: 2,808 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.
 

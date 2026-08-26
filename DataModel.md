@@ -595,3 +595,7 @@ coverage, normalized failure, and limitations without private values.
 per-instrument exchange metadata and `MarketMetadataProvenance`. The enrichment
 result preserves the evidence and quality alongside a detached reconstructed
 position projection; it is never a transaction-ledger mutation.
+`OpenFigiBootstrapResult` records aggregate request/match/batch/archive counts
+and the generated metadata document. Exact raw response bytes remain separate
+private provenance evidence; the redacted schema-version-1 report contains no
+instrument or provider-record identities.

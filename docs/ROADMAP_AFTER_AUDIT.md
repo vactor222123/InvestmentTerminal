@@ -546,3 +546,8 @@ map ISIN jobs without an API key, although multi-listing results must not be
 resolved by first-row selection and provider exchange codes must not be treated
 as MICs. A bounded exact-ticker-confirming bootstrap with private raw-response
 preservation and redacted reporting is next.
+Package 40 implements the bounded OpenFIGI v3 client, deterministic batching,
+exact private response archives, strict ticker confirmation, atomic metadata,
+and a privacy-safe aggregate report. Synthetic success and failure paths are
+green. One controlled private bootstrap is next; quote qualification and
+valuation remain excluded until that evidence is reviewed.
