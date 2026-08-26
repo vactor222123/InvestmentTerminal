@@ -370,7 +370,10 @@ and never rewrites immutable transaction payloads.
 The bounded OpenFIGI bootstrap independently confirms ISIN-to-ticker candidates,
 preserves exact provider response bytes privately, and publishes the existing
 metadata document plus a redacted aggregate report. Provider exchange codes are
-not treated as MICs, and ambiguous listings fail closed.
+not treated as MICs, and candidate ticker absence fails closed.
 Its versioned report exposes only a stable privacy-safe failure category;
 provider text, exception messages, identities, paths, and credentials remain
 private.
+When the confirmed candidate ticker is present among multiple listings,
+metadata construction filters to all candidate-ticker FIGIs deterministically;
+candidate absence and missing candidate FIGIs remain fail-closed.

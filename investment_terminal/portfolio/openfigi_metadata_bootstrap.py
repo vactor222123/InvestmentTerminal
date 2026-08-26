@@ -175,10 +175,6 @@ class OpenFigiMetadataBootstrapService:
                         raise _CategorizedBootstrapError(
                             OpenFigiFailureCategory.CANDIDATE_TICKER_ABSENT
                         )
-                    if tickers != {quote.exchange_ticker}:
-                        raise _CategorizedBootstrapError(
-                            OpenFigiFailureCategory.CANDIDATE_TICKER_WITH_ALTERNATIVES
-                        )
                     figis = sorted({str(row.get("figi", "")).strip() for row in rows
                                     if str(row.get("ticker", "")).strip().upper() == quote.exchange_ticker
                                     and str(row.get("figi", "")).strip()})

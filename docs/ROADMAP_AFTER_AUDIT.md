@@ -580,3 +580,8 @@ that alternate listing rows cause the strict set-equality rejection. The
 smallest remediation is deterministic filtering to all candidate-ticker FIGIs,
 while candidate absence and missing candidate FIGIs remain fail-closed.
 Qualification and valuation remain excluded.
+Package 46 accepts mappings containing alternative listings only when the
+candidate ticker is present, then deterministically retains all and only
+candidate-ticker FIGIs. Candidate absence and missing candidate FIGIs remain
+fail-closed. One controlled filtered bootstrap is next; private response
+inspection, qualification, and valuation remain excluded.

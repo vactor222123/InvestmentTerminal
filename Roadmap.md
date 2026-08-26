@@ -213,7 +213,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → categorized controlled private OpenFIGI bootstrap — COMPLETE: BLOCKED
 → split privacy-safe OpenFIGI ticker categories — COMPLETE
 → schema-3 controlled private OpenFIGI bootstrap — COMPLETE: BLOCKED
-→ deterministic candidate-ticker row filtering — NEXT
+→ deterministic candidate-ticker row filtering — COMPLETE
+→ filtered controlled private OpenFIGI bootstrap — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

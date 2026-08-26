@@ -601,3 +601,5 @@ private provenance evidence. The redacted schema-version-3 report distinguishes
 a missing candidate ticker from one accompanied by alternative listing tickers.
 It contains no provider text, exception message, path, credential, instrument
 identity, ticker value, or provider-record identity.
+Multiple OpenFIGI listing rows do not expand metadata identity: provenance
+retains only the sorted FIGIs of rows matching the confirmed candidate ticker.

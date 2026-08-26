@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `f18b39b72824abcef126c540c67e97ac8457ce7e`
-**Current local package:** Phase 7 Package 45 - Schema-3 Private OpenFIGI Bootstrap
+**Current GitHub baseline:** `b7f5cc5906111233581849aa805f71776821e130`
+**Current local package:** Phase 7 Package 46 - Candidate-Ticker OpenFIGI Row Filtering
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Deterministic candidate-ticker row filtering
+**Current next action:** Filtered controlled private OpenFIGI bootstrap
 
 ---
 
@@ -299,29 +299,29 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 45 - Schema-3 Private OpenFIGI Bootstrap
+Phase 7 Package 46 - Candidate-Ticker OpenFIGI Row Filtering
 ```
 
-Files: `docs/PHASE_7_PACKAGE_45.md`, `docs/ROADMAP_AFTER_AUDIT.md`,
-`Roadmap.md`, `NEXT_STEPS.md`, and `PROJECT_CONTINUATION.md`.
+Files: OpenFIGI bootstrap service and focused tests, canonical
+architecture/data-model/roadmap/handoff documents, and
+`docs/PHASE_7_PACKAGE_46.md`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ f18b39b72824abcef126c540c67e97ac8457ce7e
+develop @ b7f5cc5906111233581849aa805f71776821e130
 ```
 
 Result:
 
-- schema-version-3 bootstrap failed in the first batch with
-  `CANDIDATE_TICKER_WITH_ALTERNATIVES`;
-- candidate presence is confirmed without exposing its value;
-- deterministic filtering to candidate-ticker FIGIs is the bounded remediation;
-- qualification and valuation were not run.
+- alternative listing rows no longer reject a confirmed candidate ticker;
+- metadata retains all and only sorted candidate-ticker FIGIs;
+- candidate absence and missing candidate FIGIs remain fail-closed;
+- no private runtime action, qualification, or valuation was performed.
 
 Verification:
 
-- focused OpenFIGI/privacy/architecture checks: 32 passed;
+- focused OpenFIGI/metadata/architecture checks: 42 passed;
 - complete local suite: 2,811 passed, 4 skipped;
 - one existing Starlette deprecation warning;
 - `git diff --check`: clean.

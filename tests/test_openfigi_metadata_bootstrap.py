@@ -97,14 +97,24 @@ def test_duplicate_same_ticker_rows_are_accepted_and_figis_preserved(tmp_path: P
     assert result.metadata.instruments[0].provenance.source_record_id == "A,B"
 
 
+def test_alternative_listing_rows_are_ignored_after_candidate_confirmation(tmp_path: Path):
+    raw = json.dumps([{"data": [
+        {"figi": "CANDIDATE-B", "ticker": "T1"},
+        {"figi": "ALTERNATIVE", "ticker": "OTHER"},
+        {"figi": "CANDIDATE-A", "ticker": "T1"},
+        {"ticker": "ANOTHER"},
+    ]}]).encode()
+    result = run(tmp_path, Client([raw]), count=1)
+    assert result.metadata.instruments[0].provenance.source_record_id == (
+        "CANDIDATE-A,CANDIDATE-B"
+    )
+
+
 @pytest.mark.parametrize(("raw", "category"), [
     (json.dumps([{"warning": "no match"}]).encode(), OpenFigiFailureCategory.PROVIDER_WARNING),
     (json.dumps([{"error": "bad job"}]).encode(), OpenFigiFailureCategory.PROVIDER_ERROR),
     (json.dumps([{"data": [{"figi": "A", "ticker": "OTHER"}]}]).encode(),
      OpenFigiFailureCategory.CANDIDATE_TICKER_ABSENT),
-    (json.dumps([{"data": [
-        {"figi": "A", "ticker": "T1"}, {"figi": "B", "ticker": "OTHER"}
-    ]}]).encode(), OpenFigiFailureCategory.CANDIDATE_TICKER_WITH_ALTERNATIVES),
     (b"not-json", OpenFigiFailureCategory.RESPONSE_INVALID),
     (json.dumps([]).encode(), OpenFigiFailureCategory.RESPONSE_INVALID),
 ])
@@ -139,7 +149,9 @@ def test_existing_archive_fails_closed_without_replacement(tmp_path: Path):
 
 
 def test_matching_ticker_without_figi_has_safe_category(tmp_path: Path):
-    raw = json.dumps([{"data": [{"ticker": "T1"}]}]).encode()
+    raw = json.dumps([{"data": [
+        {"ticker": "T1"}, {"figi": "ALTERNATIVE", "ticker": "OTHER"}
+    ]}]).encode()
     with pytest.raises(OpenFigiBootstrapFailure) as captured:
         run(tmp_path, Client([raw]), count=1)
     assert captured.value.failure_category is OpenFigiFailureCategory.FIGI_MISSING
