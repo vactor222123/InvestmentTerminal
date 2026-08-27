@@ -652,3 +652,12 @@ other-exchange-listed directories, exact dual archives, official-field filters,
 and explicit Yahoo projection failures before downstream eligibility work.
 Package 61 implements that dual-source client, immutable archives, typed
 normalization/projection, private universe, and redacted qualification report.
+
+The live qualification then measures 12,424 unique accepted members. Package 62
+audits the required eligibility step and rejects Nasdaq market-level files and
+Nasdaq-venue per-symbol share as a neutral consolidated-liquidity shortcut. The
+next implementation is a complete-universe, resumable Yahoo 90-day OHLCV scan
+in bounded 100-member slices. It records private availability/data-quality and
+median `close * volume` evidence while exposing only redacted aggregate
+progress. Ranking and ten-year batch generation remain blocked until all
+members have terminal outcomes for one versioned scan.

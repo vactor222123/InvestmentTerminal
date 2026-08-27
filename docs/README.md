@@ -75,3 +75,7 @@ GET  /openapi.json
 After Sprint 31 documentation/inventory closure and a green closure CI run, the
 project should perform a focused architecture/product audit before selecting
 Sprint 32.
+
+Current Phase 7 operational continuation is recorded in
+`PHASE_7_PACKAGE_62_AUTOMATIC_ELIGIBILITY_AUDIT.md`: implement a bounded,
+resumable complete-universe eligibility scan before any mass ten-year ingestion.

@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 7daa09106934f2e3fd2355f757b0313d5bb3ac7f`
+**Current repository baseline:** `develop @ ef1ec8f8aaa444fcbca19ecd45f7faacc1285bce`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -87,6 +87,8 @@
 **Phase 7 Package 59 automatic universe source audit:** COMPLETE
 **Phase 7 Package 60 Nasdaq symbol-directory universe audit:** COMPLETE
 **Phase 7 Package 61 Nasdaq universe qualification:** COMPLETE
+**Phase 7 controlled Nasdaq universe qualification:** COMPLETE - SUCCESS
+**Phase 7 Package 62 automatic eligibility audit:** COMPLETE
 
 ## Current State
 
@@ -94,9 +96,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled live Nasdaq symbol-directory qualification and return only
-its redacted report. Keep exact archives and normalized member evidence private;
-do not generate or execute a candle batch.
+Implement a bounded resumable 90-calendar-day Yahoo eligibility scan over the
+complete private Package 61 universe. Each run may process at most 100 pending
+members and must publish only a redacted progress report. Do not rank members or
+generate a ten-year candle batch before every accepted universe member has a
+terminal eligibility outcome for the same versioned request.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
