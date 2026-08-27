@@ -625,3 +625,7 @@ candidates, atomic private output, and schema-version-1 aggregate redacted
 report. No manual identifier input or quote mutation occurs. One controlled
 private search measurement is next; cross-provider resolution and downstream
 operations remain excluded until its result is known.
+Package 54 records that successful two-candidate measurement and implements a
+fail-closed exact match between the existing quote ticker and Yahoo candidates
+returned for the same diagnostic ISIN. Only one exact match creates private
+evidence; no runtime business data is mutated.

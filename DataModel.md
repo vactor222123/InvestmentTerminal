@@ -613,3 +613,6 @@ display exchange, quote type, and currency tuple. Its schema-version-1 private
 document is separate from the Yahoo ISIN-search qualification report. The
 report contains only status, timing, aggregate candidate/symbol/exchange counts,
 normalized failure, and limitations; it grants no mapping authority.
+`YahooTickerMatchQualification` records `MATCHED`, `NO_MATCH`, `AMBIGUOUS`, or
+`FAILED`, timing, candidate count, and exact-match count. Accepted identity and
+candidate fields exist only in a separate private schema-version-1 artifact.

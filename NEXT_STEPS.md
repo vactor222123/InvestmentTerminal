@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ a8a51a491590d911a666b517e7fcda34eb010901`
+**Current repository baseline:** `develop @ 51e366b5142934868070b0aed29812d78e2cf177`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -75,6 +75,8 @@
 **Phase 7 Package 51 local candidate-absence review:** COMPLETE - REVIEW REQUIRED
 **Phase 7 Package 52 automated private ticker-resolution audit:** COMPLETE
 **Phase 7 Package 53 bounded Yahoo ISIN-search qualification:** COMPLETE
+**Phase 7 controlled private Yahoo ISIN-search measurement:** COMPLETE - SUCCESS
+**Phase 7 Package 54 exact Yahoo ticker-match qualification:** COMPLETE
 
 ## Current State
 
@@ -82,10 +84,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled private Yahoo ISIN-search qualification and return only its
-redacted aggregate report. Keep the diagnostic and Yahoo candidate artifact
-private. Do not resolve or rewrite quotes, rerun OpenFIGI, qualify quotes, or
-value yet.
+Run one controlled private exact-ticker qualification and return only its
+redacted aggregate report. Keep all runtime inputs and private match evidence
+private. Do not rewrite quotes, rerun OpenFIGI, qualify quotes, or value until
+the result is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

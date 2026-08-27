@@ -385,3 +385,6 @@ Bounded Yahoo ISIN-search qualification is a separate discovery boundary. It
 reads the private ISIN diagnostic, queries Yahoo with unrelated content
 disabled, writes normalized candidates privately, and exposes only aggregate
 redacted coverage. Yahoo discovery never selects or mutates metadata by itself.
+Exact Yahoo ticker-match qualification joins one private diagnostic, its Yahoo
+candidate document, and one existing private quote. Only a unique exact ticker
+match produces private evidence; the shareable report remains aggregate.

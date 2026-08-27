@@ -277,3 +277,7 @@ Automated ISIN discovery qualification:
 `python -m investment_terminal.cli.yahoo_isin_search_qualification`. It reads
 the private OpenFIGI diagnostic, queries Yahoo without manual ticker input,
 writes private normalized candidates, and emits a separate redacted report.
+Exact ticker-match qualification:
+`python -m investment_terminal.cli.yahoo_ticker_match_qualification`. It reads
+private diagnostic, Yahoo-candidate, and quote documents and accepts only one
+exact existing-ticker match without mutating runtime data.
