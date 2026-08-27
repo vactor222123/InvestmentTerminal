@@ -219,7 +219,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → bounded local-only candidate-absence diagnostic — COMPLETE
 → controlled diagnostic-producing OpenFIGI rerun — COMPLETE: BLOCKED
 → local candidate-absence evidence review — COMPLETE: REVIEW REQUIRED
-→ independent identity/venue verification — NEXT
+→ automated private ticker-resolution audit — COMPLETE
+→ bounded Yahoo ISIN-search qualification — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

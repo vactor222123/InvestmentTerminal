@@ -614,3 +614,9 @@ instrument and retains the submitted candidate ticker, while 17 returned
 provider tickers exclude that candidate. No automatic correction occurred.
 Independent identity and intended-venue verification is next; correction,
 rerun, qualification, and valuation remain excluded.
+Package 52 replaces the manual-verification handoff with an automated resolver
+path. The existing runtime can query Yahoo Search and already owns private
+OpenFIGI listing evidence, but Yahoo's documented search contract does not
+guarantee ISIN queries. A bounded Yahoo ISIN-search qualification with private
+candidates and a redacted aggregate report is next. Cross-provider selection,
+quote correction, rerun, valuation, and broader automation remain excluded.
