@@ -638,3 +638,5 @@ Package 56 finds that `ensure_many` is fail-fast, three-year freshness
 orchestration rather than a restart boundary. The selected implementation
 composes per-symbol imports with a private request-correlated atomic checkpoint,
 isolated sequential outcomes, and a redacted report for 1-20 instruments.
+Package 57 implements those request/checkpoint/report contracts, sequential
+failure isolation, exact resume correlation, and the operational CLI.

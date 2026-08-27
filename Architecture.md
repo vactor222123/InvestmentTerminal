@@ -21,6 +21,8 @@ The first bootstrap boundary is sequential and commits per symbol through the
 existing candle repository. Its private atomic checkpoint is correlated to a
 canonical request checksum. The final report is aggregate and redacted.
 `ensure_many` remains fail-fast freshness composition, not a restart boundary.
+The implemented `resumable_market_batch` operation owns the restart boundary
+and delegates provider access and persistence to existing services.
 
 Investment Terminal is a modular monolith with explicit domain and application
 boundaries. Infrastructure adapters are composed at CLI/server roots and must

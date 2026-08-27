@@ -19,6 +19,8 @@ aggregate counts, transfer totals, status, and normalized failure types.
 One symbol is the persistence transaction boundary. Previously committed
 symbols survive later failures, and an uncheckpointed repeat is reconciled by
 existing candle idempotency.
+The implemented request and checkpoint use schema version 1. Final status is
+`SUCCESS`, `PARTIAL`, or `FAILED`; per-item identities remain checkpoint-only.
 
 ```text
 History:

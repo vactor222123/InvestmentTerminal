@@ -30,6 +30,8 @@ The batch-ingestion audit is complete. The first implementation is a sequential
 1-20 instrument service with an exact request checksum, private atomic
 checkpoint, per-symbol failure isolation, and redacted aggregate report.
 Ten-year live qualification follows implementation.
+Package 57 implements that bounded sequential restart boundary. A controlled
+10-20 instrument ten-year run and exact resume repeat are next.
 
 ```text
 Foundation

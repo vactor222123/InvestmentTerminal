@@ -286,3 +286,7 @@ Phase 7 operational MVP direction: the user supplies private portfolio
 transactions; InvestmentTerminal automatically maintains ten-year market data,
 deterministic indicators, and portfolio-performance evidence. Final investment
 interpretation belongs to the user or a separate ChatGPT analysis.
+
+Bounded resumable bootstrap:
+`python -m investment_terminal.cli.resumable_market_batch`. It accepts a
+private versioned request/checkpoint and emits a redacted aggregate report.

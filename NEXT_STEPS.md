@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 33b9bda63c37b51d3afadcf74a2828bb8bb88525`
+**Current repository baseline:** `develop @ bb5c33f1043866c725bace529f325383aacc6aa5`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -79,6 +79,7 @@
 **Phase 7 Package 54 exact Yahoo ticker-match qualification:** COMPLETE
 **Phase 7 Package 55 product direction reset:** COMPLETE
 **Phase 7 Package 56 resumable batch-ingestion boundary audit:** COMPLETE
+**Phase 7 Package 57 bounded resumable market batch:** COMPLETE
 
 ## Current State
 
@@ -86,10 +87,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the selected private request/checkpoint and redacted report contracts
-with a sequential 1-20 instrument orchestrator. Reuse Yahoo, historical import,
-SQLite, and atomic-write boundaries. Do not add concurrency, scheduler,
-universe acquisition, indicators, valuation, or mass execution.
+Run one controlled private ten-year batch qualification for 10-20 explicit
+liquid instruments and return only its redacted report. Then repeat the exact
+request/checkpoint to measure resume behavior. Do not expand to S&P 500 yet.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
