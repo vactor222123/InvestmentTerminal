@@ -273,3 +273,7 @@ redacted aggregate report with privacy-safe failure categories;
 `OPENFIGI_API_KEY` is optional. The required `--private-diagnostic-output`
 points to a local-only JSON file written only when the candidate ticker is
 absent; that file must not be shared.
+Automated ISIN discovery qualification:
+`python -m investment_terminal.cli.yahoo_isin_search_qualification`. It reads
+the private OpenFIGI diagnostic, queries Yahoo without manual ticker input,
+writes private normalized candidates, and emits a separate redacted report.

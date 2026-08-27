@@ -608,3 +608,8 @@ document. It records one run/time, one-based request and batch ordinals, the
 affected instrument key and candidate ticker, sorted unique provider tickers,
 and the archived response checksum. It excludes raw responses, FIGIs, exchange
 codes, paths, and unrelated instruments and never changes the redacted report.
+`YahooIsinSearchCandidate` is a private normalized symbol, optional exchange,
+display exchange, quote type, and currency tuple. Its schema-version-1 private
+document is separate from the Yahoo ISIN-search qualification report. The
+report contains only status, timing, aggregate candidate/symbol/exchange counts,
+normalized failure, and limitations; it grants no mapping authority.

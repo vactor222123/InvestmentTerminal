@@ -620,3 +620,8 @@ OpenFIGI listing evidence, but Yahoo's documented search contract does not
 guarantee ISIN queries. A bounded Yahoo ISIN-search qualification with private
 candidates and a redacted aggregate report is next. Cross-provider selection,
 quote correction, rerun, valuation, and broader automation remain excluded.
+Package 53 implements the bounded Yahoo ISIN-search adapter, typed normalized
+candidates, atomic private output, and schema-version-1 aggregate redacted
+report. No manual identifier input or quote mutation occurs. One controlled
+private search measurement is next; cross-provider resolution and downstream
+operations remain excluded until its result is known.

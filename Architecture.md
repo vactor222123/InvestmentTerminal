@@ -381,3 +381,7 @@ Candidate absence optionally carries a typed private diagnostic to the CLI.
 The CLI writes that schema-version-1 document atomically to an explicit local
 path before the unchanged schema-version-3 redacted report. Diagnostic-write
 failure remains non-zero and cannot mutate metadata or expose private values.
+Bounded Yahoo ISIN-search qualification is a separate discovery boundary. It
+reads the private ISIN diagnostic, queries Yahoo with unrelated content
+disabled, writes normalized candidates privately, and exposes only aggregate
+redacted coverage. Yahoo discovery never selects or mutates metadata by itself.
