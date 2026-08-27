@@ -29,6 +29,11 @@ under source identity `STATE_STREET_SPY_DAILY_HOLDINGS`. It is not represented
 as exact proprietary S&P index membership. Exact raw bytes precede normalized
 atomic publication; Yahoo symbols are a separate deterministic projection.
 
+The SPY direction is superseded before implementation. Broad automatic
+acquisition instead uses the official Nasdaq Trader `nasdaqlisted.txt` and
+`otherlisted.txt` directories under `BROAD_US_LISTED_SECURITIES`. Both exact
+files are archived before a typed normalized universe is atomically published.
+
 Investment Terminal is a modular monolith with explicit domain and application
 boundaries. Infrastructure adapters are composed at CLI/server roots and must
 not leak persistence or provider details into domain models.

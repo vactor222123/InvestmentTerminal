@@ -38,6 +38,11 @@ SPY daily fund holdings as the first automatic broad-US universe source while
 explicitly avoiding an unsupported exact-index claim. Qualification precedes
 any member-driven batch request.
 
+Package 60 supersedes the unimplemented SPY source after clarifying that exact
+S&P membership is unnecessary. Official Nasdaq Trader directories now define
+the broad US-listed research universe; typed qualification precedes filtering
+and candle-request generation.
+
 ```text
 Foundation
 → Current-State Analysis

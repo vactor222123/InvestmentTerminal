@@ -646,3 +646,7 @@ Package 59 verifies schema-2 resume and selects official State Street SPY daily
 fund holdings as an automatically acquired broad-US universe. It preserves fund
 holdings semantics, raw provenance, and a separate Yahoo symbol projection;
 undocumented S&P scraping and ingestion remain excluded.
+Package 60 supersedes that unimplemented SPY path because exact S&P membership
+is not required. The selected broad universe uses official Nasdaq-listed and
+other-exchange-listed directories, exact dual archives, official-field filters,
+and explicit Yahoo projection failures before downstream eligibility work.

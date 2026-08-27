@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 36615b5d6f58ccf1e35cb23e39a24ac67eb164c6`
+**Current repository baseline:** `develop @ 4413ea9c45e238fc952759418502a199e3c059fb`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -85,6 +85,7 @@
 **Phase 7 Package 58 batch report semantics:** COMPLETE
 **Phase 7 schema-2 exact resume verification:** COMPLETE - SUCCESS
 **Phase 7 Package 59 automatic universe source audit:** COMPLETE
+**Phase 7 Package 60 Nasdaq symbol-directory universe audit:** COMPLETE
 
 ## Current State
 
@@ -92,9 +93,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement bounded official SPY daily-holdings qualification with immutable raw
-archive, typed normalization, narrow Yahoo symbol projection, and a redacted
-report. Do not call fund holdings exact S&P index membership or start ingestion.
+Implement bounded official Nasdaq-listed and other-listed symbol-directory
+qualification with two immutable archives, typed parsing/projection, private
+normalized evidence, and a redacted report. Do not generate a candle batch yet.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

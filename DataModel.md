@@ -30,6 +30,12 @@ source ticker and a separate normalized Yahoo symbol. Provenance includes
 source/retrieval timestamps and exact archive SHA-256; it does not claim exact
 S&P index membership.
 
+`SPY_FUND_HOLDINGS` is superseded before implementation. The selected
+`BROAD_US_LISTED_SECURITIES` document combines two independently checksummed
+Nasdaq Trader source files while preserving source symbol, listing code, ETF
+flag, and a separate Yahoo projection. Exclusions and projection failures are
+explicit evidence, not silently discarded rows.
+
 ```text
 History:
 archived Review Package bytes = canonical evidence
