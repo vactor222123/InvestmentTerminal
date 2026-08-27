@@ -218,7 +218,8 @@ Phase 6 Package 1 — immutable workflow run contract — COMPLETE
 → local-only candidate-absence diagnostic audit — COMPLETE
 → bounded local-only candidate-absence diagnostic — COMPLETE
 → controlled diagnostic-producing OpenFIGI rerun — COMPLETE: BLOCKED
-→ local evidence review and private quote correction — NEXT
+→ local candidate-absence evidence review — COMPLETE: REVIEW REQUIRED
+→ independent identity/venue verification — NEXT
 → Phase 8 User Product Layer — DEFERRED UNTIL REAL OPERATIONAL GAPS ARE MEASURED
 ```
 

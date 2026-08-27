@@ -58,6 +58,11 @@ SEND: redacted report path(s)
 DO NOT SEND: private source/database/preview path(s)
 ```
 
+PowerShell code blocks, inline comments, prompts, and emitted command messages
+must use ASCII English only. User-facing explanation outside code blocks may use
+the user's language. This avoids Windows PowerShell 5.1 code-page, here-string,
+copy/paste, and terminal rendering ambiguity.
+
 Runtime ownership is separated as follows:
 
 ```text

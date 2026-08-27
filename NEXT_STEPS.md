@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 7b59015aad5e0d4434e847a51e24ce34ea5c32bd`
+**Current repository baseline:** `develop @ 8545d1cf62d6544ec8bb994f0bdb1ac1d01cd7d8`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -72,6 +72,7 @@
 **Phase 7 Package 48 local-only candidate-absence diagnostic audit:** COMPLETE
 **Phase 7 Package 49 bounded local-only candidate-absence diagnostic:** COMPLETE
 **Phase 7 Package 50 diagnostic-producing private OpenFIGI rerun:** COMPLETE - BLOCKED
+**Phase 7 Package 51 local candidate-absence review:** COMPLETE - REVIEW REQUIRED
 
 ## Current State
 
@@ -79,10 +80,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Inspect the generated candidate-absence diagnostic locally without sending it
-to AI. Compare its candidate/provider tickers against independent instrument
-and venue evidence, then correct the affected private quote entry only when
-justified. Do not rerun OpenFIGI, qualify quotes, or value yet.
+Verify the private instrument identity and intended venue locally using a Trade
+Republic document plus an authoritative issuer or exchange source. Record only
+a privacy-safe decision outcome. Do not correct the quote, rerun OpenFIGI,
+qualify quotes, or value until that evidence establishes the correct ticker.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
@@ -195,3 +196,5 @@ Local-only candidate-absence diagnostic audit: `docs/PHASE_7_PACKAGE_48.md`.
 Bounded local-only candidate-absence diagnostic: `docs/PHASE_7_PACKAGE_49.md`.
 
 Diagnostic-producing private OpenFIGI rerun: `docs/PHASE_7_PACKAGE_50.md`.
+
+Local candidate-absence review: `docs/PHASE_7_PACKAGE_51.md`.
