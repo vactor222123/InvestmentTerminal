@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ bb5c33f1043866c725bace529f325383aacc6aa5`
+**Current repository baseline:** `develop @ e67c2a19b8d706c89c692db2464ae412744ea96a`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -80,6 +80,9 @@
 **Phase 7 Package 55 product direction reset:** COMPLETE
 **Phase 7 Package 56 resumable batch-ingestion boundary audit:** COMPLETE
 **Phase 7 Package 57 bounded resumable market batch:** COMPLETE
+**Phase 7 controlled ten-year 10-instrument batch:** COMPLETE - SUCCESS
+**Phase 7 exact batch resume:** COMPLETE - SUCCESS
+**Phase 7 Package 58 batch report semantics:** COMPLETE
 
 ## Current State
 
@@ -87,9 +90,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled private ten-year batch qualification for 10-20 explicit
-liquid instruments and return only its redacted report. Then repeat the exact
-request/checkpoint to measure resume behavior. Do not expand to S&P 500 yet.
+Run one exact resume to verify schema-version-2 current-run versus cumulative
+coverage. Then audit automatic maintained-universe acquisition. Do not expand
+to S&P 500 through a manual symbol list.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

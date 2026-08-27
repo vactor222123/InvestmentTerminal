@@ -28,8 +28,10 @@ def test_isolates_failure_and_checkpoints_each_item():
     report=ResumableMarketBatchService(importer=importer,checkpoint_writer=written.append,clock=lambda:NOW).run(request())
     assert importer.calls==["AAA","BBB"]
     assert report["status"]=="PARTIAL"
-    assert report["coverage"]=={"requested_count":2,"success_count":1,"empty_count":0,"failure_count":1,
-        "skipped_count":0,"downloaded_total":2,"inserted_total":2,"duplicate_total":0}
+    assert report["schema_version"]==2
+    assert report["coverage"]["current_run"]=={"attempted_count":2,"skipped_count":0,
+        "downloaded_total":2,"inserted_total":2,"duplicate_total":0}
+    assert report["coverage"]["cumulative"]["failure_count"]==1
     assert len(written)==2 and "AAA" not in str(report) and report["failure_types"]==["TimeoutError"]
 
 def test_resume_skips_success_and_retries_failure():
@@ -38,7 +40,19 @@ def test_resume_skips_success_and_retries_failure():
         "AAA":{"status":"FAILED","downloaded":None,"inserted":None,"duplicates":None,"failure_type":"TimeoutError"},
         "BBB":{"status":"SUCCESS","downloaded":2,"inserted":2,"duplicates":0,"failure_type":None}}}
     report=ResumableMarketBatchService(importer=importer,checkpoint_writer=written.append,clock=lambda:NOW).run(req,checkpoint)
-    assert importer.calls==["AAA"] and report["status"]=="SUCCESS" and report["coverage"]["skipped_count"]==1
+    assert importer.calls==["AAA"] and report["status"]=="SUCCESS"
+    assert report["coverage"]["current_run"]=={"attempted_count":1,"skipped_count":1,
+        "downloaded_total":2,"inserted_total":2,"duplicate_total":0}
+
+def test_exact_resume_reports_zero_current_transfer_totals():
+    req=request();importer=Importer()
+    outcome={"status":"SUCCESS","downloaded":2,"inserted":2,"duplicates":0,"failure_type":None}
+    checkpoint={"schema_version":1,"request_checksum":req.checksum,"outcomes":{"AAA":outcome,"BBB":outcome}}
+    report=ResumableMarketBatchService(importer=importer,checkpoint_writer=lambda x:None,clock=lambda:NOW).run(req,checkpoint)
+    assert importer.calls==[]
+    assert report["coverage"]["current_run"]=={"attempted_count":0,"skipped_count":2,
+        "downloaded_total":0,"inserted_total":0,"duplicate_total":0}
+    assert report["coverage"]["cumulative"]["downloaded_total"]==4
 
 def test_rejects_mismatched_checkpoint_before_import():
     importer=Importer()

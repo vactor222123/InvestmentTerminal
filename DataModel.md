@@ -21,6 +21,8 @@ symbols survive later failures, and an uncheckpointed repeat is reconciled by
 existing candle idempotency.
 The implemented request and checkpoint use schema version 1. Final status is
 `SUCCESS`, `PARTIAL`, or `FAILED`; per-item identities remain checkpoint-only.
+The redacted report uses schema version 2 and separates current execution
+attempt/transfer totals from cumulative checkpoint outcomes.
 
 ```text
 History:

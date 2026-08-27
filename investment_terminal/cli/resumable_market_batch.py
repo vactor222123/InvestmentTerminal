@@ -26,7 +26,7 @@ def main(argv: Sequence[str]|None=None, *, client=None, clock=None):
         importer=HistoricalMarketService(client or YahooFinanceClient(cache_directory=o.cache_directory),CandleRepository(db))
         payload=ResumableMarketBatchService(importer=importer,checkpoint_writer=lambda x:write_json_atomic(o.checkpoint,x),clock=runtime_clock).run(request,checkpoint)
     except Exception as exc:
-        now=runtime_clock();payload={"schema_version":1,"provider_identity":"YAHOO_FINANCE","status":"FAILED",
+        now=runtime_clock();payload={"schema_version":2,"provider_identity":"YAHOO_FINANCE","status":"FAILED",
             "started_at":now.isoformat(),"completed_at":now.isoformat(),"duration_seconds":0.0,"coverage":None,
             "failure_types":[type(exc).__name__],"limitations":["failed batch report excludes private values and exception messages"]}
     finally:

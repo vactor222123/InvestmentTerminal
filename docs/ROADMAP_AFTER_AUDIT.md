@@ -640,3 +640,5 @@ composes per-symbol imports with a private request-correlated atomic checkpoint,
 isolated sequential outcomes, and a redacted report for 1-20 instruments.
 Package 57 implements those request/checkpoint/report contracts, sequential
 failure isolation, exact resume correlation, and the operational CLI.
+Package 58 records the successful 10-instrument ten-year run and exact resume,
+then versions the report to separate current-run work from cumulative evidence.

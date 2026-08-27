@@ -66,6 +66,7 @@ class ResumableMarketBatchService:
         started = validate_aware_datetime(self.clock(), field_name="started_at")
         outcomes = self._outcomes(checkpoint, request.checksum)
         skipped = 0
+        current_outcomes: list[dict[str, object]] = []
         for item in request.items:
             previous = outcomes.get(item.symbol)
             if previous is not None and previous["status"] in {"SUCCESS", "EMPTY"}:
@@ -82,6 +83,7 @@ class ResumableMarketBatchService:
             except Exception as exc:
                 outcomes[item.symbol] = {"status": "FAILED", "downloaded": None,
                     "inserted": None, "duplicates": None, "failure_type": type(exc).__name__}
+            current_outcomes.append(outcomes[item.symbol])
             self.checkpoint_writer({"schema_version": 1, "request_checksum": request.checksum,
                                     "outcomes": outcomes})
         completed = validate_aware_datetime(self.clock(), field_name="completed_at")
@@ -90,14 +92,18 @@ class ResumableMarketBatchService:
         empty = sum(x["status"] == "EMPTY" for x in values)
         failed = sum(x["status"] == "FAILED" for x in values)
         status = "SUCCESS" if failed == 0 else ("PARTIAL" if success + empty else "FAILED")
-        return {"schema_version": 1, "provider_identity": "YAHOO_FINANCE", "status": status,
+        return {"schema_version": 2, "provider_identity": "YAHOO_FINANCE", "status": status,
             "started_at": started.isoformat(), "completed_at": completed.isoformat(),
             "duration_seconds": (completed-started).total_seconds(), "coverage": {
-                "requested_count": len(request.items), "success_count": success,
-                "empty_count": empty, "failure_count": failed, "skipped_count": skipped,
-                "downloaded_total": sum(x["downloaded"] or 0 for x in values),
-                "inserted_total": sum(x["inserted"] or 0 for x in values),
-                "duplicate_total": sum(x["duplicates"] or 0 for x in values)},
+                "current_run": {"attempted_count": len(current_outcomes), "skipped_count": skipped,
+                    "downloaded_total": sum(x["downloaded"] or 0 for x in current_outcomes),
+                    "inserted_total": sum(x["inserted"] or 0 for x in current_outcomes),
+                    "duplicate_total": sum(x["duplicates"] or 0 for x in current_outcomes)},
+                "cumulative": {"requested_count": len(request.items), "success_count": success,
+                    "empty_count": empty, "failure_count": failed,
+                    "downloaded_total": sum(x["downloaded"] or 0 for x in values),
+                    "inserted_total": sum(x["inserted"] or 0 for x in values),
+                    "duplicate_total": sum(x["duplicates"] or 0 for x in values)}},
             "failure_types": sorted({x["failure_type"] for x in values if x["failure_type"]}),
             "limitations": ["report excludes symbols, paths, prices, provider text, and exception messages",
                             "batch execution does not authorize scheduling, mass ingestion, analysis, or trading"]}
