@@ -642,3 +642,7 @@ Package 57 implements those request/checkpoint/report contracts, sequential
 failure isolation, exact resume correlation, and the operational CLI.
 Package 58 records the successful 10-instrument ten-year run and exact resume,
 then versions the report to separate current-run work from cumulative evidence.
+Package 59 verifies schema-2 resume and selects official State Street SPY daily
+fund holdings as an automatically acquired broad-US universe. It preserves fund
+holdings semantics, raw provenance, and a separate Yahoo symbol projection;
+undocumented S&P scraping and ingestion remain excluded.

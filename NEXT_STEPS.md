@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ e67c2a19b8d706c89c692db2464ae412744ea96a`
+**Current repository baseline:** `develop @ 36615b5d6f58ccf1e35cb23e39a24ac67eb164c6`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -83,6 +83,8 @@
 **Phase 7 controlled ten-year 10-instrument batch:** COMPLETE - SUCCESS
 **Phase 7 exact batch resume:** COMPLETE - SUCCESS
 **Phase 7 Package 58 batch report semantics:** COMPLETE
+**Phase 7 schema-2 exact resume verification:** COMPLETE - SUCCESS
+**Phase 7 Package 59 automatic universe source audit:** COMPLETE
 
 ## Current State
 
@@ -90,9 +92,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one exact resume to verify schema-version-2 current-run versus cumulative
-coverage. Then audit automatic maintained-universe acquisition. Do not expand
-to S&P 500 through a manual symbol list.
+Implement bounded official SPY daily-holdings qualification with immutable raw
+archive, typed normalization, narrow Yahoo symbol projection, and a redacted
+report. Do not call fund holdings exact S&P index membership or start ingestion.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

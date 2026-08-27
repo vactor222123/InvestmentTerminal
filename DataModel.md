@@ -24,6 +24,12 @@ The implemented request and checkpoint use schema version 1. Final status is
 The redacted report uses schema version 2 and separates current execution
 attempt/transfer totals from cumulative checkpoint outcomes.
 
+`SPY_FUND_HOLDINGS` is a versioned maintained-universe identity sourced from
+official State Street daily fund holdings. Each accepted member preserves its
+source ticker and a separate normalized Yahoo symbol. Provenance includes
+source/retrieval timestamps and exact archive SHA-256; it does not claim exact
+S&P index membership.
+
 ```text
 History:
 archived Review Package bytes = canonical evidence

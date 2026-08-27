@@ -24,6 +24,11 @@ canonical request checksum. The final report is aggregate and redacted.
 The implemented `resumable_market_batch` operation owns the restart boundary
 and delegates provider access and persistence to existing services.
 
+Automatic broad-US universe acquisition uses official SPY daily fund holdings
+under source identity `STATE_STREET_SPY_DAILY_HOLDINGS`. It is not represented
+as exact proprietary S&P index membership. Exact raw bytes precede normalized
+atomic publication; Yahoo symbols are a separate deterministic projection.
+
 Investment Terminal is a modular monolith with explicit domain and application
 boundaries. Infrastructure adapters are composed at CLI/server roots and must
 not leak persistence or provider details into domain models.
