@@ -602,3 +602,10 @@ atomic CLI output while leaving the shareable report at schema version 3.
 Diagnostic persistence failure remains redacted and non-zero, and metadata is
 unchanged. One controlled private rerun is next; only the redacted report may
 be returned, while the diagnostic and raw archive remain local-only.
+Package 50 records the controlled rerun as blocked with the same
+`CANDIDATE_TICKER_ABSENT` category after one archived response. The unchanged
+category proves the new local diagnostic did not encounter its fail-closed
+write path, while the identifying artifact remained private. Local operator
+review against independent identity/venue evidence and a justified private
+quote correction are next; another rerun, qualification, and valuation remain
+excluded.

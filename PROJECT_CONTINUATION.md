@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `4fa45387964ac38ec1d973ab0642d6696d3f0cd8`
-**Current local package:** Phase 7 Package 49 - Bounded Local-Only Candidate-Absence Diagnostic
+**Current GitHub baseline:** `7b59015aad5e0d4434e847a51e24ce34ea5c32bd`
+**Current local package:** Phase 7 Package 50 - Diagnostic-Producing Private OpenFIGI Rerun
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Controlled diagnostic-producing private OpenFIGI rerun
+**Current next action:** Local evidence review and private quote correction
 
 ---
 
@@ -299,26 +299,26 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 49 - Bounded Local-Only Candidate-Absence Diagnostic
+Phase 7 Package 50 - Diagnostic-Producing Private OpenFIGI Rerun
 ```
 
-Files: implementation/service/CLI tests, `docs/PHASE_7_PACKAGE_49.md`,
-architecture/data-model/roadmap/readme documents, `NEXT_STEPS.md`, and
-`PROJECT_CONTINUATION.md`.
+Files: `docs/PHASE_7_PACKAGE_50.md`, `docs/ROADMAP_AFTER_AUDIT.md`,
+`Roadmap.md`, `NEXT_STEPS.md`, and `PROJECT_CONTINUATION.md`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ 4fa45387964ac38ec1d973ab0642d6696d3f0cd8
+develop @ 7b59015aad5e0d4434e847a51e24ce34ea5c32bd
 ```
 
 Result:
 
-- candidate absence carries a typed schema-version-1 private diagnostic;
-- the CLI atomically writes it to an explicit path before the redacted report;
-- report schema version 3 and fail-closed ticker acceptance remain unchanged;
-- diagnostic-write failure is redacted, non-zero, and leaves metadata absent;
-- controlled rerun, qualification, and valuation were not performed.
+- the controlled run failed with `CANDIDATE_TICKER_ABSENT` after one archived
+  response across ten requests and two planned batches;
+- retaining that category proves the local diagnostic avoided its fail-closed
+  persistence-error path;
+- the private diagnostic and all identifying runtime inputs remained unreviewed;
+- quote qualification and valuation were not run.
 
 Verification:
 
