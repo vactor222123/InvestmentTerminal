@@ -650,3 +650,5 @@ Package 60 supersedes that unimplemented SPY path because exact S&P membership
 is not required. The selected broad universe uses official Nasdaq-listed and
 other-exchange-listed directories, exact dual archives, official-field filters,
 and explicit Yahoo projection failures before downstream eligibility work.
+Package 61 implements that dual-source client, immutable archives, typed
+normalization/projection, private universe, and redacted qualification report.

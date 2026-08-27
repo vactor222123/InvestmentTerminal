@@ -290,3 +290,8 @@ interpretation belongs to the user or a separate ChatGPT analysis.
 Bounded resumable bootstrap:
 `python -m investment_terminal.cli.resumable_market_batch`. It accepts a
 private versioned request/checkpoint and emits a redacted aggregate report.
+
+Broad US universe qualification:
+`python -m investment_terminal.cli.nasdaq_universe_qualification`. It archives
+two official Nasdaq Trader directories and emits private normalized evidence
+plus a separate redacted aggregate report.

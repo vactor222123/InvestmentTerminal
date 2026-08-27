@@ -33,6 +33,8 @@ The SPY direction is superseded before implementation. Broad automatic
 acquisition instead uses the official Nasdaq Trader `nasdaqlisted.txt` and
 `otherlisted.txt` directories under `BROAD_US_LISTED_SECURITIES`. Both exact
 files are archived before a typed normalized universe is atomically published.
+`nasdaq_universe_qualification` implements this boundary without composing
+downstream candle requests.
 
 Investment Terminal is a modular monolith with explicit domain and application
 boundaries. Infrastructure adapters are composed at CLI/server roots and must

@@ -42,6 +42,8 @@ Package 60 supersedes the unimplemented SPY source after clarifying that exact
 S&P membership is unnecessary. Official Nasdaq Trader directories now define
 the broad US-listed research universe; typed qualification precedes filtering
 and candle-request generation.
+Package 61 implements the bounded dual-file qualification. One live redacted
+measurement is required before downstream eligibility or batch composition.
 
 ```text
 Foundation

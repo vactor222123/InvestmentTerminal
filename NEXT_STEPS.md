@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 4413ea9c45e238fc952759418502a199e3c059fb`
+**Current repository baseline:** `develop @ 7daa09106934f2e3fd2355f757b0313d5bb3ac7f`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -86,6 +86,7 @@
 **Phase 7 schema-2 exact resume verification:** COMPLETE - SUCCESS
 **Phase 7 Package 59 automatic universe source audit:** COMPLETE
 **Phase 7 Package 60 Nasdaq symbol-directory universe audit:** COMPLETE
+**Phase 7 Package 61 Nasdaq universe qualification:** COMPLETE
 
 ## Current State
 
@@ -93,9 +94,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement bounded official Nasdaq-listed and other-listed symbol-directory
-qualification with two immutable archives, typed parsing/projection, private
-normalized evidence, and a redacted report. Do not generate a candle batch yet.
+Run one controlled live Nasdaq symbol-directory qualification and return only
+its redacted report. Keep exact archives and normalized member evidence private;
+do not generate or execute a candle batch.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

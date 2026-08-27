@@ -35,6 +35,7 @@ S&P index membership.
 Nasdaq Trader source files while preserving source symbol, listing code, ETF
 flag, and a separate Yahoo projection. Exclusions and projection failures are
 explicit evidence, not silently discarded rows.
+The implemented private universe and redacted report use schema version 1.
 
 ```text
 History:
