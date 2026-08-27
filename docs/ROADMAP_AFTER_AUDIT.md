@@ -629,3 +629,8 @@ Package 54 records that successful two-candidate measurement and implements a
 fail-closed exact match between the existing quote ticker and Yahoo candidates
 returned for the same diagnostic ISIN. Only one exact match creates private
 evidence; no runtime business data is mutated.
+Package 55 records the product-direction correction. Existing ingestion,
+storage, indicators, transactions, and valuation remain the foundation, while
+the critical path moves to resumable ten-year multi-instrument acquisition and
+a factual ChatGPT-ready export. Single-ticker failures become isolated
+secondary outcomes and cannot block unrelated instruments.

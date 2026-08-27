@@ -6,6 +6,26 @@
 
 ## Product Evolution
 
+### Phase 7 Primary Product Outcome
+
+Phase 7 prioritizes an automatically maintained factual dataset over
+single-instrument metadata remediation. The user provides portfolio
+transactions; the Terminal acquires and refreshes market data, calculates
+deterministic indicators and portfolio performance, and exports evidence for a
+separate ChatGPT analysis.
+
+The working target is ten years of daily data. Delivery sequence:
+
+1. audit the resumable batch-ingestion boundary;
+2. qualify 10-20 instruments over ten years;
+3. add a versioned maintained S&P 500 and representative ETF universe;
+4. expand with bounded concurrency, retry, checkpoints, and failure isolation;
+5. add incremental refresh and market-derived portfolio quotes;
+6. export a compact ChatGPT-ready factual analysis bundle.
+
+Recommendation expansion, autonomous conclusions, scheduling, mass execution,
+and further single-ticker remediation are outside the immediate boundary.
+
 ```text
 Foundation
 → Current-State Analysis

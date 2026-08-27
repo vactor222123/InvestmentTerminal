@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 51e366b5142934868070b0aed29812d78e2cf177`
+**Current repository baseline:** `develop @ 3e1a08647052be94ce53687301a872155902b285`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -77,6 +77,7 @@
 **Phase 7 Package 53 bounded Yahoo ISIN-search qualification:** COMPLETE
 **Phase 7 controlled private Yahoo ISIN-search measurement:** COMPLETE - SUCCESS
 **Phase 7 Package 54 exact Yahoo ticker-match qualification:** COMPLETE
+**Phase 7 Package 55 product direction reset:** COMPLETE
 
 ## Current State
 
@@ -84,10 +85,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled private exact-ticker qualification and return only its
-redacted aggregate report. Keep all runtime inputs and private match evidence
-private. Do not rewrite quotes, rerun OpenFIGI, qualify quotes, or value until
-the result is reviewed.
+Audit the smallest resumable multi-instrument ingestion boundary by composing
+existing Yahoo, candle-repository, and atomic-report contracts. Target a later
+controlled ten-year run on 10-20 instruments. Keep single-ticker remediation
+secondary; do not start a mass run or scheduler.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

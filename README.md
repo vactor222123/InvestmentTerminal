@@ -281,3 +281,8 @@ Exact ticker-match qualification:
 `python -m investment_terminal.cli.yahoo_ticker_match_qualification`. It reads
 private diagnostic, Yahoo-candidate, and quote documents and accepts only one
 exact existing-ticker match without mutating runtime data.
+
+Phase 7 operational MVP direction: the user supplies private portfolio
+transactions; InvestmentTerminal automatically maintains ten-year market data,
+deterministic indicators, and portfolio-performance evidence. Final investment
+interpretation belongs to the user or a separate ChatGPT analysis.

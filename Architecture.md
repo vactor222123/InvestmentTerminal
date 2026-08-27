@@ -5,6 +5,18 @@
 
 ## Architectural Style
 
+### Phase 7 Critical Product Path
+
+The operational product path is factual data preparation: one private
+portfolio input, automatic internet market acquisition, deterministic
+persistence and measurements, then an analysis-ready export. Final investment
+interpretation belongs to the user or a separate ChatGPT analysis step.
+
+Batch acquisition must isolate failures per instrument. An unresolved ticker,
+provider rejection, or incomplete series remains visible without preventing
+unrelated instruments from refreshing. Resumability and idempotency are
+required before broad-universe execution.
+
 Investment Terminal is a modular monolith with explicit domain and application
 boundaries. Infrastructure adapters are composed at CLI/server roots and must
 not leak persistence or provider details into domain models.
