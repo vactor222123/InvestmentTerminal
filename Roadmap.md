@@ -26,6 +26,11 @@ The working target is ten years of daily data. Delivery sequence:
 Recommendation expansion, autonomous conclusions, scheduling, mass execution,
 and further single-ticker remediation are outside the immediate boundary.
 
+The batch-ingestion audit is complete. The first implementation is a sequential
+1-20 instrument service with an exact request checksum, private atomic
+checkpoint, per-symbol failure isolation, and redacted aggregate report.
+Ten-year live qualification follows implementation.
+
 ```text
 Foundation
 → Current-State Analysis

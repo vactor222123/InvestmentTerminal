@@ -634,3 +634,7 @@ storage, indicators, transactions, and valuation remain the foundation, while
 the critical path moves to resumable ten-year multi-instrument acquisition and
 a factual ChatGPT-ready export. Single-ticker failures become isolated
 secondary outcomes and cannot block unrelated instruments.
+Package 56 finds that `ensure_many` is fail-fast, three-year freshness
+orchestration rather than a restart boundary. The selected implementation
+composes per-symbol imports with a private request-correlated atomic checkpoint,
+isolated sequential outcomes, and a redacted report for 1-20 instruments.

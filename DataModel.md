@@ -8,6 +8,18 @@
 Investment Terminal does not have one universal SQLite source of truth.
 Authority depends on the domain.
 
+## Resumable Market Batch Evidence
+
+The selected Phase 7 batch contract separates three versioned JSON documents:
+a private request, a private mutable checkpoint, and a redacted final report.
+Request/checkpoint correlation uses SHA-256 over canonical normalized request
+content. Per-symbol identity and outcomes remain private; the report exposes
+aggregate counts, transfer totals, status, and normalized failure types.
+
+One symbol is the persistence transaction boundary. Previously committed
+symbols survive later failures, and an uncheckpointed repeat is reconciled by
+existing candle idempotency.
+
 ```text
 History:
 archived Review Package bytes = canonical evidence

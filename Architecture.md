@@ -17,6 +17,11 @@ provider rejection, or incomplete series remains visible without preventing
 unrelated instruments from refreshing. Resumability and idempotency are
 required before broad-universe execution.
 
+The first bootstrap boundary is sequential and commits per symbol through the
+existing candle repository. Its private atomic checkpoint is correlated to a
+canonical request checksum. The final report is aggregate and redacted.
+`ensure_many` remains fail-fast freshness composition, not a restart boundary.
+
 Investment Terminal is a modular monolith with explicit domain and application
 boundaries. Infrastructure adapters are composed at CLI/server roots and must
 not leak persistence or provider details into domain models.

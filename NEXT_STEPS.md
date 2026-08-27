@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 3e1a08647052be94ce53687301a872155902b285`
+**Current repository baseline:** `develop @ 33b9bda63c37b51d3afadcf74a2828bb8bb88525`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -78,6 +78,7 @@
 **Phase 7 controlled private Yahoo ISIN-search measurement:** COMPLETE - SUCCESS
 **Phase 7 Package 54 exact Yahoo ticker-match qualification:** COMPLETE
 **Phase 7 Package 55 product direction reset:** COMPLETE
+**Phase 7 Package 56 resumable batch-ingestion boundary audit:** COMPLETE
 
 ## Current State
 
@@ -85,10 +86,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit the smallest resumable multi-instrument ingestion boundary by composing
-existing Yahoo, candle-repository, and atomic-report contracts. Target a later
-controlled ten-year run on 10-20 instruments. Keep single-ticker remediation
-secondary; do not start a mass run or scheduler.
+Implement the selected private request/checkpoint and redacted report contracts
+with a sequential 1-20 instrument orchestrator. Reuse Yahoo, historical import,
+SQLite, and atomic-write boundaries. Do not add concurrency, scheduler,
+universe acquisition, indicators, valuation, or mass execution.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
