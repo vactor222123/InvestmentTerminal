@@ -677,3 +677,10 @@ evidence, converts legacy generic failures to capped retry-pending outcomes,
 publishes stable aggregate causal categories, and stops immediately when rate
 limiting is observed. Slice 002 remains blocked until implementation and a
 controlled 10-attempt remediation measurement.
+
+Package 65 implements the schema-2 migration and retry contract. Stable causal
+categories are derived from exception types, legacy successes remain terminal,
+generic API failures become retry-pending, retries precede new members, and the
+first rate-limit result is checkpointed before `PAUSED` return. A single
+10-attempt private remediation invocation is next; only its redacted report may
+be reviewed.

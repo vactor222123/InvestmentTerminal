@@ -50,6 +50,15 @@ current-run work, cumulative terminal/pending counts, and failure categories.
 It contains no member identity or metric values and grants no ranking or
 ingestion authority.
 
+Schema version 2 replaces generic persisted eligibility failures with stable
+categories and explicit `RETRY_PENDING | FINAL_FAILED` states. Every provider
+outcome has an attempt count bounded by three. Migration retains schema-1
+success/empty/projection evidence and converts a legacy generic `APIError` to
+`UNKNOWN_LEGACY_API_ERROR` retry-pending evidence because its original cause is
+not recoverable. The redacted report separately counts terminal,
+retry-pending, and never-attempted members and may expose `PAUSED` plus a
+`RATE_LIMITED` halt category.
+
 ```text
 History:
 archived Review Package bytes = canonical evidence

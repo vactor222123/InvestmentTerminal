@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ c306ca22bde0178ba91d403e8c1f90bceec15068`
+**Current repository baseline:** `develop @ 5f5f96c166b006d71df719c11e16d1d43fd668d3`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -92,6 +92,7 @@
 **Phase 7 Package 63 resumable eligibility scan:** COMPLETE
 **Phase 7 first eligibility slice:** COMPLETE - REMEDIATION REQUIRED
 **Phase 7 Package 64 eligibility failure remediation audit:** COMPLETE
+**Phase 7 Package 65 eligibility retry remediation:** COMPLETE
 
 ## Current State
 
@@ -99,10 +100,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement schema-2 privacy-safe Yahoo failure categories, atomic migration of
-the existing schema-1 eligibility checkpoint, bounded retry semantics, and
-immediate halt on rate limiting. Do not run slice 002, delete the checkpoint,
-or generate a ten-year candle batch.
+Run one controlled schema-2 remediation invocation with the existing private
+universe/checkpoint, unchanged window end, and `--max-items 10`. Return only the
+redacted report. Do not run slice 002, delete the checkpoint, or generate a
+ten-year candle batch.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

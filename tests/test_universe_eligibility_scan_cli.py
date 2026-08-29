@@ -79,6 +79,8 @@ def test_cli_writes_private_checkpoint_and_redacted_complete_report(tmp_path):
     assert main(arguments, client=client, clock=lambda: NOW) == 0
     private = json.loads(checkpoint.read_text(encoding="utf-8"))
     public = json.loads(report.read_text(encoding="utf-8"))
+    assert private["schema_version"] == 2
+    assert public["schema_version"] == 2
     assert private["outcomes"]["NASDAQ_LISTED:AAA"]["yahoo_symbol"] == "AAA"
     assert public["status"] == "COMPLETE"
     assert "AAA" not in report.read_text(encoding="utf-8")
@@ -89,6 +91,7 @@ def test_cli_failure_report_is_redacted_and_nonzero(tmp_path):
     arguments[-1] = "not-a-date"
     assert main(arguments, client=Client(), clock=lambda: NOW) == 1
     payload = json.loads(report.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == 2
     assert payload["status"] == "FAILED"
     assert payload["failure"] == {
         "type": "ValueError",

@@ -63,7 +63,7 @@ def main(
     except Exception as exc:
         now = runtime_clock()
         payload = {
-            "schema_version": 1,
+            "schema_version": 2,
             "provider_identity": "YAHOO_FINANCE",
             "universe_identity": "BROAD_US_LISTED_SECURITIES",
             "status": "FAILED",
@@ -75,7 +75,8 @@ def main(
             "requested_start": None,
             "requested_end": None,
             "coverage": None,
-            "failure_types": [type(exc).__name__],
+            "failure_categories": {},
+            "halt_category": None,
             "failure": {
                 "type": type(exc).__name__,
                 "reason": "Universe eligibility scan failed",
@@ -87,7 +88,7 @@ def main(
     writer(options.report_output, payload)
     if options.json:
         print(json.dumps(payload, indent=2, allow_nan=False))
-    return 0 if payload["status"] in {"IN_PROGRESS", "COMPLETE"} else 1
+    return 0 if payload["status"] in {"IN_PROGRESS", "PAUSED", "COMPLETE"} else 1
 
 
 def _datetime(value: str) -> datetime:

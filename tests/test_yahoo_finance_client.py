@@ -9,9 +9,20 @@ import pandas as pd
 import pytest
 
 from investment_terminal.clients.yahoo_finance_client import (
+    YahooCandleFailureCategory,
     YahooFinanceClient,
+    classify_yahoo_candle_failure,
 )
 from investment_terminal.utils.exceptions import APIError
+from curl_cffi.requests.exceptions import ConnectionError as CurlConnectionError
+from curl_cffi.requests.exceptions import Timeout as CurlTimeout
+from yfinance.exceptions import (
+    YFException,
+    YFInvalidPeriodError,
+    YFPricesMissingError,
+    YFRateLimitError,
+    YFTzMissingError,
+)
 
 
 def create_period() -> tuple[datetime, datetime]:
@@ -269,3 +280,33 @@ def test_get_candles_converts_provider_error() -> None:
             start=start,
             end=end,
         )
+
+
+def _wrapped(cause: BaseException) -> APIError:
+    try:
+        raise cause
+    except BaseException as exc:
+        try:
+            raise APIError("redacted") from exc
+        except APIError as wrapped:
+            return wrapped
+
+
+@pytest.mark.parametrize(
+    ("error", "category"),
+    [
+        (_wrapped(YFRateLimitError()), YahooCandleFailureCategory.RATE_LIMITED),
+        (_wrapped(YFPricesMissingError("PRIVATE", "")), YahooCandleFailureCategory.NO_PRICE_DATA),
+        (_wrapped(YFTzMissingError("PRIVATE")), YahooCandleFailureCategory.NO_PRICE_DATA),
+        (_wrapped(YFInvalidPeriodError("PRIVATE", "bad", ["1d"])), YahooCandleFailureCategory.INVALID_REQUEST),
+        (_wrapped(TimeoutError("private")), YahooCandleFailureCategory.TIMEOUT),
+        (_wrapped(CurlTimeout("private")), YahooCandleFailureCategory.TIMEOUT),
+        (_wrapped(CurlConnectionError("private")), YahooCandleFailureCategory.TRANSPORT_FAILURE),
+        (_wrapped(YFException("private")), YahooCandleFailureCategory.PROVIDER_FAILURE),
+        (APIError("private"), YahooCandleFailureCategory.INVALID_RESPONSE),
+        (ValueError("private"), YahooCandleFailureCategory.INVALID_RESPONSE),
+        (RuntimeError("private"), YahooCandleFailureCategory.UNEXPECTED),
+    ],
+)
+def test_failure_classifier_uses_types_without_message_text(error, category):
+    assert classify_yahoo_candle_failure(error) is category

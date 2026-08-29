@@ -59,6 +59,12 @@ and treats it as terminal. The next package adds privacy-safe causal categories,
 atomic schema-1 migration, capped retry-pending outcomes, and immediate
 rate-limit halt before any new universe members are attempted.
 
+Package 65 implements that schema-2 boundary. It preserves terminal evidence,
+migrates legacy generic failures to retry-pending, classifies live causal types
+without provider text, prioritizes retries, caps attempts at three, and pauses
+immediately on rate limiting. One controlled 10-attempt remediation measurement
+is next; slice 002 and ten-year ingestion remain blocked.
+
 ```text
 Foundation
 → Current-State Analysis

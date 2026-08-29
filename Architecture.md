@@ -44,6 +44,14 @@ isolated and exact resume performs no provider work for completed outcomes.
 The boundary does not rank members, generate ingestion requests, or persist
 candles.
 
+Eligibility checkpoint/report schema version 2 adds a typed retry boundary.
+The Yahoo adapter classifies only in-memory exception types; operations persist
+stable privacy-safe categories. Schema-1 migration is atomically published
+before provider work, retry-pending members precede new members, each provider
+identity has a three-attempt cap, and the first rate-limit category halts the
+invocation. Completed evidence remains terminal and no automatic scheduling or
+sleep occurs.
+
 Investment Terminal is a modular monolith with explicit domain and application
 boundaries. Infrastructure adapters are composed at CLI/server roots and must
 not leak persistence or provider details into domain models.

@@ -4,6 +4,7 @@ Yahoo Finance historical market-data client.
 
 from collections.abc import Callable
 from datetime import datetime, timezone
+from enum import Enum
 from math import isfinite
 from numbers import Real
 from pathlib import Path
@@ -11,9 +12,66 @@ from typing import Any
 
 import pandas as pd
 import yfinance as yf
+from curl_cffi.requests.exceptions import RequestException, Timeout
+from yfinance.exceptions import (
+    YFException,
+    YFInvalidPeriodError,
+    YFPricesMissingError,
+    YFRateLimitError,
+    YFTickerMissingError,
+    YFTzMissingError,
+)
 
 from investment_terminal.models.candle import Candle
 from investment_terminal.utils.exceptions import APIError
+
+
+class YahooCandleFailureCategory(str, Enum):
+    """Stable privacy-safe categories for Yahoo candle failures."""
+
+    RATE_LIMITED = "RATE_LIMITED"
+    NO_PRICE_DATA = "NO_PRICE_DATA"
+    INVALID_REQUEST = "INVALID_REQUEST"
+    TIMEOUT = "TIMEOUT"
+    TRANSPORT_FAILURE = "TRANSPORT_FAILURE"
+    INVALID_RESPONSE = "INVALID_RESPONSE"
+    PROVIDER_FAILURE = "PROVIDER_FAILURE"
+    UNEXPECTED = "UNEXPECTED"
+
+
+def classify_yahoo_candle_failure(error: BaseException) -> YahooCandleFailureCategory:
+    """Classify a causal chain without inspecting or returning message text."""
+    chain: list[BaseException] = []
+    current: BaseException | None = error
+    seen: set[int] = set()
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        chain.append(current)
+        current = current.__cause__ or current.__context__
+
+    if any(isinstance(item, YFRateLimitError) for item in chain):
+        return YahooCandleFailureCategory.RATE_LIMITED
+    if any(
+        isinstance(
+            item,
+            (YFPricesMissingError, YFTzMissingError, YFTickerMissingError),
+        )
+        for item in chain
+    ):
+        return YahooCandleFailureCategory.NO_PRICE_DATA
+    if any(isinstance(item, YFInvalidPeriodError) for item in chain):
+        return YahooCandleFailureCategory.INVALID_REQUEST
+    if any(isinstance(item, (TimeoutError, Timeout)) for item in chain):
+        return YahooCandleFailureCategory.TIMEOUT
+    if any(isinstance(item, RequestException) for item in chain):
+        return YahooCandleFailureCategory.TRANSPORT_FAILURE
+    if any(isinstance(item, YFException) for item in chain):
+        return YahooCandleFailureCategory.PROVIDER_FAILURE
+    if isinstance(error, APIError) and len(chain) == 1:
+        return YahooCandleFailureCategory.INVALID_RESPONSE
+    if isinstance(error, (TypeError, ValueError)):
+        return YahooCandleFailureCategory.INVALID_RESPONSE
+    return YahooCandleFailureCategory.UNEXPECTED
 
 
 class YahooFinanceClient:

@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `c306ca22bde0178ba91d403e8c1f90bceec15068`
-**Current local package:** Phase 7 Package 64 - Eligibility Failure Remediation Audit
+**Current GitHub baseline:** `5f5f96c166b006d71df719c11e16d1d43fd668d3`
+**Current local package:** Phase 7 Package 65 - Eligibility Retry Remediation
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement schema-2 categories and retry migration
+**Current next action:** Run controlled 10-attempt remediation
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -32,6 +32,12 @@ terminal. The selected remediation preserves completed evidence, atomically
 migrates legacy generic failures to bounded retry-pending outcomes, records
 privacy-safe causal categories, caps attempts, and halts immediately on rate
 limiting. Slice 002 remains blocked.
+
+Package 65 implements causal type classification, schema-2 checkpoint/report
+migration, retry-pending-first ordering, a three-attempt cap, and immediate
+checkpointed rate-limit halt. The next action reuses the private schema-1
+checkpoint in one controlled invocation of at most 10 provider attempts and
+returns only the redacted schema-2 report.
 
 ---
 
