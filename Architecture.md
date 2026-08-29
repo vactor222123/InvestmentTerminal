@@ -52,6 +52,10 @@ identity has a three-attempt cap, and the first rate-limit category halts the
 invocation. Completed evidence remains terminal and no automatic scheduling or
 sleep occurs.
 
+Schema version 3 adds typed local invalid-response diagnostics. It atomically
+migrates eligible schema-2 terminal `INVALID_RESPONSE` evidence to one final
+retry while preserving all other evidence and the existing attempt cap.
+
 Investment Terminal is a modular monolith with explicit domain and application
 boundaries. Infrastructure adapters are composed at CLI/server roots and must
 not leak persistence or provider details into domain models.

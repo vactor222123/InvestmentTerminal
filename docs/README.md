@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 operational continuation is recorded in
-`PHASE_7_PACKAGE_67_INVALID_RESPONSE_AUDIT.md`: implement typed schema-3
-diagnostics before any new universe member is queried.
+`PHASE_7_PACKAGE_68_TYPED_INVALID_RESPONSE_DIAGNOSTICS.md`: run one controlled
+10-attempt schema-3 diagnostic before any new universe member is queried.

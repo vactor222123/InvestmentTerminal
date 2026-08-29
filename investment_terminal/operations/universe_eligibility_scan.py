@@ -11,6 +11,7 @@ from statistics import median
 
 from investment_terminal.clients.yahoo_finance_client import (
     YahooCandleFailureCategory,
+    YahooCandleInvalidResponseError,
     classify_yahoo_candle_failure,
 )
 from investment_terminal.utils.validation import normalize_required_text, validate_aware_datetime
@@ -20,6 +21,7 @@ _TERMINAL_STATUSES = frozenset({"SUCCESS", "EMPTY", "FINAL_FAILED", "PROJECTION_
 _ALL_STATUSES = _TERMINAL_STATUSES | {"RETRY_PENDING"}
 _RETRYABLE_CATEGORIES = frozenset({
     "UNKNOWN_LEGACY_API_ERROR",
+    "UNKNOWN_LEGACY_INVALID_RESPONSE",
     YahooCandleFailureCategory.RATE_LIMITED.value,
     YahooCandleFailureCategory.TIMEOUT.value,
     YahooCandleFailureCategory.TRANSPORT_FAILURE.value,
@@ -28,6 +30,11 @@ _FINAL_CATEGORIES = frozenset({
     YahooCandleFailureCategory.NO_PRICE_DATA.value,
     YahooCandleFailureCategory.INVALID_REQUEST.value,
     YahooCandleFailureCategory.INVALID_RESPONSE.value,
+    YahooCandleFailureCategory.RESPONSE_SHAPE.value,
+    YahooCandleFailureCategory.RESPONSE_TIMESTAMP.value,
+    YahooCandleFailureCategory.RESPONSE_NUMERIC.value,
+    YahooCandleFailureCategory.RESPONSE_OHLC.value,
+    YahooCandleFailureCategory.CANDLE_SET_VALIDATION.value,
     YahooCandleFailureCategory.PROVIDER_FAILURE.value,
     YahooCandleFailureCategory.UNEXPECTED.value,
 })
@@ -166,7 +173,7 @@ class UniverseEligibilityScanService:
             category = outcome.get("failure_category")
             if category is not None:
                 categories[str(category)] = categories.get(str(category), 0) + 1
-        return {"schema_version": 2, "provider_identity": "YAHOO_FINANCE",
+        return {"schema_version": 3, "provider_identity": "YAHOO_FINANCE",
             "universe_identity": "BROAD_US_LISTED_SECURITIES", "status": status,
             "started_at": started.isoformat(), "completed_at": completed.isoformat(),
             "duration_seconds": (completed-started).total_seconds(),
@@ -192,25 +199,30 @@ class UniverseEligibilityScanService:
             candles = self.client.get_candles(symbol=member.yahoo_symbol, resolution="D",
                 start=request.requested_start, end=request.requested_end, currency="USD")
             if not isinstance(candles, list):
-                raise TypeError("Provider candles must be a list")
+                raise YahooCandleInvalidResponseError(
+                    YahooCandleFailureCategory.CANDLE_SET_VALIDATION)
             timestamps = []
             values = []
             positive_days = 0
             for candle in candles:
                 if candle.symbol != member.yahoo_symbol or candle.resolution != "D" or candle.currency != "USD":
-                    raise ValueError("Provider candle identity mismatch")
+                    raise YahooCandleInvalidResponseError(
+                        YahooCandleFailureCategory.CANDLE_SET_VALIDATION)
                 timestamp = validate_aware_datetime(candle.timestamp, field_name="candle.timestamp")
                 if not request.requested_start <= timestamp < request.requested_end:
-                    raise ValueError("Provider candle is outside the request window")
+                    raise YahooCandleInvalidResponseError(
+                        YahooCandleFailureCategory.CANDLE_SET_VALIDATION)
                 close = _finite_number(candle.close_price, "close_price")
                 volume = _finite_number(candle.volume, "volume")
                 if close <= 0 or volume < 0:
-                    raise ValueError("Provider candle values are invalid")
+                    raise YahooCandleInvalidResponseError(
+                        YahooCandleFailureCategory.CANDLE_SET_VALIDATION)
                 timestamps.append(timestamp)
                 positive_days += volume > 0
                 values.append(close * volume)
             if timestamps != sorted(timestamps) or len(set(timestamps)) != len(timestamps):
-                raise ValueError("Provider candles must be unique and ordered")
+                raise YahooCandleInvalidResponseError(
+                    YahooCandleFailureCategory.CANDLE_SET_VALIDATION)
             return {**self._identity(member), "status": "SUCCESS" if candles else "EMPTY",
                 "attempt_count": attempt_count, "provider_instrument_type": None,
                 "observed_start": timestamps[0].isoformat() if timestamps else None,
@@ -243,7 +255,7 @@ class UniverseEligibilityScanService:
 
     @staticmethod
     def _checkpoint_payload(request, outcomes):
-        return {"schema_version": 2, "request_checksum": request.checksum,
+        return {"schema_version": 3, "request_checksum": request.checksum,
             "universe_checksum": request.universe_checksum,
             "requested_start": request.requested_start.isoformat(),
             "requested_end": request.requested_end.isoformat(),
@@ -253,7 +265,7 @@ class UniverseEligibilityScanService:
     def _outcomes(cls, value, request):
         if value is None:
             return {}, 0
-        if not isinstance(value, dict) or value.get("schema_version") not in {1, 2}:
+        if not isinstance(value, dict) or value.get("schema_version") not in {1, 2, 3}:
             raise ValueError("Unsupported eligibility checkpoint schema")
         if (value.get("request_checksum") != request.checksum
                 or value.get("universe_checksum") != request.universe_checksum
@@ -271,10 +283,22 @@ class UniverseEligibilityScanService:
             if value["schema_version"] == 1:
                 cls._validate_v1(outcome, members[key])
                 outcomes[key] = cls._migrate_v1(outcome, members[key])
+            elif value["schema_version"] == 2:
+                cls._validate_v2(outcome, members[key])
+                outcomes[key] = cls._migrate_v2(outcome)
             else:
                 cls._validate_v2(outcome, members[key])
                 outcomes[key] = dict(outcome)
-        return outcomes, len(outcomes) if value["schema_version"] == 1 else 0
+        return outcomes, len(outcomes) if value["schema_version"] in {1, 2} else 0
+
+    @staticmethod
+    def _migrate_v2(value):
+        if (value["status"] == "FINAL_FAILED"
+                and value["failure_category"] == "INVALID_RESPONSE"
+                and value["attempt_count"] < _MAX_PROVIDER_ATTEMPTS):
+            return {**value, "status": "RETRY_PENDING",
+                    "failure_category": "UNKNOWN_LEGACY_INVALID_RESPONSE"}
+        return dict(value)
 
     @classmethod
     def _migrate_v1(cls, value, member):

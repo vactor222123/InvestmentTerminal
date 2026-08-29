@@ -77,6 +77,10 @@ that `INVALID_RESPONSE` collapses multiple client and service validation exits
 and is terminal without a persisted subtype. Schema-3 typed diagnostics plus a
 single final retry of those 88 outcomes is required before slice 002.
 
+Package 68 implements schema-3 typed local validation categories and atomic
+migration of the 88 eligible schema-2 invalid responses without resetting their
+attempt counts. One controlled 10-attempt diagnostic measurement is next.
+
 ```text
 Foundation
 → Current-State Analysis

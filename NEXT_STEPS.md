@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 2e05643f375594a5171f3067308b21b3024fb4f2`
+**Current repository baseline:** `develop @ a0ee29128cc00dee93fe7f71bd39a89d1668a466`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -96,6 +96,7 @@
 **Phase 7 Package 66 eligibility remediation measurement:** COMPLETE - SUCCESS
 **Phase 7 eligibility legacy retry drain:** COMPLETE - DIAGNOSTIC REMEDIATION REQUIRED
 **Phase 7 Package 67 invalid-response audit:** COMPLETE
+**Phase 7 Package 68 typed invalid-response diagnostics:** COMPLETE
 
 ## Current State
 
@@ -103,10 +104,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement schema-3 typed invalid-response diagnostics and atomic migration of
-the 88 terminal schema-2 `INVALID_RESPONSE` outcomes to one final bounded retry.
-Preserve the 10 successes and two `NO_PRICE_DATA` outcomes. Do not run slice 002,
-delete the checkpoint, or generate a ten-year candle batch.
+Run one controlled schema-3 diagnostic invocation with the existing private
+universe/checkpoint, unchanged window, and `--max-items 10`. Return only the
+redacted report. Do not drain the remaining retries, run slice 002, delete the
+checkpoint, or generate a ten-year candle batch.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

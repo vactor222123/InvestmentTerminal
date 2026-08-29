@@ -59,6 +59,11 @@ not recoverable. The redacted report separately counts terminal,
 retry-pending, and never-attempted members and may expose `PAUSED` plus a
 `RATE_LIMITED` halt category.
 
+Schema version 3 distinguishes stable response-shape, timestamp, numeric, OHLC,
+and candle-set validation categories. Schema-2 terminal `INVALID_RESPONSE`
+outcomes below the attempt cap migrate to `UNKNOWN_LEGACY_INVALID_RESPONSE`
+retry-pending evidence without resetting their attempt count.
+
 ```text
 History:
 archived Review Package bytes = canonical evidence

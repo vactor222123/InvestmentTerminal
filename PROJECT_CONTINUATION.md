@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `2e05643f375594a5171f3067308b21b3024fb4f2`
-**Current local package:** Phase 7 Package 67 - Invalid-Response Audit
+**Current GitHub baseline:** `a0ee29128cc00dee93fe7f71bd39a89d1668a466`
+**Current local package:** Phase 7 Package 68 - Typed Invalid-Response Diagnostics
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement schema-3 typed invalid-response diagnostics
+**Current next action:** Run controlled 10-attempt schema-3 diagnostic
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -44,6 +44,10 @@ no rate-limit halt. Package 67 finds that the dominant category collapses
 multiple client and service validation exits and persists no subtype. Schema-3
 typed diagnostics and one final retry of those 88 outcomes are required before
 slice 002 or ten-year ingestion.
+
+Package 68 implements the schema-3 typed validation categories and atomic
+migration while preserving attempt counts and all non-invalid-response evidence.
+The next action is one controlled 10-attempt diagnostic measurement.
 
 ---
 

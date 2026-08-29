@@ -80,7 +80,7 @@ def test_schema1_migration_is_written_before_provider_call_and_preserves_success
     writes=[]; client=Client({"S010": []})
     report=UniverseEligibilityScanService(client=client,checkpoint_writer=writes.append,
         clock=lambda:END).run(req,checkpoint_v1(req,outcomes),max_items=1)
-    assert writes[0]["schema_version"] == 2
+    assert writes[0]["schema_version"] == 3
     assert writes[0]["outcomes"]["NASDAQ_LISTED:S000"]["status"] == "SUCCESS"
     assert sum(x["status"]=="RETRY_PENDING" for x in writes[0]["outcomes"].values()) == 90
     assert client.calls == ["S010"]
@@ -147,10 +147,10 @@ def test_exact_resume_bypasses_every_terminal_status():
     assert second.calls == [] and repeated["coverage"]["current_run"]["attempted_count"] == 0
 
 
-def test_schema2_report_is_redacted_and_has_no_ranking_output():
+def test_schema3_report_is_redacted_and_has_no_ranking_output():
     report=UniverseEligibilityScanService(client=Client(),checkpoint_writer=lambda value:None,
         clock=lambda:END).run(request(101),max_items=100)
-    assert report["schema_version"] == 2 and report["status"] == "IN_PROGRESS"
+    assert report["schema_version"] == 3 and report["status"] == "IN_PROGRESS"
     assert report["coverage"]["cumulative"]["never_attempted_count"] == 1
     assert "S000" not in str(report) and "50.0" not in str(report) and "rank" not in report
 
@@ -172,6 +172,39 @@ def test_corrupt_schema2_retry_outcome_fails_closed():
     with pytest.raises(ValueError,match="Retry-pending"):
         UniverseEligibilityScanService(client=Client(),checkpoint_writer=lambda value:None,
             clock=lambda:END).run(req,payload)
+
+
+def test_schema2_invalid_responses_migrate_before_one_final_retry():
+    req = request(100)
+    outcomes = {}
+    for i in range(100):
+        symbol = f"S{i:03d}"
+        if i < 10:
+            item = {**v1_outcome(symbol, "SUCCESS"), "attempt_count": 1,
+                    "failure_category": None}
+            item.pop("failure_type")
+        else:
+            category = "NO_PRICE_DATA" if i < 12 else "INVALID_RESPONSE"
+            item = {**v1_outcome(symbol, "FAILED"), "status": "FINAL_FAILED",
+                    "attempt_count": 2, "failure_category": category}
+            item.pop("failure_type")
+        outcomes[f"NASDAQ_LISTED:{symbol}"] = item
+    checkpoint = {**checkpoint_v1(req, outcomes), "schema_version": 2}
+    writes = []
+    service = UniverseEligibilityScanService(
+        client=Client({"S012": []}), checkpoint_writer=writes.append,
+        clock=lambda: END,
+    )
+
+    report = service.run(req, checkpoint, max_items=1)
+
+    migrated = writes[0]["outcomes"]
+    assert writes[0]["schema_version"] == 3
+    assert sum(item["status"] == "RETRY_PENDING" for item in migrated.values()) == 88
+    assert migrated["NASDAQ_LISTED:S010"]["failure_category"] == "NO_PRICE_DATA"
+    assert migrated["NASDAQ_LISTED:S012"]["attempt_count"] == 2
+    assert report["coverage"]["current_run"]["migrated_outcome_count"] == 100
+    assert writes[-1]["outcomes"]["NASDAQ_LISTED:S012"]["attempt_count"] == 3
 
 
 @pytest.mark.parametrize("maximum",[0,101,True,1.5])

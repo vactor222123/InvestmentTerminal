@@ -698,3 +698,7 @@ the dominant category combines multiple direct Yahoo client validation exits
 with eligibility-service validation failures, persists no subtype, and is
 terminal. The next implementation adds schema-3 typed diagnostics and one
 final bounded retry of those 88 outcomes before any new member is attempted.
+
+Package 68 implements that schema-3 boundary with typed local validation
+categories, APIError compatibility, atomic schema-2 migration, preserved attempt
+counts, retry-first ordering, and unchanged rate-limit halt behavior.

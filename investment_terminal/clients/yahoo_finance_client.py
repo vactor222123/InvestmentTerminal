@@ -35,8 +35,33 @@ class YahooCandleFailureCategory(str, Enum):
     TIMEOUT = "TIMEOUT"
     TRANSPORT_FAILURE = "TRANSPORT_FAILURE"
     INVALID_RESPONSE = "INVALID_RESPONSE"
+    RESPONSE_SHAPE = "RESPONSE_SHAPE"
+    RESPONSE_TIMESTAMP = "RESPONSE_TIMESTAMP"
+    RESPONSE_NUMERIC = "RESPONSE_NUMERIC"
+    RESPONSE_OHLC = "RESPONSE_OHLC"
+    CANDLE_SET_VALIDATION = "CANDLE_SET_VALIDATION"
     PROVIDER_FAILURE = "PROVIDER_FAILURE"
     UNEXPECTED = "UNEXPECTED"
+
+
+class YahooCandleInvalidResponseError(APIError):
+    """API-compatible local validation error with a stable privacy-safe type."""
+
+    def __init__(
+        self,
+        category: YahooCandleFailureCategory,
+        message: str = "Yahoo candle response failed local validation",
+    ) -> None:
+        if category not in {
+            YahooCandleFailureCategory.RESPONSE_SHAPE,
+            YahooCandleFailureCategory.RESPONSE_TIMESTAMP,
+            YahooCandleFailureCategory.RESPONSE_NUMERIC,
+            YahooCandleFailureCategory.RESPONSE_OHLC,
+            YahooCandleFailureCategory.CANDLE_SET_VALIDATION,
+        }:
+            raise ValueError("Invalid Yahoo candle response category")
+        self.category = category
+        super().__init__(message)
 
 
 def classify_yahoo_candle_failure(error: BaseException) -> YahooCandleFailureCategory:
@@ -48,6 +73,10 @@ def classify_yahoo_candle_failure(error: BaseException) -> YahooCandleFailureCat
         seen.add(id(current))
         chain.append(current)
         current = current.__cause__ or current.__context__
+
+    for item in chain:
+        if isinstance(item, YahooCandleInvalidResponseError):
+            return item.category
 
     if any(isinstance(item, YFRateLimitError) for item in chain):
         return YahooCandleFailureCategory.RATE_LIMITED
@@ -176,8 +205,9 @@ class YahooFinanceClient:
             ) from exc
 
         if not isinstance(frame, pd.DataFrame):
-            raise APIError(
-                "Yahoo Finance returned an invalid data type."
+            raise YahooCandleInvalidResponseError(
+                YahooCandleFailureCategory.RESPONSE_SHAPE,
+                "Yahoo Finance returned an invalid data type.",
             )
 
         if frame.empty:
@@ -199,9 +229,9 @@ class YahooFinanceClient:
             missing = ", ".join(
                 sorted(missing_columns)
             )
-            raise APIError(
-                "Yahoo Finance response is missing columns: "
-                f"{missing}."
+            raise YahooCandleInvalidResponseError(
+                YahooCandleFailureCategory.RESPONSE_SHAPE,
+                "Yahoo Finance response is missing columns: " + missing + ".",
             )
 
         candles: list[Candle] = []
@@ -237,9 +267,9 @@ class YahooFinanceClient:
                 low_price,
                 close_price,
             ):
-                raise APIError(
-                    "Yahoo Finance candle high price "
-                    "is inconsistent."
+                raise YahooCandleInvalidResponseError(
+                    YahooCandleFailureCategory.RESPONSE_OHLC,
+                    "Yahoo Finance candle high price is inconsistent.",
                 )
 
             if low_price > min(
@@ -247,9 +277,9 @@ class YahooFinanceClient:
                 high_price,
                 close_price,
             ):
-                raise APIError(
-                    "Yahoo Finance candle low price "
-                    "is inconsistent."
+                raise YahooCandleInvalidResponseError(
+                    YahooCandleFailureCategory.RESPONSE_OHLC,
+                    "Yahoo Finance candle low price is inconsistent.",
                 )
 
             candles.append(
@@ -280,8 +310,8 @@ class YahooFinanceClient:
         elif isinstance(value, datetime):
             timestamp = value
         else:
-            raise APIError(
-                "Yahoo Finance returned an invalid timestamp."
+            raise YahooCandleInvalidResponseError(
+                YahooCandleFailureCategory.RESPONSE_TIMESTAMP
             )
 
         if timestamp.tzinfo is None:
@@ -303,17 +333,15 @@ class YahooFinanceClient:
             or not isinstance(value, Real)
             or not isfinite(float(value))
         ):
-            raise APIError(
-                f"Yahoo Finance {field_name} "
-                "must be a finite number."
+            raise YahooCandleInvalidResponseError(
+                YahooCandleFailureCategory.RESPONSE_NUMERIC
             )
 
         numeric_value = float(value)
 
         if numeric_value <= 0:
-            raise APIError(
-                f"Yahoo Finance {field_name} "
-                "must be greater than zero."
+            raise YahooCandleInvalidResponseError(
+                YahooCandleFailureCategory.RESPONSE_NUMERIC
             )
 
         return numeric_value
@@ -328,17 +356,15 @@ class YahooFinanceClient:
             or not isinstance(value, Real)
             or not isfinite(float(value))
         ):
-            raise APIError(
-                f"Yahoo Finance {field_name} "
-                "must be a finite number."
+            raise YahooCandleInvalidResponseError(
+                YahooCandleFailureCategory.RESPONSE_NUMERIC
             )
 
         numeric_value = float(value)
 
         if numeric_value < 0:
-            raise APIError(
-                f"Yahoo Finance {field_name} "
-                "must not be negative."
+            raise YahooCandleInvalidResponseError(
+                YahooCandleFailureCategory.RESPONSE_NUMERIC
             )
 
         return numeric_value

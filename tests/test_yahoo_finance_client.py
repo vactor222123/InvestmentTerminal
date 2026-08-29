@@ -10,6 +10,7 @@ import pytest
 
 from investment_terminal.clients.yahoo_finance_client import (
     YahooCandleFailureCategory,
+    YahooCandleInvalidResponseError,
     YahooFinanceClient,
     classify_yahoo_candle_failure,
 )
@@ -304,6 +305,9 @@ def _wrapped(cause: BaseException) -> APIError:
         (_wrapped(CurlConnectionError("private")), YahooCandleFailureCategory.TRANSPORT_FAILURE),
         (_wrapped(YFException("private")), YahooCandleFailureCategory.PROVIDER_FAILURE),
         (APIError("private"), YahooCandleFailureCategory.INVALID_RESPONSE),
+        (YahooCandleInvalidResponseError(
+            YahooCandleFailureCategory.RESPONSE_NUMERIC,
+        ), YahooCandleFailureCategory.RESPONSE_NUMERIC),
         (ValueError("private"), YahooCandleFailureCategory.INVALID_RESPONSE),
         (RuntimeError("private"), YahooCandleFailureCategory.UNEXPECTED),
     ],
