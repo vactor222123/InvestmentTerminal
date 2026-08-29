@@ -71,6 +71,12 @@ and two `NO_PRICE_DATA` final outcomes without rate limiting. The remaining 80
 legacy retry-pending outcomes must be drained in one bounded invocation before
 slice 002 can be considered; ranking and ten-year ingestion remain blocked.
 
+The retry drain resolves all 80 remaining legacy outcomes, producing 88
+aggregate `INVALID_RESPONSE` and two `NO_PRICE_DATA` failures. Package 67 finds
+that `INVALID_RESPONSE` collapses multiple client and service validation exits
+and is terminal without a persisted subtype. Schema-3 typed diagnostics plus a
+single final retry of those 88 outcomes is required before slice 002.
+
 ```text
 Foundation
 → Current-State Analysis

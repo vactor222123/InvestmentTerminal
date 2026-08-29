@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `a570eea75fcd1aa2018ad0d44593688942daca58`
-**Current local package:** Phase 7 Package 66 - Eligibility Remediation Measurement
+**Current GitHub baseline:** `2e05643f375594a5171f3067308b21b3024fb4f2`
+**Current local package:** Phase 7 Package 67 - Invalid-Response Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Drain 80 remaining migrated legacy retries
+**Current next action:** Implement schema-3 typed invalid-response diagnostics
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -38,9 +38,12 @@ migration, retry-pending-first ordering, a three-attempt cap, and immediate
 checkpointed rate-limit halt. Package 66 records the controlled schema-2
 measurement: migration preserved 100 outcomes and 10 retries produced eight
 `INVALID_RESPONSE` plus two `NO_PRICE_DATA` final outcomes without rate limiting.
-Eighty migrated legacy outcomes remain retry-pending. The next action reuses the
-same private evidence and unchanged request window with `--max-items 80`, then
-returns only the redacted report. Slice 002 and ten-year ingestion remain blocked.
+The retry drain then resolved all 80 remaining legacy outcomes: cumulative
+coverage is 10 successes, 88 `INVALID_RESPONSE`, and two `NO_PRICE_DATA`, with
+no rate-limit halt. Package 67 finds that the dominant category collapses
+multiple client and service validation exits and persists no subtype. Schema-3
+typed diagnostics and one final retry of those 88 outcomes are required before
+slice 002 or ten-year ingestion.
 
 ---
 
@@ -332,25 +335,25 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 66 - Eligibility Remediation Measurement
+Phase 7 Package 67 - Eligibility Invalid-Response Audit
 ```
 
-Classification: `OPERATIONAL`.
+Classification: `AUDIT`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ a570eea75fcd1aa2018ad0d44593688942daca58
+develop @ 2e05643f375594a5171f3067308b21b3024fb4f2
 ```
 
 Result:
 
-- schema-1 migration preserved all 100 existing outcomes;
-- 10 retry attempts produced eight `INVALID_RESPONSE` and two
-  `NO_PRICE_DATA` final outcomes;
-- no rate-limit halt occurred;
-- 80 migrated legacy outcomes remain retry-pending;
-- 12,324 members remain never attempted;
+- the 80-retry drain completed without rate limiting;
+- cumulative outcomes are 10 successes, 88 `INVALID_RESPONSE`, and two
+  `NO_PRICE_DATA`;
+- the dominant category combines multiple client and service validation exits;
+- schema 2 persists no subtype and treats all 88 outcomes as terminal;
+- schema-3 typed diagnostics and one final retry are selected next;
 - slice 002, ranking, selection, and ten-year ingestion remain blocked.
 
 ---

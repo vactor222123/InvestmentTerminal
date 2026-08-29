@@ -691,3 +691,10 @@ migration preserved 100 existing outcomes; 10 retries produced eight
 The next bounded invocation is limited to the 80 remaining migrated legacy
 failures. Slice 002, ranking, and ten-year ingestion remain blocked until those
 retry-pending outcomes are resolved or explicitly paused.
+
+That retry drain completes with 88 aggregate `INVALID_RESPONSE` and two
+`NO_PRICE_DATA` failures. Package 67 audits the implementation and finds that
+the dominant category combines multiple direct Yahoo client validation exits
+with eligibility-service validation failures, persists no subtype, and is
+terminal. The next implementation adds schema-3 typed diagnostics and one
+final bounded retry of those 88 outcomes before any new member is attempted.
