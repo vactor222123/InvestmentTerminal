@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 operational continuation is recorded in
-`PHASE_7_PACKAGE_65_ELIGIBILITY_RETRY_REMEDIATION.md`: run one controlled
-10-attempt schema-2 remediation before any further universe expansion.
+`PHASE_7_PACKAGE_66_ELIGIBILITY_REMEDIATION_MEASUREMENT.md`: run one bounded
+80-attempt retry drain before any new universe member is queried.

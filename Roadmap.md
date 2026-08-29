@@ -65,6 +65,12 @@ without provider text, prioritizes retries, caps attempts at three, and pauses
 immediately on rate limiting. One controlled 10-attempt remediation measurement
 is next; slice 002 and ten-year ingestion remain blocked.
 
+Package 66 records that controlled measurement. Schema-1 migration preserved
+all 100 outcomes, and 10 bounded retries resolved to eight `INVALID_RESPONSE`
+and two `NO_PRICE_DATA` final outcomes without rate limiting. The remaining 80
+legacy retry-pending outcomes must be drained in one bounded invocation before
+slice 002 can be considered; ranking and ten-year ingestion remain blocked.
+
 ```text
 Foundation
 → Current-State Analysis

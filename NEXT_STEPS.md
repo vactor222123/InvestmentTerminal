@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 5f5f96c166b006d71df719c11e16d1d43fd668d3`
+**Current repository baseline:** `develop @ a570eea75fcd1aa2018ad0d44593688942daca58`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -93,6 +93,7 @@
 **Phase 7 first eligibility slice:** COMPLETE - REMEDIATION REQUIRED
 **Phase 7 Package 64 eligibility failure remediation audit:** COMPLETE
 **Phase 7 Package 65 eligibility retry remediation:** COMPLETE
+**Phase 7 Package 66 eligibility remediation measurement:** COMPLETE - SUCCESS
 
 ## Current State
 
@@ -100,10 +101,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled schema-2 remediation invocation with the existing private
-universe/checkpoint, unchanged window end, and `--max-items 10`. Return only the
-redacted report. Do not run slice 002, delete the checkpoint, or generate a
-ten-year candle batch.
+Run one controlled schema-2 retry-drain invocation with the existing private
+universe/checkpoint, unchanged window end, and `--max-items 80`. Return only the
+redacted report. Retry-pending-first ordering confines the invocation to the 80
+remaining migrated legacy failures. Do not run slice 002, delete the checkpoint,
+or generate a ten-year candle batch.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

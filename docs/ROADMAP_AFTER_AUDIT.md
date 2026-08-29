@@ -684,3 +684,10 @@ generic API failures become retry-pending, retries precede new members, and the
 first rate-limit result is checkpointed before `PAUSED` return. A single
 10-attempt private remediation invocation is next; only its redacted report may
 be reviewed.
+
+Package 66 records that private remediation through its redacted report. The
+migration preserved 100 existing outcomes; 10 retries produced eight
+`INVALID_RESPONSE` and two `NO_PRICE_DATA` final outcomes, with no halt category.
+The next bounded invocation is limited to the 80 remaining migrated legacy
+failures. Slice 002, ranking, and ten-year ingestion remain blocked until those
+retry-pending outcomes are resolved or explicitly paused.

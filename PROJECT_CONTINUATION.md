@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `5f5f96c166b006d71df719c11e16d1d43fd668d3`
-**Current local package:** Phase 7 Package 65 - Eligibility Retry Remediation
+**Current GitHub baseline:** `a570eea75fcd1aa2018ad0d44593688942daca58`
+**Current local package:** Phase 7 Package 66 - Eligibility Remediation Measurement
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run controlled 10-attempt remediation
+**Current next action:** Drain 80 remaining migrated legacy retries
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -35,9 +35,12 @@ limiting. Slice 002 remains blocked.
 
 Package 65 implements causal type classification, schema-2 checkpoint/report
 migration, retry-pending-first ordering, a three-attempt cap, and immediate
-checkpointed rate-limit halt. The next action reuses the private schema-1
-checkpoint in one controlled invocation of at most 10 provider attempts and
-returns only the redacted schema-2 report.
+checkpointed rate-limit halt. Package 66 records the controlled schema-2
+measurement: migration preserved 100 outcomes and 10 retries produced eight
+`INVALID_RESPONSE` plus two `NO_PRICE_DATA` final outcomes without rate limiting.
+Eighty migrated legacy outcomes remain retry-pending. The next action reuses the
+same private evidence and unchanged request window with `--max-items 80`, then
+returns only the redacted report. Slice 002 and ten-year ingestion remain blocked.
 
 ---
 
@@ -329,35 +332,26 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 53 - Bounded Yahoo ISIN-Search Qualification
+Phase 7 Package 66 - Eligibility Remediation Measurement
 ```
 
-Files: Yahoo search client, qualification service/CLI/tests,
-`docs/PHASE_7_PACKAGE_53.md`, architecture/data-model/readme/roadmap documents,
-`NEXT_STEPS.md`, and `PROJECT_CONTINUATION.md`.
+Classification: `OPERATIONAL`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ a8a51a491590d911a666b517e7fcda34eb010901
+develop @ a570eea75fcd1aa2018ad0d44593688942daca58
 ```
 
 Result:
 
-- the CLI obtains the ISIN from the private diagnostic without manual input;
-- Yahoo search returns normalized deterministic private candidates;
-- the shareable report contains aggregate coverage and normalized failure only;
-- empty, malformed, provider, and private-write failures remain visible;
-- quote mutation and cross-provider resolution remain excluded pending one live
-  measurement.
-
-Verification:
-
-- focused Yahoo ISIN-search/architecture checks: 24 passed after one corrected
-  test-only privacy-marker assertion;
-- complete local suite: 2,825 passed, 4 skipped;
-- one existing Starlette deprecation warning;
-- `git diff --check`: clean.
+- schema-1 migration preserved all 100 existing outcomes;
+- 10 retry attempts produced eight `INVALID_RESPONSE` and two
+  `NO_PRICE_DATA` final outcomes;
+- no rate-limit halt occurred;
+- 80 migrated legacy outcomes remain retry-pending;
+- 12,324 members remain never attempted;
+- slice 002, ranking, selection, and ten-year ingestion remain blocked.
 
 ---
 
