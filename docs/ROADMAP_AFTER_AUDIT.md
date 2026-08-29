@@ -661,3 +661,10 @@ in bounded 100-member slices. It records private availability/data-quality and
 median `close * volume` evidence while exposing only redacted aggregate
 progress. Ranking and ten-year batch generation remain blocked until all
 members have terminal outcomes for one versioned scan.
+
+Package 63 implements that boundary. The operations service validates and
+checksums the complete private universe, derives the exact 90-day window from a
+caller-supplied aware end time, processes no more than 100 pending members, and
+atomically checkpoints every terminal result. The CLI writes a schema-version-1
+redacted progress report. One controlled private slice is next; complete scan
+coverage remains required before selection or ten-year batch generation.

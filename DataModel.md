@@ -37,6 +37,19 @@ flag, and a separate Yahoo projection. Exclusions and projection failures are
 explicit evidence, not silently discarded rows.
 The implemented private universe and redacted report use schema version 1.
 
+`EligibilityScanRequest` binds that normalized universe checksum to exact
+timezone-aware start/end values for a fixed 90-calendar-day window. Its private
+schema-version-1 checkpoint maps source identities to terminal `SUCCESS`,
+`EMPTY`, `FAILED`, or `PROJECTION_FAILED` outcomes. Successful outcomes retain
+observed bounds, candle counts, positive-volume-day counts, and median daily
+`close * volume`; failed outcomes retain only a normalized category.
+
+The separate schema-version-1 report is redacted aggregate evidence. It records
+`IN_PROGRESS | COMPLETE | FAILED`, request/universe checksums, exact window,
+current-run work, cumulative terminal/pending counts, and failure categories.
+It contains no member identity or metric values and grants no ranking or
+ingestion authority.
+
 ```text
 History:
 archived Review Package bytes = canonical evidence

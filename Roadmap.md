@@ -45,6 +45,13 @@ and candle-request generation.
 Package 61 implements the bounded dual-file qualification. One live redacted
 measurement is required before downstream eligibility or batch composition.
 
+That live measurement succeeds with 12,424 unique accepted members. Package 62
+selects a complete-universe resumable Yahoo eligibility scan instead of a
+Nasdaq-venue liquidity shortcut. Package 63 implements its 90-day request,
+private atomic checkpoint, redacted progress report, isolated outcomes, and
+100-member invocation bound. Controlled private slices are next; ranking and
+ten-year ingestion remain blocked until all members have terminal outcomes.
+
 ```text
 Foundation
 → Current-State Analysis

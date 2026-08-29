@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `ef1ec8f8aaa444fcbca19ecd45f7faacc1285bce`
-**Current local package:** Phase 7 Package 62 - Automatic Eligibility Audit
+**Current GitHub baseline:** `f57577379f8470e8a65d6fec001b0151bfd8cb43`
+**Current local package:** Phase 7 Package 63 - Resumable Eligibility Scan
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement bounded resumable Yahoo eligibility scan
+**Current next action:** Run first controlled private 100-member slice
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -18,6 +18,12 @@ private universe through the existing Yahoo chart boundary using a fixed
 recorded 90-day window, resumable 100-member slices, isolated terminal outcomes,
 a private atomic checkpoint, and redacted aggregate progress. No ranking or
 ten-year batch may be emitted before complete-universe coverage.
+
+Package 63 implements the selected scan with a canonical universe/window
+request checksum, deterministic 100-member bound, isolated terminal outcomes,
+private atomic per-member checkpointing, exact-resume provider bypass, and a
+redacted aggregate progress report. The first controlled private slice is next;
+the universe, checkpoint, cache, and member evidence must not be returned.
 
 ---
 

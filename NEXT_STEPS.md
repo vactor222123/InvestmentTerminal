@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ ef1ec8f8aaa444fcbca19ecd45f7faacc1285bce`
+**Current repository baseline:** `develop @ f57577379f8470e8a65d6fec001b0151bfd8cb43`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -89,6 +89,7 @@
 **Phase 7 Package 61 Nasdaq universe qualification:** COMPLETE
 **Phase 7 controlled Nasdaq universe qualification:** COMPLETE - SUCCESS
 **Phase 7 Package 62 automatic eligibility audit:** COMPLETE
+**Phase 7 Package 63 resumable eligibility scan:** COMPLETE
 
 ## Current State
 
@@ -96,11 +97,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement a bounded resumable 90-calendar-day Yahoo eligibility scan over the
-complete private Package 61 universe. Each run may process at most 100 pending
-members and must publish only a redacted progress report. Do not rank members or
-generate a ten-year candle batch before every accepted universe member has a
-terminal eligibility outcome for the same versioned request.
+Run one controlled private eligibility slice with `--max-items 100` and return
+only its redacted progress report. Keep the Package 61 universe, eligibility
+checkpoint, yfinance cache, and member-level outcomes private. Do not rank
+members or generate a ten-year candle batch.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

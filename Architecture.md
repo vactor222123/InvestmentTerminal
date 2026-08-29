@@ -36,6 +36,14 @@ files are archived before a typed normalized universe is atomically published.
 `nasdaq_universe_qualification` implements this boundary without composing
 downstream candle requests.
 
+`universe_eligibility_scan` is the next separate operations boundary. It binds
+the canonical private universe checksum to one explicit 90-day Yahoo OHLCV
+window, atomically checkpoints at most 100 deterministic pending outcomes per
+invocation, and publishes redacted aggregate progress. Terminal failures are
+isolated and exact resume performs no provider work for completed outcomes.
+The boundary does not rank members, generate ingestion requests, or persist
+candles.
+
 Investment Terminal is a modular monolith with explicit domain and application
 boundaries. Infrastructure adapters are composed at CLI/server roots and must
 not leak persistence or provider details into domain models.

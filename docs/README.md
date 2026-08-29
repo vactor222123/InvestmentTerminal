@@ -77,5 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 operational continuation is recorded in
-`PHASE_7_PACKAGE_62_AUTOMATIC_ELIGIBILITY_AUDIT.md`: implement a bounded,
-resumable complete-universe eligibility scan before any mass ten-year ingestion.
+`PHASE_7_PACKAGE_63_RESUMABLE_ELIGIBILITY_SCAN.md`: run bounded private
+eligibility slices to complete the universe measurement before any mass
+ten-year ingestion.
