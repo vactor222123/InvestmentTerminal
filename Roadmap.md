@@ -52,6 +52,13 @@ private atomic checkpoint, redacted progress report, isolated outcomes, and
 100-member invocation bound. Controlled private slices are next; ranking and
 ten-year ingestion remain blocked until all members have terminal outcomes.
 
+The first operational slice measures 10 successes and 90 undifferentiated
+`APIError` failures. Package 64 audits the loss: yfinance's typed exceptions are
+chained under one client `APIError`, while schema-1 persists only the outer type
+and treats it as terminal. The next package adds privacy-safe causal categories,
+atomic schema-1 migration, capped retry-pending outcomes, and immediate
+rate-limit halt before any new universe members are attempted.
+
 ```text
 Foundation
 → Current-State Analysis

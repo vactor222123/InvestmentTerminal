@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `f57577379f8470e8a65d6fec001b0151bfd8cb43`
-**Current local package:** Phase 7 Package 63 - Resumable Eligibility Scan
+**Current GitHub baseline:** `c306ca22bde0178ba91d403e8c1f90bceec15068`
+**Current local package:** Phase 7 Package 64 - Eligibility Failure Remediation Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run first controlled private 100-member slice
+**Current next action:** Implement schema-2 categories and retry migration
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -24,6 +24,14 @@ request checksum, deterministic 100-member bound, isolated terminal outcomes,
 private atomic per-member checkpointing, exact-resume provider bypass, and a
 redacted aggregate progress report. The first controlled private slice is next;
 the universe, checkpoint, cache, and member evidence must not be returned.
+
+The first slice measured 10 successes and 90 generic `APIError` failures from
+100 attempts. Package 64 verifies that `YahooFinanceClient` erases yfinance's
+typed cause at the persisted boundary and Package 63 treats every failed key as
+terminal. The selected remediation preserves completed evidence, atomically
+migrates legacy generic failures to bounded retry-pending outcomes, records
+privacy-safe causal categories, caps attempts, and halts immediately on rate
+limiting. Slice 002 remains blocked.
 
 ---
 

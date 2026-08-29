@@ -668,3 +668,12 @@ caller-supplied aware end time, processes no more than 100 pending members, and
 atomically checkpoints every terminal result. The CLI writes a schema-version-1
 redacted progress report. One controlled private slice is next; complete scan
 coverage remains required before selection or ten-year batch generation.
+
+The first slice returns 10 successes and 90 generic `APIError` failures.
+Package 64 confirms that typed yfinance causes are lost when only the client's
+outer `APIError` is checkpointed, and that schema-1 cannot retry any stored
+failure. The selected schema-2 remediation atomically preserves completed
+evidence, converts legacy generic failures to capped retry-pending outcomes,
+publishes stable aggregate causal categories, and stops immediately when rate
+limiting is observed. Slice 002 remains blocked until implementation and a
+controlled 10-attempt remediation measurement.

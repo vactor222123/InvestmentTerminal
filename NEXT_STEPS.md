@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ f57577379f8470e8a65d6fec001b0151bfd8cb43`
+**Current repository baseline:** `develop @ c306ca22bde0178ba91d403e8c1f90bceec15068`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -90,6 +90,8 @@
 **Phase 7 controlled Nasdaq universe qualification:** COMPLETE - SUCCESS
 **Phase 7 Package 62 automatic eligibility audit:** COMPLETE
 **Phase 7 Package 63 resumable eligibility scan:** COMPLETE
+**Phase 7 first eligibility slice:** COMPLETE - REMEDIATION REQUIRED
+**Phase 7 Package 64 eligibility failure remediation audit:** COMPLETE
 
 ## Current State
 
@@ -97,10 +99,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled private eligibility slice with `--max-items 100` and return
-only its redacted progress report. Keep the Package 61 universe, eligibility
-checkpoint, yfinance cache, and member-level outcomes private. Do not rank
-members or generate a ten-year candle batch.
+Implement schema-2 privacy-safe Yahoo failure categories, atomic migration of
+the existing schema-1 eligibility checkpoint, bounded retry semantics, and
+immediate halt on rate limiting. Do not run slice 002, delete the checkpoint,
+or generate a ten-year candle batch.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
