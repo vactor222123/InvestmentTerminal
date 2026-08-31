@@ -83,7 +83,9 @@ attempt counts. One controlled 10-attempt diagnostic measurement is next.
 
 Package 69 records the complete diagnostic retry measurement: 10 successes,
 86 numeric-response failures, two OHLC failures, and two no-price failures, with
-no retry pending or rate-limit halt. One bounded 100-member slice 002 is next.
+no retry pending or rate-limit halt. The operator pauses further scanning and
+Package 70 adds one automatic read-only raw-series diagnostic for the first
+numeric failure. Its measurement must be reviewed before slice 002.
 
 ```text
 Foundation

@@ -56,6 +56,13 @@ Schema version 3 adds typed local invalid-response diagnostics. It atomically
 migrates eligible schema-2 terminal `INVALID_RESPONSE` evidence to one final
 retry while preserving all other evidence and the existing attempt cap.
 
+`single_series_candle_diagnostic` is a separate read-only operations boundary.
+It deterministically selects one terminal `RESPONSE_NUMERIC` outcome from a
+validated schema-3 checkpoint, repeats only that raw 90-day Yahoo request, and
+publishes timestamps plus stable defect types without identities or values. It
+does not mutate the checkpoint, weaken production candle validation, continue
+the universe scan, or persist candles.
+
 Investment Terminal is a modular monolith with explicit domain and application
 boundaries. Infrastructure adapters are composed at CLI/server roots and must
 not leak persistence or provider details into domain models.

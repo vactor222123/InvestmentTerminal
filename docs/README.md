@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 operational continuation is recorded in
-`PHASE_7_PACKAGE_69_SCHEMA3_DIAGNOSTIC_MEASUREMENT.md`: run one controlled
-100-member schema-3 slice 002 before any further expansion.
+`PHASE_7_PACKAGE_70_SINGLE_SERIES_CANDLE_DIAGNOSTIC.md`: run one automatic
+read-only raw-series diagnostic before any further universe scan.

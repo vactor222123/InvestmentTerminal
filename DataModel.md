@@ -64,6 +64,13 @@ and candle-set validation categories. Schema-2 terminal `INVALID_RESPONSE`
 outcomes below the attempt cap migrate to `UNKNOWN_LEGACY_INVALID_RESPONSE`
 retry-pending evidence without resetting their attempt count.
 
+`SingleSeriesRawCandleDiagnostic` schema version 1 is redacted operational
+evidence for one deterministic schema-3 `RESPONSE_NUMERIC` candidate. It binds
+the existing request and universe checksums to raw, valid, and invalid row
+counts, stable invalid-reason counts, and invalid UTC timestamps with reason
+labels. It contains no instrument identity, OHLCV value, path, provider text,
+or exception message and never changes eligibility evidence.
+
 ```text
 History:
 archived Review Package bytes = canonical evidence

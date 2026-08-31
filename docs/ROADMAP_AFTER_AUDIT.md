@@ -706,4 +706,8 @@ counts, retry-first ordering, and unchanged rate-limit halt behavior.
 Package 69 records the completed typed retry measurement. The 100 terminal
 first-slice outcomes comprise 10 successes, 86 numeric-response failures, two
 OHLC failures, and two no-price failures; no retry or rate-limit evidence
-remains. One controlled 100-member slice 002 is selected next.
+remains. The operator explicitly pauses further scanning. Package 70 adds a
+read-only diagnostic that automatically selects the first numeric failure,
+refetches only its unchanged 90-day raw series, and emits dates and stable
+defect categories without identities or values. One controlled diagnostic run
+is next; slice 002 remains blocked pending review.

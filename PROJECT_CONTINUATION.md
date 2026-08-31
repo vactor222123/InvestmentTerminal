@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `71e7fc0a4c39a99527f4f5ee12b93fdd50fe8d49`
-**Current local package:** Phase 7 Package 69 - Schema-3 Diagnostic Measurement
+**Current GitHub baseline:** `b8a80d77328cd49d78060b97699e97db404b6b44`
+**Current local package:** Phase 7 Package 70 - Single-Series Raw Candle Diagnostic
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run controlled 100-member schema-3 slice 002
+**Current next action:** Run one controlled single-series raw candle diagnostic
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -49,7 +49,9 @@ Package 68 implements the schema-3 typed validation categories and atomic
 migration while preserving attempt counts and all non-invalid-response evidence.
 Package 69 records the completed diagnostic retries: 10 successes, 86 numeric
 failures, two OHLC failures, and two no-price failures, with no retry pending or
-rate-limit halt. One controlled 100-member slice 002 is next.
+rate-limit halt. The operator pauses the scan. Package 70 automatically selects
+the first numeric failure and inspects only that raw 90-day series through a
+redacted read-only report. Its controlled result is required before slice 002.
 
 ---
 
@@ -341,25 +343,27 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 69 - Schema-3 Diagnostic Measurement
+Phase 7 Package 70 - Single-Series Raw Candle Diagnostic
 ```
 
-Classification: `OPERATIONAL`.
+Classification: `IMPLEMENTATION`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ 71e7fc0a4c39a99527f4f5ee12b93fdd50fe8d49
+develop @ b8a80d77328cd49d78060b97699e97db404b6b44
 ```
 
 Result:
 
-- all 100 first-slice outcomes are terminal;
-- cumulative outcomes are 10 successes, 86 `RESPONSE_NUMERIC`, two
-  `RESPONSE_OHLC`, and two `NO_PRICE_DATA`;
-- retry pending and rate-limit halt are absent;
-- one controlled 100-member schema-3 slice 002 is selected next;
-- ranking, selection, and ten-year ingestion remain blocked.
+- one private `RESPONSE_NUMERIC` candidate is selected automatically from the
+  validated schema-3 checkpoint;
+- only its unchanged raw 90-day Yahoo frame is requested;
+- the report exposes dates and stable defect categories but no identity or
+  OHLCV value;
+- the universe and checkpoint remain read-only and no scan is continued;
+- one controlled diagnostic run is next; slice 002 and ten-year ingestion
+  remain blocked.
 
 ---
 
