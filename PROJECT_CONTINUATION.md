@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `188ab94c1929b48e34778c031d71d61cde3a9526`
-**Current local package:** Phase 7 Package 71 - Numeric-Failure Recovery Audit
+**Current GitHub baseline:** `4eab854d706ed4025e28865693d821bad1cd270d`
+**Current local package:** Phase 7 Package 72 - Numeric-Failure Recovery
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement schema-4 numeric-failure revalidation
+**Current next action:** Run one controlled schema-4 numeric revalidation item
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -54,7 +54,12 @@ the first numeric failure and inspects only that raw 90-day series through a
 redacted read-only report. Its controlled result contains 48 valid rows and no
 current defect. Package 71 confirms that schema 3 cannot reconcile the stale
 terminal result and selects one schema-4 fourth production-client attempt for
-numeric failures only. Slice 002 remains blocked.
+numeric failures only. Package 72 implements that contract: schema-3 numeric
+terminal outcomes migrate atomically to retry-pending, a fourth production
+attempt either replaces the stale result with validated success/empty evidence
+or becomes final numeric failure, and every non-numeric category retains its
+existing three-attempt boundary. One controlled item is next; slice 002 and a
+bulk drain remain blocked pending review.
 
 ---
 

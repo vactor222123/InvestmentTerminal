@@ -1,5 +1,14 @@
 # Investment Terminal — Data Model
 
+## Eligibility checkpoint/report schema version 4
+
+Schema version 4 retains the schema-3 outcome fields and adds no private data.
+Its behavioral invariant permits `RETRY_PENDING/RESPONSE_NUMERIC` only below
+attempt four and requires `FINAL_FAILED/RESPONSE_NUMERIC` at attempt four.
+Non-numeric failure outcomes remain bounded to three attempts. Schema-3
+terminal numeric outcomes below four migrate without changing identity,
+metrics, measurement time, category, or prior attempt count.
+
 **Status:** Canonical data-boundary summary  
 **Current baseline:** Sprint 30 closure
 

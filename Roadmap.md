@@ -88,7 +88,9 @@ Package 70 adds one automatic read-only raw-series diagnostic for the first
 numeric failure. Its measurement returns 48 valid rows and no reproducible
 defect. Package 71 audits the resulting stale-terminal risk and selects one
 schema-4 production-client revalidation allowance for numeric failures only.
-Implementation and one controlled revalidation precede slice 002.
+Package 72 implements that allowance with atomic schema-3 migration, a fourth
+attempt only for `RESPONSE_NUMERIC`, schema-4 fail-closed validation, and no
+change to any other retry cap. One controlled revalidation precedes slice 002.
 
 ```text
 Foundation

@@ -4,6 +4,10 @@ import pytest
 from yfinance.exceptions import YFPricesMissingError, YFRateLimitError
 
 from investment_terminal.models.candle import Candle
+from investment_terminal.clients.yahoo_finance_client import (
+    YahooCandleFailureCategory,
+    YahooCandleInvalidResponseError,
+)
 from investment_terminal.operations.universe_eligibility_scan import (
     EligibilityScanRequest,
     UniverseEligibilityScanService,
@@ -80,7 +84,7 @@ def test_schema1_migration_is_written_before_provider_call_and_preserves_success
     writes=[]; client=Client({"S010": []})
     report=UniverseEligibilityScanService(client=client,checkpoint_writer=writes.append,
         clock=lambda:END).run(req,checkpoint_v1(req,outcomes),max_items=1)
-    assert writes[0]["schema_version"] == 3
+    assert writes[0]["schema_version"] == 4
     assert writes[0]["outcomes"]["NASDAQ_LISTED:S000"]["status"] == "SUCCESS"
     assert sum(x["status"]=="RETRY_PENDING" for x in writes[0]["outcomes"].values()) == 90
     assert client.calls == ["S010"]
@@ -147,10 +151,10 @@ def test_exact_resume_bypasses_every_terminal_status():
     assert second.calls == [] and repeated["coverage"]["current_run"]["attempted_count"] == 0
 
 
-def test_schema3_report_is_redacted_and_has_no_ranking_output():
+def test_schema4_report_is_redacted_and_has_no_ranking_output():
     report=UniverseEligibilityScanService(client=Client(),checkpoint_writer=lambda value:None,
         clock=lambda:END).run(request(101),max_items=100)
-    assert report["schema_version"] == 3 and report["status"] == "IN_PROGRESS"
+    assert report["schema_version"] == 4 and report["status"] == "IN_PROGRESS"
     assert report["coverage"]["cumulative"]["never_attempted_count"] == 1
     assert "S000" not in str(report) and "50.0" not in str(report) and "rank" not in report
 
@@ -199,12 +203,89 @@ def test_schema2_invalid_responses_migrate_before_one_final_retry():
     report = service.run(req, checkpoint, max_items=1)
 
     migrated = writes[0]["outcomes"]
-    assert writes[0]["schema_version"] == 3
+    assert writes[0]["schema_version"] == 4
     assert sum(item["status"] == "RETRY_PENDING" for item in migrated.values()) == 88
     assert migrated["NASDAQ_LISTED:S010"]["failure_category"] == "NO_PRICE_DATA"
     assert migrated["NASDAQ_LISTED:S012"]["attempt_count"] == 2
     assert report["coverage"]["current_run"]["migrated_outcome_count"] == 100
     assert writes[-1]["outcomes"]["NASDAQ_LISTED:S012"]["attempt_count"] == 3
+
+
+def test_schema3_numeric_failure_migrates_then_succeeds_on_fourth_attempt():
+    req = request(2)
+    numeric = {**v1_outcome("S000", "FAILED"), "status": "FINAL_FAILED",
+        "attempt_count": 3, "failure_category": "RESPONSE_NUMERIC"}
+    numeric.pop("failure_type")
+    no_price = {**v1_outcome("S001", "FAILED"), "status": "FINAL_FAILED",
+        "attempt_count": 1, "failure_category": "NO_PRICE_DATA"}
+    no_price.pop("failure_type")
+    checkpoint = {**checkpoint_v1(req, {
+        "NASDAQ_LISTED:S000": numeric,
+        "NASDAQ_LISTED:S001": no_price,
+    }), "schema_version": 3}
+    writes = []
+    client = Client()
+
+    report = UniverseEligibilityScanService(
+        client=client, checkpoint_writer=writes.append, clock=lambda: END,
+    ).run(req, checkpoint, max_items=1)
+
+    assert writes[0]["schema_version"] == 4
+    assert writes[0]["outcomes"]["NASDAQ_LISTED:S000"]["status"] == "RETRY_PENDING"
+    assert writes[0]["outcomes"]["NASDAQ_LISTED:S001"] == no_price
+    assert client.calls == ["S000"]
+    assert writes[-1]["outcomes"]["NASDAQ_LISTED:S000"]["status"] == "SUCCESS"
+    assert writes[-1]["outcomes"]["NASDAQ_LISTED:S000"]["attempt_count"] == 4
+    assert report["coverage"]["current_run"]["migrated_outcome_count"] == 2
+
+
+def test_repeated_numeric_failure_becomes_final_on_fourth_attempt():
+    req = request(1)
+    numeric = {**v1_outcome("S000", "FAILED"), "status": "FINAL_FAILED",
+        "attempt_count": 3, "failure_category": "RESPONSE_NUMERIC"}
+    numeric.pop("failure_type")
+    checkpoint = {**checkpoint_v1(req, {"NASDAQ_LISTED:S000": numeric}),
+        "schema_version": 3}
+    writes = []
+    error = YahooCandleInvalidResponseError(YahooCandleFailureCategory.RESPONSE_NUMERIC)
+
+    report = UniverseEligibilityScanService(
+        client=Client({"S000": error}), checkpoint_writer=writes.append, clock=lambda: END,
+    ).run(req, checkpoint, max_items=1)
+
+    outcome = writes[-1]["outcomes"]["NASDAQ_LISTED:S000"]
+    assert outcome["status"] == "FINAL_FAILED"
+    assert outcome["attempt_count"] == 4
+    assert outcome["failure_category"] == "RESPONSE_NUMERIC"
+    assert report["status"] == "COMPLETE"
+
+
+def test_schema4_numeric_final_below_four_attempts_fails_closed():
+    req = request(1)
+    numeric = {**v1_outcome("S000", "FAILED"), "status": "FINAL_FAILED",
+        "attempt_count": 3, "failure_category": "RESPONSE_NUMERIC"}
+    numeric.pop("failure_type")
+    checkpoint = {**checkpoint_v1(req, {"NASDAQ_LISTED:S000": numeric}),
+        "schema_version": 4}
+
+    with pytest.raises(ValueError, match="numeric final failure"):
+        UniverseEligibilityScanService(
+            client=Client(), checkpoint_writer=lambda value: None, clock=lambda: END,
+        ).run(req, checkpoint)
+
+
+def test_schema4_non_numeric_failure_cannot_use_fourth_attempt():
+    req = request(1)
+    timeout = {**v1_outcome("S000", "FAILED"), "status": "FINAL_FAILED",
+        "attempt_count": 4, "failure_category": "TIMEOUT"}
+    timeout.pop("failure_type")
+    checkpoint = {**checkpoint_v1(req, {"NASDAQ_LISTED:S000": timeout}),
+        "schema_version": 4}
+
+    with pytest.raises(ValueError, match="non-numeric failure"):
+        UniverseEligibilityScanService(
+            client=Client(), checkpoint_writer=lambda value: None, clock=lambda: END,
+        ).run(req, checkpoint)
 
 
 @pytest.mark.parametrize("maximum",[0,101,True,1.5])

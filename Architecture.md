@@ -1,5 +1,14 @@
 # Investment Terminal — Software Architecture
 
+## Phase 7 eligibility schema-version-4 boundary
+
+The resumable universe eligibility operation owns an explicit schema-version-4
+migration. It may reopen only schema-3 terminal `RESPONSE_NUMERIC` evidence for
+one fourth production-client attempt. Migration is checkpointed atomically
+before provider work; all non-numeric categories retain their three-attempt
+boundary. The public report remains aggregate and redacted, and the operation
+has no ranking, ingestion, or analysis authority.
+
 **Status:** Canonical architecture  
 **Current baseline:** Sprint 30 closure
 

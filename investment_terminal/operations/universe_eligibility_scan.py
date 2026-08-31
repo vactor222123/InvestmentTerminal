@@ -25,6 +25,7 @@ _RETRYABLE_CATEGORIES = frozenset({
     YahooCandleFailureCategory.RATE_LIMITED.value,
     YahooCandleFailureCategory.TIMEOUT.value,
     YahooCandleFailureCategory.TRANSPORT_FAILURE.value,
+    YahooCandleFailureCategory.RESPONSE_NUMERIC.value,
 })
 _FINAL_CATEGORIES = frozenset({
     YahooCandleFailureCategory.NO_PRICE_DATA.value,
@@ -32,7 +33,6 @@ _FINAL_CATEGORIES = frozenset({
     YahooCandleFailureCategory.INVALID_RESPONSE.value,
     YahooCandleFailureCategory.RESPONSE_SHAPE.value,
     YahooCandleFailureCategory.RESPONSE_TIMESTAMP.value,
-    YahooCandleFailureCategory.RESPONSE_NUMERIC.value,
     YahooCandleFailureCategory.RESPONSE_OHLC.value,
     YahooCandleFailureCategory.CANDLE_SET_VALIDATION.value,
     YahooCandleFailureCategory.PROVIDER_FAILURE.value,
@@ -40,6 +40,10 @@ _FINAL_CATEGORIES = frozenset({
 })
 _FAILURE_CATEGORIES = _RETRYABLE_CATEGORIES | _FINAL_CATEGORIES | {"PROJECTION_UNAVAILABLE"}
 _MAX_PROVIDER_ATTEMPTS = 3
+_NUMERIC_MAX_PROVIDER_ATTEMPTS = 4
+_SCHEMA_3_RETRYABLE_CATEGORIES = _RETRYABLE_CATEGORIES - {
+    YahooCandleFailureCategory.RESPONSE_NUMERIC.value,
+}
 
 
 @dataclass(frozen=True, slots=True, order=True)
@@ -173,7 +177,7 @@ class UniverseEligibilityScanService:
             category = outcome.get("failure_category")
             if category is not None:
                 categories[str(category)] = categories.get(str(category), 0) + 1
-        return {"schema_version": 3, "provider_identity": "YAHOO_FINANCE",
+        return {"schema_version": 4, "provider_identity": "YAHOO_FINANCE",
             "universe_identity": "BROAD_US_LISTED_SECURITIES", "status": status,
             "started_at": started.isoformat(), "completed_at": completed.isoformat(),
             "duration_seconds": (completed-started).total_seconds(),
@@ -232,8 +236,11 @@ class UniverseEligibilityScanService:
                 "measured_at": measured_at.isoformat(), "failure_category": None}
         except Exception as exc:
             category = classify_yahoo_candle_failure(exc).value
+            attempt_cap = (_NUMERIC_MAX_PROVIDER_ATTEMPTS
+                           if category == YahooCandleFailureCategory.RESPONSE_NUMERIC.value
+                           else _MAX_PROVIDER_ATTEMPTS)
             status = ("RETRY_PENDING" if category in _RETRYABLE_CATEGORIES
-                      and attempt_count < _MAX_PROVIDER_ATTEMPTS else "FINAL_FAILED")
+                      and attempt_count < attempt_cap else "FINAL_FAILED")
             return {**self._identity(member), "status": status, "attempt_count": attempt_count,
                 "provider_instrument_type": None, "observed_start": None, "observed_end": None,
                 "candle_count": None, "positive_volume_day_count": None,
@@ -255,17 +262,17 @@ class UniverseEligibilityScanService:
 
     @staticmethod
     def _checkpoint_payload(request, outcomes):
-        return {"schema_version": 3, "request_checksum": request.checksum,
+        return {"schema_version": 4, "request_checksum": request.checksum,
             "universe_checksum": request.universe_checksum,
             "requested_start": request.requested_start.isoformat(),
             "requested_end": request.requested_end.isoformat(),
             "outcomes": {key: outcomes[key] for key in sorted(outcomes)}}
 
     @classmethod
-    def _outcomes(cls, value, request):
+    def _outcomes(cls, value, request, *, migrate=True):
         if value is None:
             return {}, 0
-        if not isinstance(value, dict) or value.get("schema_version") not in {1, 2, 3}:
+        if not isinstance(value, dict) or value.get("schema_version") not in {1, 2, 3, 4}:
             raise ValueError("Unsupported eligibility checkpoint schema")
         if (value.get("request_checksum") != request.checksum
                 or value.get("universe_checksum") != request.universe_checksum
@@ -284,12 +291,26 @@ class UniverseEligibilityScanService:
                 cls._validate_v1(outcome, members[key])
                 outcomes[key] = cls._migrate_v1(outcome, members[key])
             elif value["schema_version"] == 2:
-                cls._validate_v2(outcome, members[key])
-                outcomes[key] = cls._migrate_v2(outcome)
+                cls._validate_v2_v3(outcome, members[key])
+                outcomes[key] = cls._migrate_v3(cls._migrate_v2(outcome))
+            elif value["schema_version"] == 3:
+                cls._validate_v2_v3(outcome, members[key])
+                outcomes[key] = cls._migrate_v3(outcome) if migrate else dict(outcome)
             else:
-                cls._validate_v2(outcome, members[key])
+                cls._validate_v4(outcome, members[key])
                 outcomes[key] = dict(outcome)
-        return outcomes, len(outcomes) if value["schema_version"] in {1, 2} else 0
+        migrated = value["schema_version"] in {1, 2} or (
+            value["schema_version"] == 3 and migrate
+        )
+        return outcomes, len(outcomes) if migrated else 0
+
+    @staticmethod
+    def _migrate_v3(value):
+        if (value["status"] == "FINAL_FAILED"
+                and value["failure_category"] == "RESPONSE_NUMERIC"
+                and value["attempt_count"] < _NUMERIC_MAX_PROVIDER_ATTEMPTS):
+            return {**value, "status": "RETRY_PENDING"}
+        return dict(value)
 
     @staticmethod
     def _migrate_v2(value):
@@ -334,29 +355,61 @@ class UniverseEligibilityScanService:
             raise ValueError("Schema-1 checkpoint failure type is invalid")
 
     @classmethod
-    def _validate_v2(cls, value, member):
+    def _validate_v2_v3(cls, value, member):
+        cls._validate_versioned(
+            value,
+            member,
+            schema_label="Schema-2/3",
+            retryable_categories=_SCHEMA_3_RETRYABLE_CATEGORIES,
+            max_attempts=_MAX_PROVIDER_ATTEMPTS,
+        )
+
+    @classmethod
+    def _validate_v4(cls, value, member):
+        cls._validate_versioned(
+            value,
+            member,
+            schema_label="Schema-4",
+            retryable_categories=_RETRYABLE_CATEGORIES,
+            max_attempts=_NUMERIC_MAX_PROVIDER_ATTEMPTS,
+        )
+        status = value["status"]
+        category = value.get("failure_category")
+        attempts = value["attempt_count"]
+        if category != "RESPONSE_NUMERIC" and status in {"RETRY_PENDING", "FINAL_FAILED"} and attempts > 3:
+            raise ValueError("Schema-4 non-numeric failure attempt count is invalid")
+        if status == "FINAL_FAILED" and category == "RESPONSE_NUMERIC" and attempts != 4:
+            raise ValueError("Schema-4 numeric final failure is invalid")
+
+    @classmethod
+    def _validate_versioned(
+            cls, value, member, *, schema_label, retryable_categories, max_attempts):
         status = value.get("status")
         if status not in _ALL_STATUSES:
-            raise ValueError("Schema-2 checkpoint status is invalid")
+            raise ValueError(f"{schema_label} checkpoint status is invalid")
         cls._validate_identity_time(value, member)
         attempts = value.get("attempt_count")
-        if isinstance(attempts, bool) or not isinstance(attempts, int) or not 0 <= attempts <= 3:
-            raise ValueError("Schema-2 checkpoint attempt count is invalid")
+        if (isinstance(attempts, bool) or not isinstance(attempts, int)
+                or not 0 <= attempts <= max_attempts):
+            raise ValueError(f"{schema_label} checkpoint attempt count is invalid")
         category = value.get("failure_category")
         if status == "SUCCESS":
             cls._validate_success(value)
-            if category is not None or attempts < 1: raise ValueError("Successful schema-2 outcome is invalid")
+            if category is not None or attempts < 1: raise ValueError(f"Successful {schema_label} outcome is invalid")
         elif status == "EMPTY":
             cls._validate_empty(value)
-            if category is not None or attempts < 1: raise ValueError("Empty schema-2 outcome is invalid")
+            if category is not None or attempts < 1: raise ValueError(f"Empty {schema_label} outcome is invalid")
         elif status == "PROJECTION_FAILED":
-            if category != "PROJECTION_UNAVAILABLE" or attempts != 0: raise ValueError("Projection schema-2 outcome is invalid")
+            if category != "PROJECTION_UNAVAILABLE" or attempts != 0: raise ValueError(f"Projection {schema_label} outcome is invalid")
         elif not isinstance(category, str) or category not in _FAILURE_CATEGORIES:
-            raise ValueError("Schema-2 failure category is invalid")
-        elif status == "RETRY_PENDING" and (category not in _RETRYABLE_CATEGORIES or attempts < 1 or attempts >= 3):
-            raise ValueError("Retry-pending schema-2 outcome is invalid")
+            raise ValueError(f"{schema_label} failure category is invalid")
+        elif status == "RETRY_PENDING" and (
+                category not in retryable_categories or attempts < 1
+                or attempts >= (_NUMERIC_MAX_PROVIDER_ATTEMPTS
+                    if category == "RESPONSE_NUMERIC" else _MAX_PROVIDER_ATTEMPTS)):
+            raise ValueError(f"Retry-pending {schema_label} outcome is invalid")
         elif status == "FINAL_FAILED" and attempts < 1:
-            raise ValueError("Final schema-2 outcome is invalid")
+            raise ValueError(f"Final {schema_label} outcome is invalid")
 
     @staticmethod
     def _validate_identity_time(value, member):

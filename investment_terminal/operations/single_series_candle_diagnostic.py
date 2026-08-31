@@ -33,6 +33,7 @@ class SingleSeriesCandleDiagnosticService:
         outcomes, migrated_count = UniverseEligibilityScanService._outcomes(
             checkpoint,
             request,
+            migrate=False,
         )
         if migrated_count:
             raise ValueError("Diagnostic must not migrate checkpoint evidence")

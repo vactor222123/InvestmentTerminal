@@ -63,7 +63,7 @@ def main(
     except Exception as exc:
         now = runtime_clock()
         payload = {
-            "schema_version": 2,
+            "schema_version": 4,
             "provider_identity": "YAHOO_FINANCE",
             "universe_identity": "BROAD_US_LISTED_SECURITIES",
             "status": "FAILED",
