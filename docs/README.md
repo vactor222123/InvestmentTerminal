@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 operational continuation is recorded in
-`PHASE_7_PACKAGE_70_SINGLE_SERIES_CANDLE_DIAGNOSTIC.md`: run one automatic
-read-only raw-series diagnostic before any further universe scan.
+`PHASE_7_PACKAGE_71_NUMERIC_FAILURE_RECOVERY_AUDIT.md`: implement one bounded
+schema-4 production-client revalidation allowance before any further scan.

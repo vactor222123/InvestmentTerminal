@@ -85,7 +85,10 @@ Package 69 records the complete diagnostic retry measurement: 10 successes,
 86 numeric-response failures, two OHLC failures, and two no-price failures, with
 no retry pending or rate-limit halt. The operator pauses further scanning and
 Package 70 adds one automatic read-only raw-series diagnostic for the first
-numeric failure. Its measurement must be reviewed before slice 002.
+numeric failure. Its measurement returns 48 valid rows and no reproducible
+defect. Package 71 audits the resulting stale-terminal risk and selects one
+schema-4 production-client revalidation allowance for numeric failures only.
+Implementation and one controlled revalidation precede slice 002.
 
 ```text
 Foundation

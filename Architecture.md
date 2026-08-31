@@ -63,6 +63,13 @@ publishes timestamps plus stable defect types without identities or values. It
 does not mutate the checkpoint, weaken production candle validation, continue
 the universe scan, or persist candles.
 
+The first controlled diagnostic returned 48 valid rows and no reproducible
+defect. Because schema 3 treats `RESPONSE_NUMERIC` as terminal, its checkpoint
+can retain a stale ineligibility outcome after the provider response recovers.
+The selected next boundary is an atomic schema-4 migration with one additional
+production-client revalidation allowance for numeric failures only. OHLC,
+no-price, and all unrelated terminal evidence remain unchanged.
+
 Investment Terminal is a modular monolith with explicit domain and application
 boundaries. Infrastructure adapters are composed at CLI/server roots and must
 not leak persistence or provider details into domain models.

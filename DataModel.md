@@ -71,6 +71,13 @@ counts, stable invalid-reason counts, and invalid UTC timestamps with reason
 labels. It contains no instrument identity, OHLCV value, path, provider text,
 or exception message and never changes eligibility evidence.
 
+The first live diagnostic measured 48 valid and zero invalid rows, so the
+selected schema-version-4 eligibility change gives `RESPONSE_NUMERIC` a bounded
+fourth-attempt recovery path. Schema-3 terminal numeric outcomes below that cap
+become retry-pending atomically; every other outcome remains unchanged. A
+successful production conversion becomes normal `SUCCESS` evidence, while a
+repeated numeric failure at attempt four remains `FINAL_FAILED`.
+
 ```text
 History:
 archived Review Package bytes = canonical evidence

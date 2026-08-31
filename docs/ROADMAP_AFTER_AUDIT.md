@@ -709,5 +709,9 @@ OHLC failures, and two no-price failures; no retry or rate-limit evidence
 remains. The operator explicitly pauses further scanning. Package 70 adds a
 read-only diagnostic that automatically selects the first numeric failure,
 refetches only its unchanged 90-day raw series, and emits dates and stable
-defect categories without identities or values. One controlled diagnostic run
-is next; slice 002 remains blocked pending review.
+defect categories without identities or values. That controlled run returns 48
+valid rows and no current defect. Package 71 confirms that schema 3 cannot
+reconcile this recovered response because numeric failures are terminal and the
+three-attempt cap is closed. The next implementation is schema 4 with one
+bounded fourth production-client attempt for numeric failures only. Slice 002
+remains blocked.

@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `b8a80d77328cd49d78060b97699e97db404b6b44`
-**Current local package:** Phase 7 Package 70 - Single-Series Raw Candle Diagnostic
+**Current GitHub baseline:** `188ab94c1929b48e34778c031d71d61cde3a9526`
+**Current local package:** Phase 7 Package 71 - Numeric-Failure Recovery Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one controlled single-series raw candle diagnostic
+**Current next action:** Implement schema-4 numeric-failure revalidation
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -51,7 +51,10 @@ Package 69 records the completed diagnostic retries: 10 successes, 86 numeric
 failures, two OHLC failures, and two no-price failures, with no retry pending or
 rate-limit halt. The operator pauses the scan. Package 70 automatically selects
 the first numeric failure and inspects only that raw 90-day series through a
-redacted read-only report. Its controlled result is required before slice 002.
+redacted read-only report. Its controlled result contains 48 valid rows and no
+current defect. Package 71 confirms that schema 3 cannot reconcile the stale
+terminal result and selects one schema-4 fourth production-client attempt for
+numeric failures only. Slice 002 remains blocked.
 
 ---
 
@@ -343,27 +346,26 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 70 - Single-Series Raw Candle Diagnostic
+Phase 7 Package 71 - Numeric-Failure Recovery Audit
 ```
 
-Classification: `IMPLEMENTATION`.
+Classification: `AUDIT`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ b8a80d77328cd49d78060b97699e97db404b6b44
+develop @ 188ab94c1929b48e34778c031d71d61cde3a9526
 ```
 
 Result:
 
-- one private `RESPONSE_NUMERIC` candidate is selected automatically from the
-  validated schema-3 checkpoint;
-- only its unchanged raw 90-day Yahoo frame is requested;
-- the report exposes dates and stable defect categories but no identity or
-  OHLCV value;
-- the universe and checkpoint remain read-only and no scan is continued;
-- one controlled diagnostic run is next; slice 002 and ten-year ingestion
-  remain blocked.
+- the controlled Package 70 report is valid and bound to the unchanged request;
+- its selected series now contains 48 valid and zero invalid raw rows;
+- schema 3 still treats all 86 numeric outcomes as terminal and cannot
+  reconcile recovered provider data;
+- schema 4 with one bounded fourth production-client attempt for numeric
+  failures only is selected next;
+- runtime evidence, slice 002, ranking, and ingestion remain untouched.
 
 ---
 

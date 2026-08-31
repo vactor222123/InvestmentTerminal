@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ b8a80d77328cd49d78060b97699e97db404b6b44`
+**Current repository baseline:** `develop @ 188ab94c1929b48e34778c031d71d61cde3a9526`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -99,6 +99,8 @@
 **Phase 7 Package 68 typed invalid-response diagnostics:** COMPLETE
 **Phase 7 Package 69 schema-3 diagnostic measurement:** COMPLETE - SUCCESS
 **Phase 7 Package 70 single-series raw candle diagnostic:** COMPLETE
+**Phase 7 controlled single-series diagnostic:** COMPLETE - NOT REPRODUCED
+**Phase 7 Package 71 numeric-failure recovery audit:** COMPLETE
 
 ## Current State
 
@@ -106,10 +108,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled `single_series_candle_diagnostic` with the existing private
-universe and schema-3 checkpoint at the unchanged window end. Return only the
-redacted report. Do not run slice 002, delete or edit the checkpoint, rank
-members, or generate a ten-year candle batch before review.
+Implement schema-version-4 numeric-failure recovery: atomically migrate only
+eligible schema-3 terminal `RESPONSE_NUMERIC` outcomes to one bounded fourth
+production-client attempt while preserving every other outcome. Do not query
+Yahoo, edit runtime evidence, or run slice 002 in the implementation package.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
