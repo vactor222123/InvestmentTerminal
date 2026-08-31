@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `2606ac071400e42d8d0fdec80a37a6424a2f7159`
-**Current local package:** Phase 7 Package 73 - Schema-4 Revalidation Result
+**Current GitHub baseline:** `0ae1efe977cc8ad74c2c1fd0ffe179e3919d4479`
+**Current local package:** Phase 7 Package 74 - Complete Eligibility Drain Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Drain at most 85 remaining schema-4 numeric retries
+**Current next action:** Implement bounded complete eligibility drain
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -67,6 +67,14 @@ and retry-pending numeric outcomes decreased from 86 to 85. The two OHLC and
 two no-price terminal failures remain unchanged, and no rate limit occurred.
 One bounded 85-item retry drain is now authorized; slice 002 remains blocked
 until its redacted result is reviewed.
+
+The schema-4 drain then attempted all 85 remaining numeric retries without rate
+limiting: 84 recovered to success and one became `NO_PRICE_DATA`. The first 100
+members are terminal with 95 successes and five final failures; 12,324 remain
+never attempted. Package 74 rejects raising the per-slice cap and selects a
+separate resumable coordinator that loops unchanged 100-item slices under an
+explicit total budget, stops on rate limit/failure/no progress, and emits one
+redacted aggregate report. Implementation precedes any complete-universe run.
 
 ---
 
@@ -358,25 +366,25 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 73 - Schema-4 Revalidation Result
+Phase 7 Package 74 - Complete Eligibility Drain Audit
 ```
 
-Classification: `OPERATIONAL`.
+Classification: `AUDIT`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ 2606ac071400e42d8d0fdec80a37a6424a2f7159
+develop @ 0ae1efe977cc8ad74c2c1fd0ffe179e3919d4479
 ```
 
 Result:
 
-- one schema-4 item and one provider request completed without rate limiting;
-- successes increased from 10 to 11 and numeric retry-pending outcomes fell
-  from 86 to 85;
-- the four non-numeric terminal outcomes remained unchanged;
-- one bounded 85-item retry drain is selected next;
-- slice 002, ranking, and ingestion remain blocked pending drain review.
+- the numeric drain completed 85 requests without rate limiting;
+- the first 100 outcomes are terminal: 95 successes and five final failures;
+- 12,324 universe members remain never attempted;
+- the existing CLI is intentionally limited to one 100-item slice;
+- a separate budgeted, resumable complete-drain coordinator is selected next;
+- live scanning, ranking, and ingestion remain outside this audit.
 
 ---
 

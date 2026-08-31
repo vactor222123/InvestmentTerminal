@@ -76,6 +76,6 @@ After Sprint 31 documentation/inventory closure and a green closure CI run, the
 project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
-Current Phase 7 operational continuation is recorded in
-`PHASE_7_PACKAGE_73_SCHEMA4_REVALIDATION_RESULT.md`: the first schema-4 retry
-recovered one stale numeric outcome, and one bounded 85-item retry drain is next.
+Current Phase 7 continuation is recorded in
+`PHASE_7_PACKAGE_74_COMPLETE_ELIGIBILITY_DRAIN_AUDIT.md`: implement a bounded,
+resumable complete-drain coordinator over unchanged 100-item slices.

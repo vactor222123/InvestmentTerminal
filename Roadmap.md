@@ -94,6 +94,11 @@ change to any other retry cap. One controlled revalidation precedes slice 002.
 That revalidation recovered one stale numeric outcome without rate limiting.
 The remaining 85 numeric retries may now be drained in one bounded invocation;
 its redacted result must be reviewed before slice 002.
+The drain completed with 95 successes and five final failures across the first
+100 members. Package 74 selects a separate budgeted coordinator over unchanged
+100-item slices so the remaining 12,324 members can be processed automatically
+with exact resume and immediate rate-limit stop. Implementation precedes the
+complete-universe run.
 
 ```text
 Foundation
