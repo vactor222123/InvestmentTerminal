@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `a0ee29128cc00dee93fe7f71bd39a89d1668a466`
-**Current local package:** Phase 7 Package 68 - Typed Invalid-Response Diagnostics
+**Current GitHub baseline:** `71e7fc0a4c39a99527f4f5ee12b93fdd50fe8d49`
+**Current local package:** Phase 7 Package 69 - Schema-3 Diagnostic Measurement
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run controlled 10-attempt schema-3 diagnostic
+**Current next action:** Run controlled 100-member schema-3 slice 002
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -47,7 +47,9 @@ slice 002 or ten-year ingestion.
 
 Package 68 implements the schema-3 typed validation categories and atomic
 migration while preserving attempt counts and all non-invalid-response evidence.
-The next action is one controlled 10-attempt diagnostic measurement.
+Package 69 records the completed diagnostic retries: 10 successes, 86 numeric
+failures, two OHLC failures, and two no-price failures, with no retry pending or
+rate-limit halt. One controlled 100-member slice 002 is next.
 
 ---
 
@@ -339,26 +341,25 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 67 - Eligibility Invalid-Response Audit
+Phase 7 Package 69 - Schema-3 Diagnostic Measurement
 ```
 
-Classification: `AUDIT`.
+Classification: `OPERATIONAL`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ 2e05643f375594a5171f3067308b21b3024fb4f2
+develop @ 71e7fc0a4c39a99527f4f5ee12b93fdd50fe8d49
 ```
 
 Result:
 
-- the 80-retry drain completed without rate limiting;
-- cumulative outcomes are 10 successes, 88 `INVALID_RESPONSE`, and two
-  `NO_PRICE_DATA`;
-- the dominant category combines multiple client and service validation exits;
-- schema 2 persists no subtype and treats all 88 outcomes as terminal;
-- schema-3 typed diagnostics and one final retry are selected next;
-- slice 002, ranking, selection, and ten-year ingestion remain blocked.
+- all 100 first-slice outcomes are terminal;
+- cumulative outcomes are 10 successes, 86 `RESPONSE_NUMERIC`, two
+  `RESPONSE_OHLC`, and two `NO_PRICE_DATA`;
+- retry pending and rate-limit halt are absent;
+- one controlled 100-member schema-3 slice 002 is selected next;
+- ranking, selection, and ten-year ingestion remain blocked.
 
 ---
 

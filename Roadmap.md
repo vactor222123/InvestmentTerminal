@@ -81,6 +81,10 @@ Package 68 implements schema-3 typed local validation categories and atomic
 migration of the 88 eligible schema-2 invalid responses without resetting their
 attempt counts. One controlled 10-attempt diagnostic measurement is next.
 
+Package 69 records the complete diagnostic retry measurement: 10 successes,
+86 numeric-response failures, two OHLC failures, and two no-price failures, with
+no retry pending or rate-limit halt. One bounded 100-member slice 002 is next.
+
 ```text
 Foundation
 → Current-State Analysis

@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ a0ee29128cc00dee93fe7f71bd39a89d1668a466`
+**Current repository baseline:** `develop @ 71e7fc0a4c39a99527f4f5ee12b93fdd50fe8d49`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -97,6 +97,7 @@
 **Phase 7 eligibility legacy retry drain:** COMPLETE - DIAGNOSTIC REMEDIATION REQUIRED
 **Phase 7 Package 67 invalid-response audit:** COMPLETE
 **Phase 7 Package 68 typed invalid-response diagnostics:** COMPLETE
+**Phase 7 Package 69 schema-3 diagnostic measurement:** COMPLETE - SUCCESS
 
 ## Current State
 
@@ -104,10 +105,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled schema-3 diagnostic invocation with the existing private
-universe/checkpoint, unchanged window, and `--max-items 10`. Return only the
-redacted report. Do not drain the remaining retries, run slice 002, delete the
-checkpoint, or generate a ten-year candle batch.
+Run one controlled schema-3 slice 002 with the existing private
+universe/checkpoint, unchanged window, and `--max-items 100`. Return only the
+redacted report. Do not run additional slices, delete the checkpoint, rank
+members, or generate a ten-year candle batch.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
