@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 4eab854d706ed4025e28865693d821bad1cd270d`
+**Current repository baseline:** `develop @ 2606ac071400e42d8d0fdec80a37a6424a2f7159`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -102,6 +102,7 @@
 **Phase 7 controlled single-series diagnostic:** COMPLETE - NOT REPRODUCED
 **Phase 7 Package 71 numeric-failure recovery audit:** COMPLETE
 **Phase 7 Package 72 numeric-failure recovery:** COMPLETE
+**Phase 7 Package 73 schema-4 revalidation result:** COMPLETE - SUCCESS
 
 ## Current State
 
@@ -109,10 +110,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Apply Package 72, then run exactly one schema-version-4 numeric revalidation
-item against the existing private universe and checkpoint. Return only the
-redacted report for review. Do not drain remaining numeric outcomes or run
-slice 002 before that result is reviewed.
+Run one controlled schema-version-4 retry drain with `--max-items 85` against
+the same private universe/checkpoint and unchanged window end. Return only the
+redacted report for review. Do not run slice 002, ranking, or ten-year ingestion
+before the drain result is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

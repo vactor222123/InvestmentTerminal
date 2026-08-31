@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `4eab854d706ed4025e28865693d821bad1cd270d`
-**Current local package:** Phase 7 Package 72 - Numeric-Failure Recovery
+**Current GitHub baseline:** `2606ac071400e42d8d0fdec80a37a6424a2f7159`
+**Current local package:** Phase 7 Package 73 - Schema-4 Revalidation Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one controlled schema-4 numeric revalidation item
+**Current next action:** Drain at most 85 remaining schema-4 numeric retries
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -60,6 +60,13 @@ attempt either replaces the stale result with validated success/empty evidence
 or becomes final numeric failure, and every non-numeric category retains its
 existing three-attempt boundary. One controlled item is next; slice 002 and a
 bulk drain remain blocked pending review.
+
+Package 73 reviews the first schema-4 operational result. Exactly one provider
+request recovered one stale numeric outcome: successes increased from 10 to 11
+and retry-pending numeric outcomes decreased from 86 to 85. The two OHLC and
+two no-price terminal failures remain unchanged, and no rate limit occurred.
+One bounded 85-item retry drain is now authorized; slice 002 remains blocked
+until its redacted result is reviewed.
 
 ---
 
@@ -351,26 +358,25 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 71 - Numeric-Failure Recovery Audit
+Phase 7 Package 73 - Schema-4 Revalidation Result
 ```
 
-Classification: `AUDIT`.
+Classification: `OPERATIONAL`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ 188ab94c1929b48e34778c031d71d61cde3a9526
+develop @ 2606ac071400e42d8d0fdec80a37a6424a2f7159
 ```
 
 Result:
 
-- the controlled Package 70 report is valid and bound to the unchanged request;
-- its selected series now contains 48 valid and zero invalid raw rows;
-- schema 3 still treats all 86 numeric outcomes as terminal and cannot
-  reconcile recovered provider data;
-- schema 4 with one bounded fourth production-client attempt for numeric
-  failures only is selected next;
-- runtime evidence, slice 002, ranking, and ingestion remain untouched.
+- one schema-4 item and one provider request completed without rate limiting;
+- successes increased from 10 to 11 and numeric retry-pending outcomes fell
+  from 86 to 85;
+- the four non-numeric terminal outcomes remained unchanged;
+- one bounded 85-item retry drain is selected next;
+- slice 002, ranking, and ingestion remain blocked pending drain review.
 
 ---
 

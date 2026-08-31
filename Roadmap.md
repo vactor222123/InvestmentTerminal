@@ -91,6 +91,9 @@ schema-4 production-client revalidation allowance for numeric failures only.
 Package 72 implements that allowance with atomic schema-3 migration, a fourth
 attempt only for `RESPONSE_NUMERIC`, schema-4 fail-closed validation, and no
 change to any other retry cap. One controlled revalidation precedes slice 002.
+That revalidation recovered one stale numeric outcome without rate limiting.
+The remaining 85 numeric retries may now be drained in one bounded invocation;
+its redacted result must be reviewed before slice 002.
 
 ```text
 Foundation

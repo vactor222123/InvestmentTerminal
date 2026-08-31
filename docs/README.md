@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 operational continuation is recorded in
-`PHASE_7_PACKAGE_71_NUMERIC_FAILURE_RECOVERY_AUDIT.md`: implement one bounded
-schema-4 production-client revalidation allowance before any further scan.
+`PHASE_7_PACKAGE_73_SCHEMA4_REVALIDATION_RESULT.md`: the first schema-4 retry
+recovered one stale numeric outcome, and one bounded 85-item retry drain is next.
