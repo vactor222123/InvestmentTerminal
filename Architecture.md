@@ -2,6 +2,11 @@
 
 ## Phase 7 eligibility schema-version-4 boundary
 
+`UniverseEligibilityDrainService` is the run-level coordinator over the
+unchanged 100-item slice boundary. It owns only bounded repetition, aggregate
+progress, and stopping semantics; the slice service retains provider outcome
+validation and atomic checkpoint ownership.
+
 The resumable universe eligibility operation owns an explicit schema-version-4
 migration. It may reopen only schema-3 terminal `RESPONSE_NUMERIC` evidence for
 one fourth production-client attempt. Migration is checkpointed atomically

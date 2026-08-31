@@ -2,6 +2,10 @@
 
 ## Eligibility checkpoint/report schema version 4
 
+The distinct complete-drain report uses schema version 1. It aggregates slice,
+attempt, provider-request, budget, and starting/ending coverage evidence while
+the private eligibility checkpoint remains schema version 4.
+
 Schema version 4 retains the schema-3 outcome fields and adds no private data.
 Its behavioral invariant permits `RETRY_PENDING/RESPONSE_NUMERIC` only below
 attempt four and requires `FINAL_FAILED/RESPONSE_NUMERIC` at attempt four.

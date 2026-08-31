@@ -99,6 +99,8 @@ The drain completed with 95 successes and five final failures across the first
 100-item slices so the remaining 12,324 members can be processed automatically
 with exact resume and immediate rate-limit stop. Implementation precedes the
 complete-universe run.
+Package 75 implements that coordinator and its redacted aggregate CLI. One
+budgeted operational run is next.
 
 ```text
 Foundation

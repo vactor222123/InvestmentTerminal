@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 0ae1efe977cc8ad74c2c1fd0ffe179e3919d4479`
+**Current repository baseline:** `develop @ d62bff1b4bdf84a7c728572738398fb3eba78919`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -105,6 +105,7 @@
 **Phase 7 Package 73 schema-4 revalidation result:** COMPLETE - SUCCESS
 **Phase 7 schema-4 numeric drain:** COMPLETE - SUCCESS
 **Phase 7 Package 74 complete eligibility drain audit:** COMPLETE
+**Phase 7 Package 75 complete eligibility drain:** COMPLETE
 
 ## Current State
 
@@ -112,10 +113,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the bounded complete eligibility drain coordinator and CLI selected
-by Package 74. Preserve the existing 100-item slice service, atomic schema-4
-checkpoint, exact resume, and immediate rate-limit halt. Do not run Yahoo,
-ranking, or ten-year ingestion in the implementation package.
+Run the bounded complete eligibility drain once with a 15,000-item total budget
+against the existing private schema-4 checkpoint. Return only its redacted
+aggregate report. Do not start ranking or ten-year ingestion before review.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
