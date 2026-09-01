@@ -109,6 +109,10 @@ projection before currency policy, batch partitioning, or ten-year ingestion.
 Package 78 implements that fail-closed private projection and its separate
 aggregate-only report. One controlled projection run is next; currency policy,
 batch construction, and ingestion remain blocked until its report is reviewed.
+The controlled projection is successful: 12,020 of 12,424 terminal members are
+included and 404 are explicitly excluded. Package 79 records the checksum-bound
+result. A focused currency and batch-construction audit is next; ingestion
+remains blocked.
 
 ```text
 Foundation

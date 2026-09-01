@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `cb2e3fa954cc5b3db7d0b479ad6adf050618d072`
-**Current local package:** Phase 7 Package 78 - Eligibility Success Projection
+**Current GitHub baseline:** `ff24ca892c15026cc9fe16005fe686123bf83b69`
+**Current local package:** Phase 7 Package 79 - Eligibility Success Projection Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run the private projection and return only its redacted report
+**Current next action:** Audit explicit currency and deterministic batch construction
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -83,6 +83,13 @@ fail-closed projection: it accepts only a matching complete schema-4 checkpoint,
 writes source identity and Yahoo symbols to a separate private atomic document,
 and emits a redacted checksum-bound aggregate report. It does not infer
 currency, partition batches, fetch ten-year candles, rank, or ingest.
+
+The controlled projection succeeded. Its redacted report accounts for all
+12,424 members: 12,020 successes and 404 exclusions. Request and universe
+checksums exactly match the completed drain evidence, and the private projection
+is bound by its own SHA-256. No private member identity was reviewed or added to
+the repository. Currency and deterministic batch construction must be audited
+before any ten-year ingestion.
 
 ---
 
@@ -374,26 +381,26 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 78 - Eligibility Success Projection
+Phase 7 Package 79 - Eligibility Success Projection Result
 ```
 
-Classification: `IMPLEMENTATION`.
+Classification: `OPERATIONAL`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ cb2e3fa954cc5b3db7d0b479ad6adf050618d072
+develop @ ff24ca892c15026cc9fe16005fe686123bf83b69
 ```
 
 Result:
 
-- complete and checksum-matching schema-4 evidence is required;
-- only `SUCCESS` members enter the deterministic private projection;
-- source identity and Yahoo symbols remain only in the private output;
-- the projection SHA-256 binds a separate aggregate-only report;
-- failure cannot produce a private success-shaped output;
-- one controlled private projection run is next;
-- currency inference, batching, candle retrieval, ranking, and ingestion remain excluded.
+- the controlled private projection completed with `SUCCESS`;
+- all 12,424 members are accounted for;
+- 12,020 successful identities entered the private projection;
+- 404 terminal failures remain excluded;
+- request and universe checksums match the complete-drain evidence;
+- the redacted report exposes no identities, symbols, values, or paths;
+- currency/batch audit is next; ingestion remains excluded.
 
 ---
 

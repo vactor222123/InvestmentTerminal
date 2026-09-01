@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_78_ELIGIBILITY_SUCCESS_PROJECTION.md`: run the implemented
-private complete-success projection and return only its redacted report.
+`PHASE_7_PACKAGE_79_ELIGIBILITY_SUCCESS_PROJECTION_RESULT.md`: the projection
+succeeded, and explicit currency/batch-boundary audit is next.

@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ cb2e3fa954cc5b3db7d0b479ad6adf050618d072`
+**Current repository baseline:** `develop @ ff24ca892c15026cc9fe16005fe686123bf83b69`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -110,6 +110,7 @@
 **Phase 7 complete eligibility drain:** COMPLETE - 12,424 terminal
 **Phase 7 Package 77 eligibility-to-ingestion audit:** COMPLETE
 **Phase 7 Package 78 eligibility success projection:** COMPLETE
+**Phase 7 Package 79 eligibility success projection result:** COMPLETE - SUCCESS
 
 ## Current State
 
@@ -117,11 +118,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled private complete-success projection against the matching
-universe and completed schema-4 checkpoint, then return only the redacted
-qualification report. Do not return the universe, checkpoint, or private
-projection. Do not infer currency, generate ten-year batches, rank instruments,
-or ingest candles before that report is reviewed.
+Audit the existing batch-request and candle-identity contracts to select the
+smallest explicit currency policy and deterministic batch-construction boundary
+for the 12,020-member private success projection. Do not infer currency or
+execute ingestion in that audit.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
