@@ -274,15 +274,30 @@ def test_schema4_numeric_final_below_four_attempts_fails_closed():
         ).run(req, checkpoint)
 
 
-def test_schema4_non_numeric_failure_cannot_use_fourth_attempt():
+def test_schema4_terminal_category_change_at_fourth_attempt_is_valid():
     req = request(1)
-    timeout = {**v1_outcome("S000", "FAILED"), "status": "FINAL_FAILED",
+    no_price = {**v1_outcome("S000", "FAILED"), "status": "FINAL_FAILED",
+        "attempt_count": 4, "failure_category": "NO_PRICE_DATA"}
+    no_price.pop("failure_type")
+    checkpoint = {**checkpoint_v1(req, {"NASDAQ_LISTED:S000": no_price}),
+        "schema_version": 4}
+
+    report = UniverseEligibilityScanService(
+        client=Client(), checkpoint_writer=lambda value: None, clock=lambda: END,
+    ).run(req, checkpoint)
+    assert report["status"] == "COMPLETE"
+    assert report["coverage"]["current_run"]["attempted_count"] == 0
+
+
+def test_schema4_non_numeric_retry_cannot_use_fourth_attempt():
+    req = request(1)
+    timeout = {**v1_outcome("S000", "FAILED"), "status": "RETRY_PENDING",
         "attempt_count": 4, "failure_category": "TIMEOUT"}
     timeout.pop("failure_type")
     checkpoint = {**checkpoint_v1(req, {"NASDAQ_LISTED:S000": timeout}),
         "schema_version": 4}
 
-    with pytest.raises(ValueError, match="non-numeric failure"):
+    with pytest.raises(ValueError, match="Retry-pending"):
         UniverseEligibilityScanService(
             client=Client(), checkpoint_writer=lambda value: None, clock=lambda: END,
         ).run(req, checkpoint)

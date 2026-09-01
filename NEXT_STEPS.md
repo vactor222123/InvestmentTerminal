@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ d62bff1b4bdf84a7c728572738398fb3eba78919`
+**Current repository baseline:** `develop @ 71707f304f1888cb3bd09cbd94b6782c7c0d8cd9`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -106,6 +106,7 @@
 **Phase 7 schema-4 numeric drain:** COMPLETE - SUCCESS
 **Phase 7 Package 74 complete eligibility drain audit:** COMPLETE
 **Phase 7 Package 75 complete eligibility drain:** COMPLETE
+**Phase 7 Package 76 schema-4 terminal transition remediation:** COMPLETE
 
 ## Current State
 
@@ -113,7 +114,7 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run the bounded complete eligibility drain once with a 15,000-item total budget
+Repeat the bounded complete eligibility drain with a 15,000-item total budget
 against the existing private schema-4 checkpoint. Return only its redacted
 aggregate report. Do not start ranking or ten-year ingestion before review.
 

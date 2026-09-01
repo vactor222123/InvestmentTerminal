@@ -13,6 +13,10 @@ Non-numeric failure outcomes remain bounded to three attempts. Schema-3
 terminal numeric outcomes below four migrate without changing identity,
 metrics, measurement time, category, or prior attempt count.
 
+A fourth numeric revalidation may end in another recognized terminal category.
+That terminal outcome retains attempt count four and is valid on resume;
+non-numeric retry-pending evidence does not gain a fourth retry allowance.
+
 **Status:** Canonical data-boundary summary  
 **Current baseline:** Sprint 30 closure
 

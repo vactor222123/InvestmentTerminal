@@ -376,8 +376,8 @@ class UniverseEligibilityScanService:
         status = value["status"]
         category = value.get("failure_category")
         attempts = value["attempt_count"]
-        if category != "RESPONSE_NUMERIC" and status in {"RETRY_PENDING", "FINAL_FAILED"} and attempts > 3:
-            raise ValueError("Schema-4 non-numeric failure attempt count is invalid")
+        if category != "RESPONSE_NUMERIC" and status == "RETRY_PENDING" and attempts > 3:
+            raise ValueError("Schema-4 non-numeric retry attempt count is invalid")
         if status == "FINAL_FAILED" and category == "RESPONSE_NUMERIC" and attempts != 4:
             raise ValueError("Schema-4 numeric final failure is invalid")
 
