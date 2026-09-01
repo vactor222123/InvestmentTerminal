@@ -6,6 +6,13 @@ The distinct complete-drain report uses schema version 1. It aggregates slice,
 attempt, provider-request, budget, and starting/ending coverage evidence while
 the private eligibility checkpoint remains schema version 4.
 
+`ELIGIBILITY_SUCCESS_UNIVERSE` schema version 1 is a private deterministic
+projection of a complete matching checkpoint. Its members contain only source,
+source symbol, and Yahoo symbol for `SUCCESS` outcomes. The separate
+`ELIGIBILITY_SUCCESS_PROJECTION` report schema version 1 binds request,
+universe, and projection SHA-256 values while exposing only member, success,
+and excluded counts. It excludes member identities, symbols, values, and paths.
+
 Schema version 4 retains the schema-3 outcome fields and adds no private data.
 Its behavioral invariant permits `RETRY_PENDING/RESPONSE_NUMERIC` only below
 attempt four and requires `FINAL_FAILED/RESPONSE_NUMERIC` at attempt four.

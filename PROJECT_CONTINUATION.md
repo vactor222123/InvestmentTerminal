@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `15d015fa0ead15ab91eac30730543e0bb2f0eaea`
-**Current local package:** Phase 7 Package 77 - Eligibility-to-Ingestion Audit
+**Current GitHub baseline:** `cb2e3fa954cc5b3db7d0b479ad6adf050618d072`
+**Current local package:** Phase 7 Package 78 - Eligibility Success Projection
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement private complete-success projection
+**Current next action:** Run the private projection and return only its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -75,6 +75,14 @@ never attempted. Package 74 rejects raising the per-slice cap and selects a
 separate resumable coordinator that loops unchanged 100-item slices under an
 explicit total budget, stops on rate limit/failure/no progress, and emits one
 redacted aggregate report. Implementation precedes any complete-universe run.
+
+The complete drain subsequently reached terminal evidence for all 12,424
+members: 12,020 successes and 404 isolated final failures. Package 77 audited
+the eligibility-to-ingestion boundary. Package 78 implements the selected
+fail-closed projection: it accepts only a matching complete schema-4 checkpoint,
+writes source identity and Yahoo symbols to a separate private atomic document,
+and emits a redacted checksum-bound aggregate report. It does not infer
+currency, partition batches, fetch ten-year candles, rank, or ingest.
 
 ---
 
@@ -366,25 +374,26 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 74 - Complete Eligibility Drain Audit
+Phase 7 Package 78 - Eligibility Success Projection
 ```
 
-Classification: `AUDIT`.
+Classification: `IMPLEMENTATION`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ 0ae1efe977cc8ad74c2c1fd0ffe179e3919d4479
+develop @ cb2e3fa954cc5b3db7d0b479ad6adf050618d072
 ```
 
 Result:
 
-- the numeric drain completed 85 requests without rate limiting;
-- the first 100 outcomes are terminal: 95 successes and five final failures;
-- 12,324 universe members remain never attempted;
-- the existing CLI is intentionally limited to one 100-item slice;
-- a separate budgeted, resumable complete-drain coordinator is selected next;
-- live scanning, ranking, and ingestion remain outside this audit.
+- complete and checksum-matching schema-4 evidence is required;
+- only `SUCCESS` members enter the deterministic private projection;
+- source identity and Yahoo symbols remain only in the private output;
+- the projection SHA-256 binds a separate aggregate-only report;
+- failure cannot produce a private success-shaped output;
+- one controlled private projection run is next;
+- currency inference, batching, candle retrieval, ranking, and ingestion remain excluded.
 
 ---
 

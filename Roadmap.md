@@ -106,6 +106,9 @@ a different terminal category. The unchanged checkpoint can now be resumed.
 The resumed drain completed all 12,424 members with 12,020 successes and 404
 isolated final failures. Package 77 selects a private, checksum-bound success
 projection before currency policy, batch partitioning, or ten-year ingestion.
+Package 78 implements that fail-closed private projection and its separate
+aggregate-only report. One controlled projection run is next; currency policy,
+batch construction, and ingestion remain blocked until its report is reviewed.
 
 ```text
 Foundation

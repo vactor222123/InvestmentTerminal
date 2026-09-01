@@ -2,6 +2,13 @@
 
 ## Phase 7 eligibility schema-version-4 boundary
 
+The downstream eligibility-success projection is a separate operations
+boundary. It requires the exact source universe and a matching complete
+schema-version-4 checkpoint, selects only terminal `SUCCESS` members, and
+writes their source/Yahoo identities to a private atomic document. A separate
+redacted report exposes only checksums and aggregate counts. The projection
+grants no currency, batching, candle-ingestion, ranking, or analysis authority.
+
 `UniverseEligibilityDrainService` is the run-level coordinator over the
 unchanged 100-item slice boundary. It owns only bounded repetition, aggregate
 progress, and stopping semantics; the slice service retains provider outcome
