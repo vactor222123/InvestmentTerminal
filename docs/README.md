@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_76_SCHEMA4_TERMINAL_TRANSITION_REMEDIATION.md`: repeat the
-budgeted complete drain against the unchanged private checkpoint.
+`PHASE_7_PACKAGE_77_ELIGIBILITY_TO_INGESTION_AUDIT.md`: implement a private
+complete-success projection and separate redacted qualification report.

@@ -103,6 +103,9 @@ Package 75 implements that coordinator and its redacted aggregate CLI. One
 budgeted operational run is next.
 Package 76 repairs resume validation for a fourth numeric attempt that ends in
 a different terminal category. The unchanged checkpoint can now be resumed.
+The resumed drain completed all 12,424 members with 12,020 successes and 404
+isolated final failures. Package 77 selects a private, checksum-bound success
+projection before currency policy, batch partitioning, or ten-year ingestion.
 
 ```text
 Foundation

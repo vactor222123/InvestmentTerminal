@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 71707f304f1888cb3bd09cbd94b6782c7c0d8cd9`
+**Current repository baseline:** `develop @ 15d015fa0ead15ab91eac30730543e0bb2f0eaea`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -107,6 +107,8 @@
 **Phase 7 Package 74 complete eligibility drain audit:** COMPLETE
 **Phase 7 Package 75 complete eligibility drain:** COMPLETE
 **Phase 7 Package 76 schema-4 terminal transition remediation:** COMPLETE
+**Phase 7 complete eligibility drain:** COMPLETE - 12,424 terminal
+**Phase 7 Package 77 eligibility-to-ingestion audit:** COMPLETE
 
 ## Current State
 
@@ -114,9 +116,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Repeat the bounded complete eligibility drain with a 15,000-item total budget
-against the existing private schema-4 checkpoint. Return only its redacted
-aggregate report. Do not start ranking or ten-year ingestion before review.
+Implement the private complete-success eligibility projection and separate
+redacted qualification report selected by Package 77. Do not generate ten-year
+batches, infer currency, rank instruments, or ingest candles in that package.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
