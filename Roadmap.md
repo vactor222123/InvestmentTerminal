@@ -146,6 +146,11 @@ The first schema-version-2 item succeeds through chart metadata with no failure
 or rate-limit halt. Package 88 records the result and authorizes one bounded
 100-item currency slice. A complete drain, batch construction, and candle
 ingestion remain blocked until that aggregate result is reviewed.
+The controlled 100-item slice then qualifies all 100 attempted items without
+failure, retry, or rate limiting, for 101 cumulative successes. Package 89
+records the result and selects an audit of a bounded resumable complete-drain
+coordinator so the operator does not manually repeat roughly 120 invocations.
+No complete run, batch construction, or ingestion is yet authorized.
 
 ```text
 Foundation

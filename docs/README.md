@@ -77,6 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_88_CHART_CURRENCY_FIRST_RESULT.md`: the first resumable
-chart-metadata currency item succeeded; run one bounded 100-item slice before
-any complete drain or batch generation.
+`PHASE_7_PACKAGE_89_CHART_CURRENCY_SLICE_RESULT.md`: the first 100-item
+chart-currency slice succeeded; audit a bounded resumable complete-drain
+coordinator before broader execution or batch generation.
