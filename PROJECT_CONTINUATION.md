@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `1ef0409dcb98f9877e2119578ecbdcb6ccd40eb4`
-**Current local package:** Phase 7 Package 86 - Chart-Metadata Currency Result
+**Current GitHub baseline:** `267cbc6135e501cd56f3d52de9443a9360d3fecd`
+**Current local package:** Phase 7 Package 87 - Resumable Chart Currency
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Integrate chart metadata into resumable currency qualification
+**Current next action:** Run one controlled schema-version-2 currency item
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -136,6 +136,14 @@ therefore repairs the Search-field absence without currency inference. The next
 package must version and migrate the resumable checkpoint, reopen only
 `INVALID_CURRENCY`, and use chart metadata directly for new pending symbols.
 Batch generation and ingestion remain blocked.
+
+Package 87 implements schema-version-2 resumable chart-currency qualification.
+It atomically migrates schema-1 evidence before provider access, reopens only
+terminal `INVALID_CURRENCY`, preserves every other terminal outcome, and uses
+Yahoo chart metadata directly for reopened and never-attempted symbols. Existing
+100-item bounds, three-attempt retry cap, immediate rate-limit halt, private
+checkpointing, and aggregate-only reporting remain in force. Run exactly one
+controlled item next; batch generation and ingestion remain blocked.
 
 ---
 

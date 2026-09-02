@@ -27,15 +27,13 @@ class Client:
     def __init__(self):
         self.calls = []
 
-    def search_symbol(self, symbol):
+    def get_currency(self, symbol):
         self.calls.append(symbol)
         if symbol == "CCC":
             raise RuntimeError("private") from YFRateLimitError()
         if symbol == "BBB":
-            return [{"symbol": "BBB", "currency": "USD"},
-                    {"symbol": "bbb", "currency": "CAD"}]
-        return [{"symbol": symbol, "currency": "usd"},
-                {"symbol": "FUZZY", "currency": "EUR"}]
+            raise ValueError("private")
+        return "USD"
 
 
 def test_qualifies_exact_currency_and_halts_on_rate_limit():
@@ -48,8 +46,9 @@ def test_qualifies_exact_currency_and_halts_on_rate_limit():
     assert report["status"] == "HALTED"
     assert report["halt_category"] == "RATE_LIMITED"
     assert report["coverage"] == {"member_count": 4, "attempted_count": 3,
-        "success_count": 1, "final_failure_count": 1,
-        "retry_pending_count": 1, "never_attempted_count": 1}
+        "success_count": 1, "final_failure_count": 0,
+        "retry_pending_count": 2, "never_attempted_count": 1}
+    assert writes[-1]["schema_version"] == 2
     assert writes[-1]["outcomes"]["AAA"]["currency"] == "USD"
     assert "AAA" not in str(report) and "USD" not in str(report)
 
@@ -59,11 +58,11 @@ def test_resume_skips_terminal_and_completes(monkeypatch):
     service = SymbolCurrencyQualificationService(
         client=client, checkpoint_writer=writes.append, clock=lambda: NOW)
     service.run(value, checksum(value), max_items=100)
-    client.search_symbol = lambda symbol: [{"symbol": symbol, "currency": "USD"}]
+    client.get_currency = lambda symbol: "USD"
     report = service.run(value, checksum(value), writes[-1], max_items=100)
     assert report["status"] == "COMPLETE"
-    assert report["coverage"]["success_count"] == 3
-    assert report["coverage"]["final_failure_count"] == 1
+    assert report["coverage"]["success_count"] == 4
+    assert report["coverage"]["final_failure_count"] == 0
 
 
 def test_rejects_projection_and_checkpoint_mismatch_before_provider_call():
@@ -77,19 +76,56 @@ def test_rejects_projection_and_checkpoint_mismatch_before_provider_call():
     assert client.calls == []
 
 
-def test_exact_result_without_valid_currency_is_terminal_and_typed():
-    value = projection(); writes = []
+def test_migrates_before_provider_and_reopens_only_invalid_currency():
+    value = projection(); writes = []; client = Client()
+    legacy_request = checksum({"schema_version": 1,
+        "operation_identity": "YAHOO_SYMBOL_CURRENCY_QUALIFICATION",
+        "projection_checksum": checksum(value)})
+    legacy = {"schema_version": 1, "request_checksum": legacy_request,
+        "projection_checksum": checksum(value), "outcomes": {
+            "AAA": {"status": "FINAL_FAILED", "attempt_count": 1,
+                    "currency": None, "failure_category": "INVALID_CURRENCY"},
+            "BBB": {"status": "FINAL_FAILED", "attempt_count": 1,
+                    "currency": None, "failure_category": "NO_EXACT_MATCH"}}}
 
-    class MissingCurrency:
-        def search_symbol(self, symbol):
-            return [{"symbol": symbol, "currency": None}]
+    SymbolCurrencyQualificationService(
+        client=client, checkpoint_writer=writes.append, clock=lambda: NOW
+    ).run(value, checksum(value), legacy, max_items=1)
 
+    assert writes[0]["schema_version"] == 2
+    assert writes[0]["outcomes"]["AAA"]["status"] == "RETRY_PENDING"
+    assert writes[0]["outcomes"]["BBB"]["status"] == "FINAL_FAILED"
+    assert client.calls == ["AAA"]
+
+
+def test_new_checkpoint_uses_chart_metadata_directly():
+    value = projection(); writes = []; client = Client()
     report = SymbolCurrencyQualificationService(
-        client=MissingCurrency(), checkpoint_writer=writes.append, clock=lambda: NOW
+        client=client, checkpoint_writer=writes.append, clock=lambda: NOW
     ).run(value, checksum(value), max_items=1)
-    assert writes[-1]["outcomes"]["AAA"]["status"] == "FINAL_FAILED"
-    assert writes[-1]["outcomes"]["AAA"]["failure_category"] == "INVALID_CURRENCY"
-    assert report["failure_categories"] == ["INVALID_CURRENCY"]
+    assert client.calls == ["AAA"]
+    assert report["schema_version"] == 2
+    assert report["provider_identity"] == "YAHOO_FINANCE_CHART_METADATA"
+
+
+def test_migration_write_failure_prevents_provider_call():
+    value = projection(); client = Client()
+    legacy_request = checksum({"schema_version": 1,
+        "operation_identity": "YAHOO_SYMBOL_CURRENCY_QUALIFICATION",
+        "projection_checksum": checksum(value)})
+    legacy = {"schema_version": 1, "request_checksum": legacy_request,
+        "projection_checksum": checksum(value), "outcomes": {
+            "AAA": {"status": "FINAL_FAILED", "attempt_count": 1,
+                    "currency": None, "failure_category": "INVALID_CURRENCY"}}}
+
+    def fail_write(value):
+        raise OSError("private")
+
+    with pytest.raises(OSError, match="private"):
+        SymbolCurrencyQualificationService(
+            client=client, checkpoint_writer=fail_write, clock=lambda: NOW
+        ).run(value, checksum(value), legacy, max_items=1)
+    assert client.calls == []
 
 
 @pytest.mark.parametrize("max_items", [0, 101, True])

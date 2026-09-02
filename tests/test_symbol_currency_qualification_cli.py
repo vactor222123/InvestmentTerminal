@@ -5,8 +5,8 @@ from tests.test_symbol_currency_qualification import NOW, checksum, projection
 
 
 class Client:
-    def search_symbol(self, symbol):
-        return [{"symbol": symbol, "currency": "USD"}]
+    def get_currency(self, symbol):
+        return "USD"
 
 
 def test_cli_writes_private_checkpoint_and_redacted_report(tmp_path):

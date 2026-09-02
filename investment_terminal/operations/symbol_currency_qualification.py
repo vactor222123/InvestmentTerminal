@@ -36,11 +36,15 @@ class SymbolCurrencyQualificationService:
         if expected != actual_checksum:
             raise ValueError("Projection checksum does not match")
         request_checksum = _checksum({
-            "schema_version": 1,
+            "schema_version": 2,
             "operation_identity": "YAHOO_SYMBOL_CURRENCY_QUALIFICATION",
             "projection_checksum": actual_checksum,
         })
-        outcomes = self._outcomes(checkpoint, request_checksum, actual_checksum)
+        outcomes, migrated = self._outcomes(
+            checkpoint, request_checksum, actual_checksum
+        )
+        if migrated:
+            self._write_checkpoint(request_checksum, actual_checksum, outcomes)
         started = validate_aware_datetime(self.clock(), field_name="started_at")
         attempted = 0
         halt_category = None
@@ -49,21 +53,9 @@ class SymbolCurrencyQualificationService:
             previous = outcomes.get(symbol, {})
             attempts = int(previous.get("attempt_count", 0)) + 1
             try:
-                rows = self.client.search_symbol(symbol)
-                currencies, exact_count = self._exact_currencies(rows, symbol)
-                if len(currencies) == 1:
-                    outcome = {"status": "SUCCESS", "attempt_count": attempts,
-                               "currency": currencies[0], "failure_category": None}
-                else:
-                    category = (
-                        "NO_EXACT_MATCH"
-                        if exact_count == 0
-                        else "INVALID_CURRENCY"
-                        if not currencies
-                        else "AMBIGUOUS_CURRENCY"
-                    )
-                    outcome = {"status": "FINAL_FAILED", "attempt_count": attempts,
-                               "currency": None, "failure_category": category}
+                currency = self.client.get_currency(symbol)
+                outcome = {"status": "SUCCESS", "attempt_count": attempts,
+                           "currency": currency, "failure_category": None}
             except Exception as exc:
                 category = classify_yahoo_candle_failure(exc).value
                 terminal = attempts >= 3
@@ -74,12 +66,7 @@ class SymbolCurrencyQualificationService:
                     halt_category = category
             outcomes[symbol] = outcome
             attempted += 1
-            self.checkpoint_writer({
-                "schema_version": 1,
-                "request_checksum": request_checksum,
-                "projection_checksum": actual_checksum,
-                "outcomes": outcomes,
-            })
+            self._write_checkpoint(request_checksum, actual_checksum, outcomes)
             if halt_category is not None:
                 break
         completed = validate_aware_datetime(self.clock(), field_name="completed_at")
@@ -88,9 +75,9 @@ class SymbolCurrencyQualificationService:
                   for status in ("SUCCESS", "FINAL_FAILED", "RETRY_PENDING")}
         terminal = counts["SUCCESS"] + counts["FINAL_FAILED"]
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "operation_identity": "YAHOO_SYMBOL_CURRENCY_QUALIFICATION",
-            "provider_identity": "YAHOO_FINANCE_SEARCH",
+            "provider_identity": "YAHOO_FINANCE_CHART_METADATA",
             "status": "HALTED" if halt_category else ("COMPLETE" if terminal == len(symbols) else "IN_PROGRESS"),
             "started_at": started.isoformat(),
             "completed_at": completed.isoformat(),
@@ -139,15 +126,46 @@ class SymbolCurrencyQualificationService:
         return tuple(sorted(values)), exact_count
 
     @staticmethod
-    def _outcomes(value: object | None, request_checksum: str, projection_checksum: str):
+    def _outcomes(
+        value: object | None,
+        request_checksum: str,
+        projection_checksum: str,
+        *,
+        migrate: bool = True,
+    ):
         if value is None:
-            return {}
-        if not isinstance(value, dict) or value.get("schema_version") != 1 or value.get("request_checksum") != request_checksum or value.get("projection_checksum") != projection_checksum:
+            return {}, False
+        if not isinstance(value, dict) or value.get("schema_version") not in {1, 2} or value.get("projection_checksum") != projection_checksum:
             raise ValueError("Checkpoint does not match request")
+        if value["schema_version"] == 2 and value.get("request_checksum") != request_checksum:
+            raise ValueError("Checkpoint does not match request")
+        if value["schema_version"] == 1:
+            legacy_checksum = _checksum({
+                "schema_version": 1,
+                "operation_identity": "YAHOO_SYMBOL_CURRENCY_QUALIFICATION",
+                "projection_checksum": projection_checksum,
+            })
+            if value.get("request_checksum") != legacy_checksum:
+                raise ValueError("Checkpoint does not match request")
         outcomes = value.get("outcomes")
         if not isinstance(outcomes, dict) or any(not isinstance(key, str) or not isinstance(item, dict) for key, item in outcomes.items()):
             raise ValueError("Checkpoint outcomes are invalid")
-        return dict(outcomes)
+        migrated = value["schema_version"] == 1 and migrate
+        copied = {key: dict(item) for key, item in outcomes.items()}
+        if migrated:
+            for item in copied.values():
+                if (item.get("status") == "FINAL_FAILED"
+                        and item.get("failure_category") == "INVALID_CURRENCY"):
+                    item["status"] = "RETRY_PENDING"
+        return copied, migrated
+
+    def _write_checkpoint(self, request_checksum, projection_checksum, outcomes):
+        self.checkpoint_writer({
+            "schema_version": 2,
+            "request_checksum": request_checksum,
+            "projection_checksum": projection_checksum,
+            "outcomes": {key: dict(item) for key, item in outcomes.items()},
+        })
 
 
 def _checksum(value: object) -> str:

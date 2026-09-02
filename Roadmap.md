@@ -137,6 +137,11 @@ private evidence and an aggregate-only report. Its controlled result is next.
 That result succeeds. Package 86 records the evidence and selects versioned
 resumable integration: reopen only `INVALID_CURRENCY` and use chart metadata
 directly for new pending symbols before any batch construction.
+Package 87 implements schema-version-2 resumable integration. Migration is
+checkpointed before provider access, only `INVALID_CURRENCY` is reopened, and
+all subsequent pending symbols use chart metadata under the existing bounded
+retry and rate-limit controls. One controlled item is next; batch construction
+and candle ingestion remain blocked pending its redacted result.
 
 ```text
 Foundation

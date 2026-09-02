@@ -13,12 +13,15 @@ source symbol, and Yahoo symbol for `SUCCESS` outcomes. The separate
 universe, and projection SHA-256 values while exposing only member, success,
 and excluded counts. It excludes member identities, symbols, values, and paths.
 
-The private `YAHOO_SYMBOL_CURRENCY_QUALIFICATION` checkpoint schema version 1
+The private `YAHOO_SYMBOL_CURRENCY_QUALIFICATION` checkpoint schema version 2
 binds its request to the eligibility-success projection SHA-256. Each symbol
 has `SUCCESS`, `RETRY_PENDING`, or `FINAL_FAILED`, an attempt count, optional
 three-letter currency only on success, and an optional stable failure category.
 Its separate report exposes aggregate coverage and halt/failure categories but
-never symbols or currency values.
+never symbols or currency values. Schema-version-1 evidence migrates atomically
+before provider access: only terminal `INVALID_CURRENCY` becomes retry-pending;
+successes and every other terminal category remain unchanged. Version 2 uses
+Yahoo chart metadata directly for both reopened and never-attempted symbols.
 
 `YAHOO_SYMBOL_CURRENCY_DIAGNOSTIC` report schema version 1 binds the projection
 and qualification request checksums and contains result count, exact-match

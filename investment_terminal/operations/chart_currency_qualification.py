@@ -19,8 +19,8 @@ class ChartCurrencyQualificationService:
         request_checksum = _checksum({"schema_version": 1,
             "operation_identity": "YAHOO_SYMBOL_CURRENCY_QUALIFICATION",
             "projection_checksum": actual})
-        outcomes = SymbolCurrencyQualificationService._outcomes(
-            checkpoint, request_checksum, actual)
+        outcomes, _ = SymbolCurrencyQualificationService._outcomes(
+            checkpoint, request_checksum, actual, migrate=False)
         candidates = sorted(symbol for symbol in symbols
             if outcomes.get(symbol, {}).get("status") == "FINAL_FAILED"
             and outcomes[symbol].get("failure_category") == "INVALID_CURRENCY")

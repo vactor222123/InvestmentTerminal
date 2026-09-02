@@ -26,8 +26,8 @@ class SymbolCurrencyDiagnosticService:
             "operation_identity": "YAHOO_SYMBOL_CURRENCY_QUALIFICATION",
             "projection_checksum": actual,
         })
-        outcomes = SymbolCurrencyQualificationService._outcomes(
-            checkpoint, request_checksum, actual
+        outcomes, _ = SymbolCurrencyQualificationService._outcomes(
+            checkpoint, request_checksum, actual, migrate=False
         )
         candidates = sorted(
             symbol for symbol in symbols

@@ -3,11 +3,13 @@
 ## Phase 7 eligibility schema-version-4 boundary
 
 Yahoo symbol-currency qualification is a separate operations boundary after
-eligibility-success projection. It verifies the projection checksum, performs
-bounded exact-symbol searches, atomically checkpoints private currency evidence,
-and exposes only aggregate redacted progress. Typed retry outcomes, a
-three-attempt cap, and immediate rate-limit stopping precede any batch request,
-candle retrieval, or persistence.
+eligibility-success projection. Its schema-version-2 flow verifies the
+projection checksum, obtains explicit currency from Yahoo chart metadata,
+atomically checkpoints private currency evidence, and exposes only aggregate
+redacted progress. Migration from schema version 1 preserves all evidence and
+reopens only terminal `INVALID_CURRENCY` outcomes before provider work. Typed
+retry outcomes, a three-attempt cap, and immediate rate-limit stopping precede
+any batch request, candle retrieval, or persistence.
 
 `symbol_currency_diagnostic` is a separate read-only boundary for exactly one
 terminal `INVALID_CURRENCY` outcome. It verifies private evidence checksums,
