@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `92e71a121f3b8e41d698d7858a87a7caf5056cd0`
-**Current local package:** Phase 7 Package 80 - Currency and Batch Boundary Audit
+**Current GitHub baseline:** `16c4d3c8c6f8e5f84f1b6f17030a97442a2004ef`
+**Current local package:** Phase 7 Package 81 - Yahoo Symbol-Currency Qualification
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement resumable Yahoo symbol-currency qualification
+**Current next action:** Run one controlled symbol-currency qualification item
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -99,6 +99,13 @@ typed retry/rate-limit controls. Because candle uniqueness excludes currency,
 guessing before ingestion is unsafe. The selected next package is a separate
 bounded, resumable, exact-symbol Yahoo currency qualification with a private
 checkpoint and redacted report. Batch generation and ingestion remain blocked.
+
+Package 81 implements that boundary. It verifies the private projection
+checksum, processes at most 100 symbols in deterministic order, accepts only a
+unique exact-symbol three-letter currency, checkpoints every private outcome,
+caps provider retries at three, and halts immediately on rate limiting. Its
+report is aggregate-only. One `--max-items 1` controlled run is next; batch
+generation and ingestion remain blocked.
 
 ---
 
@@ -390,27 +397,26 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 80 - Currency and Batch Boundary Audit
+Phase 7 Package 81 - Yahoo Symbol-Currency Qualification
 ```
 
-Classification: `AUDIT`.
+Classification: `IMPLEMENTATION`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ 92e71a121f3b8e41d698d7858a87a7caf5056cd0
+develop @ 16c4d3c8c6f8e5f84f1b6f17030a97442a2004ef
 ```
 
 Result:
 
-- the private success projection contains no currency;
-- Nasdaq source evidence contains no currency;
-- eligibility labels candles USD without validating response currency;
-- batch requests require explicit currency and are bounded to 20 symbols;
-- batch failure retries lack typed caps and immediate rate-limit stopping;
-- candle uniqueness excludes currency, so a guessed label is unsafe;
-- resumable exact-symbol Yahoo currency qualification is selected next;
-- batch generation and ingestion remain excluded.
+- exact projection checksum validation fails closed;
+- only a unique exact-symbol three-letter currency succeeds;
+- at most 100 deterministic pending members are attempted per invocation;
+- the private checkpoint is atomic and exact-resumable;
+- provider retries are capped at three and rate limiting halts immediately;
+- the report contains aggregate evidence only;
+- one controlled item is next; batch generation and ingestion remain excluded.
 
 ---
 

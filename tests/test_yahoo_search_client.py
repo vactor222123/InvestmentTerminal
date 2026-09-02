@@ -41,3 +41,20 @@ def test_search_isin_rejects_invalid_result(monkeypatch):
     monkeypatch.setattr("investment_terminal.clients.yahoo_search_client.yf.Search", Search)
     with pytest.raises(RuntimeError, match="invalid data"):
         YahooSearchClient().search_isin("DE0000000001")
+
+
+def test_search_symbol_uses_normalized_exact_query(monkeypatch):
+    captured = {}
+
+    class Search:
+        def __init__(self, query, **kwargs):
+            captured["query"] = query
+            captured.update(kwargs)
+            self.quotes = [{"symbol": "ABC", "currency": "USD"}]
+
+    monkeypatch.setattr("investment_terminal.clients.yahoo_search_client.yf.Search", Search)
+    result = YahooSearchClient(timeout_seconds=9).search_symbol(" abc ")
+    assert result == [{"symbol": "ABC", "currency": "USD"}]
+    assert captured["query"] == "ABC"
+    assert captured["timeout"] == 9.0
+    assert captured["news_count"] == 0

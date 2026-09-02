@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 92e71a121f3b8e41d698d7858a87a7caf5056cd0`
+**Current repository baseline:** `develop @ 16c4d3c8c6f8e5f84f1b6f17030a97442a2004ef`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -112,6 +112,7 @@
 **Phase 7 Package 78 eligibility success projection:** COMPLETE
 **Phase 7 Package 79 eligibility success projection result:** COMPLETE - SUCCESS
 **Phase 7 Package 80 currency and batch boundary audit:** COMPLETE
+**Phase 7 Package 81 Yahoo symbol-currency qualification:** COMPLETE
 
 ## Current State
 
@@ -119,11 +120,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement bounded resumable Yahoo symbol-currency qualification for the private
-12,020-member success projection. Require exact symbol matching and explicit
-provider currency, persist only to a private atomic checkpoint, halt on rate
-limits, and emit a separate redacted report. Do not generate batch requests,
-retrieve ten-year candles, or ingest in that package.
+Run one controlled Yahoo symbol-currency qualification with `--max-items 1`
+against the private 12,020-member success projection. Return only the redacted
+report. Do not return the projection or private checkpoint, and do not generate
+batches or ingest candles before the result is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

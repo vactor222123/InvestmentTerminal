@@ -2,6 +2,13 @@
 
 ## Phase 7 eligibility schema-version-4 boundary
 
+Yahoo symbol-currency qualification is a separate operations boundary after
+eligibility-success projection. It verifies the projection checksum, performs
+bounded exact-symbol searches, atomically checkpoints private currency evidence,
+and exposes only aggregate redacted progress. Typed retry outcomes, a
+three-attempt cap, and immediate rate-limit stopping precede any batch request,
+candle retrieval, or persistence.
+
 The downstream eligibility-success projection is a separate operations
 boundary. It requires the exact source universe and a matching complete
 schema-version-4 checkpoint, selects only terminal `SUCCESS` members, and

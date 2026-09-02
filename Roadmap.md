@@ -118,6 +118,10 @@ proves currency, while the current batch and candle contracts require it before
 persistence. It selects a separate bounded resumable exact-symbol Yahoo currency
 qualification. Batch generation and ingestion remain blocked until that
 contract is implemented and measured.
+Package 81 implements the bounded resumable exact-symbol currency boundary with
+private atomic evidence, capped retry semantics, immediate rate-limit stop, and
+an aggregate-only report. One controlled item must be reviewed before a larger
+currency slice or any batch generation.
 
 ```text
 Foundation
