@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_83_SYMBOL_CURRENCY_DIAGNOSTIC.md`: run one privacy-safe
-diagnostic and review it before changing the provider surface or expanding.
+`PHASE_7_PACKAGE_84_SYMBOL_CURRENCY_DIAGNOSTIC_RESULT.md`: Search omitted
+currency; implement one chart-metadata qualification without fallback.

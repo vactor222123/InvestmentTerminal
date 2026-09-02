@@ -129,6 +129,9 @@ before the contract or provider surface is changed.
 Package 83 implements that single-outcome read-only diagnostic with checksum
 validation and aggregate-only field-shape evidence. Its controlled result must
 be reviewed before changing the provider surface or resuming currency scans.
+The diagnostic confirms the exact Yahoo Search row omits currency. Package 84
+records that result and selects one fail-closed chart-metadata currency
+qualification before any broader scan or batch generation.
 
 ```text
 Foundation

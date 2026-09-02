@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `a96c1c26f190f7ce322492fe096b652acf2cca3e`
-**Current local package:** Phase 7 Package 83 - Symbol-Currency Diagnostic
+**Current GitHub baseline:** `42f230ae047488471be22c63586673226aa92319`
+**Current local package:** Phase 7 Package 84 - Symbol-Currency Diagnostic Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one privacy-safe invalid-currency diagnostic
+**Current next action:** Implement one chart-metadata currency qualification
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -118,6 +118,12 @@ Package 83 implements that read-only diagnostic. It selects only the first
 terminal `INVALID_CURRENCY`, verifies projection/checkpoint binding, repeats one
 lookup, and reports aggregate currency-field shapes without identities or
 values. It does not mutate the checkpoint. One controlled run is next.
+
+The diagnostic succeeded: Yahoo Search returned seven rows and one exact match,
+but the exact row omitted the currency field entirely. No valid or malformed
+currency value was present. The installed yfinance version exposes separate
+history metadata. A one-symbol fail-closed chart-metadata qualification is next;
+USD inference, broader scanning, batch generation, and ingestion remain blocked.
 
 ---
 
@@ -409,25 +415,24 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 83 - Symbol-Currency Diagnostic
+Phase 7 Package 84 - Symbol-Currency Diagnostic Result
 ```
 
-Classification: `IMPLEMENTATION`.
+Classification: `OPERATIONAL`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ a96c1c26f190f7ce322492fe096b652acf2cca3e
+develop @ 42f230ae047488471be22c63586673226aa92319
 ```
 
 Result:
 
-- one deterministic terminal invalid-currency outcome is selected privately;
-- projection and checkpoint binding fail closed;
-- exactly one Yahoo lookup is repeated;
-- only aggregate field-shape counts are reported;
-- the private checkpoint is never modified;
-- one controlled diagnostic run is next;
+- seven Yahoo Search rows were returned;
+- exactly one row matched the private symbol;
+- that exact row omitted the currency key;
+- no currency value or fallback was accepted;
+- chart/history metadata is the selected one-symbol next boundary;
 - broader scanning, batch generation, and ingestion remain excluded.
 
 ---
