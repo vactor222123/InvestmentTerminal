@@ -132,6 +132,8 @@ be reviewed before changing the provider surface or resuming currency scans.
 The diagnostic confirms the exact Yahoo Search row omits currency. Package 84
 records that result and selects one fail-closed chart-metadata currency
 qualification before any broader scan or batch generation.
+Package 85 implements that one-symbol chart-metadata qualification with separate
+private evidence and an aggregate-only report. Its controlled result is next.
 
 ```text
 Foundation

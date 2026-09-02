@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 42f230ae047488471be22c63586673226aa92319`
+**Current repository baseline:** `develop @ 1e80d637af5622dd3facc485aded9823a2130ad2`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -116,6 +116,7 @@
 **Phase 7 Package 82 first symbol-currency result:** COMPLETE - DIAGNOSTIC REQUIRED
 **Phase 7 Package 83 symbol-currency diagnostic:** COMPLETE
 **Phase 7 Package 84 symbol-currency diagnostic result:** COMPLETE - SEARCH FIELD ABSENT
+**Phase 7 Package 85 chart-metadata currency qualification:** COMPLETE
 
 ## Current State
 
@@ -123,10 +124,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement one bounded Yahoo chart-metadata currency qualification for the first
-private `INVALID_CURRENCY` outcome. Accept only an explicit provider
-three-letter currency and emit a redacted report. Do not mutate the checkpoint,
-infer USD, expand the scan, generate batches, or ingest candles.
+Run the one-symbol Yahoo chart-metadata currency qualification and return only
+its redacted report. Keep its private evidence, projection, and checkpoint
+private. Do not expand the scan, generate batches, or ingest candles.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

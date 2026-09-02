@@ -25,6 +25,10 @@ and qualification request checksums and contains result count, exact-match
 count, six currency-field shape counts, and distinct valid-currency count. It
 contains no symbol or currency value and owns no mutable private state.
 
+`YAHOO_CHART_CURRENCY_QUALIFICATION` private schema version 1 binds one symbol
+and explicit currency to projection/request checksums. Its report exposes only
+qualified/attempted counts and an evidence checksum.
+
 Schema version 4 retains the schema-3 outcome fields and adds no private data.
 Its behavioral invariant permits `RETRY_PENDING/RESPONSE_NUMERIC` only below
 attempt four and requires `FINAL_FAILED/RESPONSE_NUMERIC` at attempt four.

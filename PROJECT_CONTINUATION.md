@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `42f230ae047488471be22c63586673226aa92319`
-**Current local package:** Phase 7 Package 84 - Symbol-Currency Diagnostic Result
+**Current GitHub baseline:** `1e80d637af5622dd3facc485aded9823a2130ad2`
+**Current local package:** Phase 7 Package 85 - Chart-Metadata Currency Qualification
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement one chart-metadata currency qualification
+**Current next action:** Run one chart-metadata currency qualification
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -124,6 +124,11 @@ but the exact row omitted the currency field entirely. No valid or malformed
 currency value was present. The installed yfinance version exposes separate
 history metadata. A one-symbol fail-closed chart-metadata qualification is next;
 USD inference, broader scanning, batch generation, and ingestion remain blocked.
+
+Package 85 adds a dedicated chart-metadata adapter and one-symbol qualification.
+It accepts only explicit three-letter provider currency, writes separate private
+checksum-bound evidence, and emits an aggregate report without mutating the
+existing checkpoint. One controlled run is next.
 
 ---
 
@@ -415,15 +420,15 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 84 - Symbol-Currency Diagnostic Result
+Phase 7 Package 85 - Chart-Metadata Currency Qualification
 ```
 
-Classification: `OPERATIONAL`.
+Classification: `IMPLEMENTATION`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ 42f230ae047488471be22c63586673226aa92319
+develop @ 1e80d637af5622dd3facc485aded9823a2130ad2
 ```
 
 Result:

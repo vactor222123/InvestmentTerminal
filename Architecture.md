@@ -14,6 +14,10 @@ terminal `INVALID_CURRENCY` outcome. It verifies private evidence checksums,
 repeats one search, and exposes only aggregate exact-match and currency-field
 shape counts. It cannot mutate qualification evidence or continue the scan.
 
+Chart-metadata currency qualification uses Yahoo history metadata for exactly
+one selected invalid-currency outcome. Explicit private evidence and redacted
+reporting remain separate; it cannot mutate checkpoints or broaden execution.
+
 The downstream eligibility-success projection is a separate operations
 boundary. It requires the exact source universe and a matching complete
 schema-version-4 checkpoint, selects only terminal `SUCCESS` members, and
