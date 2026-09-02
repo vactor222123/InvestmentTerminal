@@ -126,6 +126,9 @@ The first controlled item returned terminal `INVALID_CURRENCY` without rate
 limiting. Package 82 records the result and blocks broader scanning. A separate
 single-outcome redacted diagnostic must distinguish the currency-field shape
 before the contract or provider surface is changed.
+Package 83 implements that single-outcome read-only diagnostic with checksum
+validation and aggregate-only field-shape evidence. Its controlled result must
+be reviewed before changing the provider surface or resuming currency scans.
 
 ```text
 Foundation

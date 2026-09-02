@@ -20,6 +20,11 @@ three-letter currency only on success, and an optional stable failure category.
 Its separate report exposes aggregate coverage and halt/failure categories but
 never symbols or currency values.
 
+`YAHOO_SYMBOL_CURRENCY_DIAGNOSTIC` report schema version 1 binds the projection
+and qualification request checksums and contains result count, exact-match
+count, six currency-field shape counts, and distinct valid-currency count. It
+contains no symbol or currency value and owns no mutable private state.
+
 Schema version 4 retains the schema-3 outcome fields and adds no private data.
 Its behavioral invariant permits `RETRY_PENDING/RESPONSE_NUMERIC` only below
 attempt four and requires `FINAL_FAILED/RESPONSE_NUMERIC` at attempt four.

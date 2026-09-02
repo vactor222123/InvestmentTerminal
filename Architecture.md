@@ -9,6 +9,11 @@ and exposes only aggregate redacted progress. Typed retry outcomes, a
 three-attempt cap, and immediate rate-limit stopping precede any batch request,
 candle retrieval, or persistence.
 
+`symbol_currency_diagnostic` is a separate read-only boundary for exactly one
+terminal `INVALID_CURRENCY` outcome. It verifies private evidence checksums,
+repeats one search, and exposes only aggregate exact-match and currency-field
+shape counts. It cannot mutate qualification evidence or continue the scan.
+
 The downstream eligibility-success projection is a separate operations
 boundary. It requires the exact source universe and a matching complete
 schema-version-4 checkpoint, selects only terminal `SUCCESS` members, and

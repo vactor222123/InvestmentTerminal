@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `f9f5ebdc4ac9813abd19f706eca92f4a9c9f607b`
-**Current local package:** Phase 7 Package 82 - First Symbol-Currency Result
+**Current GitHub baseline:** `a96c1c26f190f7ce322492fe096b652acf2cca3e`
+**Current local package:** Phase 7 Package 83 - Symbol-Currency Diagnostic
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement one privacy-safe invalid-currency diagnostic
+**Current next action:** Run one privacy-safe invalid-currency diagnostic
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -113,6 +113,11 @@ one terminal `INVALID_CURRENCY`, no retry pending, no rate-limit halt, and
 the exact Yahoo result did not carry a valid three-letter currency under the
 current contract; it does not identify the missing-field shape. Do not infer
 USD or expand the scan. One redacted single-outcome diagnostic is next.
+
+Package 83 implements that read-only diagnostic. It selects only the first
+terminal `INVALID_CURRENCY`, verifies projection/checkpoint binding, repeats one
+lookup, and reports aggregate currency-field shapes without identities or
+values. It does not mutate the checkpoint. One controlled run is next.
 
 ---
 
@@ -404,25 +409,25 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 82 - First Symbol-Currency Result
+Phase 7 Package 83 - Symbol-Currency Diagnostic
 ```
 
-Classification: `OPERATIONAL`.
+Classification: `IMPLEMENTATION`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ f9f5ebdc4ac9813abd19f706eca92f4a9c9f607b
+develop @ a96c1c26f190f7ce322492fe096b652acf2cca3e
 ```
 
 Result:
 
-- exactly one member was attempted;
-- it ended terminal as `INVALID_CURRENCY`;
-- no valid currency was accepted and no USD assumption was made;
-- no rate-limit halt or retry-pending outcome occurred;
-- 12,019 members remain unattempted;
-- a single privacy-safe diagnostic is next;
+- one deterministic terminal invalid-currency outcome is selected privately;
+- projection and checkpoint binding fail closed;
+- exactly one Yahoo lookup is repeated;
+- only aggregate field-shape counts are reported;
+- the private checkpoint is never modified;
+- one controlled diagnostic run is next;
 - broader scanning, batch generation, and ingestion remain excluded.
 
 ---

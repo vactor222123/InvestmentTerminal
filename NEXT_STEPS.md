@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ f9f5ebdc4ac9813abd19f706eca92f4a9c9f607b`
+**Current repository baseline:** `develop @ a96c1c26f190f7ce322492fe096b652acf2cca3e`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -114,6 +114,7 @@
 **Phase 7 Package 80 currency and batch boundary audit:** COMPLETE
 **Phase 7 Package 81 Yahoo symbol-currency qualification:** COMPLETE
 **Phase 7 Package 82 first symbol-currency result:** COMPLETE - DIAGNOSTIC REQUIRED
+**Phase 7 Package 83 symbol-currency diagnostic:** COMPLETE
 
 ## Current State
 
@@ -121,10 +122,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement one privacy-safe diagnostic for the first private `INVALID_CURRENCY`
-outcome. Repeat only that Yahoo symbol lookup and report aggregate exact-match
-and currency-field shape categories without identities or values. Do not expand
-the currency scan, generate batches, or ingest candles.
+Run the privacy-safe diagnostic once against the existing private projection
+and currency checkpoint, then return only its redacted report. Do not expand
+the currency scan, generate batches, or ingest candles before review.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
