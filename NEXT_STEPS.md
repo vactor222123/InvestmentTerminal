@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ ff24ca892c15026cc9fe16005fe686123bf83b69`
+**Current repository baseline:** `develop @ 92e71a121f3b8e41d698d7858a87a7caf5056cd0`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -111,6 +111,7 @@
 **Phase 7 Package 77 eligibility-to-ingestion audit:** COMPLETE
 **Phase 7 Package 78 eligibility success projection:** COMPLETE
 **Phase 7 Package 79 eligibility success projection result:** COMPLETE - SUCCESS
+**Phase 7 Package 80 currency and batch boundary audit:** COMPLETE
 
 ## Current State
 
@@ -118,10 +119,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit the existing batch-request and candle-identity contracts to select the
-smallest explicit currency policy and deterministic batch-construction boundary
-for the 12,020-member private success projection. Do not infer currency or
-execute ingestion in that audit.
+Implement bounded resumable Yahoo symbol-currency qualification for the private
+12,020-member success projection. Require exact symbol matching and explicit
+provider currency, persist only to a private atomic checkpoint, halt on rate
+limits, and emit a separate redacted report. Do not generate batch requests,
+retrieve ten-year candles, or ingest in that package.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

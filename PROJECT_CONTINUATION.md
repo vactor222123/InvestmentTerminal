@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `ff24ca892c15026cc9fe16005fe686123bf83b69`
-**Current local package:** Phase 7 Package 79 - Eligibility Success Projection Result
+**Current GitHub baseline:** `92e71a121f3b8e41d698d7858a87a7caf5056cd0`
+**Current local package:** Phase 7 Package 80 - Currency and Batch Boundary Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit explicit currency and deterministic batch construction
+**Current next action:** Implement resumable Yahoo symbol-currency qualification
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -90,6 +90,15 @@ checksums exactly match the completed drain evidence, and the private projection
 is bound by its own SHA-256. No private member identity was reviewed or added to
 the repository. Currency and deterministic batch construction must be audited
 before any ten-year ingestion.
+
+Package 80 confirms that eligibility's hard-coded `USD` is only a caller label:
+the candle adapter does not verify provider response currency, and Nasdaq source
+rows contain no currency. Existing batch requests require currency and only
+accept 1–20 symbols; failed batch items also lack the eligibility scanner's
+typed retry/rate-limit controls. Because candle uniqueness excludes currency,
+guessing before ingestion is unsafe. The selected next package is a separate
+bounded, resumable, exact-symbol Yahoo currency qualification with a private
+checkpoint and redacted report. Batch generation and ingestion remain blocked.
 
 ---
 
@@ -381,26 +390,27 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 79 - Eligibility Success Projection Result
+Phase 7 Package 80 - Currency and Batch Boundary Audit
 ```
 
-Classification: `OPERATIONAL`.
+Classification: `AUDIT`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ ff24ca892c15026cc9fe16005fe686123bf83b69
+develop @ 92e71a121f3b8e41d698d7858a87a7caf5056cd0
 ```
 
 Result:
 
-- the controlled private projection completed with `SUCCESS`;
-- all 12,424 members are accounted for;
-- 12,020 successful identities entered the private projection;
-- 404 terminal failures remain excluded;
-- request and universe checksums match the complete-drain evidence;
-- the redacted report exposes no identities, symbols, values, or paths;
-- currency/batch audit is next; ingestion remains excluded.
+- the private success projection contains no currency;
+- Nasdaq source evidence contains no currency;
+- eligibility labels candles USD without validating response currency;
+- batch requests require explicit currency and are bounded to 20 symbols;
+- batch failure retries lack typed caps and immediate rate-limit stopping;
+- candle uniqueness excludes currency, so a guessed label is unsafe;
+- resumable exact-symbol Yahoo currency qualification is selected next;
+- batch generation and ingestion remain excluded.
 
 ---
 

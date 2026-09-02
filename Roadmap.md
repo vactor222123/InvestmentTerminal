@@ -113,6 +113,11 @@ The controlled projection is successful: 12,020 of 12,424 terminal members are
 included and 404 are explicitly excluded. Package 79 records the checksum-bound
 result. A focused currency and batch-construction audit is next; ingestion
 remains blocked.
+Package 80 verifies that neither Nasdaq source evidence nor eligibility success
+proves currency, while the current batch and candle contracts require it before
+persistence. It selects a separate bounded resumable exact-symbol Yahoo currency
+qualification. Batch generation and ingestion remain blocked until that
+contract is implemented and measured.
 
 ```text
 Foundation

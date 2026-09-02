@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_79_ELIGIBILITY_SUCCESS_PROJECTION_RESULT.md`: the projection
-succeeded, and explicit currency/batch-boundary audit is next.
+`PHASE_7_PACKAGE_80_CURRENCY_BATCH_BOUNDARY_AUDIT.md`: implement bounded,
+resumable exact-symbol Yahoo currency qualification before batch generation.
