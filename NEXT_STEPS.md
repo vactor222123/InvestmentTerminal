@@ -119,6 +119,7 @@
 **Phase 7 Package 85 chart-metadata currency qualification:** COMPLETE
 **Phase 7 Package 86 chart-metadata currency result:** COMPLETE - SUCCESS
 **Phase 7 Package 87 resumable chart-currency integration:** COMPLETE
+**Phase 7 Package 88 first resumable chart-currency result:** COMPLETE - SUCCESS
 
 ## Current State
 
@@ -126,9 +127,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled schema-version-2 currency qualification item against the
-existing private projection/checkpoint and return only its redacted report.
-Do not expand the scan, generate batches, or ingest candles.
+Run one bounded schema-version-2 currency qualification slice with
+`--max-items 100` against the existing private projection/checkpoint and return
+only its redacted report. Do not start a complete drain, generate batches, or
+ingest candles.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

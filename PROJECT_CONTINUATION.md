@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `267cbc6135e501cd56f3d52de9443a9360d3fecd`
-**Current local package:** Phase 7 Package 87 - Resumable Chart Currency
+**Current GitHub baseline:** `4979fa0d80159b4ab7e43e96ceb5129703276d0b`
+**Current local package:** Phase 7 Package 88 - First Resumable Chart-Currency Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one controlled schema-version-2 currency item
+**Current next action:** Run one bounded 100-item chart-currency slice
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -144,6 +144,15 @@ Yahoo chart metadata directly for reopened and never-attempted symbols. Existing
 100-item bounds, three-attempt retry cap, immediate rate-limit halt, private
 checkpointing, and aggregate-only reporting remain in force. Run exactly one
 controlled item next; batch generation and ingestion remain blocked.
+
+The first controlled schema-version-2 run succeeded. Exactly one item was
+attempted and qualified through Yahoo chart metadata; cumulative coverage is
+one success, zero final failures, zero retry-pending, and 12,019 never attempted.
+No rate limit occurred. Projection checksum
+`d0709f8e83a9f0820327001162fe371129c9c01203112f28e11da0c9ce1f28ea`
+matches the established private projection. Package 88 records this evidence
+and authorizes one bounded 100-item slice next. Complete drain, batch generation,
+and candle ingestion remain blocked pending review.
 
 ---
 

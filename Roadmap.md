@@ -142,6 +142,10 @@ checkpointed before provider access, only `INVALID_CURRENCY` is reopened, and
 all subsequent pending symbols use chart metadata under the existing bounded
 retry and rate-limit controls. One controlled item is next; batch construction
 and candle ingestion remain blocked pending its redacted result.
+The first schema-version-2 item succeeds through chart metadata with no failure
+or rate-limit halt. Package 88 records the result and authorizes one bounded
+100-item currency slice. A complete drain, batch construction, and candle
+ingestion remain blocked until that aggregate result is reviewed.
 
 ```text
 Foundation
