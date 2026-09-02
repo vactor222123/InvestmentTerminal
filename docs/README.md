@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_81_SYMBOL_CURRENCY_QUALIFICATION.md`: run one controlled
-currency item and review its redacted result before expanding the slice.
+`PHASE_7_PACKAGE_82_SYMBOL_CURRENCY_FIRST_RESULT.md`: the first item returned
+`INVALID_CURRENCY`; implement one privacy-safe diagnostic before expanding.

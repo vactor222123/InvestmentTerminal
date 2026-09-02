@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `16c4d3c8c6f8e5f84f1b6f17030a97442a2004ef`
-**Current local package:** Phase 7 Package 81 - Yahoo Symbol-Currency Qualification
+**Current GitHub baseline:** `f9f5ebdc4ac9813abd19f706eca92f4a9c9f607b`
+**Current local package:** Phase 7 Package 82 - First Symbol-Currency Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one controlled symbol-currency qualification item
+**Current next action:** Implement one privacy-safe invalid-currency diagnostic
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -106,6 +106,13 @@ unique exact-symbol three-letter currency, checkpoints every private outcome,
 caps provider retries at three, and halts immediately on rate limiting. Its
 report is aggregate-only. One `--max-items 1` controlled run is next; batch
 generation and ingestion remain blocked.
+
+The first controlled currency item returned `IN_PROGRESS` with zero successes,
+one terminal `INVALID_CURRENCY`, no retry pending, no rate-limit halt, and
+12,019 never attempted. The projection checksum matches Package 79. This proves
+the exact Yahoo result did not carry a valid three-letter currency under the
+current contract; it does not identify the missing-field shape. Do not infer
+USD or expand the scan. One redacted single-outcome diagnostic is next.
 
 ---
 
@@ -397,26 +404,26 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 81 - Yahoo Symbol-Currency Qualification
+Phase 7 Package 82 - First Symbol-Currency Result
 ```
 
-Classification: `IMPLEMENTATION`.
+Classification: `OPERATIONAL`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ 16c4d3c8c6f8e5f84f1b6f17030a97442a2004ef
+develop @ f9f5ebdc4ac9813abd19f706eca92f4a9c9f607b
 ```
 
 Result:
 
-- exact projection checksum validation fails closed;
-- only a unique exact-symbol three-letter currency succeeds;
-- at most 100 deterministic pending members are attempted per invocation;
-- the private checkpoint is atomic and exact-resumable;
-- provider retries are capped at three and rate limiting halts immediately;
-- the report contains aggregate evidence only;
-- one controlled item is next; batch generation and ingestion remain excluded.
+- exactly one member was attempted;
+- it ended terminal as `INVALID_CURRENCY`;
+- no valid currency was accepted and no USD assumption was made;
+- no rate-limit halt or retry-pending outcome occurred;
+- 12,019 members remain unattempted;
+- a single privacy-safe diagnostic is next;
+- broader scanning, batch generation, and ingestion remain excluded.
 
 ---
 

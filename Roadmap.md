@@ -122,6 +122,10 @@ Package 81 implements the bounded resumable exact-symbol currency boundary with
 private atomic evidence, capped retry semantics, immediate rate-limit stop, and
 an aggregate-only report. One controlled item must be reviewed before a larger
 currency slice or any batch generation.
+The first controlled item returned terminal `INVALID_CURRENCY` without rate
+limiting. Package 82 records the result and blocks broader scanning. A separate
+single-outcome redacted diagnostic must distinguish the currency-field shape
+before the contract or provider surface is changed.
 
 ```text
 Foundation
