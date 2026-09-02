@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `1e80d637af5622dd3facc485aded9823a2130ad2`
-**Current local package:** Phase 7 Package 85 - Chart-Metadata Currency Qualification
+**Current GitHub baseline:** `1ef0409dcb98f9877e2119578ecbdcb6ccd40eb4`
+**Current local package:** Phase 7 Package 86 - Chart-Metadata Currency Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one chart-metadata currency qualification
+**Current next action:** Integrate chart metadata into resumable currency qualification
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -129,6 +129,13 @@ Package 85 adds a dedicated chart-metadata adapter and one-symbol qualification.
 It accepts only explicit three-letter provider currency, writes separate private
 checksum-bound evidence, and emits an aggregate report without mutating the
 existing checkpoint. One controlled run is next.
+
+The controlled chart-metadata qualification succeeded: one item attempted and
+one explicitly qualified, with matching evidence checksums. The provider path
+therefore repairs the Search-field absence without currency inference. The next
+package must version and migrate the resumable checkpoint, reopen only
+`INVALID_CURRENCY`, and use chart metadata directly for new pending symbols.
+Batch generation and ingestion remain blocked.
 
 ---
 
@@ -420,15 +427,15 @@ shareable and private paths.
 ## Latest Package
 
 ```text
-Phase 7 Package 85 - Chart-Metadata Currency Qualification
+Phase 7 Package 86 - Chart-Metadata Currency Result
 ```
 
-Classification: `IMPLEMENTATION`.
+Classification: `OPERATIONAL`.
 
 Source baseline verified exactly:
 
 ```text
-develop @ 1e80d637af5622dd3facc485aded9823a2130ad2
+develop @ 1ef0409dcb98f9877e2119578ecbdcb6ccd40eb4
 ```
 
 Result:

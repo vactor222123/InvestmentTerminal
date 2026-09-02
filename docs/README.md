@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_85_CHART_CURRENCY_QUALIFICATION.md`: run one chart-metadata
-qualification and review only its redacted result.
+`PHASE_7_PACKAGE_86_CHART_CURRENCY_RESULT.md`: chart metadata succeeded; integrate
+it into the versioned resumable currency flow before batch generation.

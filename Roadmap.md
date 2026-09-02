@@ -134,6 +134,9 @@ records that result and selects one fail-closed chart-metadata currency
 qualification before any broader scan or batch generation.
 Package 85 implements that one-symbol chart-metadata qualification with separate
 private evidence and an aggregate-only report. Its controlled result is next.
+That result succeeds. Package 86 records the evidence and selects versioned
+resumable integration: reopen only `INVALID_CURRENCY` and use chart metadata
+directly for new pending symbols before any batch construction.
 
 ```text
 Foundation
