@@ -122,6 +122,7 @@
 **Phase 7 Package 88 first resumable chart-currency result:** COMPLETE - SUCCESS
 **Phase 7 Package 89 bounded chart-currency slice result:** COMPLETE - SUCCESS
 **Phase 7 Package 90 complete chart-currency drain audit:** COMPLETE
+**Phase 7 Package 91 bounded chart-currency drain:** COMPLETE
 
 ## Current State
 
@@ -129,10 +130,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the separate bounded resumable chart-currency drain coordinator and
-CLI selected by Package 90. Preserve the existing schema-2 checkpoint and
-100-item slice unchanged. Do not run the complete drain, generate batches, or
-ingest candles.
+Run the bounded chart-currency drain once against the existing private
+projection/checkpoint with an explicit `12000` total-item budget and return
+only its redacted aggregate report. Do not generate batches or ingest candles.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

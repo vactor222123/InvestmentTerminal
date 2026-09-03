@@ -23,6 +23,13 @@ before provider access: only terminal `INVALID_CURRENCY` becomes retry-pending;
 successes and every other terminal category remain unchanged. Version 2 uses
 Yahoo chart metadata directly for both reopened and never-attempted symbols.
 
+`YAHOO_SYMBOL_CURRENCY_DRAIN` report schema version 1 is separate aggregate
+run evidence over the unchanged private checkpoint. It records the request and
+projection checksums, bounded total-item budget and 100-item slice size,
+slice/attempt/provider-request totals, starting and ending aggregate coverage,
+halt and failure categories, and run timing. It contains no symbol, currency,
+path, provider text, or exception message.
+
 `YAHOO_SYMBOL_CURRENCY_DIAGNOSTIC` report schema version 1 binds the projection
 and qualification request checksums and contains result count, exact-match
 count, six currency-field shape counts, and distinct valid-currency count. It

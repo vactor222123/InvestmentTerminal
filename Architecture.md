@@ -11,7 +11,7 @@ reopens only terminal `INVALID_CURRENCY` outcomes before provider work. Typed
 retry outcomes, a three-attempt cap, and immediate rate-limit stopping precede
 any batch request, candle retrieval, or persistence.
 
-The selected complete currency-drain boundary is a separate operations-owned
+The complete currency-drain boundary is a separate operations-owned
 coordinator over unchanged 100-item qualification slices. It must use an
 explicit bounded total-item budget, carry forward each atomically written
 private checkpoint, and stop on completion, rate limiting, budget exhaustion,

@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `5c0910e043de1f5bbadc50e1ecd8ad1b35e396af`
-**Current local package:** Phase 7 Package 90 - Complete Chart-Currency Drain Audit
+**Current GitHub baseline:** `eaeee75ad527bea80bc992bef26ea5b60acc1ff7`
+**Current local package:** Phase 7 Package 91 - Bounded Chart-Currency Drain
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement the bounded chart-currency drain coordinator
+**Current next action:** Run one bounded 12,000-item chart-currency drain
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -171,6 +171,15 @@ budget, latest-checkpoint carry-forward, completion/rate-limit/budget/no-progres
 stops, exact-resume behavior, and one distinct redacted aggregate report. It
 does not alter schema-2 checkpoint semantics or authorize a live drain, batch
 generation, candle retrieval, or ingestion.
+
+Package 91 implements `SymbolCurrencyDrainService` and its separate CLI. The
+coordinator repeats the unchanged 100-item currency slice under a caller-owned
+budget capped at 20,000, carries forward each atomically written checkpoint,
+and stops on completion, rate limiting, budget exhaustion, or zero progress.
+Its schema-version-1 report contains only aggregate starting/ending coverage,
+run totals, checksums, halt/failure evidence, and timing. Exact completed resume
+makes zero provider requests. One user-executed 12,000-item run is next; batch
+generation and candle ingestion remain blocked pending its report.
 
 ---
 

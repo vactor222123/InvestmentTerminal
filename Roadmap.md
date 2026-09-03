@@ -156,6 +156,11 @@ separate coordinator over unchanged 100-item slices. It must enforce a bounded
 total budget, preserve atomic exact resume, stop on completion, rate limiting,
 failure, or zero progress, and emit only aggregate evidence. Implementation and
 tests precede any complete live run.
+Package 91 implements that separate coordinator and CLI with a maximum 20,000
+item run budget, unchanged 100-item slices, exact checkpoint carry-forward,
+completion/rate-limit/budget/zero-progress stops, exact completed resume, and
+aggregate-only reporting. One explicitly bounded live run is next; batch
+construction and ingestion remain blocked pending its result.
 
 ```text
 Foundation
