@@ -77,6 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_89_CHART_CURRENCY_SLICE_RESULT.md`: the first 100-item
-chart-currency slice succeeded; audit a bounded resumable complete-drain
-coordinator before broader execution or batch generation.
+`PHASE_7_PACKAGE_90_CHART_CURRENCY_DRAIN_AUDIT.md`: implement the selected
+bounded resumable chart-currency drain coordinator before any complete live run
+or batch generation.

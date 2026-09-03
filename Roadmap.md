@@ -151,6 +151,11 @@ failure, retry, or rate limiting, for 101 cumulative successes. Package 89
 records the result and selects an audit of a bounded resumable complete-drain
 coordinator so the operator does not manually repeat roughly 120 invocations.
 No complete run, batch construction, or ingestion is yet authorized.
+Package 90 audits the complete chart-currency drain boundary and selects a
+separate coordinator over unchanged 100-item slices. It must enforce a bounded
+total budget, preserve atomic exact resume, stop on completion, rate limiting,
+failure, or zero progress, and emit only aggregate evidence. Implementation and
+tests precede any complete live run.
 
 ```text
 Foundation

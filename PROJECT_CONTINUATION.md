@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `ea3066d6c26b089031e3866dde3a1a7b3c41dd64`
-**Current local package:** Phase 7 Package 89 - Bounded Chart-Currency Slice Result
+**Current GitHub baseline:** `5c0910e043de1f5bbadc50e1ecd8ad1b35e396af`
+**Current local package:** Phase 7 Package 90 - Complete Chart-Currency Drain Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit a bounded complete currency-drain coordinator
+**Current next action:** Implement the bounded chart-currency drain coordinator
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -162,6 +162,15 @@ Package 89 records this result. Repeating about 120 manual invocations is not an
 acceptable operational workflow; audit a bounded resumable coordinator next.
 Complete drain, batch generation, and ingestion remain blocked until that
 coordinator is implemented and its run is explicitly authorized.
+
+Package 90 audits that coordinator boundary. The existing eligibility-drain
+pattern is applicable, but its request and coverage contracts cannot be reused
+as currency evidence. The selected implementation is a separate operations
+service and CLI over the unchanged currency slice. It owns a bounded total-item
+budget, latest-checkpoint carry-forward, completion/rate-limit/budget/no-progress
+stops, exact-resume behavior, and one distinct redacted aggregate report. It
+does not alter schema-2 checkpoint semantics or authorize a live drain, batch
+generation, candle retrieval, or ingestion.
 
 ---
 
