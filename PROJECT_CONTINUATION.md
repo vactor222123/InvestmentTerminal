@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `eaeee75ad527bea80bc992bef26ea5b60acc1ff7`
-**Current local package:** Phase 7 Package 91 - Bounded Chart-Currency Drain
+**Current GitHub baseline:** `df9d42129549089e550c05c3bf8fcd10d5185353`
+**Current local package:** Phase 7 Package 92 - Complete Chart-Currency Drain Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one bounded 12,000-item chart-currency drain
+**Current next action:** Verify exact completed currency-drain resume
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -180,6 +180,15 @@ Its schema-version-1 report contains only aggregate starting/ending coverage,
 run totals, checksums, halt/failure evidence, and timing. Exact completed resume
 makes zero provider requests. One user-executed 12,000-item run is next; batch
 generation and candle ingestion remain blocked pending its report.
+
+The bounded live drain completed all 12,020 members in 120 slices and
+2,550.785615 seconds. It made 11,921 provider requests: 11,919 previously
+unattempted items plus two additional capped attempts for the single final
+failure. Ending coverage is 12,019 successes, one isolated final
+`INVALID_RESPONSE`, zero retry-pending, and zero never-attempted. No rate limit
+occurred. Package 92 records this complete terminal coverage. One exact-repeat
+run with a one-item budget must prove zero provider work before batch-boundary
+audit; batch generation and ingestion remain blocked.
 
 ---
 

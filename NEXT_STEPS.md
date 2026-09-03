@@ -123,6 +123,7 @@
 **Phase 7 Package 89 bounded chart-currency slice result:** COMPLETE - SUCCESS
 **Phase 7 Package 90 complete chart-currency drain audit:** COMPLETE
 **Phase 7 Package 91 bounded chart-currency drain:** COMPLETE
+**Phase 7 Package 92 complete chart-currency drain result:** COMPLETE - SUCCESS
 
 ## Current State
 
@@ -130,9 +131,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run the bounded chart-currency drain once against the existing private
-projection/checkpoint with an explicit `12000` total-item budget and return
-only its redacted aggregate report. Do not generate batches or ingest candles.
+Run one exact-repeat chart-currency drain against the completed private
+projection/checkpoint with a one-item budget. Confirm zero provider requests
+before auditing batch construction. Do not generate batches or ingest candles.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

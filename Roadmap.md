@@ -161,6 +161,11 @@ item run budget, unchanged 100-item slices, exact checkpoint carry-forward,
 completion/rate-limit/budget/zero-progress stops, exact completed resume, and
 aggregate-only reporting. One explicitly bounded live run is next; batch
 construction and ingestion remain blocked pending its result.
+The bounded live drain completes terminal currency evidence for all 12,020
+members: 12,019 successes and one isolated `INVALID_RESPONSE`, with no pending
+or never-attempted members and no rate-limit halt. Package 92 records this
+result. An exact completed resume must demonstrate zero provider work before
+the batch-construction boundary is audited.
 
 ```text
 Foundation

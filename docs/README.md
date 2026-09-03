@@ -77,5 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_91_CHART_CURRENCY_DRAIN.md`: the bounded resumable coordinator
-is implemented; run it once with a 12,000-item budget before batch generation.
+`PHASE_7_PACKAGE_92_CHART_CURRENCY_DRAIN_RESULT.md`: complete terminal currency
+coverage is measured; verify one exact resume with zero provider requests before
+auditing batch generation.
