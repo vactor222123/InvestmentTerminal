@@ -24,46 +24,14 @@ class ManifestBatchSelection:
         expected_manifest_checksum: str,
         batch_index: int,
     ) -> "ManifestBatchSelection":
+        expected, requests = _validated_manifest_requests(
+            value, expected_manifest_checksum
+        )
         if isinstance(batch_index, bool) or not isinstance(batch_index, int):
             raise TypeError("batch_index must be an integer")
-        expected = normalize_required_text(
-            expected_manifest_checksum,
-            field_name="manifest_checksum",
-        ).lower()
-        if not _is_sha256(expected):
-            raise ValueError("manifest_checksum must be a SHA-256 value")
-        if (
-            not isinstance(value, dict)
-            or value.get("schema_version") != 1
-            or value.get("manifest_identity") != "QUALIFIED_MARKET_BATCH_MANIFEST"
-        ):
-            raise ValueError("Unsupported market batch manifest")
-        if _manifest_checksum(value) != expected:
-            raise ValueError("Manifest checksum does not match")
-        if not _is_sha256(value.get("projection_checksum")) or not _is_sha256(
-            value.get("currency_request_checksum")
-        ):
-            raise ValueError("Manifest evidence checksums are invalid")
-
-        batches = value.get("batches")
-        if (
-            not isinstance(batches, list)
-            or not batches
-            or any(not isinstance(item, dict) for item in batches)
-        ):
-            raise ValueError("Manifest batches are invalid")
-        indices = [item.get("batch_index") for item in batches]
-        if indices != list(range(1, len(batches) + 1)):
-            raise ValueError("Manifest batch indices must be ordered and contiguous")
-        if not 1 <= batch_index <= len(batches):
+        if not 1 <= batch_index <= len(requests):
             raise ValueError("batch_index is outside the manifest")
-
-        selected = batches[batch_index - 1]
-        request = MarketBatchRequest.from_dict(selected.get("request"))
-        request_checksum = selected.get("request_checksum")
-        if not _is_sha256(request_checksum) or request_checksum != request.checksum:
-            raise ValueError("Manifest request checksum does not match")
-        return cls(expected, batch_index, len(batches), request)
+        return cls(expected, batch_index, len(requests), requests[batch_index - 1])
 
 
 class ManifestBoundMarketBatchService:
@@ -109,3 +77,46 @@ def _is_sha256(value: object) -> bool:
         and len(value) == 64
         and all(character in "0123456789abcdef" for character in value)
     )
+
+
+def _validated_manifest_requests(
+    value: object,
+    expected_manifest_checksum: str,
+) -> tuple[str, tuple[MarketBatchRequest, ...]]:
+    expected = normalize_required_text(
+        expected_manifest_checksum,
+        field_name="manifest_checksum",
+    ).lower()
+    if not _is_sha256(expected):
+        raise ValueError("manifest_checksum must be a SHA-256 value")
+    if (
+        not isinstance(value, dict)
+        or value.get("schema_version") != 1
+        or value.get("manifest_identity") != "QUALIFIED_MARKET_BATCH_MANIFEST"
+    ):
+        raise ValueError("Unsupported market batch manifest")
+    if _manifest_checksum(value) != expected:
+        raise ValueError("Manifest checksum does not match")
+    if not _is_sha256(value.get("projection_checksum")) or not _is_sha256(
+        value.get("currency_request_checksum")
+    ):
+        raise ValueError("Manifest evidence checksums are invalid")
+    batches = value.get("batches")
+    if (
+        not isinstance(batches, list)
+        or not batches
+        or any(not isinstance(item, dict) for item in batches)
+    ):
+        raise ValueError("Manifest batches are invalid")
+    if [item.get("batch_index") for item in batches] != list(
+        range(1, len(batches) + 1)
+    ):
+        raise ValueError("Manifest batch indices must be ordered and contiguous")
+    requests = []
+    for batch in batches:
+        request = MarketBatchRequest.from_dict(batch.get("request"))
+        request_checksum = batch.get("request_checksum")
+        if not _is_sha256(request_checksum) or request_checksum != request.checksum:
+            raise ValueError("Manifest request checksum does not match")
+        requests.append(request)
+    return expected, tuple(requests)

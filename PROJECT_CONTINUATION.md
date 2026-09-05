@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `749c2d6a2c582583fcdddc8c2bce5f86fdc9e6ae`
-**Current local package:** Phase 7 Package 101 - Bounded Manifest-Drain Audit
+**Current GitHub baseline:** `ea66dd6cebb90b22b70a5349747d8bd38af3cde4`
+**Current local package:** Phase 7 Package 102 - Bounded Manifest Drain
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement bounded manifest-drain coordination
+**Current next action:** Run a controlled five-batch manifest drain
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -248,6 +248,12 @@ first unfinished index, limits each invocation to 1–25 batches, and stops on t
 first non-success result. The first later operational budget is five batches,
 which would cover at most indices 2–6. Implementation is next; no live batch is
 authorized by the audit.
+
+Package 102 implements the immutable plan, checkpoint-derived first-unfinished
+selection, 1–25 batch budget, deterministic checkpoint paths, and stop on the
+first non-success result. Its redacted report separates starting, current-run,
+and ending coverage. Run one `max_batches=5` measurement next; with batch 1
+complete, only batches 2–6 may be attempted.
 
 ---
 

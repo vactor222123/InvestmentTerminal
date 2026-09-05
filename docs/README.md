@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_101_MANIFEST_DRAIN_AUDIT.md`: implement a checkpoint-derived,
-budgeted manifest coordinator before a controlled five-batch expansion.
+`PHASE_7_PACKAGE_102_BOUNDED_MANIFEST_DRAIN.md`: run one controlled five-batch
+drain over the established private manifest and return only its redacted report.

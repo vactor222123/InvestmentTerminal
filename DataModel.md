@@ -755,3 +755,10 @@ the manifest checksum, one-based batch index, total batch count, and selected
 request checksum. It reuses the existing aggregate current-run and cumulative
 coverage plus failure-type vocabulary without exposing the private request.
 `SUCCESS`, `PARTIAL`, and `FAILED` retain their existing batch meanings.
+
+The schema-version-1 `MANIFEST_BATCH_DRAIN` report binds one bounded coordinator
+run to the manifest checksum and explicit `max_batches` budget. It records
+starting/ending completed and remaining batch counts, current attempted
+batch/item and transfer totals, an optional stopping batch index, and aggregated
+failure types. `COMPLETE`, `BUDGET_EXHAUSTED`, `HALTED`, and `FAILED` remain
+distinct outcomes.

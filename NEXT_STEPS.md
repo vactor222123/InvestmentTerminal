@@ -133,6 +133,7 @@
 **Phase 7 Package 99 first manifest-bound batch result:** COMPLETE - SUCCESS
 **Phase 7 Package 100 first manifest batch exact resume:** COMPLETE - SUCCESS
 **Phase 7 Package 101 bounded manifest-drain audit:** COMPLETE
+**Phase 7 Package 102 bounded manifest drain:** COMPLETE
 
 ## Current State
 
@@ -140,10 +141,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the audited manifest-drain coordinator with deterministic per-batch
-checkpoints, a 1–25 batch budget, first-unfinished selection, and immediate stop
-on the first non-SUCCESS batch. Do not execute a live batch in the implementation
-package.
+Run one controlled manifest drain with `max_batches=5`, the established private
+manifest/checkpoint directory, and market database. Return only the redacted
+report. Do not use a larger budget or start another drain.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

@@ -526,7 +526,8 @@ authority.
 A manifest drain is a separate operational composition, not a loop implicitly
 owned by the one-batch CLI. Its progress authority is the ordered set of private
 request-checksum-bound checkpoints; SQLite contents and redacted reports are not
-completion indexes. The selected coordinator processes the first unfinished
-request under a caller-owned 1–25 batch budget and stops before later requests
+completion indexes. `ManifestBatchDrainPlan` and `ManifestBatchDrainService`
+implement the coordinator. It processes the first unfinished request under a
+caller-owned 1–25 batch budget and stops before later requests
 on the first non-success result. This preserves bounded failure impact and does
 not grant scheduled or complete-manifest execution authority.

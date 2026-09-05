@@ -302,6 +302,11 @@ One manifest-bound batch execution:
 the private manifest, selected index, and request checksum before executing only
 that request through the existing resumable ingestion boundary.
 
+Bounded manifest drain:
+`python -m investment_terminal.cli.manifest_batch_drain`. It resumes from
+validated private per-batch checkpoints and processes at most 25 explicitly
+authorized first-unfinished requests, stopping on the first non-success result.
+
 Broad US universe qualification:
 `python -m investment_terminal.cli.nasdaq_universe_qualification`. It archives
 two official Nasdaq Trader directories and emits private normalized evidence

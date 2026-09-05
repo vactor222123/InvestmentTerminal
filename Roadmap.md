@@ -201,6 +201,9 @@ Package 101 audits a bounded coordinator and selects checkpoint-derived
 first-unfinished ordering, separate per-request checkpoint ownership, a 1–25
 batch budget, and first-non-success stop. Implementation precedes a controlled
 five-batch measurement; complete-manifest execution remains blocked.
+Package 102 implements that bounded coordinator and its aggregate-only CLI.
+One controlled five-batch run over indices 2–6 is next. Any non-success result
+stops expansion, and a larger budget remains unauthorized.
 
 ```text
 Foundation
