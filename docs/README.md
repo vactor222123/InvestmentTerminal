@@ -77,6 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_92_CHART_CURRENCY_DRAIN_RESULT.md`: complete terminal currency
-coverage is measured; verify one exact resume with zero provider requests before
-auditing batch generation.
+`PHASE_7_PACKAGE_93_CHART_CURRENCY_EXACT_RESUME.md`: exact completed resume made
+zero provider requests; audit deterministic success-only batch construction
+before generation or ingestion.

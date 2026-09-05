@@ -166,6 +166,10 @@ members: 12,019 successes and one isolated `INVALID_RESPONSE`, with no pending
 or never-attempted members and no rate-limit halt. Package 92 records this
 result. An exact completed resume must demonstrate zero provider work before
 the batch-construction boundary is audited.
+The exact repeat then returns `COMPLETE` with zero attempted items and zero
+provider requests while preserving all terminal coverage. Package 93 records
+the idempotency evidence. The next package audits deterministic success-only
+batch construction; generation and ingestion remain blocked during that audit.
 
 ```text
 Foundation
