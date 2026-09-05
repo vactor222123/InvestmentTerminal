@@ -77,6 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_97_MANIFEST_EXECUTION_AUDIT.md`: implement one manifest-bound
-batch executor with durable manifest/index/request evidence before any Yahoo
-execution or broader candle ingestion.
+`PHASE_7_PACKAGE_98_MANIFEST_BOUND_MARKET_BATCH.md`: run exactly manifest batch
+index 1 with its own private checkpoint and return only the bound redacted
+report before any expansion.

@@ -749,3 +749,9 @@ The separate schema-version-1
 timing, included/excluded/batch counts, batch-size bounds, and aggregate
 exclusion categories. It never contains symbols or currencies. Its manifest
 checksum is SHA-256 over the complete private manifest's canonical strict JSON.
+
+The schema-version-1 `MANIFEST_BOUND_MARKET_BATCH` report binds one execution to
+the manifest checksum, one-based batch index, total batch count, and selected
+request checksum. It reuses the existing aggregate current-run and cumulative
+coverage plus failure-type vocabulary without exposing the private request.
+`SUCCESS`, `PARTIAL`, and `FAILED` retain their existing batch meanings.

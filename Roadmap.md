@@ -185,6 +185,10 @@ Package 97 confirms that the existing one-request executor is bounded and
 resumable but its report cannot prove manifest provenance. A separate
 manifest-bound one-batch executor with manifest/index/request checksums is the
 next implementation. No batch execution is authorized by the audit.
+Package 98 implements that one-batch manifest binding while reusing existing
+request validation, checkpoint, ingestion, and aggregate accounting. One
+controlled batch-index-1 run is next; no later index or manifest drain is yet
+authorized.
 
 ```text
 Foundation

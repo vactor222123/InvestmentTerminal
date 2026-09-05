@@ -129,6 +129,7 @@
 **Phase 7 Package 95 deterministic market-batch manifest:** COMPLETE
 **Phase 7 Package 96 market-batch manifest result:** COMPLETE - SUCCESS
 **Phase 7 Package 97 manifest-bound execution audit:** COMPLETE
+**Phase 7 Package 98 manifest-bound market batch:** COMPLETE
 
 ## Current State
 
@@ -136,10 +137,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement a manifest-bound executor for exactly one caller-selected batch. It
-must verify manifest, batch index, and request checksums before provider access,
-reuse the existing per-request checkpoint, and emit a bound redacted report.
-Do not run a batch or authorize complete-manifest ingestion.
+Run one controlled manifest-bound execution for batch index 1 with its own
+private checkpoint and the established market database. Return only the
+redacted report. Do not execute batch 2 or authorize complete-manifest ingestion.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

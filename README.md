@@ -297,6 +297,11 @@ eligibility-success projection with complete currency evidence, writes a
 private versioned manifest of bounded requests, and emits a separate redacted
 aggregate report without contacting Yahoo or ingesting candles.
 
+One manifest-bound batch execution:
+`python -m investment_terminal.cli.manifest_bound_market_batch`. It validates
+the private manifest, selected index, and request checksum before executing only
+that request through the existing resumable ingestion boundary.
+
 Broad US universe qualification:
 `python -m investment_terminal.cli.nasdaq_universe_qualification`. It archives
 two official Nasdaq Trader directories and emits private normalized evidence
