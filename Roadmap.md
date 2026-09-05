@@ -208,6 +208,10 @@ The first five-batch run completes indices 2–6 without failure, inserting
 140,542 of 143,049 downloaded candles and reconciling 2,507 duplicates. Package
 103 records the bounded result. One 25-batch run over indices 7–31 is the next
 measurement; complete-manifest execution remains blocked.
+The 25-batch attempt completes indices 7–18 and halts correctly at batch 19 on
+`YahooCandleInvalidResponseError`. Package 104 records the bounded stop. A
+read-only aggregate diagnostic of the private batch-19 checkpoint is required
+before retry or later-batch execution.
 
 ```text
 Foundation

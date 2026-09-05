@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `d1effe105f7f98b644d565344328d722cb5d0e08`
-**Current local package:** Phase 7 Package 103 - Five-Batch Drain Result
+**Current GitHub baseline:** `83b1ed9abb5f4887badaac005262069b48abc923`
+**Current local package:** Phase 7 Package 104 - Manifest-Drain Halt Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run a controlled 25-batch manifest drain
+**Current next action:** Implement a read-only batch-19 checkpoint diagnostic
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -260,6 +260,12 @@ The controlled five-batch drain completed batches 2–6 in 19.625001 seconds wit
 140,542, and reconciled 2,507 duplicate candles. Six batches are now complete
 and 595 remain. Package 103 records the result. Run one bounded 25-batch
 measurement over indices 7–31 next; no subsequent drain is yet authorized.
+
+The 25-batch run stopped correctly at batch 19 after completing indices 7–18.
+It attempted 260 items, downloaded 363,397 candles, inserted 360,890, reconciled
+2,507 duplicates, and reported `YahooCandleInvalidResponseError`. Package 104
+records the halt. The report lacks halted-batch outcome counts, so implement a
+read-only manifest-bound checkpoint diagnostic before retrying batch 19.
 
 ---
 

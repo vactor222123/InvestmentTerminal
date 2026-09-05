@@ -135,6 +135,7 @@
 **Phase 7 Package 101 bounded manifest-drain audit:** COMPLETE
 **Phase 7 Package 102 bounded manifest drain:** COMPLETE
 **Phase 7 Package 103 five-batch drain result:** COMPLETE - SUCCESS
+**Phase 7 Package 104 manifest-drain halt result:** COMPLETE - DIAGNOSTIC REQUIRED
 
 ## Current State
 
@@ -142,10 +143,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled manifest drain with `max_batches=25` against the unchanged
-private manifest, checkpoints, and market database. It may attempt only batches
-7–31 and must stop on the first non-success result. Return only the redacted
-report; do not start another drain.
+Implement a read-only, manifest-bound diagnostic for the private batch-19
+checkpoint. Report only aggregate requested/success/empty/failure counts and
+failure types. Do not retry batch 19, contact Yahoo, or execute later batches.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

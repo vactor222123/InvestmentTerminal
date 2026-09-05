@@ -77,6 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_103_FIVE_BATCH_DRAIN_RESULT.md`: six batches are complete; run
-one bounded 25-batch measurement over indices 7–31 and return only its redacted
-report.
+`PHASE_7_PACKAGE_104_MANIFEST_DRAIN_HALT_RESULT.md`: batches 7–18 completed and
+batch 19 halted; implement a read-only aggregate checkpoint diagnostic before
+retrying or expanding.
