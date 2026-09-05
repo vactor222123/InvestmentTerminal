@@ -77,6 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_94_MARKET_BATCH_CONSTRUCTION_AUDIT.md`: implement an offline,
-checksum-bound private manifest from successful currency outcomes before any
-batch execution or candle ingestion.
+`PHASE_7_PACKAGE_95_MARKET_BATCH_MANIFEST.md`: run one controlled offline
+manifest construction and return only its redacted report before any batch
+execution or candle ingestion.

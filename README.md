@@ -291,6 +291,12 @@ Bounded resumable bootstrap:
 `python -m investment_terminal.cli.resumable_market_batch`. It accepts a
 private versioned request/checkpoint and emits a redacted aggregate report.
 
+Offline deterministic batch planning:
+`python -m investment_terminal.cli.market_batch_manifest`. It joins the private
+eligibility-success projection with complete currency evidence, writes a
+private versioned manifest of bounded requests, and emits a separate redacted
+aggregate report without contacting Yahoo or ingesting candles.
+
 Broad US universe qualification:
 `python -m investment_terminal.cli.nasdaq_universe_qualification`. It archives
 two official Nasdaq Trader directories and emits private normalized evidence

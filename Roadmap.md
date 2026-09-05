@@ -173,6 +173,10 @@ construction and selects an offline checksum-bound private manifest. Existing
 requests already carry per-symbol currencies and cap each request at 20 items;
 12,019 successes therefore map to 601 requests while the one terminal failure
 remains excluded. Manifest implementation precedes any ingestion.
+Package 95 implements the offline manifest service and CLI with exact evidence
+binding, success-only inclusion, deterministic 20-item partitions, per-request
+checksums, atomic private output, and a separate redacted report. One controlled
+private construction is next; batch execution remains blocked.
 
 ```text
 Foundation

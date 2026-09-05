@@ -736,3 +736,16 @@ normalized failure, and limitations; it grants no mapping authority.
 `YahooTickerMatchQualification` records `MATCHED`, `NO_MATCH`, `AMBIGUOUS`, or
 `FAILED`, timing, candidate count, and exact-match count. Accepted identity and
 candidate fields exist only in a separate private schema-version-1 artifact.
+# Phase 7 Market-Batch Manifest
+
+The private schema-version-1 `QUALIFIED_MARKET_BATCH_MANIFEST` contains the
+eligibility projection checksum, currency-qualification request checksum, and
+an ordered list of batch index, request checksum, and canonical existing
+schema-version-1 market-batch request. It contains private symbol and currency
+values and must remain under runtime data ownership.
+
+The separate schema-version-1
+`MARKET_BATCH_MANIFEST_CONSTRUCTION` report contains only evidence checksums,
+timing, included/excluded/batch counts, batch-size bounds, and aggregate
+exclusion categories. It never contains symbols or currencies. Its manifest
+checksum is SHA-256 over the complete private manifest's canonical strict JSON.

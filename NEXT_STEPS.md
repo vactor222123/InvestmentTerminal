@@ -126,6 +126,7 @@
 **Phase 7 Package 92 complete chart-currency drain result:** COMPLETE - SUCCESS
 **Phase 7 Package 93 chart-currency exact resume:** COMPLETE - SUCCESS
 **Phase 7 Package 94 market-batch construction audit:** COMPLETE
+**Phase 7 Package 95 deterministic market-batch manifest:** COMPLETE
 
 ## Current State
 
@@ -133,10 +134,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the audited checksum-bound private market-batch manifest constructor.
-Use only the 12,019 successful currency outcomes, preserve the one explicit
-exclusion, and partition deterministic requests at the existing 20-item cap.
-Do not contact Yahoo, create ingestion checkpoints, or ingest candles.
+Run one controlled offline manifest construction against the established
+private projection and completed schema-version-2 currency checkpoint. Return
+only its redacted report for review. Do not send the private manifest and do not
+contact Yahoo, create ingestion checkpoints, or ingest candles.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

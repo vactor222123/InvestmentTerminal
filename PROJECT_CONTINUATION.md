@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `91178bd88a5b7ba4918f742afadee2df8e9d3ff3`
-**Current local package:** Phase 7 Package 94 - Market-Batch Construction Audit
+**Current GitHub baseline:** `e872ed5a5d5ad1a3bd097085a6b7b0261ce067e8`
+**Current local package:** Phase 7 Package 95 - Deterministic Market-Batch Manifest
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement the offline checksum-bound batch manifest
+**Current next action:** Run one controlled offline manifest construction
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -201,6 +201,13 @@ grouping is neither required nor selected. Implement a checksum-bound private
 manifest constructor from only the 12,019 `SUCCESS` outcomes next. Preserve the
 one terminal exclusion and the resulting 601 deterministic requests; no Yahoo
 access or candle ingestion is yet authorized.
+
+Package 95 implements that offline constructor and CLI. It verifies both
+evidence bindings, requires complete schema-version-2 currency coverage and an
+exact symbol set, includes only successful explicit currencies, and reuses the
+existing canonical request validation and 20-item cap. It atomically separates
+the private manifest from its redacted aggregate report. Run one controlled
+private construction next and return only the report; ingestion remains blocked.
 
 ---
 
