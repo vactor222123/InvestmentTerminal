@@ -715,3 +715,7 @@ reconcile this recovered response because numeric failures are terminal and the
 three-attempt cap is closed. The next implementation is schema 4 with one
 bounded fourth production-client attempt for numeric failures only. Slice 002
 remains blocked.
+# Phase 7 Package 105 checkpoint
+
+Implemented the read-only manifest-bound diagnostic selected after the batch-19
+halt. Run that diagnostic before authorizing any retry or later batch.

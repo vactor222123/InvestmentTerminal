@@ -460,3 +460,8 @@ A milestone is complete only when:
 - deferred scope is explicit;
 - repository inventory is reconciled;
 - repository is committed and pushed.
+# Phase 7 Package 105 checkpoint
+
+The manifest-bound batch checkpoint diagnostic is implemented. The next gate is
+one read-only batch-19 measurement; retry and later manifest batches remain
+blocked until that aggregate report is reviewed.

@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `83b1ed9abb5f4887badaac005262069b48abc923`
-**Current local package:** Phase 7 Package 104 - Manifest-Drain Halt Result
+**Current GitHub baseline:** `d543fa9f1fc179064285cdaebeec3c19b29bb738`
+**Current local package:** Phase 7 Package 105 - Batch Checkpoint Diagnostic
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement a read-only batch-19 checkpoint diagnostic
+**Current next action:** Run the read-only batch-19 checkpoint diagnostic
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -266,6 +266,13 @@ It attempted 260 items, downloaded 363,397 candles, inserted 360,890, reconciled
 2,507 duplicates, and reported `YahooCandleInvalidResponseError`. Package 104
 records the halt. The report lacks halted-batch outcome counts, so implement a
 read-only manifest-bound checkpoint diagnostic before retrying batch 19.
+
+Package 105 implements that diagnostic. It validates the manifest checksum,
+selected batch, request checksum, exact outcome coverage, terminal status
+vocabulary, and failure types, then emits only aggregate counts and failure
+categories. Its CLI reads the manifest and checkpoint and writes a separate
+redacted report; it has no Yahoo client, database, or checkpoint writer. Run it
+for batch 19 next and return only the report. Do not retry or run later batches.
 
 ---
 

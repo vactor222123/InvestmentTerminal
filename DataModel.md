@@ -762,3 +762,11 @@ starting/ending completed and remaining batch counts, current attempted
 batch/item and transfer totals, an optional stopping batch index, and aggregated
 failure types. `COMPLETE`, `BUDGET_EXHAUSTED`, `HALTED`, and `FAILED` remain
 distinct outcomes.
+# Manifest batch checkpoint diagnostic report schema 1
+
+The report binds `manifest_checksum`, `batch_index`, `batch_count`, and
+`request_checksum`, and exposes `coverage.requested_count`, `success_count`,
+`empty_count`, `failure_count`, plus sorted `failure_types`. It never serializes
+checkpoint outcome keys, currencies, prices, paths, provider text, or exception
+messages. `status=SUCCESS` describes successful read-only diagnosis, not a
+failure-free ingestion checkpoint.
