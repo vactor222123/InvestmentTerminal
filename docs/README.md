@@ -77,6 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_99_FIRST_MANIFEST_BATCH_RESULT.md`: batch index 1 succeeded for
-20 items and 14,916 inserted candles; exact-resume the same private checkpoint
-before any expansion.
+`PHASE_7_PACKAGE_100_FIRST_MANIFEST_BATCH_EXACT_RESUME.md`: batch index 1 exact
+resume made zero provider requests and preserved all cumulative totals; audit a
+bounded coordinator before expansion.

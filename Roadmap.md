@@ -193,6 +193,10 @@ The first manifest-bound batch then succeeds for all 20 items and inserts
 14,916 daily candles without empty or failed outcomes. Package 99 records the
 bound result. Exact resume of the same request must prove zero provider work
 before any subsequent batch is considered.
+The exact repeat performs zero provider work, skips all 20 items, and preserves
+14,916 cumulative candles. Package 100 records the idempotency evidence. Audit
+a budgeted manifest coordinator before expansion; manual execution of 600 more
+requests is not the selected workflow.
 
 ```text
 Foundation
