@@ -177,6 +177,10 @@ Package 95 implements the offline manifest service and CLI with exact evidence
 binding, success-only inclusion, deterministic 20-item partitions, per-request
 checksums, atomic private output, and a separate redacted report. One controlled
 private construction is next; batch execution remains blocked.
+The controlled construction succeeds: all 12,020 members are accounted for,
+12,019 successful outcomes form 601 bounded requests, and one terminal failure
+remains excluded. Package 96 records the checksum-bound result. Audit a smallest
+measurable execution slice next; complete-manifest ingestion remains blocked.
 
 ```text
 Foundation

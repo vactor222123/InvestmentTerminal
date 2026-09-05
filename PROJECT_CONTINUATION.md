@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `e872ed5a5d5ad1a3bd097085a6b7b0261ce067e8`
-**Current local package:** Phase 7 Package 95 - Deterministic Market-Batch Manifest
+**Current GitHub baseline:** `d94f835a38d7ec58eeda58b629729c754f5630ea`
+**Current local package:** Phase 7 Package 96 - Market-Batch Manifest Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one controlled offline manifest construction
+**Current next action:** Audit bounded private-manifest execution
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -208,6 +208,13 @@ exact symbol set, includes only successful explicit currencies, and reuses the
 existing canonical request validation and 20-item cap. It atomically separates
 the private manifest from its redacted aggregate report. Run one controlled
 private construction next and return only the report; ingestion remains blocked.
+
+The controlled offline construction succeeded in 0.06522 seconds. It accounted
+for all 12,020 members, included 12,019 successes in 601 requests, and preserved
+one `INVALID_RESPONSE` exclusion. Both upstream checksums remain unchanged and
+the private manifest has its own reported checksum. Package 96 records this
+redacted evidence. Audit a smallest measurable, checkpointed execution slice
+next; execution of all 601 requests is not authorized.
 
 ---
 

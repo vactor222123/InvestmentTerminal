@@ -127,6 +127,7 @@
 **Phase 7 Package 93 chart-currency exact resume:** COMPLETE - SUCCESS
 **Phase 7 Package 94 market-batch construction audit:** COMPLETE
 **Phase 7 Package 95 deterministic market-batch manifest:** COMPLETE
+**Phase 7 Package 96 market-batch manifest result:** COMPLETE - SUCCESS
 
 ## Current State
 
@@ -134,10 +135,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled offline manifest construction against the established
-private projection and completed schema-version-2 currency checkpoint. Return
-only its redacted report for review. Do not send the private manifest and do not
-contact Yahoo, create ingestion checkpoints, or ingest candles.
+Audit the bounded execution boundary for the successful private 601-request
+manifest. Select the smallest measurable request slice with explicit checkpoint
+and report ownership. Do not execute or authorize all 601 requests.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

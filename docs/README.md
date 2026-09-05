@@ -77,6 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_95_MARKET_BATCH_MANIFEST.md`: run one controlled offline
-manifest construction and return only its redacted report before any batch
-execution or candle ingestion.
+`PHASE_7_PACKAGE_96_MARKET_BATCH_MANIFEST_RESULT.md`: deterministic construction
+succeeded for 12,019 included items in 601 requests; audit one bounded execution
+slice before any broader candle ingestion.
