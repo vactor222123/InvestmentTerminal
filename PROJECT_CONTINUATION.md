@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `315a3d6770b38460cae2dddaef12da7e820c4d26`
-**Current local package:** Phase 7 Package 100 - First Manifest Batch Exact Resume
+**Current GitHub baseline:** `749c2d6a2c582583fcdddc8c2bce5f86fdc9e6ae`
+**Current local package:** Phase 7 Package 101 - Bounded Manifest-Drain Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit bounded manifest-drain coordination
+**Current next action:** Implement bounded manifest-drain coordination
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -241,6 +241,13 @@ items skipped, zero current transfers, and unchanged cumulative 14,916
 downloaded/inserted candles. Package 100 records deterministic provider bypass.
 Audit a bounded coordinator next rather than issuing 600 manual commands. It
 must stop on any non-success result; no additional batch is yet authorized.
+
+Package 101 selects a separate coordinator over the unchanged one-batch service.
+It derives progress only from checksum-valid per-batch checkpoints, selects the
+first unfinished index, limits each invocation to 1–25 batches, and stops on the
+first non-success result. The first later operational budget is five batches,
+which would cover at most indices 2–6. Implementation is next; no live batch is
+authorized by the audit.
 
 ---
 

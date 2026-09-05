@@ -197,6 +197,10 @@ The exact repeat performs zero provider work, skips all 20 items, and preserves
 14,916 cumulative candles. Package 100 records the idempotency evidence. Audit
 a budgeted manifest coordinator before expansion; manual execution of 600 more
 requests is not the selected workflow.
+Package 101 audits a bounded coordinator and selects checkpoint-derived
+first-unfinished ordering, separate per-request checkpoint ownership, a 1–25
+batch budget, and first-non-success stop. Implementation precedes a controlled
+five-batch measurement; complete-manifest execution remains blocked.
 
 ```text
 Foundation

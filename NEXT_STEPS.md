@@ -132,6 +132,7 @@
 **Phase 7 Package 98 manifest-bound market batch:** COMPLETE
 **Phase 7 Package 99 first manifest-bound batch result:** COMPLETE - SUCCESS
 **Phase 7 Package 100 first manifest batch exact resume:** COMPLETE - SUCCESS
+**Phase 7 Package 101 bounded manifest-drain audit:** COMPLETE
 
 ## Current State
 
@@ -139,10 +140,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit a bounded manifest-drain coordinator. It must select the next unfinished
-batch deterministically, use separate private checkpoints, enforce an explicit
-batch budget, and stop immediately on any non-SUCCESS batch. Do not execute an
-additional batch during the audit.
+Implement the audited manifest-drain coordinator with deterministic per-batch
+checkpoints, a 1–25 batch budget, first-unfinished selection, and immediate stop
+on the first non-SUCCESS batch. Do not execute a live batch in the implementation
+package.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
