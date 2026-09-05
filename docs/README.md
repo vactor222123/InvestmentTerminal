@@ -77,5 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_102_BOUNDED_MANIFEST_DRAIN.md`: run one controlled five-batch
-drain over the established private manifest and return only its redacted report.
+`PHASE_7_PACKAGE_103_FIVE_BATCH_DRAIN_RESULT.md`: six batches are complete; run
+one bounded 25-batch measurement over indices 7–31 and return only its redacted
+report.

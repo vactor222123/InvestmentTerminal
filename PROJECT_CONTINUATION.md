@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `ea66dd6cebb90b22b70a5349747d8bd38af3cde4`
-**Current local package:** Phase 7 Package 102 - Bounded Manifest Drain
+**Current GitHub baseline:** `d1effe105f7f98b644d565344328d722cb5d0e08`
+**Current local package:** Phase 7 Package 103 - Five-Batch Drain Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run a controlled five-batch manifest drain
+**Current next action:** Run a controlled 25-batch manifest drain
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -254,6 +254,12 @@ selection, 1–25 batch budget, deterministic checkpoint paths, and stop on the
 first non-success result. Its redacted report separates starting, current-run,
 and ending coverage. Run one `max_batches=5` measurement next; with batch 1
 complete, only batches 2–6 may be attempted.
+
+The controlled five-batch drain completed batches 2–6 in 19.625001 seconds with
+100 attempted items and no failure types. It downloaded 143,049, inserted
+140,542, and reconciled 2,507 duplicate candles. Six batches are now complete
+and 595 remain. Package 103 records the result. Run one bounded 25-batch
+measurement over indices 7–31 next; no subsequent drain is yet authorized.
 
 ---
 

@@ -204,6 +204,10 @@ five-batch measurement; complete-manifest execution remains blocked.
 Package 102 implements that bounded coordinator and its aggregate-only CLI.
 One controlled five-batch run over indices 2–6 is next. Any non-success result
 stops expansion, and a larger budget remains unauthorized.
+The first five-batch run completes indices 2–6 without failure, inserting
+140,542 of 143,049 downloaded candles and reconciling 2,507 duplicates. Package
+103 records the bounded result. One 25-batch run over indices 7–31 is the next
+measurement; complete-manifest execution remains blocked.
 
 ```text
 Foundation
