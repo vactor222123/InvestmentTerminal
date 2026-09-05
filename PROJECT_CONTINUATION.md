@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `df1245454d7267eb75f017013b5d08810646c6fc`
-**Current local package:** Phase 7 Package 98 - Manifest-Bound Market Batch
+**Current GitHub baseline:** `ff5df78dc3ee5968509d010ebb4028b11376fd26`
+**Current local package:** Phase 7 Package 99 - First Manifest-Bound Batch Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run controlled manifest batch index 1
+**Current next action:** Exact-resume manifest batch index 1
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -229,6 +229,12 @@ indices, selected request schema/checksum, and only then composes persistence
 and Yahoo. The redacted envelope durably binds aggregate execution evidence to
 the manifest, index, and request. Run batch index 1 next with a dedicated
 private checkpoint; batch 2 and complete-manifest ingestion remain blocked.
+
+The first controlled manifest-bound run succeeded for all 20 items in 3.934809
+seconds. It downloaded and inserted 14,916 candles with zero duplicates, empty
+outcomes, failures, or failure types. Manifest, index, count, and request
+bindings are present and correct. Package 99 records this redacted result. Run
+only an exact repeat with the unchanged checkpoint next; batch 2 remains blocked.
 
 ---
 

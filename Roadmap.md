@@ -189,6 +189,10 @@ Package 98 implements that one-batch manifest binding while reusing existing
 request validation, checkpoint, ingestion, and aggregate accounting. One
 controlled batch-index-1 run is next; no later index or manifest drain is yet
 authorized.
+The first manifest-bound batch then succeeds for all 20 items and inserts
+14,916 daily candles without empty or failed outcomes. Package 99 records the
+bound result. Exact resume of the same request must prove zero provider work
+before any subsequent batch is considered.
 
 ```text
 Foundation
