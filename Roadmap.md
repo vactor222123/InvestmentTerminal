@@ -168,8 +168,11 @@ result. An exact completed resume must demonstrate zero provider work before
 the batch-construction boundary is audited.
 The exact repeat then returns `COMPLETE` with zero attempted items and zero
 provider requests while preserving all terminal coverage. Package 93 records
-the idempotency evidence. The next package audits deterministic success-only
-batch construction; generation and ingestion remain blocked during that audit.
+the idempotency evidence. Package 94 audits deterministic success-only batch
+construction and selects an offline checksum-bound private manifest. Existing
+requests already carry per-symbol currencies and cap each request at 20 items;
+12,019 successes therefore map to 601 requests while the one terminal failure
+remains excluded. Manifest implementation precedes any ingestion.
 
 ```text
 Foundation

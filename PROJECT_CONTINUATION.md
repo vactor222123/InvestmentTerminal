@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `68778241d95adaec278573395a78b2b92b224234`
-**Current local package:** Phase 7 Package 93 - Chart-Currency Exact Resume
+**Current GitHub baseline:** `91178bd88a5b7ba4918f742afadee2df8e9d3ff3`
+**Current local package:** Phase 7 Package 94 - Market-Batch Construction Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit deterministic success-only batch construction
+**Current next action:** Implement the offline checksum-bound batch manifest
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -194,9 +194,13 @@ The exact-repeat drain returned `COMPLETE` in 0.033114 seconds with one slice,
 zero attempted items, and zero provider requests. Starting and ending coverage
 both remain 12,019 successes, one final `INVALID_RESPONSE`, zero retry-pending,
 and zero never-attempted. Package 93 records deterministic completed resume.
-Currency qualification is now operationally complete. Audit deterministic
-success-only batch construction next; no private batch generation or candle
-ingestion is yet authorized.
+Currency qualification is now operationally complete. Package 94 audits the
+next join boundary. The existing request already carries currency per symbol,
+sorts items canonically, and enforces one to 20 unique symbols, so currency
+grouping is neither required nor selected. Implement a checksum-bound private
+manifest constructor from only the 12,019 `SUCCESS` outcomes next. Preserve the
+one terminal exclusion and the resulting 601 deterministic requests; no Yahoo
+access or candle ingestion is yet authorized.
 
 ---
 

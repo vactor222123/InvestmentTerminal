@@ -499,3 +499,16 @@ redacted coverage. Yahoo discovery never selects or mutates metadata by itself.
 Exact Yahoo ticker-match qualification joins one private diagnostic, its Yahoo
 candidate document, and one existing private quote. Only a unique exact ticker
 match produces private evidence; the shareable report remains aggregate.
+
+## Deterministic Market-Batch Construction Boundary
+
+The selected Phase 7 boundary joins the checksum-bound private eligibility
+projection with its complete schema-version-2 currency checkpoint entirely
+offline. Only terminal `SUCCESS` outcomes may become market-batch items. Items
+retain their per-symbol currencies, are sorted canonically, and are partitioned
+into existing schema-version-1 requests of at most 20 unique symbols.
+
+The private manifest and its checksum remain separate from a privacy-safe
+aggregate report. Construction has no provider, repository, scheduler,
+analysis, or trading authority. Each request later owns a separate resumable
+checkpoint because resume identity is bound to the individual request checksum.

@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 1ef0409dcb98f9877e2119578ecbdcb6ccd40eb4`
+**Current repository baseline:** `develop @ 91178bd88a5b7ba4918f742afadee2df8e9d3ff3`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -125,6 +125,7 @@
 **Phase 7 Package 91 bounded chart-currency drain:** COMPLETE
 **Phase 7 Package 92 complete chart-currency drain result:** COMPLETE - SUCCESS
 **Phase 7 Package 93 chart-currency exact resume:** COMPLETE - SUCCESS
+**Phase 7 Package 94 market-batch construction audit:** COMPLETE
 
 ## Current State
 
@@ -132,9 +133,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit deterministic market-data batch construction from only the 12,019
-successful currency outcomes. Preserve the one explicit exclusion and existing
-request limits. Do not generate private batches or ingest candles.
+Implement the audited checksum-bound private market-batch manifest constructor.
+Use only the 12,019 successful currency outcomes, preserve the one explicit
+exclusion, and partition deterministic requests at the existing 20-item cap.
+Do not contact Yahoo, create ingestion checkpoints, or ingest candles.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
