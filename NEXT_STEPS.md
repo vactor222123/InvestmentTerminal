@@ -128,6 +128,7 @@
 **Phase 7 Package 94 market-batch construction audit:** COMPLETE
 **Phase 7 Package 95 deterministic market-batch manifest:** COMPLETE
 **Phase 7 Package 96 market-batch manifest result:** COMPLETE - SUCCESS
+**Phase 7 Package 97 manifest-bound execution audit:** COMPLETE
 
 ## Current State
 
@@ -135,9 +136,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit the bounded execution boundary for the successful private 601-request
-manifest. Select the smallest measurable request slice with explicit checkpoint
-and report ownership. Do not execute or authorize all 601 requests.
+Implement a manifest-bound executor for exactly one caller-selected batch. It
+must verify manifest, batch index, and request checksums before provider access,
+reuse the existing per-request checkpoint, and emit a bound redacted report.
+Do not run a batch or authorize complete-manifest ingestion.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

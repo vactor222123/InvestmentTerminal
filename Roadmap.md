@@ -181,6 +181,10 @@ The controlled construction succeeds: all 12,020 members are accounted for,
 12,019 successful outcomes form 601 bounded requests, and one terminal failure
 remains excluded. Package 96 records the checksum-bound result. Audit a smallest
 measurable execution slice next; complete-manifest ingestion remains blocked.
+Package 97 confirms that the existing one-request executor is bounded and
+resumable but its report cannot prove manifest provenance. A separate
+manifest-bound one-batch executor with manifest/index/request checksums is the
+next implementation. No batch execution is authorized by the audit.
 
 ```text
 Foundation

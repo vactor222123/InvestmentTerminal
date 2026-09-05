@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `d94f835a38d7ec58eeda58b629729c754f5630ea`
-**Current local package:** Phase 7 Package 96 - Market-Batch Manifest Result
+**Current GitHub baseline:** `6d199d15c9783954b38235a6a61c87faa49719d9`
+**Current local package:** Phase 7 Package 97 - Manifest-Bound Execution Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit bounded private-manifest execution
+**Current next action:** Implement one-batch manifest-bound execution
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -215,6 +215,13 @@ one `INVALID_RESPONSE` exclusion. Both upstream checksums remain unchanged and
 the private manifest has its own reported checksum. Package 96 records this
 redacted evidence. Audit a smallest measurable, checkpointed execution slice
 next; execution of all 601 requests is not authorized.
+
+Package 97 finds that the existing one-request executor has correct bounded and
+resume primitives but no durable manifest binding: its CLI accepts a standalone
+request and its report omits manifest checksum, batch index, and request
+checksum. Implement a separate executor for exactly one selected manifest batch
+next. It must validate all bindings before provider access and retain the
+existing private checkpoint. No operational batch is yet authorized.
 
 ---
 

@@ -513,3 +513,11 @@ its checksum remain separate from a privacy-safe
 aggregate report. Construction has no provider, repository, scheduler,
 analysis, or trading authority. Each request later owns a separate resumable
 checkpoint because resume identity is bound to the individual request checksum.
+
+A qualified manifest must not be executed through an unbound standalone request
+handoff. The selected execution composition validates the complete private
+manifest checksum, selected batch index, and embedded request checksum before
+opening persistence or contacting a provider. Its redacted envelope preserves
+those identities while the existing request checkpoint remains private. This
+composition is restricted to one batch and grants no scheduling or drain
+authority.
