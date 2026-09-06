@@ -11,6 +11,7 @@ import pytest
 from investment_terminal.clients.yahoo_finance_client import (
     YahooCandleFailureCategory,
     YahooCandleInvalidResponseError,
+    YahooCandleProjection,
     YahooFinanceClient,
     classify_yahoo_candle_failure,
 )
@@ -314,3 +315,103 @@ def _wrapped(cause: BaseException) -> APIError:
 )
 def test_failure_classifier_uses_types_without_message_text(error, category):
     assert classify_yahoo_candle_failure(error) is category
+
+
+def _client_for_frame(frame):
+    ticker = Mock()
+    ticker.history.return_value = frame
+    return YahooFinanceClient(ticker_factory=Mock(return_value=ticker))
+
+
+def test_projection_exposes_one_daily_trailing_nonfinite_omission():
+    frame = create_history_frame()
+    frame.loc[frame.index[-1], "Close"] = float("nan")
+    start, end = create_period()
+
+    projection = _client_for_frame(frame).get_candle_projection(
+        "MSFT", "D", start, end, allow_trailing_incomplete=True
+    )
+
+    assert len(projection.candles) == 1
+    assert projection.omitted_trailing_count == 1
+    assert projection.omission_types == ("TRAILING_NON_FINITE_NUMERIC",)
+
+
+def test_projection_evidence_rejects_inconsistent_construction():
+    with pytest.raises(ValueError):
+        YahooCandleProjection((), 1, ())
+    with pytest.raises(ValueError):
+        YahooCandleProjection((), 0, ("TRAILING_NON_FINITE_NUMERIC",))
+
+
+def test_existing_list_contract_remains_strict_for_trailing_nonfinite_row():
+    frame = create_history_frame()
+    frame.loc[frame.index[-1], "Close"] = float("nan")
+    start, end = create_period()
+
+    with pytest.raises(YahooCandleInvalidResponseError):
+        _client_for_frame(frame).get_candles("MSFT", "D", start, end)
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda frame: frame.__setitem__("Close", [float("nan"), 106.0]),
+        lambda frame: frame.__setitem__("Close", [float("nan"), float("nan")]),
+        lambda frame: frame.__setitem__("Close", [103.0, 0.0]),
+        lambda frame: frame.__setitem__("Volume", [1_000_000, -1.0]),
+        lambda frame: frame.__setitem__("High", [105.0, 50.0]),
+    ],
+)
+def test_projection_rejects_interior_multiple_sign_and_ohlc_defects(mutate):
+    frame = create_history_frame()
+    mutate(frame)
+    start, end = create_period()
+
+    with pytest.raises(YahooCandleInvalidResponseError):
+        _client_for_frame(frame).get_candle_projection(
+            "MSFT", "D", start, end, allow_trailing_incomplete=True
+        )
+
+
+def test_projection_rejects_trailing_omission_without_valid_predecessor():
+    frame = create_history_frame().iloc[-1:].copy()
+    frame.loc[frame.index[-1], "Close"] = float("nan")
+    start, end = create_period()
+
+    with pytest.raises(YahooCandleInvalidResponseError):
+        _client_for_frame(frame).get_candle_projection(
+            "MSFT", "D", start, end, allow_trailing_incomplete=True
+        )
+
+
+@pytest.mark.parametrize(
+    "index",
+    [
+        pd.DatetimeIndex(["2026-07-02T00:00:00Z", "2026-07-01T00:00:00Z"]),
+        pd.DatetimeIndex(["2026-07-01T00:00:00Z", "2026-07-01T00:00:00Z"]),
+        pd.Index(["first", "second"]),
+    ],
+)
+def test_projection_rejects_unordered_duplicate_or_non_datetime_index(index):
+    frame = create_history_frame()
+    frame.index = index
+    frame.iloc[-1, frame.columns.get_loc("Close")] = float("nan")
+    start, end = create_period()
+
+    with pytest.raises(YahooCandleInvalidResponseError):
+        _client_for_frame(frame).get_candle_projection(
+            "MSFT", "D", start, end, allow_trailing_incomplete=True
+        )
+
+
+@pytest.mark.parametrize("resolution", ["W", "M"])
+def test_projection_keeps_weekly_and_monthly_trailing_rows_strict(resolution):
+    frame = create_history_frame()
+    frame.loc[frame.index[-1], "Close"] = float("nan")
+    start, end = create_period()
+
+    with pytest.raises(YahooCandleInvalidResponseError):
+        _client_for_frame(frame).get_candle_projection(
+            "MSFT", resolution, start, end, allow_trailing_incomplete=True
+        )

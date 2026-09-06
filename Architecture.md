@@ -552,3 +552,9 @@ prove required shape, timestamp normalization, uniqueness, strict ordering, and
 validity of every preceding row. Any omission must be typed and observable;
 interior, multiple, sign, OHLC, timestamp, or shape defects remain fail-closed.
 Resolution-specific behavior cannot reuse mismatched diagnostic intervals.
+
+`YahooCandleProjection` is the typed provider evidence boundary. The legacy
+`get_candles` list contract remains strict; omission requires an explicit
+projection call and produces an immutable count/category result. Provider
+normalization cannot enter batch ingestion until that evidence has a durable
+service/checkpoint/report path.

@@ -778,3 +778,11 @@ requested window. `selection` exposes only requested/failed/selected counts and
 checkpoint failure types. `coverage` reuses raw, valid, invalid, reason-count,
 and redacted-timestamp evidence. Identity, currency, prices, paths, provider
 text, and exception messages are forbidden.
+
+## Yahoo candle projection evidence
+
+`YahooCandleProjection` owns an immutable candle tuple,
+`omitted_trailing_count`, and ordered `omission_types`. Strict projections use
+zero and an empty tuple. The only implemented omission type is
+`TRAILING_NON_FINITE_NUMERIC`, bounded to one proven final daily row. This is an
+internal typed contract and does not change existing serialized reports.

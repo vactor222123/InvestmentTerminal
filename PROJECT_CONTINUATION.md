@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `4b44eaaa677cafc8080aec5c897e7ce091ed923c`
-**Current local package:** Phase 7 Package 111 - Trailing Incomplete Candle Audit
+**Current GitHub baseline:** `53212f8f9343bc22a607ebb15d51fa01a5c90a05`
+**Current local package:** Phase 7 Package 112 - Typed Yahoo Candle Projection
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement typed trailing-candle projection boundary
+**Current next action:** Audit typed omission propagation into batch evidence
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -316,6 +316,13 @@ be omitted, and at least one fully valid preceding candle is required. Interior,
 multiple, sign, OHLC, timestamp, ordering, and shape defects remain failures.
 Weekly/monthly remain fail-closed until raw diagnosis uses matching intervals.
 Implement a typed, observable projection seam next; do not retry batch 19 yet.
+
+Package 112 adds immutable `YahooCandleProjection` evidence and an explicit
+daily-only final non-finite-row policy. Strict list behavior remains unchanged;
+all interior/multiple/order/timestamp/sign/OHLC and weekly/monthly cases still
+fail. The batch path is not enabled because its list-only service cannot yet
+persist omission evidence. Audit the smallest service/checkpoint/report
+propagation seam next; do not retry batch 19.
 
 ---
 

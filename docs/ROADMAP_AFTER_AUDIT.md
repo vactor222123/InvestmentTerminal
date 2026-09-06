@@ -751,3 +751,8 @@ provable trailing-incomplete-row remediation; do not filter interior defects.
 The selected policy permits only one proven daily final row with non-finite
 numeric defects and requires typed omission evidence. All other defect shapes
 and unmatched weekly/monthly diagnostics remain fail-closed.
+
+## Phase 7 Package 112 checkpoint
+
+The typed projection boundary is implemented without enabling batch filtering.
+Audit durable omission propagation through the batch path next.

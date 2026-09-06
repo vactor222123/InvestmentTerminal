@@ -143,6 +143,7 @@
 **Phase 7 Package 109 manifest failed-series diagnostic:** COMPLETE
 **Phase 7 Package 110 failed-series diagnostic result:** COMPLETE - CAUSE FOUND
 **Phase 7 Package 111 trailing incomplete candle audit:** COMPLETE
+**Phase 7 Package 112 typed Yahoo candle projection:** COMPLETE
 
 ## Current State
 
@@ -150,11 +151,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the typed Yahoo frame-projection boundary selected by Package 111.
-Support only one provable daily trailing row with non-finite numeric defects;
-preserve hard failures for all interior, multiple, ordering, timestamp, sign,
-OHLC, and shape defects. Keep weekly/monthly fail-closed and make omission
-evidence explicit before retrying batch 19 or executing later batches.
+Audit the smallest typed propagation seam from `YahooCandleProjection` through
+historical import into the resumable batch checkpoint and redacted report.
+Preserve existing callers and schema compatibility where omission is absent.
+Do not enable or retry batch 19 until omission evidence is durably visible;
+do not execute batch 20/later batches.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

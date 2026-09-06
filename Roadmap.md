@@ -502,3 +502,9 @@ The trailing-incomplete audit defines a future-safe, daily-only, one-final-row
 policy with strict timestamp/order and preceding-row validation. Implement a
 typed observable projection boundary next; weekly/monthly, batch retry, and
 later-batch execution remain blocked.
+
+## Phase 7 Package 112 checkpoint
+
+Typed Yahoo projection and future-safe daily trailing-row guards are
+implemented with strict legacy behavior unchanged. Audit explicit propagation
+into import/checkpoint/report evidence next; batch execution remains blocked.
