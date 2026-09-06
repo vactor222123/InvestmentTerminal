@@ -471,3 +471,9 @@ blocked until that aggregate report is reviewed.
 The read-only batch-19 diagnostic measured 19 successes and one isolated Yahoo
 invalid-response failure. One checkpoint-resuming batch-19 retry is selected;
 batch 20 and broader drain execution remain blocked pending its result.
+
+## Phase 7 Package 107 checkpoint
+
+The one-item batch-19 retry repeated the same invalid-response failure while
+skipping all 19 successes. Audit a privacy-safe raw-series diagnostic boundary
+before another retry; later batches remain blocked.

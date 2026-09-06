@@ -724,3 +724,8 @@ halt. Run that diagnostic before authorizing any retry or later batch.
 
 Batch 19 contains 19 successes and one isolated invalid-response failure.
 Authorize only one checkpoint-resuming retry of that batch next.
+
+## Phase 7 Package 107 checkpoint
+
+The isolated batch-19 failure repeated. Select a read-only single-series/raw
+diagnostic boundary before any further retry or later batch execution.

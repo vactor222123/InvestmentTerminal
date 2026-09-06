@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_106_BATCH_19_CHECKPOINT_RESULT.md`: batch 19 contains 19
-successes and one isolated failure; retry only that checkpoint before expanding.
+`PHASE_7_PACKAGE_107_BATCH_19_RETRY_RESULT.md`: the isolated failure repeated;
+audit a privacy-safe raw-series diagnostic before retrying or expanding.
