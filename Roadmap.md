@@ -489,3 +489,9 @@ next; batch retry and later-batch execution remain blocked.
 The manifest-bound one-failed-series raw diagnostic is implemented. Run it once
 for batch 19 and review the redacted causal evidence before choosing remediation
 or authorizing any later batch.
+
+## Phase 7 Package 110 checkpoint
+
+The raw diagnostic isolated one `CLOSE_NON_FINITE` row in a two-row series.
+Audit a latest-row-only incomplete-candle policy before remediation; arbitrary
+invalid-row filtering and later-batch execution remain blocked.

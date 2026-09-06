@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `5dc1a89b8ca0f287edd17e6d07a88355a7ce6d2e`
-**Current local package:** Phase 7 Package 109 - Manifest Failed-Series Diagnostic
+**Current GitHub baseline:** `8855a45216f7be35b47037473df27f691634706e`
+**Current local package:** Phase 7 Package 110 - Failed-Series Diagnostic Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run batch-19 failed-series raw diagnostic
+**Current next action:** Audit trailing incomplete Yahoo candle policy
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -301,6 +301,13 @@ Yahoo request over the manifest's exact window. The existing analyzer emits
 only redacted row/reason evidence. The service has no SQLite, importer, or
 checkpoint writer. Run one batch-19 diagnostic next and return only its report;
 do not retry or execute batch 20.
+
+The controlled diagnostic returned two raw rows: one valid and one invalid.
+The only reason is `CLOSE_NON_FINITE` at 2026-09-04T04:00:00Z. This identifies
+strict local response validation as the repeated failure cause, but the redacted
+report does not prove whether that row is last. Audit a fail-closed policy that
+may omit only an explicitly proven trailing incomplete row while preserving
+interior-row rejection. Do not retry or execute batch 20 yet.
 
 ---
 

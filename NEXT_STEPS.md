@@ -141,6 +141,7 @@
 **Phase 7 Package 107 batch-19 retry result:** COMPLETE - FAILURE REPEATED
 **Phase 7 Package 108 failed batch-series diagnostic audit:** COMPLETE
 **Phase 7 Package 109 manifest failed-series diagnostic:** COMPLETE
+**Phase 7 Package 110 failed-series diagnostic result:** COMPLETE - CAUSE FOUND
 
 ## Current State
 
@@ -148,9 +149,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run exactly one manifest-bound raw diagnostic for the failed batch-19 outcome
-and return only its redacted report. Do not send the manifest, checkpoint, or
-cache. Do not open SQLite, retry batch 19, or execute batch 20/later batches.
+Audit a narrowly bounded Yahoo trailing-incomplete-candle policy. Determine how
+to prove an invalid row is the latest raw row and preserve strict failure for
+any invalid interior row. Do not retry batch 19 or execute batch 20/later
+batches before that audit.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

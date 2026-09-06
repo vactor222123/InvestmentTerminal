@@ -740,3 +740,8 @@ manifest-bound one-failed-series diagnostic next.
 
 Implemented the manifest-bound raw diagnostic for exactly one failed outcome.
 One controlled batch-19 diagnostic result is the next evidence gate.
+
+## Phase 7 Package 110 checkpoint
+
+The failed series contains one valid row and one non-finite close. Audit only a
+provable trailing-incomplete-row remediation; do not filter interior defects.
