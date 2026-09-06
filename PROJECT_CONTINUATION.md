@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `d543fa9f1fc179064285cdaebeec3c19b29bb738`
-**Current local package:** Phase 7 Package 105 - Batch Checkpoint Diagnostic
+**Current GitHub baseline:** `6c6c4ebf9b5ac11e6044d2c7346d09c6fb1e4516`
+**Current local package:** Phase 7 Package 106 - Batch 19 Checkpoint Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run the read-only batch-19 checkpoint diagnostic
+**Current next action:** Retry only failed batch-19 checkpoint outcomes
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -273,6 +273,12 @@ vocabulary, and failure types, then emits only aggregate counts and failure
 categories. Its CLI reads the manifest and checkpoint and writes a separate
 redacted report; it has no Yahoo client, database, or checkpoint writer. Run it
 for batch 19 next and return only the report. Do not retry or run later batches.
+
+The controlled diagnostic then accounted for all 20 batch-19 outcomes: 19
+successes, zero empty results, and one `YahooCandleInvalidResponseError`. The
+halt is therefore isolated to one item. Run exactly one manifest-bound batch-19
+retry against the unchanged checkpoint next; the executor must skip the 19
+successes. Do not execute batch 20 or a broader drain before reviewing it.
 
 ---
 

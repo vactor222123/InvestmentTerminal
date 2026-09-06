@@ -77,6 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_105_BATCH_CHECKPOINT_DIAGNOSTIC.md`: the read-only aggregate
-diagnostic is implemented and must be run for batch 19 before retrying or
-expanding.
+`PHASE_7_PACKAGE_106_BATCH_19_CHECKPOINT_RESULT.md`: batch 19 contains 19
+successes and one isolated failure; retry only that checkpoint before expanding.

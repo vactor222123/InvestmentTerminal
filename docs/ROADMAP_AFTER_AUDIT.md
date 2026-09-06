@@ -719,3 +719,8 @@ remains blocked.
 
 Implemented the read-only manifest-bound diagnostic selected after the batch-19
 halt. Run that diagnostic before authorizing any retry or later batch.
+
+## Phase 7 Package 106 checkpoint
+
+Batch 19 contains 19 successes and one isolated invalid-response failure.
+Authorize only one checkpoint-resuming retry of that batch next.

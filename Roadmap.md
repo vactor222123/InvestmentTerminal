@@ -465,3 +465,9 @@ A milestone is complete only when:
 The manifest-bound batch checkpoint diagnostic is implemented. The next gate is
 one read-only batch-19 measurement; retry and later manifest batches remain
 blocked until that aggregate report is reviewed.
+
+## Phase 7 Package 106 checkpoint
+
+The read-only batch-19 diagnostic measured 19 successes and one isolated Yahoo
+invalid-response failure. One checkpoint-resuming batch-19 retry is selected;
+batch 20 and broader drain execution remain blocked pending its result.
