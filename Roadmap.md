@@ -477,3 +477,9 @@ batch 20 and broader drain execution remain blocked pending its result.
 The one-item batch-19 retry repeated the same invalid-response failure while
 skipping all 19 successes. Audit a privacy-safe raw-series diagnostic boundary
 before another retry; later batches remain blocked.
+
+## Phase 7 Package 108 checkpoint
+
+The failed-series audit selects a separate manifest-bound raw diagnostic that
+reuses the existing Yahoo raw adapter and redacted analyzer. Implementation is
+next; batch retry and later-batch execution remain blocked.

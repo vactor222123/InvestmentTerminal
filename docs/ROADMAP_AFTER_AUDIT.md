@@ -729,3 +729,9 @@ Authorize only one checkpoint-resuming retry of that batch next.
 
 The isolated batch-19 failure repeated. Select a read-only single-series/raw
 diagnostic boundary before any further retry or later batch execution.
+
+## Phase 7 Package 108 checkpoint
+
+Audit confirms the raw adapter/analyzer are reusable but the eligibility-owned
+service is not compatible with manifest checkpoints. Implement a separate
+manifest-bound one-failed-series diagnostic next.

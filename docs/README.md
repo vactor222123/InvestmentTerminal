@@ -77,5 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_107_BATCH_19_RETRY_RESULT.md`: the isolated failure repeated;
-audit a privacy-safe raw-series diagnostic before retrying or expanding.
+`PHASE_7_PACKAGE_108_FAILED_BATCH_SERIES_DIAGNOSTIC_AUDIT.md`: reuse the raw
+adapter/analyzer through a new manifest-bound diagnostic before retrying or
+expanding.

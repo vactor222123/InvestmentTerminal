@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `bc9cbd22d764df7462d1d224165ae8135d4374af`
-**Current local package:** Phase 7 Package 107 - Batch 19 Retry Result
+**Current GitHub baseline:** `5f611273db0646cf234061532f48298a88c3117b`
+**Current local package:** Phase 7 Package 108 - Failed Batch Series Diagnostic Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit one failed batch-series diagnostic boundary
+**Current next action:** Implement manifest-bound failed-series diagnostic
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -286,6 +286,14 @@ Do not retry it blindly. Audit the existing single-series/raw diagnostic seams
 for a privacy-safe failed batch-outcome diagnostic next. The separate SQLite
 integrity wrapper failed after report creation; integrity remains unverified,
 not proven corrupt. Batch 20 and later batches remain blocked.
+
+Package 108 finds that the existing raw Yahoo adapter and redacted frame
+analyzer are reusable, but their service is coupled to schema-3 eligibility
+evidence and its 90-day window. Batch checkpoints retain only the invalid-
+response class, not its causal category. Implement a separate read-only
+manifest-bound diagnostic for the exactly one failed outcome and the manifest's
+ten-year window. It must not open SQLite, mutate the checkpoint, ingest, retry,
+or authorize batch 20.
 
 ---
 
