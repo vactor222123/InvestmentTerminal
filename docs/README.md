@@ -77,6 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_108_FAILED_BATCH_SERIES_DIAGNOSTIC_AUDIT.md`: reuse the raw
-adapter/analyzer through a new manifest-bound diagnostic before retrying or
-expanding.
+`PHASE_7_PACKAGE_109_MANIFEST_FAILED_SERIES_DIAGNOSTIC.md`: the manifest-bound
+raw diagnostic is implemented; run it once for batch 19 before remediation or
+expansion.

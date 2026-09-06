@@ -483,3 +483,9 @@ before another retry; later batches remain blocked.
 The failed-series audit selects a separate manifest-bound raw diagnostic that
 reuses the existing Yahoo raw adapter and redacted analyzer. Implementation is
 next; batch retry and later-batch execution remain blocked.
+
+## Phase 7 Package 109 checkpoint
+
+The manifest-bound one-failed-series raw diagnostic is implemented. Run it once
+for batch 19 and review the redacted causal evidence before choosing remediation
+or authorizing any later batch.

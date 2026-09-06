@@ -770,3 +770,11 @@ The report binds `manifest_checksum`, `batch_index`, `batch_count`, and
 checkpoint outcome keys, currencies, prices, paths, provider text, or exception
 messages. `status=SUCCESS` describes successful read-only diagnosis, not a
 failure-free ingestion checkpoint.
+
+## Manifest failed-series raw diagnostic schema 1
+
+The report binds manifest checksum, batch index/count, request checksum, and
+requested window. `selection` exposes only requested/failed/selected counts and
+checkpoint failure types. `coverage` reuses raw, valid, invalid, reason-count,
+and redacted-timestamp evidence. Identity, currency, prices, paths, provider
+text, and exception messages are forbidden.

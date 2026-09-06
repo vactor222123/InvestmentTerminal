@@ -538,3 +538,10 @@ checksum-selected manifest request and its private checkpoint. It may validate
 and aggregate terminal outcomes, but it has no provider, database, importer, or
 checkpoint-write dependency. Its public report excludes member identities and
 values; operational retry remains a separate explicit action.
+
+`ManifestFailedSeriesDiagnosticService` is the provider-reading but state-
+immutable follow-up boundary for exactly one failed manifest outcome. It
+validates manifest/request/checkpoint binding before internally selecting the
+private series, reuses the raw Yahoo adapter and redacted analyzer over the
+request's exact window, and has no SQLite, repository, importer, or checkpoint-
+write authority.

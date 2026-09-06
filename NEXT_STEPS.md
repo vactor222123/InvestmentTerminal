@@ -140,6 +140,7 @@
 **Phase 7 Package 106 batch-19 checkpoint result:** COMPLETE - ONE FAILURE
 **Phase 7 Package 107 batch-19 retry result:** COMPLETE - FAILURE REPEATED
 **Phase 7 Package 108 failed batch-series diagnostic audit:** COMPLETE
+**Phase 7 Package 109 manifest failed-series diagnostic:** COMPLETE
 
 ## Current State
 
@@ -147,10 +148,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the audited read-only manifest-bound diagnostic for the exactly one
-failed batch-19 outcome. Reuse the existing raw Yahoo adapter and frame analyzer
-over the manifest request's exact window. Do not open SQLite, mutate the
-checkpoint, ingest, retry batch 19, or execute batch 20/later batches.
+Run exactly one manifest-bound raw diagnostic for the failed batch-19 outcome
+and return only its redacted report. Do not send the manifest, checkpoint, or
+cache. Do not open SQLite, retry batch 19, or execute batch 20/later batches.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

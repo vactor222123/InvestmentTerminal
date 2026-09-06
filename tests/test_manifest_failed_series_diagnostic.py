@@ -1,0 +1,114 @@
+from datetime import datetime, timezone
+
+import pandas as pd
+import pytest
+
+from investment_terminal.operations.manifest_bound_market_batch import (
+    ManifestBatchSelection,
+)
+from investment_terminal.operations.manifest_failed_series_diagnostic import (
+    ManifestFailedSeriesDiagnosticService,
+)
+from investment_terminal.operations.resumable_market_batch import (
+    MarketBatchItem,
+    MarketBatchRequest,
+)
+
+
+NOW = datetime(2026, 9, 6, tzinfo=timezone.utc)
+
+
+def selection():
+    request = MarketBatchRequest(
+        resolution="D",
+        start=NOW.replace(year=2016),
+        end=NOW,
+        items=(MarketBatchItem("AAA", "USD"), MarketBatchItem("BBB", "EUR")),
+    )
+    return ManifestBatchSelection("a" * 64, 19, 601, request)
+
+
+def checkpoint(checksum):
+    return {
+        "schema_version": 1,
+        "request_checksum": checksum,
+        "outcomes": {
+            "AAA": {"status": "SUCCESS", "failure_type": None},
+            "BBB": {
+                "status": "FAILED",
+                "failure_type": "YahooCandleInvalidResponseError",
+            },
+        },
+    }
+
+
+class Client:
+    def __init__(self):
+        self.calls = []
+
+    def get_daily_frame(self, **kwargs):
+        self.calls.append(kwargs)
+        return pd.DataFrame(
+            {
+                "Open": [10.0, float("nan")],
+                "High": [11.0, 12.0],
+                "Low": [9.0, 8.0],
+                "Close": [10.5, 9.0],
+                "Volume": [100.0, 200.0],
+            },
+            index=pd.to_datetime(["2026-09-04T00:00:00Z", "2026-09-05T00:00:00Z"]),
+        )
+
+
+def test_selects_only_failed_item_over_exact_window_and_redacts_identity():
+    selected = selection()
+    value = checkpoint(selected.request.checksum)
+    before = repr(value)
+    client = Client()
+
+    report = ManifestFailedSeriesDiagnosticService(
+        client=client,
+        clock=lambda: NOW,
+    ).run(selected, value)
+
+    assert client.calls == [{
+        "symbol": "BBB",
+        "start": selected.request.start,
+        "end": selected.request.end,
+    }]
+    assert report["selection"]["checkpoint_failure_types"] == [
+        "YahooCandleInvalidResponseError"
+    ]
+    assert report["coverage"]["invalid_reason_counts"] == {
+        "OPEN_NON_FINITE": 1
+    }
+    assert repr(value) == before
+    assert "AAA" not in str(report) and "BBB" not in str(report)
+    assert "EUR" not in str(report) and "200.0" not in str(report)
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda value: value.update(request_checksum="0" * 64),
+        lambda value: value["outcomes"].pop("AAA"),
+        lambda value: value["outcomes"]["AAA"].update(
+            status="FAILED", failure_type="AnotherFailure"
+        ),
+        lambda value: value["outcomes"]["BBB"].update(status="PENDING"),
+        lambda value: value["outcomes"]["BBB"].update(failure_type=""),
+    ],
+)
+def test_rejects_invalid_selection_before_provider_access(mutate):
+    selected = selection()
+    value = checkpoint(selected.request.checksum)
+    mutate(value)
+    client = Client()
+
+    with pytest.raises(ValueError):
+        ManifestFailedSeriesDiagnosticService(
+            client=client,
+            clock=lambda: NOW,
+        ).run(selected, value)
+
+    assert client.calls == []

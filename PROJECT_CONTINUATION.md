@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `5f611273db0646cf234061532f48298a88c3117b`
-**Current local package:** Phase 7 Package 108 - Failed Batch Series Diagnostic Audit
+**Current GitHub baseline:** `5dc1a89b8ca0f287edd17e6d07a88355a7ce6d2e`
+**Current local package:** Phase 7 Package 109 - Manifest Failed-Series Diagnostic
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement manifest-bound failed-series diagnostic
+**Current next action:** Run batch-19 failed-series raw diagnostic
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -294,6 +294,13 @@ response class, not its causal category. Implement a separate read-only
 manifest-bound diagnostic for the exactly one failed outcome and the manifest's
 ten-year window. It must not open SQLite, mutate the checkpoint, ingest, retry,
 or authorize batch 20.
+
+Package 109 implements that separate boundary. It validates exact manifest,
+request, and checkpoint coverage plus exactly one failed outcome before one raw
+Yahoo request over the manifest's exact window. The existing analyzer emits
+only redacted row/reason evidence. The service has no SQLite, importer, or
+checkpoint writer. Run one batch-19 diagnostic next and return only its report;
+do not retry or execute batch 20.
 
 ---
 
