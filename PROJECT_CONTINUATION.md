@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `8855a45216f7be35b47037473df27f691634706e`
-**Current local package:** Phase 7 Package 110 - Failed-Series Diagnostic Result
+**Current GitHub baseline:** `4b44eaaa677cafc8080aec5c897e7ce091ed923c`
+**Current local package:** Phase 7 Package 111 - Trailing Incomplete Candle Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit trailing incomplete Yahoo candle policy
+**Current next action:** Implement typed trailing-candle projection boundary
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -308,6 +308,14 @@ strict local response validation as the repeated failure cause, but the redacted
 report does not prove whether that row is last. Audit a fail-closed policy that
 may omit only an explicitly proven trailing incomplete row while preserving
 interior-row rejection. Do not retry or execute batch 20 yet.
+
+Package 111 defines the future-safe policy. Before identifying a final row, the
+frame must have required columns and unique, strictly ascending, UTC-normalizable
+timestamps. Only one daily final row with solely non-finite numeric defects may
+be omitted, and at least one fully valid preceding candle is required. Interior,
+multiple, sign, OHLC, timestamp, ordering, and shape defects remain failures.
+Weekly/monthly remain fail-closed until raw diagnosis uses matching intervals.
+Implement a typed, observable projection seam next; do not retry batch 19 yet.
 
 ---
 

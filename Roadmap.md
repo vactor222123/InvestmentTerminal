@@ -495,3 +495,10 @@ or authorizing any later batch.
 The raw diagnostic isolated one `CLOSE_NON_FINITE` row in a two-row series.
 Audit a latest-row-only incomplete-candle policy before remediation; arbitrary
 invalid-row filtering and later-batch execution remain blocked.
+
+## Phase 7 Package 111 checkpoint
+
+The trailing-incomplete audit defines a future-safe, daily-only, one-final-row
+policy with strict timestamp/order and preceding-row validation. Implement a
+typed observable projection boundary next; weekly/monthly, batch retry, and
+later-batch execution remain blocked.

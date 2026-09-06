@@ -745,3 +745,9 @@ One controlled batch-19 diagnostic result is the next evidence gate.
 
 The failed series contains one valid row and one non-finite close. Audit only a
 provable trailing-incomplete-row remediation; do not filter interior defects.
+
+## Phase 7 Package 111 checkpoint
+
+The selected policy permits only one proven daily final row with non-finite
+numeric defects and requires typed omission evidence. All other defect shapes
+and unmatched weekly/monthly diagnostics remain fail-closed.

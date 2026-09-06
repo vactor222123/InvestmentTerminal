@@ -77,6 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_110_FAILED_SERIES_DIAGNOSTIC_RESULT.md`: one non-finite close
-causes the failed series; audit a trailing-row-only remediation before retrying
-or expanding.
+`PHASE_7_PACKAGE_111_TRAILING_INCOMPLETE_CANDLE_AUDIT.md`: implement the typed,
+daily-only, one-final-row projection policy before retrying or expanding.

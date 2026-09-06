@@ -142,6 +142,7 @@
 **Phase 7 Package 108 failed batch-series diagnostic audit:** COMPLETE
 **Phase 7 Package 109 manifest failed-series diagnostic:** COMPLETE
 **Phase 7 Package 110 failed-series diagnostic result:** COMPLETE - CAUSE FOUND
+**Phase 7 Package 111 trailing incomplete candle audit:** COMPLETE
 
 ## Current State
 
@@ -149,10 +150,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit a narrowly bounded Yahoo trailing-incomplete-candle policy. Determine how
-to prove an invalid row is the latest raw row and preserve strict failure for
-any invalid interior row. Do not retry batch 19 or execute batch 20/later
-batches before that audit.
+Implement the typed Yahoo frame-projection boundary selected by Package 111.
+Support only one provable daily trailing row with non-finite numeric defects;
+preserve hard failures for all interior, multiple, ordering, timestamp, sign,
+OHLC, and shape defects. Keep weekly/monthly fail-closed and make omission
+evidence explicit before retrying batch 19 or executing later batches.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

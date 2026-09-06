@@ -545,3 +545,10 @@ validates manifest/request/checkpoint binding before internally selecting the
 private series, reuses the raw Yahoo adapter and redacted analyzer over the
 request's exact window, and has no SQLite, repository, importer, or checkpoint-
 write authority.
+
+A trailing-incomplete Yahoo candle is a bounded provider-projection concern,
+not permission to filter historical defects generally. Projection must first
+prove required shape, timestamp normalization, uniqueness, strict ordering, and
+validity of every preceding row. Any omission must be typed and observable;
+interior, multiple, sign, OHLC, timestamp, or shape defects remain fail-closed.
+Resolution-specific behavior cannot reuse mismatched diagnostic intervals.
