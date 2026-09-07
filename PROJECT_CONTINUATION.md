@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `ab0fd0621f0422ad52ff6dcd67bd638defb3f462`
-**Current local package:** Phase 7 Package 117 - Projection Decision-Parity Audit
+**Current GitHub baseline:** `0195690547a0c9566de91bf33ecc55dccbc3a560`
+**Current local package:** Phase 7 Package 118 - Projection Decision Parity
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement typed projection decision parity
+**Current next action:** Run one schema-2 batch-19 parity diagnostic
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -355,6 +355,11 @@ position, and production's partial finite-OHLC decision. Duplicating those rules
 would create future drift. Implement one provider-owned typed assessment shared
 by production projection and the schema-2 manifest diagnostic; keep generic raw
 and strict legacy contracts unchanged. Runtime execution remains blocked.
+
+Package 118 implements the shared provider-owned assessment and schema-2
+manifest diagnostic. Production projection and diagnostic now use the same
+closed guard decision on one in-memory frame; generic raw and strict legacy
+contracts remain unchanged. Run one read-only batch-19 diagnostic next.
 
 ---
 

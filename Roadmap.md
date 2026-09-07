@@ -539,3 +539,9 @@ remains blocked.
 The audit selects one provider-owned typed assessment shared by production and
 the manifest diagnostic, avoiding duplicated policy logic. Implement a redacted
 schema-2 diagnostic extension next; runtime retries and batch 20 remain blocked.
+
+## Phase 7 Package 118 checkpoint
+
+Shared typed projection assessment and schema-2 manifest diagnostic are
+implemented. Run one read-only batch-19 diagnostic next; ingestion retry and
+batch 20 remain blocked pending its redacted decision evidence.

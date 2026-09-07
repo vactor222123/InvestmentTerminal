@@ -13,6 +13,7 @@ from investment_terminal.clients.yahoo_finance_client import (
     YahooCandleInvalidResponseError,
     YahooCandleProjection,
     YahooFinanceClient,
+    YahooTrailingIncompleteAssessment,
     classify_yahoo_candle_failure,
 )
 from investment_terminal.utils.exceptions import APIError
@@ -337,11 +338,93 @@ def test_projection_exposes_one_daily_trailing_nonfinite_omission():
     assert projection.omission_types == ("TRAILING_NON_FINITE_NUMERIC",)
 
 
+@pytest.mark.parametrize(
+    ("mutate", "reason"),
+    [
+        (lambda frame: setattr(frame, "index", pd.Index(["bad", "worse"])),
+         "TIMESTAMP_NOT_NORMALIZABLE"),
+        (lambda frame: setattr(frame, "index", pd.to_datetime(
+            ["2026-07-01T00:00:00Z", "2026-07-01T00:00:00Z"])),
+         "TIMESTAMP_NOT_UNIQUE"),
+        (lambda frame: setattr(frame, "index", pd.to_datetime(
+            ["2026-07-02T00:00:00Z", "2026-07-01T00:00:00Z"])),
+         "TIMESTAMP_NOT_ASCENDING"),
+        (lambda frame: frame.__setitem__("Close", [float("nan"), 106.0]),
+         "INVALID_ROW_NOT_FINAL"),
+        (lambda frame: frame.__setitem__("Close", [float("nan"), float("nan")]),
+         "MULTIPLE_INVALID_ROWS"),
+        (lambda frame: frame.__setitem__("Close", [103.0, 0.0]),
+         "TRAILING_FINITE_SIGN_INVALID"),
+        (lambda frame: (
+            frame.__setitem__("Close", [103.0, float("nan")]),
+            frame.__setitem__("Open", [102.0, 200.0]),
+        ), "TRAILING_PARTIAL_OHLC_INCONSISTENT"),
+    ],
+)
+def test_shared_trailing_assessment_reports_stable_rejection_reason(mutate, reason):
+    frame = create_history_frame()
+    mutate(frame)
+
+    assessment = YahooFinanceClient.assess_trailing_incomplete_frame(
+        frame, resolution="D"
+    )
+
+    assert assessment.status == "REJECTED"
+    assert assessment.rejection_reason == reason
+    assert assessment.omitted_trailing_count == 0
+
+
 def test_projection_evidence_rejects_inconsistent_construction():
     with pytest.raises(ValueError):
         YahooCandleProjection((), 1, ())
     with pytest.raises(ValueError):
         YahooCandleProjection((), 0, ("TRAILING_NON_FINITE_NUMERIC",))
+
+
+def test_trailing_assessment_rejects_unknown_reason():
+    with pytest.raises(ValueError, match="Unsupported.*rejection reason"):
+        YahooTrailingIncompleteAssessment(
+            "DAILY_SINGLE_TRAILING_NON_FINITE_NUMERIC_V1",
+            "REJECTED", "UNKNOWN", 0, (),
+        )
+
+
+@pytest.mark.parametrize(
+    ("frame", "resolution", "reason"),
+    [
+        ([], "D", "FRAME_TYPE_INVALID"),
+        (create_history_frame().iloc[:0], "D", "FRAME_EMPTY"),
+        (create_history_frame().drop(columns=["Volume"]), "D",
+         "REQUIRED_COLUMNS_MISSING"),
+        (create_history_frame(), "D", "NO_INVALID_ROW"),
+        (create_history_frame().iloc[-1:], "D", "NO_INVALID_ROW"),
+        (create_history_frame(), "W", "RESOLUTION_NOT_DAILY"),
+    ],
+)
+def test_shared_trailing_assessment_covers_structural_rejections(
+    frame, resolution, reason
+):
+    assessment = YahooFinanceClient.assess_trailing_incomplete_frame(
+        frame, resolution=resolution
+    )
+    assert assessment.status == "REJECTED"
+    assert assessment.rejection_reason == reason
+
+
+def test_shared_assessment_reports_no_predecessor_and_non_numeric_failure():
+    no_predecessor = create_history_frame().iloc[-1:].copy()
+    no_predecessor.iloc[0, no_predecessor.columns.get_loc("Close")] = float("nan")
+    assessment = YahooFinanceClient.assess_trailing_incomplete_frame(
+        no_predecessor, resolution="D"
+    )
+    assert assessment.rejection_reason == "NO_VALID_PREDECESSOR"
+
+    ohlc = create_history_frame()
+    ohlc.iloc[-1, ohlc.columns.get_loc("High")] = 1.0
+    assessment = YahooFinanceClient.assess_trailing_incomplete_frame(
+        ohlc, resolution="D"
+    )
+    assert assessment.rejection_reason == "TRAILING_FAILURE_NOT_NUMERIC"
 
 
 def test_existing_list_contract_remains_strict_for_trailing_nonfinite_row():

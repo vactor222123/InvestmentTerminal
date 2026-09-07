@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_117_PROJECTION_DECISION_PARITY_AUDIT.md`: implement the selected
-shared typed assessment before another runtime retry.
+`PHASE_7_PACKAGE_118_PROJECTION_DECISION_PARITY.md`: run one schema-2 read-only
+batch-19 diagnostic before another ingestion retry.

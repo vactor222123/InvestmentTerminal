@@ -785,3 +785,9 @@ before remediation or later-batch execution.
 Audit selects a shared provider-owned projection assessment and a redacted
 schema-2 manifest diagnostic. Implement and test that bounded seam before any
 runtime retry or later batch.
+
+## Phase 7 Package 118 checkpoint
+
+Provider-owned decision parity and the schema-2 redacted diagnostic are
+implemented. Measure batch 19 once through the read-only diagnostic before any
+retry or later batch.

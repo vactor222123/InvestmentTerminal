@@ -82,9 +82,35 @@ def test_selects_only_failed_item_over_exact_window_and_redacts_identity():
     assert report["coverage"]["invalid_reason_counts"] == {
         "OPEN_NON_FINITE": 1
     }
+    assert report["schema_version"] == 2
+    assert report["coverage"]["projection_assessment"] == {
+        "policy_identity": "DAILY_SINGLE_TRAILING_NON_FINITE_NUMERIC_V1",
+        "status": "ELIGIBLE",
+        "rejection_reason": None,
+        "omitted_trailing_count": 1,
+        "omission_types": ["TRAILING_NON_FINITE_NUMERIC"],
+    }
     assert repr(value) == before
     assert "AAA" not in str(report) and "BBB" not in str(report)
     assert "EUR" not in str(report) and "200.0" not in str(report)
+
+
+def test_reports_exact_shared_partial_ohlc_rejection_without_values():
+    selected = selection()
+    client = Client()
+    frame = client.get_daily_frame()
+    frame.iloc[-1, frame.columns.get_loc("Open")] = 20.0
+    frame.iloc[-1, frame.columns.get_loc("Close")] = float("nan")
+    client.get_daily_frame = lambda **kwargs: frame
+
+    report = ManifestFailedSeriesDiagnosticService(
+        client=client, clock=lambda: NOW
+    ).run(selected, checkpoint(selected.request.checksum))
+
+    assessment = report["coverage"]["projection_assessment"]
+    assert assessment["status"] == "REJECTED"
+    assert assessment["rejection_reason"] == "TRAILING_PARTIAL_OHLC_INCONSISTENT"
+    assert "20.0" not in str(report)
 
 
 @pytest.mark.parametrize(

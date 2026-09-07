@@ -1,5 +1,7 @@
 """Privacy-safe raw diagnosis of one failed manifest batch series."""
 
+from investment_terminal.clients.yahoo_finance_client import YahooFinanceClient
+
 from investment_terminal.operations.manifest_bound_market_batch import (
     ManifestBatchSelection,
 )
@@ -63,12 +65,22 @@ class ManifestFailedSeriesDiagnosticService:
             end=selection.request.end,
         )
         coverage = _analyze_frame(frame)
+        assessment = YahooFinanceClient.assess_trailing_incomplete_frame(
+            frame, resolution=selection.request.resolution
+        )
+        coverage["projection_assessment"] = {
+            "policy_identity": assessment.policy_identity,
+            "status": assessment.status,
+            "rejection_reason": assessment.rejection_reason,
+            "omitted_trailing_count": assessment.omitted_trailing_count,
+            "omission_types": list(assessment.omission_types),
+        }
         completed = validate_aware_datetime(self.clock(), field_name="completed_at")
         duration = (completed - started).total_seconds()
         if duration < 0:
             raise ValueError("completed_at must not be earlier than started_at")
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "provider_identity": "YAHOO_FINANCE",
             "diagnostic_identity": "MANIFEST_FAILED_SERIES_RAW_CANDLE_DIAGNOSTIC",
             "status": "SUCCESS",

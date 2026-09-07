@@ -572,3 +572,8 @@ The projected service persists only validated candles and returns typed
 trailing-omission evidence to the resumable checkpoint/report boundary. This
 keeps a provider-specific, daily-only exception from silently broadening the
 general market-data contract.
+
+The provider adapter also owns the typed daily trailing-incomplete assessment
+used by both projection and the manifest-only raw diagnostic. This prevents a
+diagnostic copy of timestamp, position, numeric, and partial-OHLC policy from
+drifting away from production while keeping the diagnostic read-only.

@@ -92,6 +92,45 @@ class YahooCandleProjection:
             raise ValueError("omission_types do not match omitted_trailing_count")
 
 
+@dataclass(frozen=True, slots=True)
+class YahooTrailingIncompleteAssessment:
+    """Privacy-safe decision evidence for the bounded daily omission policy."""
+
+    policy_identity: str
+    status: str
+    rejection_reason: str | None
+    omitted_trailing_count: int
+    omission_types: tuple[str, ...]
+
+    REJECTION_REASONS = frozenset({
+        "RESOLUTION_NOT_DAILY", "FRAME_TYPE_INVALID", "FRAME_EMPTY",
+        "REQUIRED_COLUMNS_MISSING", "TIMESTAMP_NOT_NORMALIZABLE",
+        "TIMESTAMP_NOT_UNIQUE", "TIMESTAMP_NOT_ASCENDING", "NO_INVALID_ROW",
+        "MULTIPLE_INVALID_ROWS", "INVALID_ROW_NOT_FINAL",
+        "NO_VALID_PREDECESSOR", "TRAILING_FAILURE_NOT_NUMERIC",
+        "TRAILING_VALUE_NOT_REAL", "TRAILING_FINITE_SIGN_INVALID",
+        "TRAILING_NON_FINITE_ABSENT", "TRAILING_PARTIAL_OHLC_INCONSISTENT",
+    })
+
+    def __post_init__(self) -> None:
+        if self.policy_identity != "DAILY_SINGLE_TRAILING_NON_FINITE_NUMERIC_V1":
+            raise ValueError("Unsupported trailing-incomplete policy identity")
+        if self.status not in {"ELIGIBLE", "REJECTED"}:
+            raise ValueError("Unsupported trailing-incomplete assessment status")
+        expected_count = 1 if self.status == "ELIGIBLE" else 0
+        expected_types = (("TRAILING_NON_FINITE_NUMERIC",)
+                          if expected_count else ())
+        if self.omitted_trailing_count != expected_count:
+            raise ValueError("Assessment count does not match status")
+        if self.omission_types != expected_types:
+            raise ValueError("Assessment omission types do not match status")
+        if (self.status == "ELIGIBLE") != (self.rejection_reason is None):
+            raise ValueError("Assessment rejection reason does not match status")
+        if (self.rejection_reason is not None
+                and self.rejection_reason not in self.REJECTION_REASONS):
+            raise ValueError("Unsupported trailing-incomplete rejection reason")
+
+
 def classify_yahoo_candle_failure(error: BaseException) -> YahooCandleFailureCategory:
     """Classify a causal chain without inspecting or returning message text."""
     chain: list[BaseException] = []
@@ -292,6 +331,23 @@ class YahooFinanceClient:
         currency: str,
         allow_trailing_incomplete: bool,
     ) -> YahooCandleProjection:
+        if allow_trailing_incomplete:
+            assessment = cls.assess_trailing_incomplete_frame(
+                frame, resolution=resolution
+            )
+            if assessment.status == "ELIGIBLE":
+                projected = cls._project_history_frame(
+                    frame.iloc[:-1],
+                    symbol=symbol,
+                    resolution=resolution,
+                    currency=currency,
+                    allow_trailing_incomplete=False,
+                )
+                return YahooCandleProjection(
+                    projected.candles,
+                    assessment.omitted_trailing_count,
+                    assessment.omission_types,
+                )
         if not isinstance(frame, pd.DataFrame):
             raise YahooCandleInvalidResponseError(
                 YahooCandleFailureCategory.RESPONSE_SHAPE,
@@ -403,6 +459,67 @@ class YahooFinanceClient:
 
         return YahooCandleProjection(tuple(candles), 0, ())
 
+    @classmethod
+    def assess_trailing_incomplete_frame(
+        cls, frame: object, *, resolution: str
+    ) -> YahooTrailingIncompleteAssessment:
+        """Evaluate the exact production omission policy without identities."""
+        def rejected(reason: str) -> YahooTrailingIncompleteAssessment:
+            return YahooTrailingIncompleteAssessment(
+                "DAILY_SINGLE_TRAILING_NON_FINITE_NUMERIC_V1",
+                "REJECTED", reason, 0, (),
+            )
+
+        if resolution != "D":
+            return rejected("RESOLUTION_NOT_DAILY")
+        if not isinstance(frame, pd.DataFrame):
+            return rejected("FRAME_TYPE_INVALID")
+        if frame.empty:
+            return rejected("FRAME_EMPTY")
+        required = {"Open", "High", "Low", "Close", "Volume"}
+        if required - set(frame.columns):
+            return rejected("REQUIRED_COLUMNS_MISSING")
+        try:
+            timestamps = [cls._normalize_timestamp(value) for value in frame.index]
+        except YahooCandleInvalidResponseError:
+            return rejected("TIMESTAMP_NOT_NORMALIZABLE")
+        if len(set(timestamps)) != len(timestamps):
+            return rejected("TIMESTAMP_NOT_UNIQUE")
+        if any(current <= previous
+               for previous, current in zip(timestamps, timestamps[1:])):
+            return rejected("TIMESTAMP_NOT_ASCENDING")
+
+        invalid: list[tuple[int, YahooCandleFailureCategory]] = []
+        for position in range(len(frame)):
+            try:
+                cls._project_history_frame(
+                    frame.iloc[position:position + 1],
+                    symbol="ASSESSMENT",
+                    resolution="D",
+                    currency="USD",
+                    allow_trailing_incomplete=False,
+                )
+            except YahooCandleInvalidResponseError as exc:
+                invalid.append((position, exc.category))
+        if not invalid:
+            return rejected("NO_INVALID_ROW")
+        if len(invalid) != 1:
+            return rejected("MULTIPLE_INVALID_ROWS")
+        position, category = invalid[0]
+        if position != len(frame) - 1:
+            return rejected("INVALID_ROW_NOT_FINAL")
+        if position == 0:
+            return rejected("NO_VALID_PREDECESSOR")
+        if category is not YahooCandleFailureCategory.RESPONSE_NUMERIC:
+            return rejected("TRAILING_FAILURE_NOT_NUMERIC")
+        reason = _trailing_nonfinite_rejection(frame.iloc[-1])
+        if reason is not None:
+            return rejected(reason)
+        return YahooTrailingIncompleteAssessment(
+            "DAILY_SINGLE_TRAILING_NON_FINITE_NUMERIC_V1",
+            "ELIGIBLE", None, 1, ("TRAILING_NON_FINITE_NUMERIC",),
+        )
+
     @staticmethod
     def _normalize_timestamp(
         value: object,
@@ -491,25 +608,25 @@ class YahooFinanceClient:
         return value.strip().upper()
 
 
-def _has_only_nonfinite_numeric_defects(row: object) -> bool:
+def _trailing_nonfinite_rejection(row: object) -> str | None:
     values: dict[str, float] = {}
     has_nonfinite = False
     for field_name in ("Open", "High", "Low", "Close", "Volume"):
         value = row[field_name]
         if isinstance(value, bool) or not isinstance(value, Real):
-            return False
+            return "TRAILING_VALUE_NOT_REAL"
         numeric = float(value)
         if not isfinite(numeric):
             has_nonfinite = True
             continue
         if field_name == "Volume":
             if numeric < 0:
-                return False
+                return "TRAILING_FINITE_SIGN_INVALID"
         elif numeric <= 0:
-            return False
+            return "TRAILING_FINITE_SIGN_INVALID"
         values[field_name] = numeric
     if not has_nonfinite:
-        return False
+        return "TRAILING_NON_FINITE_ABSENT"
     high = values.get("High")
     low = values.get("Low")
     comparable = [
@@ -518,12 +635,16 @@ def _has_only_nonfinite_numeric_defects(row: object) -> bool:
         if field_name in values
     ]
     if high is not None and comparable and high < max(comparable):
-        return False
+        return "TRAILING_PARTIAL_OHLC_INCONSISTENT"
     comparable = [
         values[field_name]
         for field_name in ("Open", "High", "Close")
         if field_name in values
     ]
     if low is not None and comparable and low > min(comparable):
-        return False
-    return True
+        return "TRAILING_PARTIAL_OHLC_INCONSISTENT"
+    return None
+
+
+def _has_only_nonfinite_numeric_defects(row: object) -> bool:
+    return _trailing_nonfinite_rejection(row) is None

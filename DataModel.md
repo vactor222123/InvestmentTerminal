@@ -802,3 +802,10 @@ and `omission_types` (empty or exactly `TRAILING_NON_FINITE_NUMERIC`) to every
 outcome. Schema-1 inputs migrate with explicit zero values. Resumable reports
 schema 3 and manifest reports schema 2 aggregate the same evidence without
 including instrument identities, paths, prices, or provider payload text.
+
+`YahooTrailingIncompleteAssessment` identifies
+`DAILY_SINGLE_TRAILING_NON_FINITE_NUMERIC_V1`, owns a closed
+`ELIGIBLE`/`REJECTED` status and rejection-reason vocabulary, and carries one
+typed omission only when eligible. Manifest failed-series diagnostic schema 2
+projects this evidence without raw values or identity; the generic raw
+diagnostic remains schema 1.
