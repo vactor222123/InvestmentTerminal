@@ -13,7 +13,9 @@ from investment_terminal.operations.manifest_bound_market_batch import (
     ManifestBoundMarketBatchService,
 )
 from investment_terminal.repositories.candle_repository import CandleRepository
-from investment_terminal.services.historical_market_service import HistoricalMarketService
+from investment_terminal.services.projected_historical_market_service import (
+    ProjectedHistoricalMarketService,
+)
 from investment_terminal.utils.atomic_write import write_json_atomic
 
 
@@ -54,7 +56,7 @@ def main(
         )
         database = Database(options.database)
         database.initialize()
-        importer = HistoricalMarketService(
+        importer = ProjectedHistoricalMarketService(
             client or YahooFinanceClient(cache_directory=options.cache_directory),
             CandleRepository(database),
         )
@@ -68,7 +70,7 @@ def main(
     except Exception as exc:
         now = runtime_clock()
         payload = {
-            "schema_version": 1,
+            "schema_version": 2,
             "operation_identity": "MANIFEST_BOUND_MARKET_BATCH",
             "provider_identity": "YAHOO_FINANCE",
             "status": "FAILED",

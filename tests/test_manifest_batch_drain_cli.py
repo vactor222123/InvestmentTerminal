@@ -2,13 +2,15 @@ import json
 
 from investment_terminal.cli import manifest_batch_drain as cli
 from investment_terminal.models.candle import Candle
+from investment_terminal.clients.yahoo_finance_client import YahooCandleProjection
 from investment_terminal.operations.manifest_batch_drain import ManifestBatchDrainPlan
 from tests.test_manifest_batch_drain import NOW, complete_checkpoint, manifest
 
 
 class Client:
-    def get_candles(self, *, symbol, resolution, start, end, currency):
-        return [
+    def get_candle_projection(self, *, symbol, resolution, start, end, currency,
+                              allow_trailing_incomplete):
+        candles = (
             Candle(
                 symbol=symbol,
                 resolution=resolution,
@@ -19,8 +21,9 @@ class Client:
                 close_price=1,
                 volume=1,
                 currency=currency,
-            )
-        ]
+            ),
+        )
+        return YahooCandleProjection(candles, 0, ())
 
 
 def arguments(tmp_path, checksum):

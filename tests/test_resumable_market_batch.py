@@ -28,9 +28,10 @@ def test_isolates_failure_and_checkpoints_each_item():
     report=ResumableMarketBatchService(importer=importer,checkpoint_writer=written.append,clock=lambda:NOW).run(request())
     assert importer.calls==["AAA","BBB"]
     assert report["status"]=="PARTIAL"
-    assert report["schema_version"]==2
+    assert report["schema_version"]==3
     assert report["coverage"]["current_run"]=={"attempted_count":2,"skipped_count":0,
-        "downloaded_total":2,"inserted_total":2,"duplicate_total":0}
+        "downloaded_total":2,"inserted_total":2,"duplicate_total":0,
+        "omitted_trailing_total":0,"omission_types":[]}
     assert report["coverage"]["cumulative"]["failure_count"]==1
     assert len(written)==2 and "AAA" not in str(report) and report["failure_types"]==["TimeoutError"]
 
@@ -42,7 +43,8 @@ def test_resume_skips_success_and_retries_failure():
     report=ResumableMarketBatchService(importer=importer,checkpoint_writer=written.append,clock=lambda:NOW).run(req,checkpoint)
     assert importer.calls==["AAA"] and report["status"]=="SUCCESS"
     assert report["coverage"]["current_run"]=={"attempted_count":1,"skipped_count":1,
-        "downloaded_total":2,"inserted_total":2,"duplicate_total":0}
+        "downloaded_total":2,"inserted_total":2,"duplicate_total":0,
+        "omitted_trailing_total":0,"omission_types":[]}
 
 def test_exact_resume_reports_zero_current_transfer_totals():
     req=request();importer=Importer()
@@ -51,8 +53,30 @@ def test_exact_resume_reports_zero_current_transfer_totals():
     report=ResumableMarketBatchService(importer=importer,checkpoint_writer=lambda x:None,clock=lambda:NOW).run(req,checkpoint)
     assert importer.calls==[]
     assert report["coverage"]["current_run"]=={"attempted_count":0,"skipped_count":2,
-        "downloaded_total":0,"inserted_total":0,"duplicate_total":0}
+        "downloaded_total":0,"inserted_total":0,"duplicate_total":0,
+        "omitted_trailing_total":0,"omission_types":[]}
     assert report["coverage"]["cumulative"]["downloaded_total"]==4
+
+def test_schema2_checkpoint_persists_and_replays_omission_evidence():
+    req=request();written=[]
+    importer=Importer()
+    importer.import_candles=lambda **kw: type("Result",(),{"downloaded":1,"inserted":1,
+        "duplicates":0,"omitted_trailing_count":1,
+        "omission_types":("TRAILING_NON_FINITE_NUMERIC",)})()
+    report=ResumableMarketBatchService(importer=importer,checkpoint_writer=written.append,clock=lambda:NOW).run(req)
+    assert written[-1]["schema_version"]==2
+    assert report["coverage"]["cumulative"]["omitted_trailing_total"]==2
+    assert report["coverage"]["cumulative"]["omission_types"]==["TRAILING_NON_FINITE_NUMERIC"]
+    replay=ResumableMarketBatchService(importer=Importer(),checkpoint_writer=lambda x:None,clock=lambda:NOW).run(req,written[-1])
+    assert replay["coverage"]["current_run"]["attempted_count"]==0
+    assert replay["coverage"]["cumulative"]["omitted_trailing_total"]==2
+
+def test_rejects_inconsistent_schema2_omission_before_resume():
+    req=request();outcome={"status":"SUCCESS","downloaded":1,"inserted":1,"duplicates":0,
+        "omitted_trailing_count":1,"omission_types":[],"failure_type":None}
+    checkpoint={"schema_version":2,"request_checksum":req.checksum,"outcomes":{"AAA":outcome,"BBB":outcome}}
+    with pytest.raises(ValueError,match="omission"):
+        ResumableMarketBatchService(importer=Importer(),checkpoint_writer=lambda x:None,clock=lambda:NOW).run(req,checkpoint)
 
 def test_rejects_mismatched_checkpoint_before_import():
     importer=Importer()

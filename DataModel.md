@@ -795,3 +795,10 @@ evidence migrates deterministically to zero and an empty list. Resumable report
 schema version 3 aggregates current/cumulative omission totals and sorted types.
 Manifest-bound and drain envelopes must version any corresponding public shape
 change. These schemas are not operationally active until implementation passes.
+## Phase 7 manifest omission evidence
+
+Resumable market checkpoints schema 2 add `omitted_trailing_count` (`0` or `1`)
+and `omission_types` (empty or exactly `TRAILING_NON_FINITE_NUMERIC`) to every
+outcome. Schema-1 inputs migrate with explicit zero values. Resumable reports
+schema 3 and manifest reports schema 2 aggregate the same evidence without
+including instrument identities, paths, prices, or provider payload text.

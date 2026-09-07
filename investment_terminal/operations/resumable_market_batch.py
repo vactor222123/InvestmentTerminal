@@ -77,14 +77,18 @@ class ResumableMarketBatchService:
                     symbol=item.symbol, resolution=request.resolution,
                     start=request.start, end=request.end, currency=item.currency)
                 status = "SUCCESS" if result.downloaded else "EMPTY"
+                omitted, omission_types = _omission_evidence(result)
                 outcomes[item.symbol] = {"status": status, "downloaded": result.downloaded,
                     "inserted": result.inserted, "duplicates": result.duplicates,
-                    "failure_type": None}
+                    "omitted_trailing_count": omitted,
+                    "omission_types": list(omission_types), "failure_type": None}
             except Exception as exc:
                 outcomes[item.symbol] = {"status": "FAILED", "downloaded": None,
-                    "inserted": None, "duplicates": None, "failure_type": type(exc).__name__}
+                    "inserted": None, "duplicates": None,
+                    "omitted_trailing_count": 0, "omission_types": [],
+                    "failure_type": type(exc).__name__}
             current_outcomes.append(outcomes[item.symbol])
-            self.checkpoint_writer({"schema_version": 1, "request_checksum": request.checksum,
+            self.checkpoint_writer({"schema_version": 2, "request_checksum": request.checksum,
                                     "outcomes": outcomes})
         completed = validate_aware_datetime(self.clock(), field_name="completed_at")
         values = [outcomes[item.symbol] for item in request.items]
@@ -92,18 +96,22 @@ class ResumableMarketBatchService:
         empty = sum(x["status"] == "EMPTY" for x in values)
         failed = sum(x["status"] == "FAILED" for x in values)
         status = "SUCCESS" if failed == 0 else ("PARTIAL" if success + empty else "FAILED")
-        return {"schema_version": 2, "provider_identity": "YAHOO_FINANCE", "status": status,
+        return {"schema_version": 3, "provider_identity": "YAHOO_FINANCE", "status": status,
             "started_at": started.isoformat(), "completed_at": completed.isoformat(),
             "duration_seconds": (completed-started).total_seconds(), "coverage": {
                 "current_run": {"attempted_count": len(current_outcomes), "skipped_count": skipped,
                     "downloaded_total": sum(x["downloaded"] or 0 for x in current_outcomes),
                     "inserted_total": sum(x["inserted"] or 0 for x in current_outcomes),
-                    "duplicate_total": sum(x["duplicates"] or 0 for x in current_outcomes)},
+                    "duplicate_total": sum(x["duplicates"] or 0 for x in current_outcomes),
+                    "omitted_trailing_total": sum(x["omitted_trailing_count"] for x in current_outcomes),
+                    "omission_types": _omission_types(current_outcomes)},
                 "cumulative": {"requested_count": len(request.items), "success_count": success,
                     "empty_count": empty, "failure_count": failed,
                     "downloaded_total": sum(x["downloaded"] or 0 for x in values),
                     "inserted_total": sum(x["inserted"] or 0 for x in values),
-                    "duplicate_total": sum(x["duplicates"] or 0 for x in values)}},
+                    "duplicate_total": sum(x["duplicates"] or 0 for x in values),
+                    "omitted_trailing_total": sum(x["omitted_trailing_count"] for x in values),
+                    "omission_types": _omission_types(values)}},
             "failure_types": sorted({x["failure_type"] for x in values if x["failure_type"]}),
             "limitations": ["report excludes symbols, paths, prices, provider text, and exception messages",
                             "batch execution does not authorize scheduling, mass ingestion, analysis, or trading"]}
@@ -112,12 +120,42 @@ class ResumableMarketBatchService:
     def _outcomes(value: object | None, checksum: str) -> dict[str, dict[str, object]]:
         if value is None:
             return {}
-        if not isinstance(value, dict) or value.get("schema_version") != 1 or value.get("request_checksum") != checksum:
+        if not isinstance(value, dict) or value.get("schema_version") not in {1, 2} or value.get("request_checksum") != checksum:
             raise ValueError("Checkpoint does not match request")
         outcomes = value.get("outcomes")
         if not isinstance(outcomes, dict) or any(not isinstance(k, str) or not isinstance(v, dict) for k, v in outcomes.items()):
             raise ValueError("Checkpoint outcomes are invalid")
-        return dict(outcomes)
+        normalized = {}
+        for key, outcome in outcomes.items():
+            item = dict(outcome)
+            if value["schema_version"] == 1:
+                item["omitted_trailing_count"] = 0
+                item["omission_types"] = []
+            _validate_outcome_omission(item)
+            normalized[key] = item
+        return normalized
+
+
+def _omission_evidence(result) -> tuple[int, tuple[str, ...]]:
+    count = getattr(result, "omitted_trailing_count", 0)
+    types = getattr(result, "omission_types", ())
+    candidate = {"omitted_trailing_count": count, "omission_types": list(types)}
+    _validate_outcome_omission(candidate)
+    return count, tuple(types)
+
+
+def _validate_outcome_omission(outcome: dict[str, object]) -> None:
+    count = outcome.get("omitted_trailing_count")
+    types = outcome.get("omission_types")
+    if isinstance(count, bool) or count not in {0, 1} or not isinstance(types, list):
+        raise ValueError("Checkpoint omission evidence is invalid")
+    expected = ["TRAILING_NON_FINITE_NUMERIC"] if count else []
+    if types != expected:
+        raise ValueError("Checkpoint omission evidence is inconsistent")
+
+
+def _omission_types(outcomes) -> list[str]:
+    return sorted({item for outcome in outcomes for item in outcome["omission_types"]})
 
 
 def _datetime(value: object, field_name: str) -> datetime:

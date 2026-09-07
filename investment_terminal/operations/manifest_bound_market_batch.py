@@ -51,7 +51,7 @@ class ManifestBoundMarketBatchService:
             raise TypeError("selection must be a ManifestBatchSelection")
         result = self.service.run(selection.request, checkpoint)
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "operation_identity": "MANIFEST_BOUND_MARKET_BATCH",
             "provider_identity": result["provider_identity"],
             "status": result["status"],

@@ -761,3 +761,9 @@ Audit durable omission propagation through the batch path next.
 
 Audit selects schema-versioned omission propagation through a manifest-only
 projected importer, checkpoint, one-batch report, and drain aggregate.
+
+## Phase 7 Package 114 checkpoint
+
+Manifest-only projection now carries validated trailing omission evidence
+through schema-versioned checkpoints and reports. One controlled batch-19 retry
+is authorized as the next evidence gate; later batches remain blocked.

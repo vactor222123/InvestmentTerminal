@@ -59,7 +59,8 @@ class ManifestBatchDrainService:
 
         starting_completed = first_unfinished - 1
         attempted_batches = attempted_items = 0
-        downloaded = inserted = duplicates = 0
+        downloaded = inserted = duplicates = omitted = 0
+        omission_types = set()
         failure_types = set()
         stop_batch_index = None
         status = "COMPLETE" if first_unfinished > len(plan.requests) else None
@@ -83,6 +84,8 @@ class ManifestBatchDrainService:
             downloaded += current["downloaded_total"]
             inserted += current["inserted_total"]
             duplicates += current["duplicate_total"]
+            omitted += current["omitted_trailing_total"]
+            omission_types.update(current["omission_types"])
             failure_types.update(report["failure_types"])
             if report["status"] != "SUCCESS":
                 status = "HALTED"
@@ -101,7 +104,7 @@ class ManifestBatchDrainService:
         )
         completed = validate_aware_datetime(self.clock(), field_name="completed_at")
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "operation_identity": "MANIFEST_BATCH_DRAIN",
             "provider_identity": "YAHOO_FINANCE",
             "status": status,
@@ -121,6 +124,8 @@ class ManifestBatchDrainService:
                 "downloaded_total": downloaded,
                 "inserted_total": inserted,
                 "duplicate_total": duplicates,
+                "omitted_trailing_total": omitted,
+                "omission_types": sorted(omission_types),
             },
             "ending_coverage": {
                 "batch_count": len(plan.requests),

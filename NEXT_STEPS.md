@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 91178bd88a5b7ba4918f742afadee2df8e9d3ff3`
+**Current repository baseline:** `develop @ 7bff11ac95aa6057390215d4f3cc17a81b71c1aa`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -145,6 +145,7 @@
 **Phase 7 Package 111 trailing incomplete candle audit:** COMPLETE
 **Phase 7 Package 112 typed Yahoo candle projection:** COMPLETE
 **Phase 7 Package 113 omission evidence propagation audit:** COMPLETE
+**Phase 7 Package 114 versioned omission evidence path:** COMPLETE
 
 ## Current State
 
@@ -152,11 +153,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the Package 113 versioned vertical path: a manifest-only projected
-importer, schema-2 checkpoint migration, schema-3 resumable report, and
-versioned manifest/drain omission aggregation. Preserve strict generic refresh,
-legacy import, weekly, and monthly behavior. Do not retry batch 19 or execute
-later batches until atomicity, exact resume, migration, and redaction pass.
+Run one controlled manifest-bound retry of batch 19 using the existing private
+schema-1 checkpoint. Return only the redacted report and verify coherent
+`TRAILING_NON_FINITE_NUMERIC` omission evidence plus SQLite integrity. Do not
+execute batch 20 until that result is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

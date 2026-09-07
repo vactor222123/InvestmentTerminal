@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `6d5fb0ba1fca0dd59c774b7c5c4bf7c929cf9e1e`
-**Current local package:** Phase 7 Package 113 - Omission Evidence Propagation Audit
+**Current GitHub baseline:** `7bff11ac95aa6057390215d4f3cc17a81b71c1aa`
+**Current local package:** Phase 7 Package 114 - Versioned Omission Evidence Path
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement versioned manifest omission propagation
+**Current next action:** Run one controlled manifest batch-19 retry
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -330,6 +330,13 @@ schema-2 checkpoint migration with explicit zero/nonzero omission fields,
 schema-3 resumable reporting, and versioned manifest/drain propagation. Exact
 resume, atomic failure, mixed old/new checkpoints, redaction, and D-only guards
 are required. Do not retry batch 19 until that vertical path is complete.
+
+Package 114 implements that complete vertical path. Manifest execution alone
+uses the projected importer; checkpoint schema 2, resumable report schema 3,
+and manifest/drain report schema 2 preserve explicit omission evidence while
+legacy schema-1 checkpoints migrate with zero evidence. Generic import,
+refresh, weekly, and monthly behavior remains strict. One controlled batch-19
+retry is the next evidence gate; batch 20 remains blocked pending review.
 
 ---
 

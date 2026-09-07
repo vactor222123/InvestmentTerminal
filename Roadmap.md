@@ -514,3 +514,9 @@ into import/checkpoint/report evidence next; batch execution remains blocked.
 The propagation audit selects a manifest-only projected importer and explicit
 versioned checkpoint/report/drain migration. Implement the complete vertical
 evidence path before retrying batch 19 or continuing the manifest.
+
+## Phase 7 Package 114 checkpoint
+
+The versioned omission path is implemented with schema migration, exact-resume
+evidence, redacted aggregation, and strict generic behavior preserved. Run one
+controlled batch-19 retry next; do not continue to batch 20 before review.

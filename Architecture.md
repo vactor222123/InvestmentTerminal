@@ -564,3 +564,11 @@ batch composition. Generic historical import and refresh remain strict. The
 manifest path must version and propagate omission evidence through importer,
 atomic checkpoint, one-batch report, and drain aggregation; no layer may infer
 zero after schema migration or discard a nonzero omission.
+## Phase 7 manifest omission evidence boundary
+
+Manifest-bound ingestion composes `ProjectedHistoricalMarketService`, while
+generic historical import and refresh retain strict Yahoo candle validation.
+The projected service persists only validated candles and returns typed
+trailing-omission evidence to the resumable checkpoint/report boundary. This
+keeps a provider-specific, daily-only exception from silently broadening the
+general market-data contract.

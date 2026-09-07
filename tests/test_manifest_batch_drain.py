@@ -61,6 +61,8 @@ class Result:
     downloaded: int = 2
     inserted: int = 2
     duplicates: int = 0
+    omitted_trailing_count: int = 0
+    omission_types: tuple[str, ...] = ()
 
 
 class Importer:
@@ -106,7 +108,36 @@ def test_runs_first_unfinished_batches_with_explicit_budget():
         "downloaded_total": 2,
         "inserted_total": 2,
         "duplicate_total": 0,
+        "omitted_trailing_total": 0,
+        "omission_types": [],
     }
+
+
+def test_aggregates_versioned_omission_evidence():
+    value, checksum = manifest(1)
+    plan = ManifestBatchDrainPlan.from_manifest(value, checksum, max_batches=1)
+
+    class ProjectingImporter(Importer):
+        def import_candles(self, **kwargs):
+            self.calls.append(kwargs["symbol"])
+            return Result(
+                downloaded=1,
+                inserted=1,
+                omitted_trailing_count=1,
+                omission_types=("TRAILING_NON_FINITE_NUMERIC",),
+            )
+
+    checkpoints = {}
+    report = service(checkpoints, ProjectingImporter()).run(plan)
+
+    assert report["schema_version"] == 2
+    assert report["status"] == "COMPLETE"
+    assert report["current_run"]["omitted_trailing_total"] == 1
+    assert report["current_run"]["omission_types"] == [
+        "TRAILING_NON_FINITE_NUMERIC"
+    ]
+    assert checkpoints[1]["schema_version"] == 2
+    assert checkpoints[1]["outcomes"]["S1"]["omitted_trailing_count"] == 1
 
 
 def test_stops_on_first_non_success_batch():
