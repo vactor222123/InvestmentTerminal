@@ -791,3 +791,9 @@ runtime retry or later batch.
 Provider-owned decision parity and the schema-2 redacted diagnostic are
 implemented. Measure batch 19 once through the read-only diagnostic before any
 retry or later batch.
+
+## Phase 7 Package 119 checkpoint
+
+The exact guard rejection is `TRAILING_PARTIAL_OHLC_INCONSISTENT`. Preserve the
+guard and audit a separate read-only recovery qualification before retrying or
+continuing the manifest.

@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_118_PROJECTION_DECISION_PARITY.md`: run one schema-2 read-only
-batch-19 diagnostic before another ingestion retry.
+`PHASE_7_PACKAGE_119_PROJECTION_PARITY_RESULT.md`: preserve the rejecting guard
+and audit one read-only automatic recovery qualification next.

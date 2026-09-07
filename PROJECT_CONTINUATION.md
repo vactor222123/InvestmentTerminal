@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `0195690547a0c9566de91bf33ecc55dccbc3a560`
-**Current local package:** Phase 7 Package 118 - Projection Decision Parity
+**Current GitHub baseline:** `e10abd60ba607562edf4fc3e858cbe8ab59274c7`
+**Current local package:** Phase 7 Package 119 - Projection Parity Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one schema-2 batch-19 parity diagnostic
+**Current next action:** Audit one-series automatic recovery qualification
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -360,6 +360,13 @@ Package 118 implements the shared provider-owned assessment and schema-2
 manifest diagnostic. Production projection and diagnostic now use the same
 closed guard decision on one in-memory frame; generic raw and strict legacy
 contracts remain unchanged. Run one read-only batch-19 diagnostic next.
+
+Package 119 measures the exact rejection:
+`TRAILING_PARTIAL_OHLC_INCONSISTENT`. The final row is not eligible for the
+non-finite-only omission because its remaining finite OHLC evidence is also
+inconsistent. Do not weaken the guard or retry ingestion. Audit a separate
+read-only repaired/alternate retrieval qualification next; batch 20 stays
+blocked.
 
 ---
 

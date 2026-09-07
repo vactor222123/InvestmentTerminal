@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 0195690547a0c9566de91bf33ecc55dccbc3a560`
+**Current repository baseline:** `develop @ e10abd60ba607562edf4fc3e858cbe8ab59274c7`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -150,6 +150,7 @@
 **Phase 7 Package 116 repeat raw diagnostic:** COMPLETE - PARITY EVIDENCE REQUIRED
 **Phase 7 Package 117 projection decision-parity audit:** COMPLETE
 **Phase 7 Package 118 projection decision parity:** COMPLETE
+**Phase 7 Package 119 projection parity result:** COMPLETE - RECOVERY AUDIT REQUIRED
 
 ## Current State
 
@@ -157,10 +158,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run exactly one read-only manifest failed-series diagnostic for batch 19 and
-return only its schema-2 redacted report. Review the shared projection
-assessment before changing validation or retrying ingestion. Do not execute
-batch 20 or resume the drain.
+Audit one read-only automatic recovery qualification for the batch-19 series.
+Prefer an explicit separately measured Yahoo repaired retrieval followed by
+strict projection and redacted comparison evidence. Do not weaken omission
+guards, retry ingestion, execute batch 20, or resume the drain.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

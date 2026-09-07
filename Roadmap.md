@@ -545,3 +545,10 @@ schema-2 diagnostic extension next; runtime retries and batch 20 remain blocked.
 Shared typed projection assessment and schema-2 manifest diagnostic are
 implemented. Run one read-only batch-19 diagnostic next; ingestion retry and
 batch 20 remain blocked pending its redacted decision evidence.
+
+## Phase 7 Package 119 checkpoint
+
+Shared diagnostic evidence identifies
+`TRAILING_PARTIAL_OHLC_INCONSISTENT`; omission is correctly rejected. Audit a
+separate read-only automatic recovery qualification before ingestion or batch
+20.
