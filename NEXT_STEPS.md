@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 7bff11ac95aa6057390215d4f3cc17a81b71c1aa`
+**Current repository baseline:** `develop @ c1484e8f7e56d8de80e6808a8509f7bd26f6e5b4`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -146,6 +146,7 @@
 **Phase 7 Package 112 typed Yahoo candle projection:** COMPLETE
 **Phase 7 Package 113 omission evidence propagation audit:** COMPLETE
 **Phase 7 Package 114 versioned omission evidence path:** COMPLETE
+**Phase 7 Package 115 batch-19 projection retry:** COMPLETE - FAILURE REPEATED
 
 ## Current State
 
@@ -153,10 +154,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled manifest-bound retry of batch 19 using the existing private
-schema-1 checkpoint. Return only the redacted report and verify coherent
-`TRAILING_NON_FINITE_NUMERIC` omission evidence plus SQLite integrity. Do not
-execute batch 20 until that result is reviewed.
+Repeat the existing read-only failed-series raw diagnostic for batch 19 against
+the current provider response. Return only its redacted report. Do not mutate
+the checkpoint, retry ingestion, weaken validation, execute batch 20, or resume
+the drain until the changed failure shape is measured.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

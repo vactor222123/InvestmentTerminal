@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `7bff11ac95aa6057390215d4f3cc17a81b71c1aa`
-**Current local package:** Phase 7 Package 114 - Versioned Omission Evidence Path
+**Current GitHub baseline:** `c1484e8f7e56d8de80e6808a8509f7bd26f6e5b4`
+**Current local package:** Phase 7 Package 115 - Batch 19 Projection Retry Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one controlled manifest batch-19 retry
+**Current next action:** Repeat one read-only batch-19 raw diagnostic
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -337,6 +337,12 @@ and manifest/drain report schema 2 preserve explicit omission evidence while
 legacy schema-1 checkpoints migrate with zero evidence. Generic import,
 refresh, weekly, and monthly behavior remains strict. One controlled batch-19
 retry is the next evidence gate; batch 20 remains blocked pending review.
+
+Package 115 records that retry. It attempted one outcome, skipped 19, transferred
+zero candles, emitted zero omission evidence, and remained `PARTIAL` with one
+`YahooCandleInvalidResponseError`. The aggregate report cannot identify which
+guard rejected the current frame. Repeat the existing read-only raw diagnostic
+once before any policy change or retry; batch 20 remains blocked.
 
 ---
 

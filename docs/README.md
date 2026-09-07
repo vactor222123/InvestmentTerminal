@@ -76,6 +76,6 @@ After Sprint 31 documentation/inventory closure and a green closure CI run, the
 project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
-Current Phase 7 continuation is recorded in `PHASE_7_PACKAGE_114.md`: the
-versioned manifest-only omission evidence path is complete, and one controlled
-batch-19 retry is the next evidence gate.
+Current Phase 7 continuation is recorded in
+`PHASE_7_PACKAGE_115_BATCH_19_PROJECTION_RETRY_RESULT.md`: the retry remained
+partial, and one read-only raw diagnostic repeat is the next evidence gate.

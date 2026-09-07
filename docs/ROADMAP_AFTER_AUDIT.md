@@ -767,3 +767,9 @@ projected importer, checkpoint, one-batch report, and drain aggregate.
 Manifest-only projection now carries validated trailing omission evidence
 through schema-versioned checkpoints and reports. One controlled batch-19 retry
 is authorized as the next evidence gate; later batches remain blocked.
+
+## Phase 7 Package 115 checkpoint
+
+The projected batch-19 retry still failed with zero omission evidence. Measure
+the current raw frame once through the existing read-only diagnostic before any
+remediation. Later batches remain blocked.
