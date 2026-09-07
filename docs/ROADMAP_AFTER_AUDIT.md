@@ -779,3 +779,9 @@ remediation. Later batches remain blocked.
 The raw defect reproduced, while the report still cannot identify the rejecting
 projection guard. Audit a privacy-safe decision-parity diagnostic extension
 before remediation or later-batch execution.
+
+## Phase 7 Package 117 checkpoint
+
+Audit selects a shared provider-owned projection assessment and a redacted
+schema-2 manifest diagnostic. Implement and test that bounded seam before any
+runtime retry or later batch.

@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `78e01a39eec95ce01271c8056ce2c1afa39ee1e0`
-**Current local package:** Phase 7 Package 116 - Repeat Raw Diagnostic Result
+**Current GitHub baseline:** `ab0fd0621f0422ad52ff6dcd67bd638defb3f462`
+**Current local package:** Phase 7 Package 117 - Projection Decision-Parity Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit privacy-safe projection decision parity
+**Current next action:** Implement typed projection decision parity
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -349,6 +349,12 @@ rows, one valid and one `CLOSE_NON_FINITE` row at 2026-09-04. The existing
 report omits order/final-position and partial finite-OHLC guard evidence, so it
 cannot explain the projection rejection. Audit a read-only privacy-safe parity
 extension next; validation changes and later batches remain blocked.
+
+Package 117 finds that the raw analyzer omits timestamp structure, final-row
+position, and production's partial finite-OHLC decision. Duplicating those rules
+would create future drift. Implement one provider-owned typed assessment shared
+by production projection and the schema-2 manifest diagnostic; keep generic raw
+and strict legacy contracts unchanged. Runtime execution remains blocked.
 
 ---
 

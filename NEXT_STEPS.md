@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 78e01a39eec95ce01271c8056ce2c1afa39ee1e0`
+**Current repository baseline:** `develop @ ab0fd0621f0422ad52ff6dcd67bd638defb3f462`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -148,6 +148,7 @@
 **Phase 7 Package 114 versioned omission evidence path:** COMPLETE
 **Phase 7 Package 115 batch-19 projection retry:** COMPLETE - FAILURE REPEATED
 **Phase 7 Package 116 repeat raw diagnostic:** COMPLETE - PARITY EVIDENCE REQUIRED
+**Phase 7 Package 117 projection decision-parity audit:** COMPLETE
 
 ## Current State
 
@@ -155,11 +156,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit the smallest privacy-safe decision-parity extension for the read-only raw
-diagnostic. It must distinguish timestamp normalization/order/uniqueness,
-invalid-row final position, and partial finite-OHLC rejection without exposing
-identity or values. Do not change production validation, retry ingestion,
-execute batch 20, or resume the drain.
+Implement one provider-owned typed trailing-incomplete assessment shared by
+production projection and the manifest diagnostic. Version only the manifest
+diagnostic report and preserve redaction, the generic analyzer, strict legacy
+projection, and read-only behavior. Do not execute batch 19, batch 20, or the
+drain before focused and failure-path tests pass.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

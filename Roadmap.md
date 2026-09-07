@@ -533,3 +533,9 @@ The repeat diagnostic reproduced two rows and one `CLOSE_NON_FINITE` defect,
 but lacks production decision-parity evidence. Audit a redacted read-only
 extension for ordering, final position, and partial OHLC guards next. Batch 20
 remains blocked.
+
+## Phase 7 Package 117 checkpoint
+
+The audit selects one provider-owned typed assessment shared by production and
+the manifest diagnostic, avoiding duplicated policy logic. Implement a redacted
+schema-2 diagnostic extension next; runtime retries and batch 20 remain blocked.

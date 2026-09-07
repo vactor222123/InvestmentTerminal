@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_116_REPEAT_RAW_DIAGNOSTIC_RESULT.md`: the raw defect reproduced,
-and a privacy-safe projection decision-parity audit is next.
+`PHASE_7_PACKAGE_117_PROJECTION_DECISION_PARITY_AUDIT.md`: implement the selected
+shared typed assessment before another runtime retry.
