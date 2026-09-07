@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `53212f8f9343bc22a607ebb15d51fa01a5c90a05`
-**Current local package:** Phase 7 Package 112 - Typed Yahoo Candle Projection
+**Current GitHub baseline:** `6d5fb0ba1fca0dd59c774b7c5c4bf7c929cf9e1e`
+**Current local package:** Phase 7 Package 113 - Omission Evidence Propagation Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit typed omission propagation into batch evidence
+**Current next action:** Implement versioned manifest omission propagation
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -323,6 +323,13 @@ all interior/multiple/order/timestamp/sign/OHLC and weekly/monthly cases still
 fail. The batch path is not enabled because its list-only service cannot yet
 persist omission evidence. Audit the smallest service/checkpoint/report
 propagation seam next; do not retry batch 19.
+
+Package 113 maps the missing evidence path. The generic list/import/refresh
+contracts must stay strict. Implement a separate projected manifest importer,
+schema-2 checkpoint migration with explicit zero/nonzero omission fields,
+schema-3 resumable reporting, and versioned manifest/drain propagation. Exact
+resume, atomic failure, mixed old/new checkpoints, redaction, and D-only guards
+are required. Do not retry batch 19 until that vertical path is complete.
 
 ---
 

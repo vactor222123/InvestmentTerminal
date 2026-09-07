@@ -508,3 +508,9 @@ later-batch execution remain blocked.
 Typed Yahoo projection and future-safe daily trailing-row guards are
 implemented with strict legacy behavior unchanged. Audit explicit propagation
 into import/checkpoint/report evidence next; batch execution remains blocked.
+
+## Phase 7 Package 113 checkpoint
+
+The propagation audit selects a manifest-only projected importer and explicit
+versioned checkpoint/report/drain migration. Implement the complete vertical
+evidence path before retrying batch 19 or continuing the manifest.

@@ -756,3 +756,8 @@ and unmatched weekly/monthly diagnostics remain fail-closed.
 
 The typed projection boundary is implemented without enabling batch filtering.
 Audit durable omission propagation through the batch path next.
+
+## Phase 7 Package 113 checkpoint
+
+Audit selects schema-versioned omission propagation through a manifest-only
+projected importer, checkpoint, one-batch report, and drain aggregate.

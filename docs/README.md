@@ -77,5 +77,5 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_112_TYPED_YAHOO_CANDLE_PROJECTION.md`: typed daily trailing-row
-evidence is implemented; audit durable batch propagation before enabling it.
+`PHASE_7_PACKAGE_113_OMISSION_EVIDENCE_PROPAGATION_AUDIT.md`: implement the
+versioned manifest-only omission evidence path before enabling batch retry.

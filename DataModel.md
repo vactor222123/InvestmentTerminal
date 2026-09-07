@@ -786,3 +786,12 @@ text, and exception messages are forbidden.
 zero and an empty tuple. The only implemented omission type is
 `TRAILING_NON_FINITE_NUMERIC`, bounded to one proven final daily row. This is an
 internal typed contract and does not change existing serialized reports.
+
+## Planned manifest omission evidence migration
+
+The selected next contract uses checkpoint schema version 2. Every terminal
+outcome explicitly owns `omitted_trailing_count` and `omission_types`; schema-1
+evidence migrates deterministically to zero and an empty list. Resumable report
+schema version 3 aggregates current/cumulative omission totals and sorted types.
+Manifest-bound and drain envelopes must version any corresponding public shape
+change. These schemas are not operationally active until implementation passes.

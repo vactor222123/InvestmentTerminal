@@ -144,6 +144,7 @@
 **Phase 7 Package 110 failed-series diagnostic result:** COMPLETE - CAUSE FOUND
 **Phase 7 Package 111 trailing incomplete candle audit:** COMPLETE
 **Phase 7 Package 112 typed Yahoo candle projection:** COMPLETE
+**Phase 7 Package 113 omission evidence propagation audit:** COMPLETE
 
 ## Current State
 
@@ -151,11 +152,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit the smallest typed propagation seam from `YahooCandleProjection` through
-historical import into the resumable batch checkpoint and redacted report.
-Preserve existing callers and schema compatibility where omission is absent.
-Do not enable or retry batch 19 until omission evidence is durably visible;
-do not execute batch 20/later batches.
+Implement the Package 113 versioned vertical path: a manifest-only projected
+importer, schema-2 checkpoint migration, schema-3 resumable report, and
+versioned manifest/drain omission aggregation. Preserve strict generic refresh,
+legacy import, weekly, and monthly behavior. Do not retry batch 19 or execute
+later batches until atomicity, exact resume, migration, and redaction pass.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

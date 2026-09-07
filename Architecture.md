@@ -558,3 +558,9 @@ Resolution-specific behavior cannot reuse mismatched diagnostic intervals.
 projection call and produces an immutable count/category result. Provider
 normalization cannot enter batch ingestion until that evidence has a durable
 service/checkpoint/report path.
+
+Typed omission evidence may enter ingestion only through a separate manifest-
+batch composition. Generic historical import and refresh remain strict. The
+manifest path must version and propagate omission evidence through importer,
+atomic checkpoint, one-batch report, and drain aggregation; no layer may infer
+zero after schema migration or discard a nonzero omission.
