@@ -773,3 +773,9 @@ is authorized as the next evidence gate; later batches remain blocked.
 The projected batch-19 retry still failed with zero omission evidence. Measure
 the current raw frame once through the existing read-only diagnostic before any
 remediation. Later batches remain blocked.
+
+## Phase 7 Package 116 checkpoint
+
+The raw defect reproduced, while the report still cannot identify the rejecting
+projection guard. Audit a privacy-safe decision-parity diagnostic extension
+before remediation or later-batch execution.

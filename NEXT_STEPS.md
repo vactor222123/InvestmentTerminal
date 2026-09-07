@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ c1484e8f7e56d8de80e6808a8509f7bd26f6e5b4`
+**Current repository baseline:** `develop @ 78e01a39eec95ce01271c8056ce2c1afa39ee1e0`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -147,6 +147,7 @@
 **Phase 7 Package 113 omission evidence propagation audit:** COMPLETE
 **Phase 7 Package 114 versioned omission evidence path:** COMPLETE
 **Phase 7 Package 115 batch-19 projection retry:** COMPLETE - FAILURE REPEATED
+**Phase 7 Package 116 repeat raw diagnostic:** COMPLETE - PARITY EVIDENCE REQUIRED
 
 ## Current State
 
@@ -154,10 +155,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Repeat the existing read-only failed-series raw diagnostic for batch 19 against
-the current provider response. Return only its redacted report. Do not mutate
-the checkpoint, retry ingestion, weaken validation, execute batch 20, or resume
-the drain until the changed failure shape is measured.
+Audit the smallest privacy-safe decision-parity extension for the read-only raw
+diagnostic. It must distinguish timestamp normalization/order/uniqueness,
+invalid-row final position, and partial finite-OHLC rejection without exposing
+identity or values. Do not change production validation, retry ingestion,
+execute batch 20, or resume the drain.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

@@ -526,3 +526,10 @@ controlled batch-19 retry next; do not continue to batch 20 before review.
 The controlled projected retry remained partial and emitted no omission
 evidence. Repeat the read-only raw diagnostic against the current response
 before changing validation or retrying ingestion. Batch 20 remains blocked.
+
+## Phase 7 Package 116 checkpoint
+
+The repeat diagnostic reproduced two rows and one `CLOSE_NON_FINITE` defect,
+but lacks production decision-parity evidence. Audit a redacted read-only
+extension for ordering, final position, and partial OHLC guards next. Batch 20
+remains blocked.

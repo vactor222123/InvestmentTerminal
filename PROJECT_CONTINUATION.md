@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `c1484e8f7e56d8de80e6808a8509f7bd26f6e5b4`
-**Current local package:** Phase 7 Package 115 - Batch 19 Projection Retry Result
+**Current GitHub baseline:** `78e01a39eec95ce01271c8056ce2c1afa39ee1e0`
+**Current local package:** Phase 7 Package 116 - Repeat Raw Diagnostic Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Repeat one read-only batch-19 raw diagnostic
+**Current next action:** Audit privacy-safe projection decision parity
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -343,6 +343,12 @@ zero candles, emitted zero omission evidence, and remained `PARTIAL` with one
 `YahooCandleInvalidResponseError`. The aggregate report cannot identify which
 guard rejected the current frame. Repeat the existing read-only raw diagnostic
 once before any policy change or retry; batch 20 remains blocked.
+
+Package 116 records the repeated diagnostic: the current frame still has two
+rows, one valid and one `CLOSE_NON_FINITE` row at 2026-09-04. The existing
+report omits order/final-position and partial finite-OHLC guard evidence, so it
+cannot explain the projection rejection. Audit a read-only privacy-safe parity
+extension next; validation changes and later batches remain blocked.
 
 ---
 
