@@ -77,6 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_121_REPAIRED_SERIES_QUALIFICATION.md`: run one controlled
-batch-19 qualification and return only the redacted report while persistence
-and later batches remain blocked.
+`PHASE_7_PACKAGE_122_REPAIRED_QUALIFICATION_RESULT.md`: the controlled request
+failed with an unclassified exception before frame evidence; audit privacy-safe
+causal exception-type evidence before any repeat, persistence, or later batch.

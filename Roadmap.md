@@ -360,6 +360,11 @@ manifest/checkpoint binding, one repaired daily request, strict projection, and
 redacted versioned repair evidence. One controlled batch-19 measurement is next;
 persistence, ingestion retry, and batch 20 remain blocked pending its result.
 
+The controlled Package 122 measurement failed before any frame evidence became
+available and reported `UNEXPECTED`. This is not repair rejection evidence.
+Audit normalized causal exception-class reporting next; another provider request,
+persistence, ingestion retry, and batch 20 remain blocked.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

@@ -812,3 +812,10 @@ The separate repaired-series qualification is implemented. It validates the
 manifest and checkpoint before one explicit repaired daily retrieval and then
 uses unchanged strict projection. Run it once for batch 19 and review only the
 redacted report before deciding any persistence contract, retry, or batch 20.
+
+## Phase 7 Package 122 checkpoint
+
+The one repaired-series measurement returned `FAILED/UNEXPECTED` with no frame,
+repair-count, or coverage evidence. Do not infer qualification or rejection and
+do not repeat it blindly. Audit a privacy-safe normalized causal exception-class
+extension next; persistence, retry, and batch 20 remain blocked.

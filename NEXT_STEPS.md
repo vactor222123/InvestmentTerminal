@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ dc953860e44e8a6df81bc908100a9cfb0491259e`
+**Current repository baseline:** `develop @ 578bcbc1b9debe585b38058b6cb7274e27ae145e`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -153,6 +153,7 @@
 **Phase 7 Package 119 projection parity result:** COMPLETE - RECOVERY AUDIT REQUIRED
 **Phase 7 Package 120 repaired retrieval qualification audit:** COMPLETE
 **Phase 7 Package 121 repaired series qualification:** COMPLETE
+**Phase 7 Package 122 repaired qualification result:** COMPLETE - UNEXPECTED FAILURE
 
 ## Current State
 
@@ -160,10 +161,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one repaired-series qualification for batch 19 against the existing private
-manifest and checkpoint, then return only the redacted report. Do not send the
-manifest, checkpoint, cache, database, or identity data. Do not persist repaired
-candles, retry ingestion, execute batch 20, or resume the drain.
+Audit the smallest privacy-safe extension that records normalized causal
+exception class identifiers when repaired-series qualification returns
+`UNEXPECTED`. Do not include messages, arguments, tracebacks, paths, identities,
+or provider payloads. Do not repeat qualification, persist repaired candles,
+retry ingestion, execute batch 20, or resume the drain.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
