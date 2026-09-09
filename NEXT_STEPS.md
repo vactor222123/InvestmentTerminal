@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 578bcbc1b9debe585b38058b6cb7274e27ae145e`
+**Current repository baseline:** `develop @ d0cd9afd237f40157a4c42d88ba73506d844dbab`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -154,6 +154,7 @@
 **Phase 7 Package 120 repaired retrieval qualification audit:** COMPLETE
 **Phase 7 Package 121 repaired series qualification:** COMPLETE
 **Phase 7 Package 122 repaired qualification result:** COMPLETE - UNEXPECTED FAILURE
+**Phase 7 Package 123 causal exception evidence audit:** COMPLETE
 
 ## Current State
 
@@ -161,10 +162,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit the smallest privacy-safe extension that records normalized causal
-exception class identifiers when repaired-series qualification returns
-`UNEXPECTED`. Do not include messages, arguments, tracebacks, paths, identities,
-or provider payloads. Do not repeat qualification, persist repaired candles,
+Implement schema-version-2 repaired-series failure evidence with an allowlisted,
+ASCII-normalized, cycle-safe causal exception class chain capped at eight
+entries. Preserve existing category behavior and exclude messages, arguments,
+tracebacks, paths, identities, and provider payloads. Do not contact Yahoo,
 retry ingestion, execute batch 20, or resume the drain.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,

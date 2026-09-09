@@ -819,3 +819,10 @@ The one repaired-series measurement returned `FAILED/UNEXPECTED` with no frame,
 repair-count, or coverage evidence. Do not infer qualification or rejection and
 do not repeat it blindly. Audit a privacy-safe normalized causal exception-class
 extension next; persistence, retry, and batch 20 remain blocked.
+
+## Phase 7 Package 123 checkpoint
+
+The audit finds that causal traversal already exists but class identity is lost
+from the repaired-series failure report. Implement a schema-version-2,
+allowlisted, bounded exception-type chain with unchanged category semantics
+next. Do not contact Yahoo or authorize persistence, retry, or batch 20.

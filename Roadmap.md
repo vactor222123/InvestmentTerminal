@@ -365,6 +365,11 @@ available and reported `UNEXPECTED`. This is not repair rejection evidence.
 Audit normalized causal exception-class reporting next; another provider request,
 persistence, ingestion retry, and batch 20 remain blocked.
 
+Package 123 selects a schema-version-2 failure envelope with an allowlisted,
+bounded, cycle-safe module/class chain and unchanged stable category behavior.
+Implement that evidence without provider access next; an operational rerun and
+all persistence remain separately blocked.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
