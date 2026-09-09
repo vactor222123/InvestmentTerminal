@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ b45768e24c9678b1b783b6a1de7d6be6cc6350eb`
+**Current repository baseline:** `develop @ dc953860e44e8a6df81bc908100a9cfb0491259e`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -152,6 +152,7 @@
 **Phase 7 Package 118 projection decision parity:** COMPLETE
 **Phase 7 Package 119 projection parity result:** COMPLETE - RECOVERY AUDIT REQUIRED
 **Phase 7 Package 120 repaired retrieval qualification audit:** COMPLETE
+**Phase 7 Package 121 repaired series qualification:** COMPLETE
 
 ## Current State
 
@@ -159,11 +160,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement one separate read-only qualification for the batch-19 series. It must
-make one explicit yfinance `repair=True` retrieval, apply unchanged strict
-projection, and emit redacted repair provenance. Do not change production
-defaults, persist repaired candles, retry ingestion, execute batch 20, or resume
-the drain.
+Run one repaired-series qualification for batch 19 against the existing private
+manifest and checkpoint, then return only the redacted report. Do not send the
+manifest, checkpoint, cache, database, or identity data. Do not persist repaired
+candles, retry ingestion, execute batch 20, or resume the drain.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

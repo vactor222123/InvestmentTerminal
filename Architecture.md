@@ -577,3 +577,12 @@ The provider adapter also owns the typed daily trailing-incomplete assessment
 used by both projection and the manifest-only raw diagnostic. This prevents a
 diagnostic copy of timestamp, position, numeric, and partial-OHLC policy from
 drifting away from production while keeping the diagnostic read-only.
+## Phase 7 Repaired-Series Qualification Boundary
+
+The manifest repaired-series qualification is a separate read-only operational
+boundary. It selects exactly one failed manifest outcome only after validating
+the private manifest and checkpoint, explicitly requests yfinance price repair,
+and sends the returned frame through the unchanged strict Yahoo candle
+projection. Its redacted report records aggregate repair provenance and stable
+failure categories. It has no SQLite, importer, checkpoint-writer, retry-loop,
+or drain authority, and it does not change production `repair=False` behavior.

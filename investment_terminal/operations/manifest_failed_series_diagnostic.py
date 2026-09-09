@@ -6,6 +6,7 @@ from investment_terminal.operations.manifest_bound_market_batch import (
     ManifestBatchSelection,
 )
 from investment_terminal.operations.resumable_market_batch import (
+    MarketBatchItem,
     ResumableMarketBatchService,
 )
 from investment_terminal.operations.single_series_candle_diagnostic import (
@@ -30,35 +31,9 @@ class ManifestFailedSeriesDiagnosticService:
         if not isinstance(selection, ManifestBatchSelection):
             raise TypeError("selection must be a ManifestBatchSelection")
         started = validate_aware_datetime(self.clock(), field_name="started_at")
-        outcomes = ResumableMarketBatchService._outcomes(
-            checkpoint,
-            selection.request.checksum,
+        selected, checkpoint_failure_types = select_single_failed_manifest_item(
+            selection, checkpoint
         )
-        items = {item.symbol: item for item in selection.request.items}
-        if set(outcomes) != set(items):
-            raise ValueError("Checkpoint outcomes do not exactly cover the request")
-
-        failed_symbols = []
-        checkpoint_failure_types = set()
-        for symbol, outcome in outcomes.items():
-            status = outcome.get("status")
-            if status not in {"SUCCESS", "EMPTY", "FAILED"}:
-                raise ValueError("Checkpoint outcome status is invalid")
-            failure_type = outcome.get("failure_type")
-            if status == "FAILED":
-                failed_symbols.append(symbol)
-                checkpoint_failure_types.add(
-                    normalize_required_text(
-                        failure_type,
-                        field_name="failure_type",
-                    )
-                )
-            elif failure_type is not None:
-                raise ValueError("Non-failed checkpoint outcome has a failure type")
-        if len(failed_symbols) != 1:
-            raise ValueError("Checkpoint must contain exactly one failed outcome")
-
-        selected = items[failed_symbols[0]]
         frame = self.client.get_daily_frame(
             symbol=selected.symbol,
             start=selection.request.start,
@@ -97,7 +72,7 @@ class ManifestFailedSeriesDiagnosticService:
                 "requested_count": len(selection.request.items),
                 "failed_candidate_count": 1,
                 "selected_count": 1,
-                "checkpoint_failure_types": sorted(checkpoint_failure_types),
+                "checkpoint_failure_types": list(checkpoint_failure_types),
             },
             "coverage": coverage,
             "failure": None,
@@ -106,3 +81,37 @@ class ManifestFailedSeriesDiagnosticService:
                 "one raw series diagnostic does not mutate checkpoints, ingest candles, retry batches, or authorize later batches",
             ],
         }
+
+
+def select_single_failed_manifest_item(
+    selection: ManifestBatchSelection,
+    checkpoint: object,
+) -> tuple[MarketBatchItem, tuple[str, ...]]:
+    """Validate exact checkpoint coverage and return its single failed item."""
+    if not isinstance(selection, ManifestBatchSelection):
+        raise TypeError("selection must be a ManifestBatchSelection")
+    outcomes = ResumableMarketBatchService._outcomes(
+        checkpoint,
+        selection.request.checksum,
+    )
+    items = {item.symbol: item for item in selection.request.items}
+    if set(outcomes) != set(items):
+        raise ValueError("Checkpoint outcomes do not exactly cover the request")
+
+    failed_symbols = []
+    checkpoint_failure_types = set()
+    for symbol, outcome in outcomes.items():
+        status = outcome.get("status")
+        if status not in {"SUCCESS", "EMPTY", "FAILED"}:
+            raise ValueError("Checkpoint outcome status is invalid")
+        failure_type = outcome.get("failure_type")
+        if status == "FAILED":
+            failed_symbols.append(symbol)
+            checkpoint_failure_types.add(
+                normalize_required_text(failure_type, field_name="failure_type")
+            )
+        elif failure_type is not None:
+            raise ValueError("Non-failed checkpoint outcome has a failure type")
+    if len(failed_symbols) != 1:
+        raise ValueError("Checkpoint must contain exactly one failed outcome")
+    return items[failed_symbols[0]], tuple(sorted(checkpoint_failure_types))

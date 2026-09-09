@@ -355,6 +355,11 @@ next package is a separate read-only one-series yfinance `repair=True`
 qualification followed by unchanged strict projection. Production retrieval
 remains `repair=False`; persistence, another retry, and batch 20 remain blocked.
 
+Phase 7 Package 121 implements that separate qualification with exact
+manifest/checkpoint binding, one repaired daily request, strict projection, and
+redacted versioned repair evidence. One controlled batch-19 measurement is next;
+persistence, ingestion retry, and batch 20 remain blocked pending its result.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

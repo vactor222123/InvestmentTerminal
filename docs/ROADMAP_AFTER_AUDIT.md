@@ -805,3 +805,10 @@ provider-library transformation rather than validation of the original frame.
 Implement one separate manifest-bound, read-only qualification with one repaired
 request, unchanged strict projection, and redacted provenance. Do not alter the
 production default or authorize persistence, retry, or batch 20.
+
+## Phase 7 Package 121 checkpoint
+
+The separate repaired-series qualification is implemented. It validates the
+manifest and checkpoint before one explicit repaired daily retrieval and then
+uses unchanged strict projection. Run it once for batch 19 and review only the
+redacted report before deciding any persistence contract, retry, or batch 20.

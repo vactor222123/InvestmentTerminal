@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `b45768e24c9678b1b783b6a1de7d6be6cc6350eb`
-**Current local package:** Phase 7 Package 120 - Repaired Retrieval Qualification Audit
+**Current GitHub baseline:** `dc953860e44e8a6df81bc908100a9cfb0491259e`
+**Current local package:** Phase 7 Package 121 - Repaired Series Qualification
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement one-series repaired retrieval qualification
+**Current next action:** Run one batch-19 repaired-series qualification
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -623,6 +623,12 @@ Market / external data
 ---
 
 ## Current Audit Conclusion
+
+Package 121 implements the separate manifest-bound one-series qualification.
+It explicitly requests yfinance repair, applies unchanged strict projection,
+and emits only aggregate repair provenance. Run it once for batch 19 and return
+only the redacted report. Persistence, batch-19 retry, and batch 20 remain
+blocked pending review.
 
 Package 120 confirms that yfinance `repair=True` is a distinct heuristic
 transformation, while both current Yahoo paths deliberately use `repair=False`.

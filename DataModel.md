@@ -809,3 +809,14 @@ including instrument identities, paths, prices, or provider payload text.
 typed omission only when eligible. Manifest failed-series diagnostic schema 2
 projects this evidence without raw values or identity; the generic raw
 diagnostic remains schema 1.
+## Manifest Repaired-Series Qualification Report
+
+The schema-version-1 `MANIFEST_REPAIRED_SERIES_QUALIFICATION` report binds one
+read-only qualification to manifest checksum, batch index/count, request
+checksum, and the existing half-open window. Status is `QUALIFIED`, `REJECTED`,
+or `FAILED`. Repair evidence contains the explicit method identity, yfinance
+version, requested flag, repaired-row count, and aggregate presence flag.
+Coverage contains only raw row count, optional strict projected-candle count,
+and optional stable failure category. The report excludes identities,
+currencies, prices, row keys, paths, provider text, and exception messages and
+grants no persistence, retry, later-batch, analytical, or trading authority.

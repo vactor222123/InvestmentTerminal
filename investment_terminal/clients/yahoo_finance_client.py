@@ -322,6 +322,24 @@ class YahooFinanceClient:
         )
 
     @classmethod
+    def project_history_frame_strict(
+        cls,
+        frame: object,
+        *,
+        symbol: str,
+        resolution: str,
+        currency: str,
+    ) -> YahooCandleProjection:
+        """Project an already fetched frame through the strict production policy."""
+        return cls._project_history_frame(
+            frame,
+            symbol=cls._normalize_text(symbol, field_name="symbol"),
+            resolution=cls._normalize_text(resolution, field_name="resolution"),
+            currency=cls._normalize_text(currency, field_name="currency"),
+            allow_trailing_incomplete=False,
+        )
+
+    @classmethod
     def _project_history_frame(
         cls,
         frame: object,
