@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ d0cd9afd237f40157a4c42d88ba73506d844dbab`
+**Current repository baseline:** `develop @ 8c21c4114fabdd3d7e0c25227be444b3c2f64ca6`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -155,6 +155,7 @@
 **Phase 7 Package 121 repaired series qualification:** COMPLETE
 **Phase 7 Package 122 repaired qualification result:** COMPLETE - UNEXPECTED FAILURE
 **Phase 7 Package 123 causal exception evidence audit:** COMPLETE
+**Phase 7 Package 124 causal exception evidence:** COMPLETE
 
 ## Current State
 
@@ -162,11 +163,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement schema-version-2 repaired-series failure evidence with an allowlisted,
-ASCII-normalized, cycle-safe causal exception class chain capped at eight
-entries. Preserve existing category behavior and exclude messages, arguments,
-tracebacks, paths, identities, and provider payloads. Do not contact Yahoo,
-retry ingestion, execute batch 20, or resume the drain.
+Run one controlled schema-version-2 repaired-series qualification for the same
+batch-19 failure and return only its redacted report. Review the causal class
+evidence before selecting remediation. Do not retry ingestion, execute batch 20,
+or resume the drain.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

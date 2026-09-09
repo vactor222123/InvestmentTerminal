@@ -77,6 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_123_CAUSAL_EXCEPTION_EVIDENCE_AUDIT.md`: implement the selected
-schema-version-2 allowlisted causal exception-type evidence without provider
-access before any qualification rerun, persistence, or later batch.
+`PHASE_7_PACKAGE_124_CAUSAL_EXCEPTION_EVIDENCE.md`: schema-version-2 allowlisted
+causal exception-type evidence is implemented without provider access. One
+controlled qualification rerun is next; persistence and later batches remain
+blocked.

@@ -86,6 +86,8 @@ def test_qualifies_only_failed_series_and_redacts_identity():
         "end": selected.request.end,
     }]
     assert report["status"] == "QUALIFIED"
+    assert report["schema_version"] == 2
+    assert report["failure"] is None
     assert report["repair"] == {
         "method_identity": "YFINANCE_PRICE_REPAIR_V1",
         "library_identity": "YFINANCE",
@@ -114,6 +116,8 @@ def test_rejects_invalid_repaired_frame_with_stable_category():
     ).run(selected, checkpoint(selected.request.checksum))
 
     assert report["status"] == "REJECTED"
+    assert report["schema_version"] == 2
+    assert report["failure"] is None
     assert report["coverage"] == {
         "raw_row_count": 1,
         "projected_candle_count": None,
@@ -130,6 +134,8 @@ def test_rejects_empty_repaired_frame():
     ).run(selected, checkpoint(selected.request.checksum))
 
     assert report["status"] == "REJECTED"
+    assert report["schema_version"] == 2
+    assert report["failure"] is None
     assert report["coverage"]["projected_candle_count"] == 0
     assert report["coverage"]["projection_failure_category"] == "NO_PRICE_DATA"
 

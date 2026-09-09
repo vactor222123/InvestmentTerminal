@@ -55,6 +55,8 @@ def test_cli_atomically_writes_qualified_redacted_report(tmp_path, monkeypatch):
     report = json.loads(report_text)
     assert result == 0
     assert calls == [(tmp_path / "report.json", "QUALIFIED")]
+    assert report["schema_version"] == 2
+    assert report["failure"] is None
     assert report["qualification_identity"] == (
         "MANIFEST_REPAIRED_SERIES_QUALIFICATION"
     )
@@ -83,7 +85,12 @@ def test_rate_limit_writes_normalized_redacted_failure(tmp_path):
     report = json.loads(report_text)
     assert result == 1
     assert report["status"] == "FAILED"
+    assert report["schema_version"] == 2
     assert report["failure"]["category"] == "RATE_LIMITED"
+    assert report["failure"]["exception_type_chain"] == [
+        "investment_terminal.utils.exceptions.APIError",
+        "yfinance.exceptions.YFRateLimitError",
+    ]
     assert "private provider detail" not in report_text
     assert "AAA" not in report_text
 
@@ -102,4 +109,44 @@ def test_invalid_checkpoint_fails_before_provider_access(tmp_path):
     report = json.loads((tmp_path / "report.json").read_text(encoding="utf-8"))
     assert result == 1
     assert report["failure"]["category"] == "INVALID_RESPONSE"
+    assert report["failure"]["exception_type_chain"] == ["builtins.ValueError"]
     assert client.calls == []
+
+
+def test_unapproved_failure_type_is_redacted_from_strict_json_report(tmp_path):
+    checksum, _ = prepare(tmp_path)
+    hidden_type = type(
+        "HiddenError",
+        (Exception,),
+        {"__module__": "private_provider.internal"},
+    )
+
+    class UnexpectedClient:
+        def get_daily_frame(self, **kwargs):
+            try:
+                raise hidden_type("private payload and C:/private/path")
+            except hidden_type as exc:
+                raise APIError("private provider detail") from exc
+
+    result = cli.main(
+        arguments(tmp_path, checksum),
+        client=UnexpectedClient(),
+        clock=lambda: NOW,
+    )
+
+    report = json.loads((tmp_path / "report.json").read_text(encoding="utf-8"))
+    serialized = json.dumps(report, allow_nan=False)
+    assert result == 1
+    assert report["failure"] == {
+        "category": "UNEXPECTED",
+        "exception_type_chain": [
+            "investment_terminal.utils.exceptions.APIError",
+            "UNRECOGNIZED_EXCEPTION_TYPE",
+        ],
+        "reason": "Manifest repaired-series qualification failed",
+    }
+    assert "private payload" not in serialized
+    assert "private provider detail" not in serialized
+    assert "private_provider" not in serialized
+    assert "private/path" not in serialized
+    assert "AAA" not in serialized

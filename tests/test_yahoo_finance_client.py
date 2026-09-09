@@ -15,6 +15,7 @@ from investment_terminal.clients.yahoo_finance_client import (
     YahooFinanceClient,
     YahooTrailingIncompleteAssessment,
     classify_yahoo_candle_failure,
+    project_yahoo_candle_failure,
 )
 from investment_terminal.utils.exceptions import APIError
 from curl_cffi.requests.exceptions import ConnectionError as CurlConnectionError
@@ -316,6 +317,59 @@ def _wrapped(cause: BaseException) -> APIError:
 )
 def test_failure_classifier_uses_types_without_message_text(error, category):
     assert classify_yahoo_candle_failure(error) is category
+    assert project_yahoo_candle_failure(error).category is category
+
+
+def test_failure_evidence_projects_allowlisted_type_chain_in_causal_order():
+    evidence = project_yahoo_candle_failure(_wrapped(YFRateLimitError()))
+
+    assert evidence.category is YahooCandleFailureCategory.RATE_LIMITED
+    assert evidence.exception_type_chain == (
+        "investment_terminal.utils.exceptions.APIError",
+        "yfinance.exceptions.YFRateLimitError",
+    )
+
+
+@pytest.mark.parametrize(
+    "module_name",
+    ["private_provider.internal", "investment_terminal.invalid-name"],
+)
+def test_failure_evidence_redacts_unapproved_or_unsafe_type_identity(module_name):
+    hidden_type = type("HiddenError", (Exception,), {"__module__": module_name})
+
+    evidence = project_yahoo_candle_failure(hidden_type("private"))
+
+    assert evidence.category is YahooCandleFailureCategory.UNEXPECTED
+    assert evidence.exception_type_chain == ("UNRECOGNIZED_EXCEPTION_TYPE",)
+
+
+def test_failure_evidence_is_cycle_safe():
+    outer = RuntimeError("outer private")
+    inner = ValueError("inner private")
+    outer.__cause__ = inner
+    inner.__cause__ = outer
+
+    evidence = project_yahoo_candle_failure(outer)
+
+    assert evidence.exception_type_chain == (
+        "builtins.RuntimeError",
+        "builtins.ValueError",
+    )
+
+
+def test_failure_evidence_caps_long_chain_with_truncation_marker():
+    errors = [RuntimeError(str(index)) for index in range(8)]
+    errors.append(YFRateLimitError())
+    for current, cause in zip(errors, errors[1:]):
+        current.__cause__ = cause
+
+    evidence = project_yahoo_candle_failure(errors[0])
+
+    assert evidence.category is YahooCandleFailureCategory.RATE_LIMITED
+    assert evidence.exception_type_chain == (
+        *("builtins.RuntimeError" for _ in range(7)),
+        "EXCEPTION_CHAIN_TRUNCATED",
+    )
 
 
 def _client_for_frame(frame):

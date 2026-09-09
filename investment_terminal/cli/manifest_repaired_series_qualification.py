@@ -9,7 +9,7 @@ from pathlib import Path
 import yfinance as yf
 
 from investment_terminal.clients.yahoo_finance_client import (
-    classify_yahoo_candle_failure,
+    project_yahoo_candle_failure,
 )
 from investment_terminal.clients.yahoo_repaired_candle_qualification_client import (
     YahooRepairedCandleQualificationClient,
@@ -57,8 +57,9 @@ def main(argv: Sequence[str] | None = None, *, client=None, clock=None) -> int:
         ).run(selection, checkpoint)
     except Exception as exc:
         now = runtime_clock()
+        failure_evidence = project_yahoo_candle_failure(exc)
         payload = {
-            "schema_version": 1,
+            "schema_version": 2,
             "provider_identity": "YAHOO_FINANCE",
             "qualification_identity": "MANIFEST_REPAIRED_SERIES_QUALIFICATION",
             "status": "FAILED",
@@ -92,7 +93,10 @@ def main(argv: Sequence[str] | None = None, *, client=None, clock=None) -> int:
             },
             "coverage": None,
             "failure": {
-                "category": classify_yahoo_candle_failure(exc).value,
+                "category": failure_evidence.category.value,
+                "exception_type_chain": list(
+                    failure_evidence.exception_type_chain
+                ),
                 "reason": "Manifest repaired-series qualification failed",
             },
             "limitations": [

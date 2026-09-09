@@ -826,3 +826,11 @@ The audit finds that causal traversal already exists but class identity is lost
 from the repaired-series failure report. Implement a schema-version-2,
 allowlisted, bounded exception-type chain with unchanged category semantics
 next. Do not contact Yahoo or authorize persistence, retry, or batch 20.
+
+## Phase 7 Package 124 checkpoint
+
+The provider-owned immutable failure projection and repaired-series report
+schema version 2 are implemented. Category behavior is unchanged; failed
+reports expose only a bounded allowlisted causal type chain, and all content-
+bearing exception fields remain excluded. Run one controlled batch-19 repaired-
+series qualification next and review its redacted evidence before remediation.

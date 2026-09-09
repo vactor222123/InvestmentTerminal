@@ -811,7 +811,19 @@ projects this evidence without raw values or identity; the generic raw
 diagnostic remains schema 1.
 ## Manifest Repaired-Series Qualification Report
 
-The schema-version-1 `MANIFEST_REPAIRED_SERIES_QUALIFICATION` report binds one
+The historical schema-version-1 `MANIFEST_REPAIRED_SERIES_QUALIFICATION` report
+remains immutable. Schema version 2 preserves its manifest, request, selection,
+repair, coverage, status, and limitation semantics. `QUALIFIED` and `REJECTED`
+retain `failure=null`. A `FAILED` report adds
+`failure.exception_type_chain`: one to eight outermost-first class identifiers.
+Approved module namespaces are `builtins`, `yfinance`, `curl_cffi`, `pandas`,
+`numpy`, `peewee`, `sqlite3`, `requests`, `urllib3`, and
+`investment_terminal`. Unsafe or unapproved identities become
+`UNRECOGNIZED_EXCEPTION_TYPE`; a chain longer than the evidence bound ends with
+`EXCEPTION_CHAIN_TRUNCATED`. Category classification still evaluates the full
+causal chain.
+
+The report binds one
 read-only qualification to manifest checksum, batch index/count, request
 checksum, and the existing half-open window. Status is `QUALIFIED`, `REJECTED`,
 or `FAILED`. Repair evidence contains the explicit method identity, yfinance

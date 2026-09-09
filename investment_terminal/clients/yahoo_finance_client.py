@@ -45,6 +45,28 @@ class YahooCandleFailureCategory(str, Enum):
     UNEXPECTED = "UNEXPECTED"
 
 
+@dataclass(frozen=True, slots=True)
+class YahooCandleFailureEvidence:
+    """Stable category plus bounded privacy-safe causal type evidence."""
+
+    category: YahooCandleFailureCategory
+    exception_type_chain: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.category, YahooCandleFailureCategory):
+            raise TypeError("category must be a YahooCandleFailureCategory")
+        if (
+            not isinstance(self.exception_type_chain, tuple)
+            or not self.exception_type_chain
+            or len(self.exception_type_chain) > _MAX_EXCEPTION_TYPE_CHAIN_LENGTH
+            or any(
+                not isinstance(item, str) or not item
+                for item in self.exception_type_chain
+            )
+        ):
+            raise ValueError("exception_type_chain must contain one to eight values")
+
+
 class YahooCandleInvalidResponseError(APIError):
     """API-compatible local validation error with a stable privacy-safe type."""
 
@@ -131,8 +153,30 @@ class YahooTrailingIncompleteAssessment:
             raise ValueError("Unsupported trailing-incomplete rejection reason")
 
 
-def classify_yahoo_candle_failure(error: BaseException) -> YahooCandleFailureCategory:
-    """Classify a causal chain without inspecting or returning message text."""
+_MAX_EXCEPTION_TYPE_CHAIN_LENGTH = 8
+_UNRECOGNIZED_EXCEPTION_TYPE = "UNRECOGNIZED_EXCEPTION_TYPE"
+_EXCEPTION_CHAIN_TRUNCATED = "EXCEPTION_CHAIN_TRUNCATED"
+_ALLOWED_EXCEPTION_TYPE_NAMESPACES = frozenset({
+    "builtins",
+    "curl_cffi",
+    "investment_terminal",
+    "numpy",
+    "pandas",
+    "peewee",
+    "requests",
+    "sqlite3",
+    "urllib3",
+    "yfinance",
+})
+
+
+def project_yahoo_candle_failure(
+    error: BaseException,
+) -> YahooCandleFailureEvidence:
+    """Project category and class identities without reading exception content."""
+    if not isinstance(error, BaseException):
+        raise TypeError("error must be a BaseException")
+
     chain: list[BaseException] = []
     current: BaseException | None = error
     seen: set[int] = set()
@@ -141,6 +185,27 @@ def classify_yahoo_candle_failure(error: BaseException) -> YahooCandleFailureCat
         chain.append(current)
         current = current.__cause__ or current.__context__
 
+    category = _classify_yahoo_candle_failure_chain(error, chain)
+    if len(chain) > _MAX_EXCEPTION_TYPE_CHAIN_LENGTH:
+        projected_chain = [
+            _normalized_exception_type(item)
+            for item in chain[:_MAX_EXCEPTION_TYPE_CHAIN_LENGTH - 1]
+        ]
+        projected_chain.append(_EXCEPTION_CHAIN_TRUNCATED)
+    else:
+        projected_chain = [_normalized_exception_type(item) for item in chain]
+    return YahooCandleFailureEvidence(category, tuple(projected_chain))
+
+
+def classify_yahoo_candle_failure(error: BaseException) -> YahooCandleFailureCategory:
+    """Classify a causal chain without inspecting or returning message text."""
+    return project_yahoo_candle_failure(error).category
+
+
+def _classify_yahoo_candle_failure_chain(
+    error: BaseException,
+    chain: list[BaseException],
+) -> YahooCandleFailureCategory:
     for item in chain:
         if isinstance(item, YahooCandleInvalidResponseError):
             return item.category
@@ -168,6 +233,34 @@ def classify_yahoo_candle_failure(error: BaseException) -> YahooCandleFailureCat
     if isinstance(error, (TypeError, ValueError)):
         return YahooCandleFailureCategory.INVALID_RESPONSE
     return YahooCandleFailureCategory.UNEXPECTED
+
+
+def _normalized_exception_type(error: BaseException) -> str:
+    exception_type = type(error)
+    module = type.__getattribute__(exception_type, "__module__")
+    qualname = type.__getattribute__(exception_type, "__qualname__")
+    if not isinstance(module, str) or not isinstance(qualname, str):
+        return _UNRECOGNIZED_EXCEPTION_TYPE
+    segments = module.split(".") + qualname.split(".")
+    if (
+        module.split(".", 1)[0] not in _ALLOWED_EXCEPTION_TYPE_NAMESPACES
+        or any(not _is_ascii_identifier(segment) for segment in segments)
+    ):
+        return _UNRECOGNIZED_EXCEPTION_TYPE
+    return f"{module}.{qualname}"
+
+
+def _is_ascii_identifier(value: str) -> bool:
+    if not value:
+        return False
+    first, remainder = value[0], value[1:]
+    return (first == "_" or "A" <= first <= "Z" or "a" <= first <= "z") and all(
+        character == "_"
+        or "A" <= character <= "Z"
+        or "a" <= character <= "z"
+        or "0" <= character <= "9"
+        for character in remainder
+    )
 
 
 class YahooFinanceClient:

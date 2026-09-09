@@ -62,7 +62,7 @@ class ManifestRepairedSeriesQualificationService:
         if duration < 0:
             raise ValueError("completed_at must not be earlier than started_at")
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "provider_identity": "YAHOO_FINANCE",
             "qualification_identity": "MANIFEST_REPAIRED_SERIES_QUALIFICATION",
             "status": status,

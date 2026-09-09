@@ -586,3 +586,11 @@ and sends the returned frame through the unchanged strict Yahoo candle
 projection. Its redacted report records aggregate repair provenance and stable
 failure categories. It has no SQLite, importer, checkpoint-writer, retry-loop,
 or drain authority, and it does not change production `repair=False` behavior.
+
+Its schema-version-2 failure envelope uses the shared Yahoo causal classifier
+and adds only a bounded allowlisted exception class chain. Classification still
+examines the complete cycle-safe causal chain, while report evidence contains at
+most eight ASCII module/class identifiers or fixed redaction/truncation markers.
+Exception messages, arguments, tracebacks, paths, identities, and provider
+payloads remain outside the report. This observability change grants no retry,
+persistence, or later-batch authority.

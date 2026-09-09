@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `d0cd9afd237f40157a4c42d88ba73506d844dbab`
-**Current local package:** Phase 7 Package 123 - Causal Exception Evidence Audit
+**Current GitHub baseline:** `8c21c4114fabdd3d7e0c25227be444b3c2f64ca6`
+**Current local package:** Phase 7 Package 124 - Causal Exception Evidence
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement versioned causal exception-type evidence
+**Current next action:** Run one schema-version-2 repaired-series qualification
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -623,6 +623,14 @@ Market / external data
 ---
 
 ## Current Audit Conclusion
+
+Package 124 implements schema-version-2 repaired-series evidence. The shared
+Yahoo projection preserves category behavior across the complete causal chain
+and emits at most eight allowlisted ASCII class identifiers or fixed redaction
+markers. Qualified and rejected reports retain `failure=null`; only failed
+reports own a non-empty type chain. Run one controlled batch-19 qualification
+next and return only the redacted report. Ingestion retry and batch 20 remain
+blocked.
 
 Package 123 confirms that the current classifier traverses causal exceptions but
 the repaired-series failure envelope discards their class identities. Implement
