@@ -797,3 +797,11 @@ retry or later batch.
 The exact guard rejection is `TRAILING_PARTIAL_OHLC_INCONSISTENT`. Preserve the
 guard and audit a separate read-only recovery qualification before retrying or
 continuing the manifest.
+
+## Phase 7 Package 120 checkpoint
+
+The recovery audit confirms that yfinance `repair=True` is an explicit
+provider-library transformation rather than validation of the original frame.
+Implement one separate manifest-bound, read-only qualification with one repaired
+request, unchanged strict projection, and redacted provenance. Do not alter the
+production default or authorize persistence, retry, or batch 20.

@@ -77,5 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_119_PROJECTION_PARITY_RESULT.md`: preserve the rejecting guard
-and audit one read-only automatic recovery qualification next.
+`PHASE_7_PACKAGE_120_REPAIRED_RETRIEVAL_AUDIT.md`: implement one separate
+manifest-bound repaired-retrieval qualification next while production remains
+strict and persistence remains blocked.

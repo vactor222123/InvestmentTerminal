@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ e10abd60ba607562edf4fc3e858cbe8ab59274c7`
+**Current repository baseline:** `develop @ b45768e24c9678b1b783b6a1de7d6be6cc6350eb`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -151,6 +151,7 @@
 **Phase 7 Package 117 projection decision-parity audit:** COMPLETE
 **Phase 7 Package 118 projection decision parity:** COMPLETE
 **Phase 7 Package 119 projection parity result:** COMPLETE - RECOVERY AUDIT REQUIRED
+**Phase 7 Package 120 repaired retrieval qualification audit:** COMPLETE
 
 ## Current State
 
@@ -158,10 +159,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit one read-only automatic recovery qualification for the batch-19 series.
-Prefer an explicit separately measured Yahoo repaired retrieval followed by
-strict projection and redacted comparison evidence. Do not weaken omission
-guards, retry ingestion, execute batch 20, or resume the drain.
+Implement one separate read-only qualification for the batch-19 series. It must
+make one explicit yfinance `repair=True` retrieval, apply unchanged strict
+projection, and emit redacted repair provenance. Do not change production
+defaults, persist repaired candles, retry ingestion, execute batch 20, or resume
+the drain.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

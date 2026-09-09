@@ -350,6 +350,11 @@ Still deferred:
 
 ## Current Decision Point
 
+Phase 7 Package 120 audits the isolated batch-19 recovery boundary. The selected
+next package is a separate read-only one-series yfinance `repair=True`
+qualification followed by unchanged strict projection. Production retrieval
+remains `repair=False`; persistence, another retry, and batch 20 remain blocked.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
