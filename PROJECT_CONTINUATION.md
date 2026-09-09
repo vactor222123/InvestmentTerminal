@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `8c21c4114fabdd3d7e0c25227be444b3c2f64ca6`
-**Current local package:** Phase 7 Package 124 - Causal Exception Evidence
+**Current GitHub baseline:** `d264aa048c69f9ee7d92f9ad133d0ffb6e007ed9`
+**Current local package:** Phase 7 Package 125 - Schema-2 Repaired Qualification Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one schema-version-2 repaired-series qualification
+**Current next action:** Audit yfinance repair optional dependencies
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -623,6 +623,14 @@ Market / external data
 ---
 
 ## Current Audit Conclusion
+
+Package 125 records a valid schema-version-2 `FAILED/UNEXPECTED` qualification
+whose causal evidence is `APIError -> ModuleNotFoundError`. The frame was not
+returned, so repair and coverage counts remain unknown. Installed yfinance 1.6.0
+contains repair-only imports of `scipy` and `scikit-learn`; neither package is
+installed or present in repository dependency manifests and locks. Audit the
+minimal reproducible dependency closure next. Do not install ad hoc packages,
+repeat qualification, retry ingestion, or execute batch 20.
 
 Package 124 implements schema-version-2 repaired-series evidence. The shared
 Yahoo projection preserves category behavior across the complete causal chain

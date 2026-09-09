@@ -376,6 +376,12 @@ schema version 2; failed reports expose only the bounded normalized type chain,
 while qualified/rejected shapes retain `failure=null`. One controlled repaired-
 series rerun is next; ingestion retry and batch 20 remain blocked.
 
+The Package 125 rerun reports `APIError -> ModuleNotFoundError` before any frame
+evidence. Local yfinance 1.6.0 source uses optional `scipy` and `scikit-learn`
+imports in repaired-price paths, while the environment and repository locks
+contain neither. Audit the minimal reproducible dependency closure before any
+installation or another provider request; ingestion and batch 20 remain blocked.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

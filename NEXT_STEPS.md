@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 8c21c4114fabdd3d7e0c25227be444b3c2f64ca6`
+**Current repository baseline:** `develop @ d264aa048c69f9ee7d92f9ad133d0ffb6e007ed9`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -156,6 +156,7 @@
 **Phase 7 Package 122 repaired qualification result:** COMPLETE - UNEXPECTED FAILURE
 **Phase 7 Package 123 causal exception evidence audit:** COMPLETE
 **Phase 7 Package 124 causal exception evidence:** COMPLETE
+**Phase 7 Package 125 schema-2 repaired qualification result:** COMPLETE - OPTIONAL DEPENDENCY BLOCKER
 
 ## Current State
 
@@ -163,10 +164,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one controlled schema-version-2 repaired-series qualification for the same
-batch-19 failure and return only its redacted report. Review the causal class
-evidence before selecting remediation. Do not retry ingestion, execute batch 20,
-or resume the drain.
+Audit the yfinance 1.6.0 `repair=True` optional dependency boundary. The
+controlled schema-version-2 report identified `APIError -> ModuleNotFoundError`;
+local source inspection found repair-only `scipy` and `scikit-learn` imports,
+while neither dependency is declared, locked, or installed. Do not install an
+unlocked package, repeat qualification, retry ingestion, execute batch 20, or
+resume the drain.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

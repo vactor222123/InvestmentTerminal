@@ -834,3 +834,11 @@ schema version 2 are implemented. Category behavior is unchanged; failed
 reports expose only a bounded allowlisted causal type chain, and all content-
 bearing exception fields remain excluded. Run one controlled batch-19 repaired-
 series qualification next and review its redacted evidence before remediation.
+
+## Phase 7 Package 125 checkpoint
+
+The controlled schema-version-2 rerun failed before returning a frame with the
+safe chain `APIError -> ModuleNotFoundError`. Installed yfinance repair source
+contains optional `scipy` and `scikit-learn` imports, while neither dependency
+is installed or locked by the repository. Audit the smallest reproducible
+dependency closure next; do not install ad hoc packages or repeat the request.

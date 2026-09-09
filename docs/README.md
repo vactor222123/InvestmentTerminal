@@ -77,7 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_124_CAUSAL_EXCEPTION_EVIDENCE.md`: schema-version-2 allowlisted
-causal exception-type evidence is implemented without provider access. One
-controlled qualification rerun is next; persistence and later batches remain
-blocked.
+`PHASE_7_PACKAGE_125_REPAIRED_QUALIFICATION_SCHEMA2_RESULT.md`: the controlled
+schema-version-2 rerun found a missing optional module before frame retrieval.
+Audit reproducible yfinance repair dependencies before installation, another
+request, persistence, or later batches.
