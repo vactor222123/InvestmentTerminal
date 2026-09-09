@@ -842,3 +842,12 @@ safe chain `APIError -> ModuleNotFoundError`. Installed yfinance repair source
 contains optional `scipy` and `scikit-learn` imports, while neither dependency
 is installed or locked by the repository. Audit the smallest reproducible
 dependency closure next; do not install ad hoc packages or repeat the request.
+
+## Phase 7 Package 126 checkpoint
+
+yfinance 1.6.0 officially exposes `repair` as an extra that requires both
+SciPy and scikit-learn, and compatible CPython 3.13 Windows and Linux wheels
+exist. Implement the capability as `yfinance[repair]>=0.2.65`, regenerate both
+hash locks through the existing compiler, add focused dependency-contract
+checks, and verify clean locked installs before repeating qualification.
+Ingestion, batch 20, and the broader drain remain blocked.

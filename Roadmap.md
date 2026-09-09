@@ -382,6 +382,14 @@ imports in repaired-price paths, while the environment and repository locks
 contain neither. Audit the minimal reproducible dependency closure before any
 installation or another provider request; ingestion and batch 20 remain blocked.
 
+Package 126 verifies that yfinance 1.6.0 publishes the complete repair
+capability as its official `repair` extra, covering both SciPy and
+scikit-learn. Compatible CPython 3.13 Windows and Linux wheels are available.
+Implement `yfinance[repair]>=0.2.65`, regenerate both hash locks with the
+existing compiler, and verify clean locked installs before another repaired
+qualification. Production retrieval, persistence, and later batches remain
+unchanged and blocked.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `d264aa048c69f9ee7d92f9ad133d0ffb6e007ed9`
-**Current local package:** Phase 7 Package 125 - Schema-2 Repaired Qualification Result
+**Current GitHub baseline:** `314e2ddcc379d247cc18accd91e8f614b198d2bb`
+**Current local package:** Phase 7 Package 126 - Repaired Retrieval Dependency Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit yfinance repair optional dependencies
+**Current next action:** Implement the yfinance repair dependency closure
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -624,13 +624,18 @@ Market / external data
 
 ## Current Audit Conclusion
 
+Package 126 confirms that yfinance 1.6.0 officially publishes a `repair` extra
+which owns both `scipy` and `scikit-learn`. Source inspection shows SciPy is
+reached by the multi-row non-FX unit-mixup path and scikit-learn by finer-
+interval reconstruction. Compatible CPython 3.13 wheels exist for Windows and
+Linux. Implement `yfinance[repair]>=0.2.65` in the runtime and legacy source
+manifests, regenerate both hash locks with the existing compiler, add contract
+checks, and verify clean locked installs. Do not install ad hoc packages,
+repeat qualification, retry ingestion, or execute batch 20 first.
+
 Package 125 records a valid schema-version-2 `FAILED/UNEXPECTED` qualification
 whose causal evidence is `APIError -> ModuleNotFoundError`. The frame was not
-returned, so repair and coverage counts remain unknown. Installed yfinance 1.6.0
-contains repair-only imports of `scipy` and `scikit-learn`; neither package is
-installed or present in repository dependency manifests and locks. Audit the
-minimal reproducible dependency closure next. Do not install ad hoc packages,
-repeat qualification, retry ingestion, or execute batch 20.
+returned, so repair and coverage counts remain unknown.
 
 Package 124 implements schema-version-2 repaired-series evidence. The shared
 Yahoo projection preserves category behavior across the complete causal chain

@@ -77,7 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_125_REPAIRED_QUALIFICATION_SCHEMA2_RESULT.md`: the controlled
-schema-version-2 rerun found a missing optional module before frame retrieval.
-Audit reproducible yfinance repair dependencies before installation, another
-request, persistence, or later batches.
+`PHASE_7_PACKAGE_126_REPAIR_DEPENDENCY_AUDIT.md`: yfinance 1.6.0 owns its full
+repair dependency set through the official `repair` extra. Implement that extra
+in the runtime dependency contract and regenerate both hash locks before
+another request, persistence, or later batches.
