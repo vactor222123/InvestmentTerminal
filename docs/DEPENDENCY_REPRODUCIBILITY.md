@@ -38,6 +38,7 @@ Important ownership rule:
 FastAPI framework        → fastapi
 production ASGI server   → uvicorn
 TestClient transport     → httpx (development/test)
+yfinance repaired prices → yfinance[repair] (runtime)
 ```
 
 The project intentionally does **not** depend on `fastapi[standard]`.
@@ -50,6 +51,11 @@ contract.
 
 Directly declaring only the capabilities the project actually owns avoids this
 hidden platform-specific dependency surface.
+
+The `repair` extra is intentionally owned through `yfinance[repair]`, rather
+than by declaring its implementation dependencies directly. This keeps SciPy
+and scikit-learn in the generated runtime closure while leaving their version
+policy with the provider capability that requires them.
 
 ## Compiler Toolchain
 

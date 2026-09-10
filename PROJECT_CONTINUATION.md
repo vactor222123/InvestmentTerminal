@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `314e2ddcc379d247cc18accd91e8f614b198d2bb`
-**Current local package:** Phase 7 Package 126 - Repaired Retrieval Dependency Audit
+**Current GitHub baseline:** `4387c248d352aacee2f8d1125475bef90c241d08`
+**Current local package:** Phase 7 Package 127 - Repair Dependency Closure
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement the yfinance repair dependency closure
+**Current next action:** Run one controlled schema-2 repaired qualification
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -623,6 +623,15 @@ Market / external data
 ---
 
 ## Current Audit Conclusion
+
+Package 127 implements the official yfinance repair dependency closure in the
+runtime source and both Python 3.13 hash locks while preserving yfinance 1.6.0
+and every unrelated pin. Clean runtime and development installs pass
+`--require-hashes`, `pip check`, and the SciPy/scikit-learn repair imports.
+No provider, projection, schema, checkpoint, persistence, or batch behavior
+changed. Run exactly one controlled schema-version-2 repaired qualification
+for batch 19 next and return only its redacted report. Persistence, ingestion
+retry, batch 20, and the broader drain remain blocked pending review.
 
 Package 126 confirms that yfinance 1.6.0 officially publishes a `repair` extra
 which owns both `scipy` and `scikit-learn`. Source inspection shows SciPy is

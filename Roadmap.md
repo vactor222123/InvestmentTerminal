@@ -390,6 +390,13 @@ existing compiler, and verify clean locked installs before another repaired
 qualification. Production retrieval, persistence, and later batches remain
 unchanged and blocked.
 
+Package 127 implements the provider-owned repair closure in both hash locks.
+Clean runtime and development installs pass hash verification, dependency
+checks, and the SciPy/scikit-learn imports while all production behavior and
+unrelated pins remain unchanged. One controlled schema-version-2 repaired
+qualification for batch 19 is next; persistence, ingestion retry, batch 20,
+and the broader drain remain blocked pending review.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

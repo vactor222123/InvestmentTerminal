@@ -851,3 +851,11 @@ exist. Implement the capability as `yfinance[repair]>=0.2.65`, regenerate both
 hash locks through the existing compiler, add focused dependency-contract
 checks, and verify clean locked installs before repeating qualification.
 Ingestion, batch 20, and the broader drain remain blocked.
+
+## Phase 7 Package 127 checkpoint
+
+The official yfinance repair dependency closure is now present in both Python
+3.13 hash locks and verified by clean runtime/development installs, `pip check`,
+and repair-path imports. Run one controlled schema-version-2 repaired
+qualification for batch 19 next. Persistence, ingestion retry, batch 20, and
+the broader drain remain blocked pending its redacted result.

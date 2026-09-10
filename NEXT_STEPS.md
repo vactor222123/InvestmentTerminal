@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 314e2ddcc379d247cc18accd91e8f614b198d2bb`
+**Current repository baseline:** `develop @ 4387c248d352aacee2f8d1125475bef90c241d08`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -158,6 +158,7 @@
 **Phase 7 Package 124 causal exception evidence:** COMPLETE
 **Phase 7 Package 125 schema-2 repaired qualification result:** COMPLETE - OPTIONAL DEPENDENCY BLOCKER
 **Phase 7 Package 126 repaired retrieval dependency audit:** COMPLETE
+**Phase 7 Package 127 repair dependency closure:** COMPLETE
 
 ## Current State
 
@@ -165,12 +166,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the audited yfinance repair dependency closure. Declare
-`yfinance[repair]>=0.2.65` in the runtime source and legacy combined manifest,
-regenerate both hash locks with the existing Python 3.13 compiler, add focused
-dependency-contract checks, and verify clean locked installs plus imports. Do
-not install ad hoc packages, repeat qualification, retry ingestion, execute
-batch 20, or resume the drain before that implementation is complete.
+Run exactly one controlled schema-version-2 repaired-series qualification for
+batch 19 against the unchanged private manifest and checkpoint, then return
+only the redacted report for review. Do not persist repaired candles, retry
+batch 19 ingestion, execute batch 20, or resume the broader drain before that
+result is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

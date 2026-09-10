@@ -7,6 +7,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 REQUIREMENT_NAME = re.compile(
     r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?"
 )
+LOCKED_REQUIREMENT_NAME = re.compile(
+    r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?=="
+)
 
 
 def _direct_requirement_names(
@@ -39,6 +42,28 @@ def _direct_requirement_names(
                 "-",
             )
         )
+
+    return names
+
+
+def _locked_requirement_names(
+    path: Path,
+) -> set[str]:
+    names: set[str] = set()
+
+    for raw_line in path.read_text(
+        encoding="utf-8"
+    ).splitlines():
+        match = LOCKED_REQUIREMENT_NAME.match(
+            raw_line.strip()
+        )
+        if match is not None:
+            names.add(
+                match.group(1).lower().replace(
+                    "_",
+                    "-",
+                )
+            )
 
     return names
 
@@ -98,6 +123,36 @@ def test_runtime_source_owns_server_without_standard_extra() -> None:
     assert "fastapi[standard]" not in runtime_text
     assert "fastapi" in runtime
     assert "uvicorn" in runtime
+
+
+def test_runtime_source_owns_yfinance_repair_extra() -> None:
+    for manifest_name in (
+        "requirements.in",
+        "requirements.txt",
+    ):
+        lines = (
+            PROJECT_ROOT / manifest_name
+        ).read_text(
+            encoding="utf-8"
+        ).splitlines()
+
+        assert "yfinance[repair]>=0.2.65" in lines
+
+
+def test_generated_locks_include_repair_dependency_closure() -> None:
+    for lock_name in (
+        "requirements.lock",
+        "requirements-dev.lock",
+    ):
+        locked = _locked_requirement_names(
+            PROJECT_ROOT / lock_name
+        )
+
+        assert {
+            "scipy",
+            "scikit-learn",
+            "yfinance",
+        } <= locked
 
 
 def test_dev_source_owns_testclient_transport() -> None:
