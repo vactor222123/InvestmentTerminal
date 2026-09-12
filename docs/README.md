@@ -77,7 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_131_NORMAL_PATH_PROJECTION_RESULT.md`: the current normal
-`repair=False` frame is valid and unchanged strict projection qualified one
-candle. Run one manifest-bound batch-19 retry against the unchanged checkpoint
-before considering batch 20 or the broader drain.
+`PHASE_7_PACKAGE_132_BATCH_19_RECOVERY_RESULT.md`: batch 19 is complete with 20
+successes, the normal path inserted one candle, and SQLite integrity is `ok`.
+Audit the manifest-drain restart boundary before batch 20 or broader execution.

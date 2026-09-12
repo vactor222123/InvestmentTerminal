@@ -429,6 +429,13 @@ is required. Run exactly one normal manifest-bound batch-19 retry against the
 unchanged checkpoint next, then review its redacted result and SQLite integrity.
 Batch 20 and the broader drain remain blocked.
 
+Package 132 records successful normal-path recovery of batch 19. Exactly one
+failed item was attempted, 19 successes were skipped, one candle was inserted,
+and cumulative coverage reached 20 successes with zero failures, duplicates,
+or omissions. SQLite integrity is `ok`. Audit the checkpoint-derived drain
+restart boundary and existing budget/stop semantics before authorizing batch 20
+or any broader continuation.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

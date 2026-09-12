@@ -898,3 +898,11 @@ one candle with no failure category; no omission or repair is required. Run one
 manifest-bound batch-19 retry against the unchanged checkpoint next and review
 its redacted report plus SQLite integrity. Batch 20 and the broader drain remain
 blocked.
+
+## Phase 7 Package 132 checkpoint
+
+Batch 19 recovered successfully through normal `repair=False` retrieval. The
+retry attempted one item, skipped 19, inserted one candle, and completed all 20
+outcomes with zero failures, duplicates, or omissions. SQLite integrity is
+`ok`. Audit the checkpoint-derived drain restart boundary, budget, stop rules,
+and report semantics before authorizing batch 20 or broader execution.

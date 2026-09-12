@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ ce54d345e3a2373e7cef50e700820c203f272714`
+**Current repository baseline:** `develop @ f049595cef476db75bf4f23da59c945b47a9227d`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -163,6 +163,7 @@
 **Phase 7 Package 129 repaired-series integration audit:** COMPLETE
 **Phase 7 Package 130 normal-path strict-projection evidence:** COMPLETE
 **Phase 7 Package 131 normal-path projection result:** COMPLETE - QUALIFIED
+**Phase 7 Package 132 batch-19 recovery result:** COMPLETE - SUCCESS
 
 ## Current State
 
@@ -170,11 +171,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run exactly one manifest-bound batch-19 retry against the unchanged private
-checkpoint. The executor must skip the 19 existing successes and attempt only
-the one failed outcome through the normal `repair=False` path. Return only its
-redacted report and the privacy-safe SQLite integrity result. Do not persist
-repaired candles, execute batch 20, or resume the broader drain before review.
+Audit the manifest-drain restart boundary after successful batch-19 recovery.
+Verify checkpoint-derived first-unfinished selection, the existing 25-batch
+budget and stop rules, report semantics, and operational prerequisites before
+authorizing any run beginning at batch 20. Do not execute batch 20 or resume the
+broader drain during the audit. Repaired retrieval remains outside persistence.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

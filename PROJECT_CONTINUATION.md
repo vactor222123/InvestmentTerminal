@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `ce54d345e3a2373e7cef50e700820c203f272714`
-**Current local package:** Phase 7 Package 131 - Normal-Path Projection Result
+**Current GitHub baseline:** `f049595cef476db75bf4f23da59c945b47a9227d`
+**Current local package:** Phase 7 Package 132 - Batch-19 Recovery Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one normal manifest-bound batch-19 retry
+**Current next action:** Audit manifest-drain restart from batch 20
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -624,13 +624,17 @@ Market / external data
 
 ## Current Audit Conclusion
 
+Package 132 records successful batch-19 recovery. The normal `repair=False`
+retry attempted one item, skipped 19, inserted one candle, and completed all 20
+outcomes with no failures, duplicates, or omissions. SQLite integrity is `ok`.
+Audit checkpoint-derived drain restart, the existing 25-batch budget, stop
+rules, report semantics, and operational prerequisites next. Do not execute
+batch 20 during that audit; repaired retrieval remains outside persistence.
+
 Package 131 records a valid schema-version-3 normal-path result. The one raw
 `repair=False` row was valid and unchanged strict projection qualified one
 candle with no failure category. The omission assessment's
-`REJECTED/NO_INVALID_ROW` is expected because no row required omission. Run
-exactly one manifest-bound batch-19 retry against the unchanged checkpoint;
-it must skip 19 successes and attempt only the failed outcome. Review its
-redacted report and SQLite integrity before batch 20 or the broader drain.
+`REJECTED/NO_INVALID_ROW` is expected because no row required omission.
 
 Package 130 advances the read-only manifest failed-series diagnostic to schema
 version 3. It applies unchanged strict Yahoo projection to the same already-
