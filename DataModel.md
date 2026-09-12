@@ -833,7 +833,7 @@ and optional stable failure category. The report excludes identities,
 currencies, prices, row keys, paths, provider text, and exception messages and
 grants no persistence, retry, later-batch, analytical, or trading authority.
 
-## Planned Manifest Failed-Series Diagnostic Schema 3
+## Manifest Failed-Series Diagnostic Schema 3
 
 Historical manifest failed-series diagnostic schemas 1 and 2 remain immutable.
 The selected schema-version-3 extension preserves all schema-2 raw coverage and
@@ -850,5 +850,5 @@ This is redacted diagnostic evidence, not stored-candle provenance. Current
 resumable checkpoints, batch reports, `Candle`, and the SQLite `candles` table
 have no repair-mode or repaired-row field. Repaired retrieval must not be
 persisted until that separate durable provenance contract is explicitly
-designed and migrated. Schema 3 is not operationally active until its bounded
-implementation and failure-path tests pass.
+designed and migrated. Schema 3 is a read-only measurement contract and does
+not change checkpoint, batch-report, candle, or SQLite schemas.

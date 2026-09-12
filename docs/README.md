@@ -77,8 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_129_REPAIRED_SERIES_INTEGRATION_AUDIT.md`: repaired-source
-provenance cannot currently cross checkpoint, report, candle, or SQLite
-boundaries safely. Implement one read-only schema-version-3 normal-path strict-
-projection diagnostic before considering persistence, an ingestion retry, or
-later batches.
+`PHASE_7_PACKAGE_130_NORMAL_PATH_STRICT_PROJECTION_EVIDENCE.md`: the schema-
+version-3 read-only diagnostic measures unchanged strict projection on the same
+normal `repair=False` frame without a second provider request. Run it once for
+batch 19 before considering persistence, an ingestion retry, or later batches.

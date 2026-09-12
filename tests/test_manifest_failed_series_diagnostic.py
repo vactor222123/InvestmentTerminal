@@ -82,13 +82,18 @@ def test_selects_only_failed_item_over_exact_window_and_redacts_identity():
     assert report["coverage"]["invalid_reason_counts"] == {
         "OPEN_NON_FINITE": 1
     }
-    assert report["schema_version"] == 2
+    assert report["schema_version"] == 3
     assert report["coverage"]["projection_assessment"] == {
         "policy_identity": "DAILY_SINGLE_TRAILING_NON_FINITE_NUMERIC_V1",
         "status": "ELIGIBLE",
         "rejection_reason": None,
         "omitted_trailing_count": 1,
         "omission_types": ["TRAILING_NON_FINITE_NUMERIC"],
+    }
+    assert report["coverage"]["strict_projection"] == {
+        "status": "REJECTED",
+        "projected_candle_count": None,
+        "failure_category": "RESPONSE_NUMERIC",
     }
     assert repr(value) == before
     assert "AAA" not in str(report) and "BBB" not in str(report)
@@ -111,6 +116,65 @@ def test_reports_exact_shared_partial_ohlc_rejection_without_values():
     assert assessment["status"] == "REJECTED"
     assert assessment["rejection_reason"] == "TRAILING_PARTIAL_OHLC_INCONSISTENT"
     assert "20.0" not in str(report)
+
+
+def test_reports_qualified_strict_projection_for_complete_valid_frame():
+    selected = selection()
+    client = Client()
+    frame = client.get_daily_frame().iloc[:1].copy()
+    client.calls.clear()
+    client.get_daily_frame = lambda **kwargs: frame
+
+    report = ManifestFailedSeriesDiagnosticService(
+        client=client, clock=lambda: NOW
+    ).run(selected, checkpoint(selected.request.checksum))
+
+    assert report["coverage"]["projection_assessment"]["status"] == "REJECTED"
+    assert (
+        report["coverage"]["projection_assessment"]["rejection_reason"]
+        == "NO_INVALID_ROW"
+    )
+    assert report["coverage"]["strict_projection"] == {
+        "status": "QUALIFIED",
+        "projected_candle_count": 1,
+        "failure_category": None,
+    }
+
+
+def test_reports_empty_strict_projection_without_inventing_failure():
+    selected = selection()
+    client = Client()
+    frame = client.get_daily_frame().iloc[:0].copy()
+    client.get_daily_frame = lambda **kwargs: frame
+
+    report = ManifestFailedSeriesDiagnosticService(
+        client=client, clock=lambda: NOW
+    ).run(selected, checkpoint(selected.request.checksum))
+
+    assert report["coverage"]["strict_projection"] == {
+        "status": "EMPTY",
+        "projected_candle_count": 0,
+        "failure_category": None,
+    }
+
+
+def test_reports_strict_ohlc_rejection_without_private_values():
+    selected = selection()
+    client = Client()
+    frame = client.get_daily_frame().iloc[:1].copy()
+    frame.iloc[0, frame.columns.get_loc("High")] = 8.0
+    client.get_daily_frame = lambda **kwargs: frame
+
+    report = ManifestFailedSeriesDiagnosticService(
+        client=client, clock=lambda: NOW
+    ).run(selected, checkpoint(selected.request.checksum))
+
+    assert report["coverage"]["strict_projection"] == {
+        "status": "REJECTED",
+        "projected_candle_count": None,
+        "failure_category": "RESPONSE_OHLC",
+    }
+    assert "8.0" not in str(report)
 
 
 @pytest.mark.parametrize(

@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `d27fb2b7178e0871ce3a6b083412dcbc0d60245b`
-**Current local package:** Phase 7 Package 129 - Repaired-Series Integration Audit
+**Current GitHub baseline:** `41d724e740e098f63ca8f1084aca4bf0c4d37896`
+**Current local package:** Phase 7 Package 130 - Normal-Path Strict-Projection Evidence
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement read-only normal-path strict-projection evidence
+**Current next action:** Run one schema-3 batch-19 diagnostic
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -624,16 +624,19 @@ Market / external data
 
 ## Current Audit Conclusion
 
+Package 130 advances the read-only manifest failed-series diagnostic to schema
+version 3. It applies unchanged strict Yahoo projection to the same already-
+fetched `repair=False` frame without a second provider request and emits only
+`QUALIFIED`, `EMPTY`, or `REJECTED`, projected count, and stable rejection
+category. Run exactly one controlled diagnostic for the existing batch-19
+failure next and return only its redacted report. Repaired persistence,
+ingestion retry, batch 20, and the broader drain remain blocked pending review.
+
 Package 129 confirms that repair-mode provenance stops at the qualification
 report. The production checkpoint/report path, `Candle`, repository, and SQLite
 schema cannot preserve whether heuristic repair was requested or whether a row
 was repaired, so repaired retrieval must not be persisted. Package 128's zero-
-repaired-row result does not justify a broad storage migration. Next, version
-the existing read-only manifest failed-series diagnostic to schema 3 and apply
-unchanged strict projection to its same `repair=False` frame, exposing only a
-redacted status, projected count, and stable failure category. Then run one
-controlled batch-19 diagnostic. Persistence, ingestion retry, batch 20, and the
-broader drain remain blocked pending that result.
+repaired-row result does not justify a broad storage migration.
 
 Package 128 records a valid checksum-bound schema-version-2 `QUALIFIED`
 repaired-series measurement. The explicit yfinance 1.6.0 repair request

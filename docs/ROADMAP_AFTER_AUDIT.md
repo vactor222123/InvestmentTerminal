@@ -880,3 +880,12 @@ which runs unchanged strict projection on the same `repair=False` frame and
 reports only status, projected count, and stable failure category. Run it once
 for batch 19 after implementation; batch 20 and the broader drain remain
 blocked.
+
+## Phase 7 Package 130 checkpoint
+
+The manifest failed-series diagnostic now emits schema version 3 and applies
+unchanged strict projection to the same already-fetched normal `repair=False`
+frame without a second provider request. Its added evidence is limited to
+`QUALIFIED`, `EMPTY`, or `REJECTED`, projected count, and stable failure
+category. Run one controlled batch-19 diagnostic next. Persistence, ingestion
+retry, batch 20, and the broader drain remain blocked pending review.

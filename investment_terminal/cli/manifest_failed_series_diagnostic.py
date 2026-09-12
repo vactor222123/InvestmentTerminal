@@ -53,7 +53,7 @@ def main(argv: Sequence[str] | None = None, *, client=None, clock=None) -> int:
     except Exception as exc:
         now = runtime_clock()
         payload = {
-            "schema_version": 2,
+            "schema_version": 3,
             "provider_identity": "YAHOO_FINANCE",
             "diagnostic_identity": "MANIFEST_FAILED_SERIES_RAW_CANDLE_DIAGNOSTIC",
             "status": "FAILED",

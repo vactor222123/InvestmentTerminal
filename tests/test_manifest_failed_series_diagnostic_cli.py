@@ -40,7 +40,7 @@ def test_cli_writes_bound_report_without_mutating_checkpoint(tmp_path):
     report = json.loads(report_text)
     assert result == 0
     assert report["status"] == "SUCCESS"
-    assert report["schema_version"] == 2
+    assert report["schema_version"] == 3
     assert report["manifest_checksum"] == checksum
     assert report["batch_index"] == 1
     assert checkpoint_path.read_bytes() == before
@@ -65,7 +65,7 @@ def test_invalid_checkpoint_writes_redacted_failure_without_provider_call(tmp_pa
     report_text = (tmp_path / "report.json").read_text(encoding="utf-8")
     report = json.loads(report_text)
     assert result == 1
-    assert report["schema_version"] == 2
+    assert report["schema_version"] == 3
     assert report["failure"]["type"] == "ValueError"
     assert client.calls == []
     assert "AAA" not in report_text

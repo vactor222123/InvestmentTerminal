@@ -1,6 +1,10 @@
 """Privacy-safe raw diagnosis of one failed manifest batch series."""
 
-from investment_terminal.clients.yahoo_finance_client import YahooFinanceClient
+from investment_terminal.clients.yahoo_finance_client import (
+    YahooCandleInvalidResponseError,
+    YahooFinanceClient,
+    classify_yahoo_candle_failure,
+)
 
 from investment_terminal.operations.manifest_bound_market_batch import (
     ManifestBatchSelection,
@@ -50,12 +54,32 @@ class ManifestFailedSeriesDiagnosticService:
             "omitted_trailing_count": assessment.omitted_trailing_count,
             "omission_types": list(assessment.omission_types),
         }
+        try:
+            projection = YahooFinanceClient.project_history_frame_strict(
+                frame,
+                symbol=selected.symbol,
+                resolution=selection.request.resolution,
+                currency=selected.currency,
+            )
+            projected_count = len(projection.candles)
+            strict_projection = {
+                "status": "QUALIFIED" if projected_count else "EMPTY",
+                "projected_candle_count": projected_count,
+                "failure_category": None,
+            }
+        except YahooCandleInvalidResponseError as exc:
+            strict_projection = {
+                "status": "REJECTED",
+                "projected_candle_count": None,
+                "failure_category": classify_yahoo_candle_failure(exc).value,
+            }
+        coverage["strict_projection"] = strict_projection
         completed = validate_aware_datetime(self.clock(), field_name="completed_at")
         duration = (completed - started).total_seconds()
         if duration < 0:
             raise ValueError("completed_at must not be earlier than started_at")
         return {
-            "schema_version": 2,
+            "schema_version": 3,
             "provider_identity": "YAHOO_FINANCE",
             "diagnostic_identity": "MANIFEST_FAILED_SERIES_RAW_CANDLE_DIAGNOSTIC",
             "status": "SUCCESS",

@@ -598,9 +598,11 @@ persistence, or later-batch authority.
 Repair-mode provenance currently terminates at this qualification boundary.
 Manifest checkpoints, batch reports, `Candle`, and SQLite do not carry a
 retrieval-mode or repaired-row field, so repaired frames must not enter
-persistence until an explicit end-to-end provenance contract is selected. The
-next safe boundary is instead a schema-version-3 extension of the existing
-read-only manifest failed-series diagnostic: it applies unchanged strict
-projection to the same already-fetched `repair=False` frame and adds only a
-redacted status, projected count, and stable failure category. It adds no
-provider request or mutable dependency.
+persistence until an explicit end-to-end provenance contract is selected.
+
+The schema-version-3 manifest failed-series diagnostic applies unchanged
+strict projection to its same already-fetched `repair=False` frame. It adds
+only a redacted status, projected count, and stable failure category, makes no
+second provider request, and retains no mutable dependency. This measures
+normal-path projection parity without granting ingestion or repair-persistence
+authority.

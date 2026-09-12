@@ -414,6 +414,14 @@ count, and stable failure category. Then measure that normal path once before
 deciding whether batch 19 can be retried without repair. Batch 20 and the
 broader drain remain blocked.
 
+Package 130 implements that read-only normal-path evidence. The existing
+manifest failed-series diagnostic now emits schema version 3 and applies
+unchanged strict Yahoo projection to the same raw `repair=False` frame without
+a second provider request. It reports only `QUALIFIED`, `EMPTY`, or `REJECTED`,
+the completed projected count, and a stable rejection category. Run exactly one
+controlled batch-19 diagnostic next. Ingestion retry, repaired persistence,
+batch 20, and the broader drain remain blocked pending review.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
