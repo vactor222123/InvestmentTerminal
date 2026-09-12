@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `4387c248d352aacee2f8d1125475bef90c241d08`
-**Current local package:** Phase 7 Package 127 - Repair Dependency Closure
+**Current GitHub baseline:** `8417fd7f26e8ca2203117d54cf944f18eaf0c749`
+**Current local package:** Phase 7 Package 128 - Repaired Qualification Success
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one controlled schema-2 repaired qualification
+**Current next action:** Audit repaired-series integration provenance
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -623,6 +623,16 @@ Market / external data
 ---
 
 ## Current Audit Conclusion
+
+Package 128 records a valid checksum-bound schema-version-2 `QUALIFIED`
+repaired-series measurement. The explicit yfinance 1.6.0 repair request
+returned one raw row, unchanged strict projection accepted one candle, and no
+row was marked repaired. This proves structural acceptance of that returned
+frame only; it does not prove repair causality, ten-year completeness, or the
+unchanged production path. Audit explicit repair provenance across checkpoint,
+report, and storage boundaries next, including whether a read-only production-
+path measurement is required. Persistence, batch-19 ingestion retry, batch 20,
+and the broader drain remain blocked.
 
 Package 127 implements the official yfinance repair dependency closure in the
 runtime source and both Python 3.13 hash locks while preserving yfinance 1.6.0

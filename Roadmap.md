@@ -397,6 +397,13 @@ unrelated pins remain unchanged. One controlled schema-version-2 repaired
 qualification for batch 19 is next; persistence, ingestion retry, batch 20,
 and the broader drain remain blocked pending review.
 
+Package 128 records that controlled result as `QUALIFIED`: one raw row passed
+unchanged strict projection as one candle, while yfinance marked zero rows as
+repaired. This establishes structural acceptance of the returned repair-mode
+frame only, not repair causality, ten-year completeness, or production-path
+parity. Audit explicit repair provenance and integration semantics before any
+persistence, ingestion retry, batch 20, or broader drain.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

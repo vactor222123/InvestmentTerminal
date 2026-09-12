@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 4387c248d352aacee2f8d1125475bef90c241d08`
+**Current repository baseline:** `develop @ 8417fd7f26e8ca2203117d54cf944f18eaf0c749`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -159,6 +159,7 @@
 **Phase 7 Package 125 schema-2 repaired qualification result:** COMPLETE - OPTIONAL DEPENDENCY BLOCKER
 **Phase 7 Package 126 repaired retrieval dependency audit:** COMPLETE
 **Phase 7 Package 127 repair dependency closure:** COMPLETE
+**Phase 7 Package 128 repaired qualification result:** COMPLETE - QUALIFIED
 
 ## Current State
 
@@ -166,11 +167,13 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run exactly one controlled schema-version-2 repaired-series qualification for
-batch 19 against the unchanged private manifest and checkpoint, then return
-only the redacted report for review. Do not persist repaired candles, retry
-batch 19 ingestion, execute batch 20, or resume the broader drain before that
-result is reviewed.
+Audit the repaired-series integration and provenance boundary. The controlled
+schema-version-2 result is `QUALIFIED`, but it returned one strict candle and
+marked zero rows as repaired. Decide how explicit repair-mode provenance and
+zero/nonzero repair evidence would cross checkpoint, report, and storage
+boundaries, and whether an unchanged read-only production-path measurement is
+required. Do not persist candles, retry batch 19 ingestion, execute batch 20,
+or resume the broader drain before that audit.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

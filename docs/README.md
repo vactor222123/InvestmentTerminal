@@ -77,8 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_127_REPAIR_DEPENDENCY_CLOSURE.md`: the official yfinance repair
-extra and its SciPy/scikit-learn closure are present in both Python 3.13 hash
-locks and clean-install verified. Run one controlled schema-version-2 repaired
-qualification next; persistence and later batches remain blocked pending
-review.
+`PHASE_7_PACKAGE_128_REPAIRED_QUALIFICATION_SUCCESS.md`: one explicit repair-
+mode frame passed unchanged strict projection, but no row was marked repaired.
+Audit repaired-source provenance and integration semantics before persistence,
+an ingestion retry, or later batches.

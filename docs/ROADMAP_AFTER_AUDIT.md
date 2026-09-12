@@ -859,3 +859,13 @@ The official yfinance repair dependency closure is now present in both Python
 and repair-path imports. Run one controlled schema-version-2 repaired
 qualification for batch 19 next. Persistence, ingestion retry, batch 20, and
 the broader drain remain blocked pending its redacted result.
+
+## Phase 7 Package 128 checkpoint
+
+The controlled schema-version-2 repaired qualification is `QUALIFIED`. One raw
+row passed unchanged strict projection as one candle, while yfinance marked
+zero rows as repaired. The result proves structural acceptance of this returned
+repair-mode frame only; it does not prove repair causality, ten-year
+completeness, or production-path parity. Audit explicit repair provenance and
+integration semantics before persistence, batch-19 retry, batch 20, or the
+broader drain.
