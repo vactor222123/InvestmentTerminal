@@ -889,3 +889,12 @@ frame without a second provider request. Its added evidence is limited to
 `QUALIFIED`, `EMPTY`, or `REJECTED`, projected count, and stable failure
 category. Run one controlled batch-19 diagnostic next. Persistence, ingestion
 retry, batch 20, and the broader drain remain blocked pending review.
+
+## Phase 7 Package 131 checkpoint
+
+The controlled schema-version-3 normal-path diagnostic is `QUALIFIED`.
+`repair=False` returned one valid row and unchanged strict projection accepted
+one candle with no failure category; no omission or repair is required. Run one
+manifest-bound batch-19 retry against the unchanged checkpoint next and review
+its redacted report plus SQLite integrity. Batch 20 and the broader drain remain
+blocked.

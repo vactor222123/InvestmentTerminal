@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `41d724e740e098f63ca8f1084aca4bf0c4d37896`
-**Current local package:** Phase 7 Package 130 - Normal-Path Strict-Projection Evidence
+**Current GitHub baseline:** `ce54d345e3a2373e7cef50e700820c203f272714`
+**Current local package:** Phase 7 Package 131 - Normal-Path Projection Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one schema-3 batch-19 diagnostic
+**Current next action:** Run one normal manifest-bound batch-19 retry
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -624,13 +624,19 @@ Market / external data
 
 ## Current Audit Conclusion
 
+Package 131 records a valid schema-version-3 normal-path result. The one raw
+`repair=False` row was valid and unchanged strict projection qualified one
+candle with no failure category. The omission assessment's
+`REJECTED/NO_INVALID_ROW` is expected because no row required omission. Run
+exactly one manifest-bound batch-19 retry against the unchanged checkpoint;
+it must skip 19 successes and attempt only the failed outcome. Review its
+redacted report and SQLite integrity before batch 20 or the broader drain.
+
 Package 130 advances the read-only manifest failed-series diagnostic to schema
 version 3. It applies unchanged strict Yahoo projection to the same already-
 fetched `repair=False` frame without a second provider request and emits only
 `QUALIFIED`, `EMPTY`, or `REJECTED`, projected count, and stable rejection
-category. Run exactly one controlled diagnostic for the existing batch-19
-failure next and return only its redacted report. Repaired persistence,
-ingestion retry, batch 20, and the broader drain remain blocked pending review.
+category.
 
 Package 129 confirms that repair-mode provenance stops at the qualification
 report. The production checkpoint/report path, `Candle`, repository, and SQLite

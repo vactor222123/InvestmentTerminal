@@ -77,7 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_130_NORMAL_PATH_STRICT_PROJECTION_EVIDENCE.md`: the schema-
-version-3 read-only diagnostic measures unchanged strict projection on the same
-normal `repair=False` frame without a second provider request. Run it once for
-batch 19 before considering persistence, an ingestion retry, or later batches.
+`PHASE_7_PACKAGE_131_NORMAL_PATH_PROJECTION_RESULT.md`: the current normal
+`repair=False` frame is valid and unchanged strict projection qualified one
+candle. Run one manifest-bound batch-19 retry against the unchanged checkpoint
+before considering batch 20 or the broader drain.

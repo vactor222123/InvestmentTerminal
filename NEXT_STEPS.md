@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 41d724e740e098f63ca8f1084aca4bf0c4d37896`
+**Current repository baseline:** `develop @ ce54d345e3a2373e7cef50e700820c203f272714`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -162,6 +162,7 @@
 **Phase 7 Package 128 repaired qualification result:** COMPLETE - QUALIFIED
 **Phase 7 Package 129 repaired-series integration audit:** COMPLETE
 **Phase 7 Package 130 normal-path strict-projection evidence:** COMPLETE
+**Phase 7 Package 131 normal-path projection result:** COMPLETE - QUALIFIED
 
 ## Current State
 
@@ -169,11 +170,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run exactly one controlled schema-version-3 manifest failed-series diagnostic
-for the existing failed batch-19 outcome. Return only the redacted report; keep
-the manifest, checkpoint, cache, database, symbols, currencies, and candles
-private. Do not retry ingestion, persist repaired candles, execute batch 20, or
-resume the broader drain before the result is reviewed.
+Run exactly one manifest-bound batch-19 retry against the unchanged private
+checkpoint. The executor must skip the 19 existing successes and attempt only
+the one failed outcome through the normal `repair=False` path. Return only its
+redacted report and the privacy-safe SQLite integrity result. Do not persist
+repaired candles, execute batch 20, or resume the broader drain before review.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

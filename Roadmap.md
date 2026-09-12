@@ -422,6 +422,13 @@ the completed projected count, and a stable rejection category. Run exactly one
 controlled batch-19 diagnostic next. Ingestion retry, repaired persistence,
 batch 20, and the broader drain remain blocked pending review.
 
+Package 131 records the controlled schema-version-3 result as `QUALIFIED`.
+Normal `repair=False` retrieval returned one valid row and unchanged strict
+projection accepted one candle with no failure category. No omission or repair
+is required. Run exactly one normal manifest-bound batch-19 retry against the
+unchanged checkpoint next, then review its redacted result and SQLite integrity.
+Batch 20 and the broader drain remain blocked.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
