@@ -77,7 +77,8 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_128_REPAIRED_QUALIFICATION_SUCCESS.md`: one explicit repair-
-mode frame passed unchanged strict projection, but no row was marked repaired.
-Audit repaired-source provenance and integration semantics before persistence,
-an ingestion retry, or later batches.
+`PHASE_7_PACKAGE_129_REPAIRED_SERIES_INTEGRATION_AUDIT.md`: repaired-source
+provenance cannot currently cross checkpoint, report, candle, or SQLite
+boundaries safely. Implement one read-only schema-version-3 normal-path strict-
+projection diagnostic before considering persistence, an ingestion retry, or
+later batches.

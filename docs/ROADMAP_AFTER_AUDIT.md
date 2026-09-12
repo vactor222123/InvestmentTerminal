@@ -869,3 +869,14 @@ repair-mode frame only; it does not prove repair causality, ten-year
 completeness, or production-path parity. Audit explicit repair provenance and
 integration semantics before persistence, batch-19 retry, batch 20, or the
 broader drain.
+
+## Phase 7 Package 129 checkpoint
+
+Repair-mode provenance currently stops at the read-only qualification report;
+the production checkpoint/report path, `Candle`, repository, and SQLite schema
+cannot preserve it. Do not persist repaired retrieval. Implement a schema-
+version-3 extension of the existing read-only manifest failed-series diagnostic
+which runs unchanged strict projection on the same `repair=False` frame and
+reports only status, projected count, and stable failure category. Run it once
+for batch 19 after implementation; batch 20 and the broader drain remain
+blocked.

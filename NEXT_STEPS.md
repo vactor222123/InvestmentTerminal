@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 8417fd7f26e8ca2203117d54cf944f18eaf0c749`
+**Current repository baseline:** `develop @ d27fb2b7178e0871ce3a6b083412dcbc0d60245b`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -160,6 +160,7 @@
 **Phase 7 Package 126 repaired retrieval dependency audit:** COMPLETE
 **Phase 7 Package 127 repair dependency closure:** COMPLETE
 **Phase 7 Package 128 repaired qualification result:** COMPLETE - QUALIFIED
+**Phase 7 Package 129 repaired-series integration audit:** COMPLETE
 
 ## Current State
 
@@ -167,13 +168,14 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit the repaired-series integration and provenance boundary. The controlled
-schema-version-2 result is `QUALIFIED`, but it returned one strict candle and
-marked zero rows as repaired. Decide how explicit repair-mode provenance and
-zero/nonzero repair evidence would cross checkpoint, report, and storage
-boundaries, and whether an unchanged read-only production-path measurement is
-required. Do not persist candles, retry batch 19 ingestion, execute batch 20,
-or resume the broader drain before that audit.
+Implement a schema-version-3 extension of the existing read-only manifest
+failed-series diagnostic. On its same already-fetched `repair=False` frame,
+run unchanged strict Yahoo projection and expose only redacted status,
+projected-candle count, and stable failure category. Preserve historical report
+schemas and the single-provider-request boundary. Do not add persistence,
+retry batch 19, execute batch 20, or resume the broader drain. After the
+implementation passes, run exactly one controlled batch-19 diagnostic and
+return only its redacted report.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

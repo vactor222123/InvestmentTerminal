@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `8417fd7f26e8ca2203117d54cf944f18eaf0c749`
-**Current local package:** Phase 7 Package 128 - Repaired Qualification Success
+**Current GitHub baseline:** `d27fb2b7178e0871ce3a6b083412dcbc0d60245b`
+**Current local package:** Phase 7 Package 129 - Repaired-Series Integration Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit repaired-series integration provenance
+**Current next action:** Implement read-only normal-path strict-projection evidence
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -624,15 +624,23 @@ Market / external data
 
 ## Current Audit Conclusion
 
+Package 129 confirms that repair-mode provenance stops at the qualification
+report. The production checkpoint/report path, `Candle`, repository, and SQLite
+schema cannot preserve whether heuristic repair was requested or whether a row
+was repaired, so repaired retrieval must not be persisted. Package 128's zero-
+repaired-row result does not justify a broad storage migration. Next, version
+the existing read-only manifest failed-series diagnostic to schema 3 and apply
+unchanged strict projection to its same `repair=False` frame, exposing only a
+redacted status, projected count, and stable failure category. Then run one
+controlled batch-19 diagnostic. Persistence, ingestion retry, batch 20, and the
+broader drain remain blocked pending that result.
+
 Package 128 records a valid checksum-bound schema-version-2 `QUALIFIED`
 repaired-series measurement. The explicit yfinance 1.6.0 repair request
 returned one raw row, unchanged strict projection accepted one candle, and no
 row was marked repaired. This proves structural acceptance of that returned
 frame only; it does not prove repair causality, ten-year completeness, or the
-unchanged production path. Audit explicit repair provenance across checkpoint,
-report, and storage boundaries next, including whether a read-only production-
-path measurement is required. Persistence, batch-19 ingestion retry, batch 20,
-and the broader drain remain blocked.
+unchanged production path.
 
 Package 127 implements the official yfinance repair dependency closure in the
 runtime source and both Python 3.13 hash locks while preserving yfinance 1.6.0

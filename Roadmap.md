@@ -404,6 +404,16 @@ frame only, not repair causality, ten-year completeness, or production-path
 parity. Audit explicit repair provenance and integration semantics before any
 persistence, ingestion retry, batch 20, or broader drain.
 
+Package 129 confirms that repaired-source provenance cannot currently cross
+the production checkpoint, report, `Candle`, or SQLite boundaries without
+being discarded. A broad persistence migration is not justified by the zero-
+repaired-row result. Implement one schema-version-3 extension of the existing
+read-only manifest failed-series diagnostic next: run unchanged strict
+projection on its same `repair=False` frame and expose only status, projected
+count, and stable failure category. Then measure that normal path once before
+deciding whether batch 19 can be retried without repair. Batch 20 and the
+broader drain remain blocked.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
