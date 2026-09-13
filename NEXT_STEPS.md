@@ -174,6 +174,7 @@
 **Phase 7 Package 140 batch-41 terminal isolation result:** COMPLETE - SUCCESS
 **Phase 7 Package 141 batch-41 exclusion resume:** COMPLETE - SUCCESS WITH EXCLUSIONS
 **Phase 7 Package 142 batches 42-66 drain result:** COMPLETE - SUCCESS
+**Phase 7 Package 143 manifest-drain budget 100:** COMPLETE
 
 ## Current State
 
@@ -181,8 +182,8 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one existing bounded manifest drain with `max_batches=25`. Exact checkpoint
-ordering must select batch 67 first and permit at most batches 67–91. Stop on
+Run one bounded manifest drain with `max_batches=100`. Exact checkpoint ordering
+must select batch 67 first and permit at most batches 67–166. Stop on
 the first non-success result, return only the redacted drain report, and verify
 SQLite `integrity_check=ok` separately. Do not start another drain before
 reviewing that result.

@@ -528,7 +528,7 @@ owned by the one-batch CLI. Its progress authority is the ordered set of private
 request-checksum-bound checkpoints; SQLite contents and redacted reports are not
 completion indexes. `ManifestBatchDrainPlan` and `ManifestBatchDrainService`
 implement the coordinator. It processes the first unfinished request under a
-caller-owned 1–25 batch budget and stops before later requests
+caller-owned 1–100 batch budget and stops before later requests
 on the first non-success result. This preserves bounded failure impact and does
 not grant scheduled or complete-manifest execution authority.
 # Phase 7 read-only batch checkpoint boundary

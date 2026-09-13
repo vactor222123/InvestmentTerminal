@@ -224,7 +224,17 @@ def test_rejects_out_of_order_or_mismatched_checkpoint_before_import():
     assert importer.calls == []
 
 
-@pytest.mark.parametrize("budget", [0, 26, True])
+def test_plan_accepts_maximum_100_batch_budget():
+    value, checksum = manifest()
+
+    plan = ManifestBatchDrainPlan.from_manifest(
+        value, checksum, max_batches=100
+    )
+
+    assert plan.max_batches == 100
+
+
+@pytest.mark.parametrize("budget", [0, 101, True])
 def test_plan_rejects_invalid_budget(budget):
     value, checksum = manifest()
     with pytest.raises((TypeError, ValueError)):

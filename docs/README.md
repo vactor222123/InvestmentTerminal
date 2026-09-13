@@ -77,7 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_142_BATCHES_42_66_DRAIN_RESULT.md`: one bounded drain completed
-batches 42–66 and inserted 655,813 candles without failures, duplicates, or
-omissions while SQLite integrity remained `ok`. The next gate is one existing
-25-batch-bounded drain beginning at batch 67.
+`PHASE_7_PACKAGE_143_MANIFEST_DRAIN_BUDGET_100.md`: the manifest drain now
+accepts a caller-owned maximum of 100 sequential batches while preserving exact
+resume, checkpointing, and first-non-success stopping. The next gate is one
+100-batch-bounded drain beginning at batch 67.

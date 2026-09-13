@@ -304,7 +304,7 @@ that request through the existing resumable ingestion boundary.
 
 Bounded manifest drain:
 `python -m investment_terminal.cli.manifest_batch_drain`. It resumes from
-validated private per-batch checkpoints and processes at most 25 explicitly
+validated private per-batch checkpoints and processes at most 100 explicitly
 authorized first-unfinished requests, stopping on the first non-success result.
 
 Broad US universe qualification:

@@ -24,8 +24,8 @@ class ManifestBatchDrainPlan:
     def from_manifest(cls, value, manifest_checksum, *, max_batches: int):
         if isinstance(max_batches, bool) or not isinstance(max_batches, int):
             raise TypeError("max_batches must be an integer")
-        if not 1 <= max_batches <= 25:
-            raise ValueError("max_batches must be between 1 and 25")
+        if not 1 <= max_batches <= 100:
+            raise ValueError("max_batches must be between 1 and 100")
         checksum, requests = _validated_manifest_requests(value, manifest_checksum)
         return cls(checksum, requests, max_batches)
 

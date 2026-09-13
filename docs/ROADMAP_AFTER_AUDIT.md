@@ -996,3 +996,11 @@ omissions. Ordered progress is 66 completed batches and 535 remaining; the one
 existing final `RESPONSE_NUMERIC` exclusion remains explicit and SQLite
 integrity is `ok`. Run one existing bounded drain over at most batches 67–91
 next and review its redacted result before continuing.
+
+## Phase 7 Package 143 checkpoint
+
+The manifest drain now accepts a caller-owned maximum of 100 batches. It
+remains sequential, checkpointed per item, checksum-bound, exactly resumable,
+and stopped by the first non-success batch. The unchanged report records the
+exact budget. Run one `max_batches=100` drain next; ordered progress must begin
+at batch 67 and stop by batch 166 or on the first non-success result.

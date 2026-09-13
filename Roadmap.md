@@ -507,6 +507,12 @@ now has 66 completed batches and 535 remaining; the existing batch-41 final
 exclusion remains explicit and SQLite integrity is `ok`. One further bounded
 drain may process at most batches 67–91 before another review.
 
+Package 143 raises the manifest drain's caller-owned maximum from 25 to 100
+batches after that operational success. Execution remains sequential, each
+item remains atomically checkpointed, exact ordered resume is unchanged, and
+the first non-success batch still stops progress. One 100-batch-bounded run may
+now process at most batches 67–166 before another review.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

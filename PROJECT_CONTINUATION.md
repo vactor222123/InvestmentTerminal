@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `34f001b9c48bb5407908f893cfbef1c566b2cf3e`
-**Current local package:** Phase 7 Package 142 - Batches 42-66 Drain Result
+**Current GitHub baseline:** `de8416fe7942758728c37b55a2e70c3ed6307e6e`
+**Current local package:** Phase 7 Package 143 - Manifest Drain Budget 100
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Resume one bounded drain at batch 67
+**Current next action:** Run a 100-batch-bounded drain at batch 67
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -623,6 +623,13 @@ Market / external data
 ---
 
 ## Current Audit Conclusion
+
+Package 143 raises only the manifest drain's caller-owned maximum budget from
+25 to 100 batches. Sequential execution, 20-item requests, per-item atomic
+checkpointing, exact ordered resume, redacted schema-version-3 reporting, and
+stop-on-first-non-success behavior are unchanged. The upper boundary accepts
+100 and rejects 101. Run one bounded drain over at most batches 67–166 next and
+review its redacted result plus SQLite integrity before continuing.
 
 Package 142 records a successful 25-batch-bounded drain over batches 42–66.
 All 500 items completed without failure, duplicate, or omission; 655,813
