@@ -77,7 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_140_TERMINAL_ISOLATION_RESULT.md`: the controlled batch-41
-transition produced one evidence-bound final exclusion and no retryable
-failures. The next gate is one exact batch-41 resume proving provider bypass;
-batch 42 and the wider drain remain blocked pending that result.
+`PHASE_7_PACKAGE_141_BATCH_41_EXCLUSION_RESUME.md`: exact batch-41 resume
+reported zero attempted items, 20 skipped terminal outcomes, and
+`SUCCESS_WITH_EXCLUSIONS`, while SQLite integrity remained `ok`. The next gate
+is one existing 25-batch-bounded drain beginning at batch 42.

@@ -978,3 +978,12 @@ zero retryable failures, and one final `RESPONSE_NUMERIC` exclusion, with both
 source evidence checksums independently verified. Run one exact batch-41 resume
 to measure provider bypass and separately verify SQLite integrity before batch
 42 or a broader drain.
+
+## Phase 7 Package 141 checkpoint
+
+The exact batch-41 resume returned `SUCCESS_WITH_EXCLUSIONS`, attempted zero
+items, skipped all 20 terminal outcomes, and preserved 19 successes plus one
+final `RESPONSE_NUMERIC` exclusion with zero retryable failures. The checkpoint
+remained unchanged and SQLite integrity is `ok`. Run one existing bounded drain
+with `max_batches=25` next; ordered progress must begin at batch 42 and stop by
+batch 66 or on the first non-success result.

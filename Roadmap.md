@@ -494,6 +494,12 @@ their returned source reports. Run one exact batch-41 resume next to measure
 `SUCCESS_WITH_EXCLUSIONS` with zero provider work and separately confirm SQLite
 integrity before considering batch 42 or another drain.
 
+Package 141 records that exact resume as `SUCCESS_WITH_EXCLUSIONS`. It attempted
+zero items, skipped all 20 terminal outcomes, preserved 19 successes and one
+final `RESPONSE_NUMERIC` exclusion, left the checkpoint unchanged, and retained
+SQLite integrity `ok`. One existing `max_batches=25` drain may now resume at
+batch 42 and reach at most batch 66, stopping on the first non-success result.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `53e6d633b0dd0d122f9cca64046c2d0c0666d03d`
-**Current local package:** Phase 7 Package 140 - Batch-41 Terminal Isolation Result
+**Current GitHub baseline:** `5f7f28e1b6f5a0ce307bdeaec4bc3cff28e24967`
+**Current local package:** Phase 7 Package 141 - Batch-41 Exclusion Resume
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one exact batch-41 exclusion resume
+**Current next action:** Resume one bounded drain at batch 42
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -623,6 +623,15 @@ Market / external data
 ---
 
 ## Current Audit Conclusion
+
+Package 141 records the exact batch-41 resume as
+`SUCCESS_WITH_EXCLUSIONS`. All 20 terminal outcomes were skipped, no item was
+attempted, no transfer or omission occurred, and cumulative evidence remains
+19 successes plus one final `RESPONSE_NUMERIC` exclusion with zero retryable
+failures. The checkpoint remained unchanged and separately reported SQLite
+integrity is `ok`. Batch 41 no longer blocks ordered progress. Run one existing
+25-batch-bounded drain next; it must start at batch 42 and stop no later than
+batch 66 or at the first non-success result.
 
 Package 140 records the successful batch-41 terminal transition. The redacted
 report contains 19 successes, zero retryable failures, and one evidence-bound

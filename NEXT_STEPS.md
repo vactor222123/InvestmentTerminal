@@ -172,6 +172,7 @@
 **Phase 7 Package 138 terminal-series isolation audit:** COMPLETE
 **Phase 7 Package 139 evidence-bound terminal-series isolation:** COMPLETE
 **Phase 7 Package 140 batch-41 terminal isolation result:** COMPLETE - SUCCESS
+**Phase 7 Package 141 batch-41 exclusion resume:** COMPLETE - SUCCESS WITH EXCLUSIONS
 
 ## Current State
 
@@ -179,11 +180,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run exactly one manifest-bound batch-41 resume against the transitioned private
-checkpoint. Require `SUCCESS_WITH_EXCLUSIONS`, zero attempted items, 20 skipped
-items, zero retryable failures, one final `RESPONSE_NUMERIC` exclusion, and a
-separate SQLite `integrity_check=ok`. Return only the redacted batch report. Do
-not run batch 42 or resume the broader drain before reviewing that result.
+Run one existing bounded manifest drain with `max_batches=25`. Exact checkpoint
+ordering must select batch 42 first and permit at most batches 42–66. Stop on
+the first non-success result, return only the redacted drain report, and verify
+SQLite `integrity_check=ok` separately. Do not start another drain before
+reviewing that result.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
