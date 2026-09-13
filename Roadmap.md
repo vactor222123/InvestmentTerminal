@@ -500,6 +500,13 @@ final `RESPONSE_NUMERIC` exclusion, left the checkpoint unchanged, and retained
 SQLite integrity `ok`. One existing `max_batches=25` drain may now resume at
 batch 42 and reach at most batch 66, stopping on the first non-success result.
 
+Package 142 records that bounded drain as successful through its complete
+25-batch budget. Batches 42–66 attempted 500 items and downloaded and inserted
+655,813 candles with zero failures, duplicates, or omissions. Ordered progress
+now has 66 completed batches and 535 remaining; the existing batch-41 final
+exclusion remains explicit and SQLite integrity is `ok`. One further bounded
+drain may process at most batches 67–91 before another review.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

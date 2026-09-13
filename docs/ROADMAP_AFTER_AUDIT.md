@@ -987,3 +987,12 @@ final `RESPONSE_NUMERIC` exclusion with zero retryable failures. The checkpoint
 remained unchanged and SQLite integrity is `ok`. Run one existing bounded drain
 with `max_batches=25` next; ordered progress must begin at batch 42 and stop by
 batch 66 or on the first non-success result.
+
+## Phase 7 Package 142 checkpoint
+
+The 25-batch-bounded drain completed batches 42–66. It attempted 500 items and
+downloaded and inserted 655,813 candles with zero failures, duplicates, or
+omissions. Ordered progress is 66 completed batches and 535 remaining; the one
+existing final `RESPONSE_NUMERIC` exclusion remains explicit and SQLite
+integrity is `ok`. Run one existing bounded drain over at most batches 67–91
+next and review its redacted result before continuing.

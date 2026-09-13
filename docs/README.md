@@ -77,7 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_141_BATCH_41_EXCLUSION_RESUME.md`: exact batch-41 resume
-reported zero attempted items, 20 skipped terminal outcomes, and
-`SUCCESS_WITH_EXCLUSIONS`, while SQLite integrity remained `ok`. The next gate
-is one existing 25-batch-bounded drain beginning at batch 42.
+`PHASE_7_PACKAGE_142_BATCHES_42_66_DRAIN_RESULT.md`: one bounded drain completed
+batches 42–66 and inserted 655,813 candles without failures, duplicates, or
+omissions while SQLite integrity remained `ok`. The next gate is one existing
+25-batch-bounded drain beginning at batch 67.

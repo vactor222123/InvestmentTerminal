@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `5f7f28e1b6f5a0ce307bdeaec4bc3cff28e24967`
-**Current local package:** Phase 7 Package 141 - Batch-41 Exclusion Resume
+**Current GitHub baseline:** `34f001b9c48bb5407908f893cfbef1c566b2cf3e`
+**Current local package:** Phase 7 Package 142 - Batches 42-66 Drain Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Resume one bounded drain at batch 42
+**Current next action:** Resume one bounded drain at batch 67
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -623,6 +623,14 @@ Market / external data
 ---
 
 ## Current Audit Conclusion
+
+Package 142 records a successful 25-batch-bounded drain over batches 42–66.
+All 500 items completed without failure, duplicate, or omission; 655,813
+candles were downloaded and inserted. Ordered progress advanced from 41 to 66
+completed batches, leaving 535. The existing batch-41 final
+`RESPONSE_NUMERIC` exclusion remains explicit, and separately reported SQLite
+integrity is `ok`. Run one existing bounded drain over at most batches 67–91
+next and review its redacted result before continuing.
 
 Package 141 records the exact batch-41 resume as
 `SUCCESS_WITH_EXCLUSIONS`. All 20 terminal outcomes were skipped, no item was
