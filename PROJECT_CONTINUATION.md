@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `7d5a24f7a7477071deed362535e9e1fe818cf6f7`
-**Current local package:** Phase 7 Package 136 - Batch-41 Normal-Path Result
+**Current GitHub baseline:** `2bfb7f7bbbb4b725119669f7e364b13fc9d21879`
+**Current local package:** Phase 7 Package 137 - Batch-41 Repaired Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one read-only repaired-series qualification for batch 41
+**Current next action:** Audit terminal-series isolation across manifest batches
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -624,14 +624,13 @@ Market / external data
 
 ## Current Audit Conclusion
 
-Package 136 confirms that normal `repair=False` retrieval still contains one
-interior row with non-positive open and low among 2,514 rows. The established
-trailing-row policy correctly rejects it, and unchanged strict projection
-returns `REJECTED/RESPONSE_NUMERIC`. Do not retry batch 41 through the normal
-path or discard the row. Run the existing separate read-only repaired-series
-qualification exactly once for batch 41; repaired persistence, batch 42, and
-the broader drain remain blocked pending its redacted result and a separate
-provenance decision.
+Package 137 confirms that explicit yfinance repair marked one of 2,514 rows as
+repaired but unchanged strict projection still returned
+`REJECTED/RESPONSE_NUMERIC`. Do not retry either retrieval mode, persist the
+rejected frame, discard the interior row, or weaken validation. Audit a durable
+terminal-series isolation boundary so this explicit failure can remain visible
+without blocking unrelated later batches. Batch 42 and the broader drain remain
+blocked until the checkpoint/report/drain contract and consumers are audited.
 
 Package 134 records a correct halt at batch 41. Batches 20–40 completed; the
 run attempted 22 batches and 440 items, downloaded and inserted 602,174

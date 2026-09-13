@@ -168,6 +168,7 @@
 **Phase 7 Package 134 batches 20-44 drain result:** COMPLETE - HALTED AT 41
 **Phase 7 Package 135 batch-41 checkpoint result:** COMPLETE - ONE FAILURE
 **Phase 7 Package 136 batch-41 normal-path result:** COMPLETE - INTERIOR NUMERIC DEFECT
+**Phase 7 Package 137 batch-41 repaired result:** COMPLETE - REPAIR REJECTED
 
 ## Current State
 
@@ -175,12 +176,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run the existing manifest-bound repaired-series qualification exactly once for
-batch 41. It may fetch only the single failed series through explicit
-`repair=True` retrieval and must apply unchanged strict projection. Return only
-its redacted schema-version-2 report. Do not persist repaired data, retry batch
-41, execute batch 42, or resume the drain before review and a separate
-provenance decision.
+Audit the existing manifest checkpoint, one-batch report, and drain contracts
+for the smallest versioned terminal-series isolation boundary. One irreparable
+series must remain explicit and checksum-bound without silently becoming
+success or blocking unrelated later batches. Do not contact Yahoo, mutate
+private evidence, retry batch 41, execute batch 42, or resume the drain during
+the audit.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

@@ -941,3 +941,12 @@ is `REJECTED/RESPONSE_NUMERIC`. Run the existing separate manifest-bound
 repaired-series qualification once for batch 41. Repaired persistence, batch
 retry, batch 42, and the broader drain remain blocked pending review and an
 explicit provenance decision.
+
+## Phase 7 Package 137 checkpoint
+
+Explicit yfinance repair marked one of 2,514 rows as repaired, but unchanged
+strict projection still returned `REJECTED/RESPONSE_NUMERIC`. Do not retry or
+persist either returned frame. Audit a versioned terminal-series isolation
+boundary across checkpoint, one-batch report, and drain consumers so the
+failure remains explicit without blocking unrelated later batches. Runtime
+mutation and batch 42 remain blocked during that audit.

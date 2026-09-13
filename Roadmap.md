@@ -463,6 +463,14 @@ qualification once for batch 41 to measure explicit provider repair behavior.
 Do not persist repaired data, retry the batch, or continue to batch 42 pending
 that evidence and a separate provenance decision.
 
+Package 137 records that explicit yfinance repair marked one of 2,514 rows as
+repaired, but unchanged strict projection still rejected the series as
+`RESPONSE_NUMERIC`. Neither retrieval mode should be retried or persisted.
+Audit a versioned terminal-series isolation contract next so an irreparable
+series remains visible in evidence without indefinitely blocking unrelated
+manifest batches. No runtime mutation or later batch is authorized by this
+result.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
