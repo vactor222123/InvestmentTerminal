@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `3c317dd2746c8214aaf2e5df84acbd1ce2945fa0`
-**Current local package:** Phase 7 Package 139 - Terminal-Series Isolation
+**Current GitHub baseline:** `53e6d633b0dd0d122f9cca64046c2d0c0666d03d`
+**Current local package:** Phase 7 Package 140 - Batch-41 Terminal Isolation Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one controlled batch-41 terminal isolation
+**Current next action:** Run one exact batch-41 exclusion resume
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -623,6 +623,13 @@ Market / external data
 ---
 
 ## Current Audit Conclusion
+
+Package 140 records the successful batch-41 terminal transition. The redacted
+report contains 19 successes, zero retryable failures, and one evidence-bound
+`FINAL_FAILED/RESPONSE_NUMERIC` outcome. Both source-report SHA-256 values were
+independently verified. Run one exact manifest-bound batch-41 resume next to
+measure zero provider work and `SUCCESS_WITH_EXCLUSIONS`, and verify SQLite
+integrity in that handoff. Batch 42 and the broader drain remain blocked.
 
 Package 139 implements the evidence-bound terminal-series isolation boundary.
 Only matching normal and repaired strict rejection for one fixed manifest

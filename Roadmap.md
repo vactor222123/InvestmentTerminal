@@ -487,6 +487,13 @@ retryable failures from final exclusions, skip provider access for final
 outcomes, and allow ordered progress after an explicit exclusion. Run one
 controlled batch-41 isolation next; batch 42 remains blocked pending review.
 
+Package 140 records a successful evidence-bound transition for batch 41. Its
+redacted result has 19 successes, zero retryable failures, and one final
+`RESPONSE_NUMERIC` exclusion; both normal and repaired evidence checksums match
+their returned source reports. Run one exact batch-41 resume next to measure
+`SUCCESS_WITH_EXCLUSIONS` with zero provider work and separately confirm SQLite
+integrity before considering batch 42 or another drain.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

@@ -970,3 +970,11 @@ rejection in an allowlisted category. Versioned batch, manifest, drain, and
 diagnostic evidence exposes the exclusion separately and final outcomes make no
 provider call. Run exactly one controlled batch-41 transition next and review
 its redacted report before batch 42 or a broader drain.
+
+## Phase 7 Package 140 checkpoint
+
+The controlled batch-41 isolation succeeded. Redacted coverage is 19 successes,
+zero retryable failures, and one final `RESPONSE_NUMERIC` exclusion, with both
+source evidence checksums independently verified. Run one exact batch-41 resume
+to measure provider bypass and separately verify SQLite integrity before batch
+42 or a broader drain.

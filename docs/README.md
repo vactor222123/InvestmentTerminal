@@ -77,7 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_139_TERMINAL_SERIES_ISOLATION.md`: evidence-bound
-`FINAL_FAILED` transition and versioned propagation are implemented. The next
-gate is one controlled batch-41 transition; batch 42 and the wider drain remain
-blocked until its redacted report is reviewed.
+`PHASE_7_PACKAGE_140_TERMINAL_ISOLATION_RESULT.md`: the controlled batch-41
+transition produced one evidence-bound final exclusion and no retryable
+failures. The next gate is one exact batch-41 resume proving provider bypass;
+batch 42 and the wider drain remain blocked pending that result.
