@@ -110,6 +110,8 @@ def test_runs_first_unfinished_batches_with_explicit_budget():
         "duplicate_total": 0,
         "omitted_trailing_total": 0,
         "omission_types": [],
+        "final_failure_count": 0,
+        "final_failure_categories": [],
     }
 
 
@@ -130,13 +132,13 @@ def test_aggregates_versioned_omission_evidence():
     checkpoints = {}
     report = service(checkpoints, ProjectingImporter()).run(plan)
 
-    assert report["schema_version"] == 2
+    assert report["schema_version"] == 3
     assert report["status"] == "COMPLETE"
     assert report["current_run"]["omitted_trailing_total"] == 1
     assert report["current_run"]["omission_types"] == [
         "TRAILING_NON_FINITE_NUMERIC"
     ]
-    assert checkpoints[1]["schema_version"] == 2
+    assert checkpoints[1]["schema_version"] == 3
     assert checkpoints[1]["outcomes"]["S1"]["omitted_trailing_count"] == 1
 
 
@@ -168,6 +170,45 @@ def test_complete_resume_makes_zero_provider_calls():
     assert importer.calls == []
     assert report["status"] == "COMPLETE"
     assert report["current_run"]["attempted_batch_count"] == 0
+
+
+def test_final_failure_completes_batch_and_allows_next_batch():
+    value, checksum = manifest(2)
+    plan = ManifestBatchDrainPlan.from_manifest(value, checksum, max_batches=1)
+    request = plan.requests[0]
+    item = request.items[0]
+    final_checkpoint = {
+        "schema_version": 3,
+        "request_checksum": request.checksum,
+        "outcomes": {item.symbol: {
+            "status": "FINAL_FAILED",
+            "downloaded": None,
+            "inserted": None,
+            "duplicates": None,
+            "omitted_trailing_count": 0,
+            "omission_types": [],
+            "failure_type": "YahooCandleInvalidResponseError",
+            "failure_category": "RESPONSE_NUMERIC",
+            "isolation_policy_identity": (
+                "NORMAL_AND_REPAIRED_STRICT_REJECTION_V1"
+            ),
+            "isolation_evidence": {
+                "normal_diagnostic_checksum": "a" * 64,
+                "repaired_qualification_checksum": "b" * 64,
+            },
+        }},
+    }
+    importer = Importer()
+
+    report = service({1: final_checkpoint}, importer).run(plan)
+
+    assert importer.calls == ["S2"]
+    assert report["status"] == "COMPLETE"
+    assert report["starting_coverage"]["final_failure_count"] == 1
+    assert report["ending_coverage"]["final_failure_count"] == 1
+    assert report["ending_coverage"]["final_failure_categories"] == [
+        "RESPONSE_NUMERIC"
+    ]
 
 
 def test_rejects_out_of_order_or_mismatched_checkpoint_before_import():

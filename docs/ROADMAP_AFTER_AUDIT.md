@@ -961,3 +961,12 @@ Propagate explicit exclusion evidence through versioned batch, manifest, drain,
 and checkpoint-diagnostic reports while preserving legacy reads, exact resume,
 privacy, and fail-closed guards. Do not mutate runtime evidence or execute batch
 42 before implementation and review.
+
+## Phase 7 Package 139 checkpoint
+
+Evidence-bound terminal isolation is implemented. Checkpoint schema 3 records
+one `FINAL_FAILED` outcome only after matching normal and repaired strict
+rejection in an allowlisted category. Versioned batch, manifest, drain, and
+diagnostic evidence exposes the exclusion separately and final outcomes make no
+provider call. Run exactly one controlled batch-41 transition next and review
+its redacted report before batch 42 or a broader drain.

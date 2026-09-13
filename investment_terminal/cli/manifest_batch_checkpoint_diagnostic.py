@@ -51,7 +51,7 @@ def main(
     except Exception as exc:
         now = runtime_clock()
         payload = {
-            "schema_version": 1,
+            "schema_version": 2,
             "operation_identity": "MANIFEST_BATCH_CHECKPOINT_DIAGNOSTIC",
             "status": "FAILED",
             "started_at": now.isoformat(),
@@ -67,6 +67,7 @@ def main(
             ),
             "coverage": None,
             "failure_types": [type(exc).__name__],
+            "final_failure_categories": [],
             "limitations": [
                 "failed report excludes private values, paths, provider text, and exception messages"
             ],

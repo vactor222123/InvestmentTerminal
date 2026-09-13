@@ -606,3 +606,21 @@ only a redacted status, projected count, and stable failure category, makes no
 second provider request, and retains no mutable dependency. This measures
 normal-path projection parity without granting ingestion or repair-persistence
 authority.
+
+## Phase 7 Terminal-Series Isolation Boundary
+
+`ManifestTerminalSeriesIsolationService` is an offline, manifest-bound
+checkpoint transition. It verifies strict JSON bytes against caller-supplied
+SHA-256 values and requires the normal and explicitly repaired reports to bind
+to the same manifest, batch, request, window, and single retryable failure.
+Only matching `RESPONSE_NUMERIC` or `RESPONSE_OHLC` strict rejection may enter
+policy `NORMAL_AND_REPAIRED_STRICT_REJECTION_V1`.
+
+Checkpoint schema 3 adds `FINAL_FAILED` with the original failure type, stable
+category, policy identity, and both evidence checksums. Final outcomes are
+terminal only within that checksum-bound request: resumable execution bypasses
+the provider, and the ordered drain may advance while retaining explicit
+exclusion totals. The service has no provider, repository, database, candle-
+repair, analysis, or trading authority. Its CLI commits the private checkpoint
+before writing a separate redacted report; mismatches and conflicting repeat
+evidence fail before mutation.

@@ -60,10 +60,48 @@ def test_reports_only_aggregate_bound_checkpoint_evidence():
         "requested_count": 3,
         "success_count": 1,
         "empty_count": 1,
-        "failure_count": 1,
+        "retryable_failure_count": 1,
+        "final_failure_count": 0,
     }
     assert report["failure_types"] == ["YahooCandleInvalidResponseError"]
     assert all(symbol not in str(report) for symbol in ("AAA", "BBB", "CCC"))
+
+
+def test_reports_final_failure_separately_from_retryable_failure():
+    selected = selection()
+    value = checkpoint(selected.request.checksum)
+    value["schema_version"] = 3
+    value["outcomes"]["CCC"].update({
+        "status": "FINAL_FAILED",
+        "downloaded": None,
+        "inserted": None,
+        "duplicates": None,
+        "omitted_trailing_count": 0,
+        "omission_types": [],
+        "failure_category": "RESPONSE_NUMERIC",
+        "isolation_policy_identity": (
+            "NORMAL_AND_REPAIRED_STRICT_REJECTION_V1"
+        ),
+        "isolation_evidence": {
+            "normal_diagnostic_checksum": "a" * 64,
+            "repaired_qualification_checksum": "b" * 64,
+        },
+    })
+    for key in ("AAA", "BBB"):
+        value["outcomes"][key].update({
+            "omitted_trailing_count": 0,
+            "omission_types": [],
+        })
+
+    report = ManifestBatchCheckpointDiagnostic(clock=lambda: NOW).run(
+        selected, value
+    )
+
+    assert report["schema_version"] == 2
+    assert report["coverage"]["retryable_failure_count"] == 0
+    assert report["coverage"]["final_failure_count"] == 1
+    assert report["failure_types"] == []
+    assert report["final_failure_categories"] == ["RESPONSE_NUMERIC"]
 
 
 @pytest.mark.parametrize(

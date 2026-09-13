@@ -852,3 +852,27 @@ have no repair-mode or repaired-row field. Repaired retrieval must not be
 persisted until that separate durable provenance contract is explicitly
 designed and migrated. Schema 3 is a read-only measurement contract and does
 not change checkpoint, batch-report, candle, or SQLite schemas.
+
+## Manifest Terminal-Series Isolation Contracts
+
+Resumable checkpoint schema 3 retains schema-2 omission fields and adds the
+terminal `FINAL_FAILED` status. Such an outcome has null transfer counts, zero
+omission evidence, the original non-empty `failure_type`, an allowlisted
+`failure_category`, `isolation_policy_identity`, and exactly two SHA-256 values
+under `isolation_evidence`: `normal_diagnostic_checksum` and
+`repaired_qualification_checksum`. These isolation fields are forbidden on
+non-final outcomes. Checkpoint schemas 1 and 2 remain readable.
+
+The schema-version-1 `MANIFEST_TERMINAL_SERIES_ISOLATION` report binds the
+manifest checksum, batch index/count, request checksum, requested window,
+policy/category, and evidence checksums. Its coverage separates success, empty,
+retryable failure, final failure, transitioned, and already-final counts. It
+contains no symbol, currency, price, path, provider payload, or exception text.
+
+Resumable report schema 4 and manifest-bound report schema 3 replace the old
+aggregate failure count with `retryable_failure_count` and
+`final_failure_count`, add sorted `final_failure_categories`, and introduce
+`SUCCESS_WITH_EXCLUSIONS`. Drain report schema 3 carries final counts/categories
+through starting, current, and ending coverage. Checkpoint diagnostic schema 2
+reports retryable and final failures separately. These report changes do not
+alter `Candle`, candle uniqueness, or SQLite storage.

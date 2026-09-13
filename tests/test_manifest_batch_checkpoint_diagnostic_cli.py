@@ -40,7 +40,8 @@ def test_cli_reads_checkpoint_without_mutating_it(tmp_path):
     report_text = (tmp_path / "report.json").read_text(encoding="utf-8")
     report = json.loads(report_text)
     assert result == 0
-    assert report["coverage"]["failure_count"] == 1
+    assert report["coverage"]["retryable_failure_count"] == 1
+    assert report["coverage"]["final_failure_count"] == 0
     assert report["failure_types"] == ["YahooCandleInvalidResponseError"]
     assert checkpoint_path.read_bytes() == before
     assert "AAA" not in report_text

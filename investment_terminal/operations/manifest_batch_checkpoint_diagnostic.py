@@ -34,8 +34,9 @@ class ManifestBatchCheckpointDiagnostic:
         if set(outcomes) != requested_symbols:
             raise ValueError("Checkpoint outcomes do not exactly cover the request")
 
-        counts = {"SUCCESS": 0, "EMPTY": 0, "FAILED": 0}
+        counts = {"SUCCESS": 0, "EMPTY": 0, "FAILED": 0, "FINAL_FAILED": 0}
         failure_types: set[str] = set()
+        final_failure_categories: set[str] = set()
         for outcome in outcomes.values():
             status = outcome.get("status")
             if status not in counts:
@@ -49,12 +50,14 @@ class ManifestBatchCheckpointDiagnostic:
                         field_name="failure_type",
                     )
                 )
+            elif status == "FINAL_FAILED":
+                final_failure_categories.add(outcome["failure_category"])
             elif failure_type is not None:
                 raise ValueError("Non-failed checkpoint outcome has a failure type")
 
         completed = validate_aware_datetime(self.clock(), field_name="completed_at")
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "operation_identity": "MANIFEST_BATCH_CHECKPOINT_DIAGNOSTIC",
             "status": "SUCCESS",
             "started_at": started.isoformat(),
@@ -68,9 +71,11 @@ class ManifestBatchCheckpointDiagnostic:
                 "requested_count": len(selection.request.items),
                 "success_count": counts["SUCCESS"],
                 "empty_count": counts["EMPTY"],
-                "failure_count": counts["FAILED"],
+                "retryable_failure_count": counts["FAILED"],
+                "final_failure_count": counts["FINAL_FAILED"],
             },
             "failure_types": sorted(failure_types),
+            "final_failure_categories": sorted(final_failure_categories),
             "limitations": [
                 "report excludes symbols, currencies, paths, prices, provider text, and exception messages",
                 "diagnostic is read-only and does not authorize retry, later batches, analysis, or trading",

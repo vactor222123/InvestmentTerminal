@@ -170,6 +170,7 @@
 **Phase 7 Package 136 batch-41 normal-path result:** COMPLETE - INTERIOR NUMERIC DEFECT
 **Phase 7 Package 137 batch-41 repaired result:** COMPLETE - REPAIR REJECTED
 **Phase 7 Package 138 terminal-series isolation audit:** COMPLETE
+**Phase 7 Package 139 evidence-bound terminal-series isolation:** COMPLETE
 
 ## Current State
 
@@ -177,13 +178,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the evidence-bound terminal-series isolation vertical slice selected
-in `docs/PHASE_7_PACKAGE_138_TERMINAL_SERIES_ISOLATION_AUDIT.md`. Add the
-schema-version-3 `FINAL_FAILED` checkpoint transition and propagate explicit
-final-failure counts through versioned batch, manifest, drain, and diagnostic
-reports. Preserve legacy reads, exact-resume, privacy, and all fail-closed
-guards. Do not contact Yahoo or mutate private runtime evidence in the
-implementation package.
+Run exactly one controlled terminal-series isolation for batch 41 using the
+existing private manifest/checkpoint and the exact normal and repaired evidence
+files with caller-calculated SHA-256 values. Return only the redacted schema-1
+isolation report and verify SQLite integrity separately. Do not return private
+inputs, run batch 42, or resume the broader drain before reviewing the result.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

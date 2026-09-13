@@ -77,7 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_138_TERMINAL_SERIES_ISOLATION_AUDIT.md`: implement an
-evidence-bound `FINAL_FAILED` checkpoint transition and versioned propagation
-so one deterministic rejected series remains visible without blocking
-unrelated later batches. Runtime mutation remains blocked until implementation.
+`PHASE_7_PACKAGE_139_TERMINAL_SERIES_ISOLATION.md`: evidence-bound
+`FINAL_FAILED` transition and versioned propagation are implemented. The next
+gate is one controlled batch-41 transition; batch 42 and the wider drain remain
+blocked until its redacted report is reviewed.

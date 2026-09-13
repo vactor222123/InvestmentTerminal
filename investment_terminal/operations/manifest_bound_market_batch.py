@@ -51,7 +51,7 @@ class ManifestBoundMarketBatchService:
             raise TypeError("selection must be a ManifestBatchSelection")
         result = self.service.run(selection.request, checkpoint)
         return {
-            "schema_version": 2,
+            "schema_version": 3,
             "operation_identity": "MANIFEST_BOUND_MARKET_BATCH",
             "provider_identity": result["provider_identity"],
             "status": result["status"],
@@ -64,6 +64,7 @@ class ManifestBoundMarketBatchService:
             "request_checksum": selection.request.checksum,
             "coverage": result["coverage"],
             "failure_types": result["failure_types"],
+            "final_failure_categories": result["final_failure_categories"],
             "limitations": [
                 "report excludes symbols, currencies, paths, prices, provider text, and exception messages",
                 "one-batch execution does not authorize another batch, a manifest drain, scheduling, analysis, or trading",

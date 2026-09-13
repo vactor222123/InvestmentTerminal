@@ -8,6 +8,10 @@ import json
 from investment_terminal.utils.validation import normalize_required_text, validate_aware_datetime
 
 
+FINAL_FAILURE_POLICY_IDENTITY = "NORMAL_AND_REPAIRED_STRICT_REJECTION_V1"
+FINAL_FAILURE_CATEGORIES = frozenset({"RESPONSE_NUMERIC", "RESPONSE_OHLC"})
+
+
 @dataclass(frozen=True, slots=True, order=True)
 class MarketBatchItem:
     symbol: str
@@ -69,7 +73,9 @@ class ResumableMarketBatchService:
         current_outcomes: list[dict[str, object]] = []
         for item in request.items:
             previous = outcomes.get(item.symbol)
-            if previous is not None and previous["status"] in {"SUCCESS", "EMPTY"}:
+            if previous is not None and previous["status"] in {
+                "SUCCESS", "EMPTY", "FINAL_FAILED"
+            }:
                 skipped += 1
                 continue
             try:
@@ -88,15 +94,19 @@ class ResumableMarketBatchService:
                     "omitted_trailing_count": 0, "omission_types": [],
                     "failure_type": type(exc).__name__}
             current_outcomes.append(outcomes[item.symbol])
-            self.checkpoint_writer({"schema_version": 2, "request_checksum": request.checksum,
+            self.checkpoint_writer({"schema_version": 3, "request_checksum": request.checksum,
                                     "outcomes": outcomes})
         completed = validate_aware_datetime(self.clock(), field_name="completed_at")
         values = [outcomes[item.symbol] for item in request.items]
         success = sum(x["status"] == "SUCCESS" for x in values)
         empty = sum(x["status"] == "EMPTY" for x in values)
         failed = sum(x["status"] == "FAILED" for x in values)
-        status = "SUCCESS" if failed == 0 else ("PARTIAL" if success + empty else "FAILED")
-        return {"schema_version": 3, "provider_identity": "YAHOO_FINANCE", "status": status,
+        final_failed = sum(x["status"] == "FINAL_FAILED" for x in values)
+        if failed == 0:
+            status = "SUCCESS_WITH_EXCLUSIONS" if final_failed else "SUCCESS"
+        else:
+            status = "PARTIAL" if success + empty + final_failed else "FAILED"
+        return {"schema_version": 4, "provider_identity": "YAHOO_FINANCE", "status": status,
             "started_at": started.isoformat(), "completed_at": completed.isoformat(),
             "duration_seconds": (completed-started).total_seconds(), "coverage": {
                 "current_run": {"attempted_count": len(current_outcomes), "skipped_count": skipped,
@@ -106,13 +116,17 @@ class ResumableMarketBatchService:
                     "omitted_trailing_total": sum(x["omitted_trailing_count"] for x in current_outcomes),
                     "omission_types": _omission_types(current_outcomes)},
                 "cumulative": {"requested_count": len(request.items), "success_count": success,
-                    "empty_count": empty, "failure_count": failed,
+                    "empty_count": empty, "retryable_failure_count": failed,
+                    "final_failure_count": final_failed,
                     "downloaded_total": sum(x["downloaded"] or 0 for x in values),
                     "inserted_total": sum(x["inserted"] or 0 for x in values),
                     "duplicate_total": sum(x["duplicates"] or 0 for x in values),
                     "omitted_trailing_total": sum(x["omitted_trailing_count"] for x in values),
                     "omission_types": _omission_types(values)}},
-            "failure_types": sorted({x["failure_type"] for x in values if x["failure_type"]}),
+            "failure_types": sorted({x["failure_type"] for x in values
+                                     if x["status"] == "FAILED" and x["failure_type"]}),
+            "final_failure_categories": sorted({x["failure_category"] for x in values
+                                                if x["status"] == "FINAL_FAILED"}),
             "limitations": ["report excludes symbols, paths, prices, provider text, and exception messages",
                             "batch execution does not authorize scheduling, mass ingestion, analysis, or trading"]}
 
@@ -120,7 +134,7 @@ class ResumableMarketBatchService:
     def _outcomes(value: object | None, checksum: str) -> dict[str, dict[str, object]]:
         if value is None:
             return {}
-        if not isinstance(value, dict) or value.get("schema_version") not in {1, 2} or value.get("request_checksum") != checksum:
+        if not isinstance(value, dict) or value.get("schema_version") not in {1, 2, 3} or value.get("request_checksum") != checksum:
             raise ValueError("Checkpoint does not match request")
         outcomes = value.get("outcomes")
         if not isinstance(outcomes, dict) or any(not isinstance(k, str) or not isinstance(v, dict) for k, v in outcomes.items()):
@@ -132,6 +146,7 @@ class ResumableMarketBatchService:
                 item["omitted_trailing_count"] = 0
                 item["omission_types"] = []
             _validate_outcome_omission(item)
+            _validate_outcome_status(item, schema_version=value["schema_version"])
             normalized[key] = item
         return normalized
 
@@ -156,6 +171,50 @@ def _validate_outcome_omission(outcome: dict[str, object]) -> None:
 
 def _omission_types(outcomes) -> list[str]:
     return sorted({item for outcome in outcomes for item in outcome["omission_types"]})
+
+
+def _validate_outcome_status(
+    outcome: dict[str, object], *, schema_version: int
+) -> None:
+    status = outcome.get("status")
+    if status not in {"SUCCESS", "EMPTY", "FAILED", "FINAL_FAILED"}:
+        raise ValueError("Checkpoint outcome status is invalid")
+    final_fields = {
+        "failure_category",
+        "isolation_policy_identity",
+        "isolation_evidence",
+    }
+    if status != "FINAL_FAILED":
+        if any(field in outcome for field in final_fields):
+            raise ValueError("Non-final checkpoint outcome has isolation evidence")
+        return
+    if schema_version != 3:
+        raise ValueError("FINAL_FAILED requires checkpoint schema version 3")
+    if any(outcome.get(field) is not None for field in ("downloaded", "inserted", "duplicates")):
+        raise ValueError("FINAL_FAILED transfer counts must be null")
+    failure_type = outcome.get("failure_type")
+    if not isinstance(failure_type, str) or not failure_type.strip():
+        raise ValueError("FINAL_FAILED requires a failure type")
+    if outcome.get("failure_category") not in FINAL_FAILURE_CATEGORIES:
+        raise ValueError("FINAL_FAILED category is invalid")
+    if outcome.get("isolation_policy_identity") != FINAL_FAILURE_POLICY_IDENTITY:
+        raise ValueError("FINAL_FAILED policy identity is invalid")
+    evidence = outcome.get("isolation_evidence")
+    if not isinstance(evidence, dict) or set(evidence) != {
+        "normal_diagnostic_checksum",
+        "repaired_qualification_checksum",
+    }:
+        raise ValueError("FINAL_FAILED isolation evidence is invalid")
+    if any(not _is_sha256(value) for value in evidence.values()):
+        raise ValueError("FINAL_FAILED evidence checksum is invalid")
+
+
+def _is_sha256(value: object) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value)
+    )
 
 
 def _datetime(value: object, field_name: str) -> datetime:

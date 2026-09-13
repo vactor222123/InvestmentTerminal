@@ -479,6 +479,14 @@ OHLC category. Versioned checkpoint, batch, manifest, drain, and diagnostic
 evidence must keep the exclusion explicit while permitting later unrelated
 batches. Implementation precedes any runtime transition or batch 42.
 
+Package 139 implements that versioned boundary. Matching checksum-bound normal
+and repaired strict rejection may atomically transition one retryable outcome
+to checkpoint schema-3 `FINAL_FAILED`; exact repeat is idempotent and conflict
+fails closed. Batch, manifest, drain, and diagnostic reports now distinguish
+retryable failures from final exclusions, skip provider access for final
+outcomes, and allow ordered progress after an explicit exclusion. Run one
+controlled batch-41 isolation next; batch 42 remains blocked pending review.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

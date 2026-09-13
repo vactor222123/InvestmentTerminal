@@ -70,7 +70,7 @@ def main(
     except Exception as exc:
         now = runtime_clock()
         payload = {
-            "schema_version": 2,
+            "schema_version": 3,
             "operation_identity": "MANIFEST_BOUND_MARKET_BATCH",
             "provider_identity": "YAHOO_FINANCE",
             "status": "FAILED",
@@ -87,6 +87,7 @@ def main(
             ),
             "coverage": None,
             "failure_types": [type(exc).__name__],
+            "final_failure_categories": [],
             "limitations": [
                 "failed report excludes private values, paths, provider text, and exception messages"
             ],
@@ -97,7 +98,9 @@ def main(
     write_json_atomic(options.report_output, payload)
     if options.json:
         print(json.dumps(payload, indent=2, allow_nan=False))
-    return 0 if payload["status"] == "SUCCESS" else 1
+    return 0 if payload["status"] in {
+        "SUCCESS", "SUCCESS_WITH_EXCLUSIONS"
+    } else 1
 
 
 if __name__ == "__main__":

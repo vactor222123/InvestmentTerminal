@@ -28,11 +28,12 @@ def test_isolates_failure_and_checkpoints_each_item():
     report=ResumableMarketBatchService(importer=importer,checkpoint_writer=written.append,clock=lambda:NOW).run(request())
     assert importer.calls==["AAA","BBB"]
     assert report["status"]=="PARTIAL"
-    assert report["schema_version"]==3
+    assert report["schema_version"]==4
     assert report["coverage"]["current_run"]=={"attempted_count":2,"skipped_count":0,
         "downloaded_total":2,"inserted_total":2,"duplicate_total":0,
         "omitted_trailing_total":0,"omission_types":[]}
-    assert report["coverage"]["cumulative"]["failure_count"]==1
+    assert report["coverage"]["cumulative"]["retryable_failure_count"]==1
+    assert report["coverage"]["cumulative"]["final_failure_count"]==0
     assert len(written)==2 and "AAA" not in str(report) and report["failure_types"]==["TimeoutError"]
 
 def test_resume_skips_success_and_retries_failure():
@@ -64,7 +65,7 @@ def test_schema2_checkpoint_persists_and_replays_omission_evidence():
         "duplicates":0,"omitted_trailing_count":1,
         "omission_types":("TRAILING_NON_FINITE_NUMERIC",)})()
     report=ResumableMarketBatchService(importer=importer,checkpoint_writer=written.append,clock=lambda:NOW).run(req)
-    assert written[-1]["schema_version"]==2
+    assert written[-1]["schema_version"]==3
     assert report["coverage"]["cumulative"]["omitted_trailing_total"]==2
     assert report["coverage"]["cumulative"]["omission_types"]==["TRAILING_NON_FINITE_NUMERIC"]
     replay=ResumableMarketBatchService(importer=Importer(),checkpoint_writer=lambda x:None,clock=lambda:NOW).run(req,written[-1])
@@ -77,6 +78,44 @@ def test_rejects_inconsistent_schema2_omission_before_resume():
     checkpoint={"schema_version":2,"request_checksum":req.checksum,"outcomes":{"AAA":outcome,"BBB":outcome}}
     with pytest.raises(ValueError,match="omission"):
         ResumableMarketBatchService(importer=Importer(),checkpoint_writer=lambda x:None,clock=lambda:NOW).run(req,checkpoint)
+
+def test_schema3_final_failure_is_terminal_and_explicit():
+    req=request();importer=Importer();written=[]
+    final={"status":"FINAL_FAILED","downloaded":None,"inserted":None,
+        "duplicates":None,"omitted_trailing_count":0,"omission_types":[],
+        "failure_type":"YahooCandleInvalidResponseError",
+        "failure_category":"RESPONSE_NUMERIC",
+        "isolation_policy_identity":"NORMAL_AND_REPAIRED_STRICT_REJECTION_V1",
+        "isolation_evidence":{"normal_diagnostic_checksum":"a"*64,
+            "repaired_qualification_checksum":"b"*64}}
+    success={"status":"SUCCESS","downloaded":2,"inserted":2,"duplicates":0,
+        "omitted_trailing_count":0,"omission_types":[],"failure_type":None}
+    checkpoint={"schema_version":3,"request_checksum":req.checksum,
+        "outcomes":{"AAA":final,"BBB":success}}
+
+    report=ResumableMarketBatchService(importer=importer,
+        checkpoint_writer=written.append,clock=lambda:NOW).run(req,checkpoint)
+
+    assert importer.calls==[] and written==[]
+    assert report["status"]=="SUCCESS_WITH_EXCLUSIONS"
+    assert report["coverage"]["cumulative"]["retryable_failure_count"]==0
+    assert report["coverage"]["cumulative"]["final_failure_count"]==1
+    assert report["final_failure_categories"]==["RESPONSE_NUMERIC"]
+
+def test_rejects_final_failure_without_exact_evidence():
+    req=request()
+    outcome={"status":"FINAL_FAILED","downloaded":None,"inserted":None,
+        "duplicates":None,"omitted_trailing_count":0,"omission_types":[],
+        "failure_type":"YahooCandleInvalidResponseError",
+        "failure_category":"RESPONSE_NUMERIC",
+        "isolation_policy_identity":"NORMAL_AND_REPAIRED_STRICT_REJECTION_V1",
+        "isolation_evidence":{"normal_diagnostic_checksum":"not-a-sha",
+            "repaired_qualification_checksum":"b"*64}}
+    checkpoint={"schema_version":3,"request_checksum":req.checksum,
+        "outcomes":{"AAA":outcome}}
+    with pytest.raises(ValueError,match="checksum"):
+        ResumableMarketBatchService(importer=Importer(),
+            checkpoint_writer=lambda x:None,clock=lambda:NOW).run(req,checkpoint)
 
 def test_rejects_mismatched_checkpoint_before_import():
     importer=Importer()

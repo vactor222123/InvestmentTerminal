@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `f4e109ccb0c8b36c125e5dffff9322637fa284b9`
-**Current local package:** Phase 7 Package 138 - Terminal-Series Isolation Audit
+**Current GitHub baseline:** `3c317dd2746c8214aaf2e5df84acbd1ce2945fa0`
+**Current local package:** Phase 7 Package 139 - Terminal-Series Isolation
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement evidence-bound terminal-series isolation
+**Current next action:** Run one controlled batch-41 terminal isolation
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -623,6 +623,16 @@ Market / external data
 ---
 
 ## Current Audit Conclusion
+
+Package 139 implements the evidence-bound terminal-series isolation boundary.
+Only matching normal and repaired strict rejection for one fixed manifest
+series may produce checkpoint schema-3 `FINAL_FAILED`; exact evidence is
+idempotent and conflicting evidence fails before write. Versioned resumable,
+manifest, drain, and checkpoint-diagnostic reports keep retryable and final
+failures separate, bypass provider work for final outcomes, and permit later
+batches only after a final exclusion is explicit. Run exactly one controlled
+batch-41 transition next; batch 42 and the broader drain remain blocked until
+its redacted report is reviewed.
 
 Package 138 confirms that legacy `FAILED` is always retryable and that the drain
 cannot skip batch 41 without violating checkpoint order. Implement one

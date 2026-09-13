@@ -26,13 +26,14 @@ def main(argv: Sequence[str]|None=None, *, client=None, clock=None):
         importer=HistoricalMarketService(client or YahooFinanceClient(cache_directory=o.cache_directory),CandleRepository(db))
         payload=ResumableMarketBatchService(importer=importer,checkpoint_writer=lambda x:write_json_atomic(o.checkpoint,x),clock=runtime_clock).run(request,checkpoint)
     except Exception as exc:
-        now=runtime_clock();payload={"schema_version":2,"provider_identity":"YAHOO_FINANCE","status":"FAILED",
+        now=runtime_clock();payload={"schema_version":4,"provider_identity":"YAHOO_FINANCE","status":"FAILED",
             "started_at":now.isoformat(),"completed_at":now.isoformat(),"duration_seconds":0.0,"coverage":None,
-            "failure_types":[type(exc).__name__],"limitations":["failed batch report excludes private values and exception messages"]}
+            "failure_types":[type(exc).__name__],"final_failure_categories":[],
+            "limitations":["failed batch report excludes private values and exception messages"]}
     finally:
         if db is not None: db.close()
     write_json_atomic(o.report_output,payload)
     if o.json: print(json.dumps(payload,indent=2,allow_nan=False))
-    return 0 if payload["status"]=="SUCCESS" else 1
+    return 0 if payload["status"] in {"SUCCESS","SUCCESS_WITH_EXCLUSIONS"} else 1
 
 if __name__=="__main__": raise SystemExit(main())
