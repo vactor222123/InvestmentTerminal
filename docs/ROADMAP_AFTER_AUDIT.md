@@ -915,3 +915,11 @@ enforces a maximum 25-batch budget, and stops before the next batch on
 non-success. Existing evidence establishes batches 1–19 complete. One
 `max_batches=25` run may start at batch 20 and reach at most batch 44; review
 its redacted report and SQLite integrity before any further drain.
+
+## Phase 7 Package 134 checkpoint
+
+The bounded drain completed batches 20–40 and halted at batch 41 before batch
+42. It attempted 440 items, downloaded and inserted 602,174 candles with zero
+duplicates or omissions, and SQLite integrity is `ok`. Run the existing
+read-only manifest-bound checkpoint diagnostic for batch 41 next. Retry and
+later batches remain blocked pending that aggregate result.

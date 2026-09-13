@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `6687c7221400ea141b5393de4a45ca2837f1a465`
-**Current local package:** Phase 7 Package 133 - Manifest-Drain Restart Audit
+**Current GitHub baseline:** `455d52867d20aa0286109fb49bc14326d8645f72`
+**Current local package:** Phase 7 Package 134 - Batch-20-to-44 Drain Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one 25-batch drain from batch 20
+**Current next action:** Diagnose the batch-41 checkpoint read-only
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -624,13 +624,15 @@ Market / external data
 
 ## Current Audit Conclusion
 
+Package 134 records a correct halt at batch 41. Batches 20–40 completed; the
+run attempted 22 batches and 440 items, downloaded and inserted 602,174
+candles, and recorded zero duplicates or omissions. Batch 42 was not attempted
+and SQLite integrity is `ok`. Run the existing read-only checkpoint diagnostic
+once for batch 41 next. Do not retry batch 41 or resume the drain first.
+
 Package 133 confirms that the existing drain safely resumes from the first
 checksum-valid unfinished checkpoint, enforces its 1–25 batch budget, rejects
-out-of-order progress, and stops before the next batch on non-success. Existing
-redacted evidence establishes batches 1–19 complete. Run one
-`max_batches=25` invocation next; it must start at batch 20 and may reach at
-most batch 44. Return only the redacted drain report and SQLite integrity.
-Batch 45 and another invocation remain blocked pending review.
+out-of-order progress, and stops before the next batch on non-success.
 
 Package 132 records successful batch-19 recovery. The normal `repair=False`
 retry attempted one item, skipped 19, inserted one candle, and completed all 20

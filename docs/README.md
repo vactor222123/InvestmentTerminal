@@ -77,6 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_133_MANIFEST_DRAIN_RESTART_AUDIT.md`: the existing bounded
-coordinator may resume from batch 20 with one explicit 25-batch budget, reaching
-at most batch 44 and stopping on the first non-success result.
+`PHASE_7_PACKAGE_134_BATCH_20_44_DRAIN_RESULT.md`: batches 20–40 completed and
+the coordinator halted at batch 41 before batch 42, with SQLite integrity
+`ok`. Diagnose the private batch-41 checkpoint through the existing read-only
+aggregate boundary before any retry.

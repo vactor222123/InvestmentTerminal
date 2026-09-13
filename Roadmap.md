@@ -443,6 +443,12 @@ and stops before the next batch on non-success. One controlled
 `max_batches=25` run may start at batch 20 and reach at most batch 44. Review
 its redacted report and SQLite integrity before batch 45 or another drain.
 
+Package 134 records that the bounded run completed batches 20–40 and halted at
+batch 41 before batch 42. It attempted 440 items, downloaded and inserted
+602,174 candles with zero duplicates or omissions, and SQLite integrity is
+`ok`. Run the existing read-only batch-checkpoint diagnostic for batch 41 next;
+retry and later batches remain blocked pending its aggregate result.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
