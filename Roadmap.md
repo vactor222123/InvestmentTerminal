@@ -455,6 +455,14 @@ failed-series diagnostic for that outcome next, using normal `repair=False`
 retrieval and unchanged strict projection. Batch retry, repaired retrieval,
 batch 42, and the broader drain remain blocked pending review.
 
+Package 136 confirms that the current normal response reproduces one interior
+numeric defect among 2,514 rows: open and low are non-positive on 2016-12-28.
+The trailing-row policy correctly rejects omission, and strict projection is
+`REJECTED/RESPONSE_NUMERIC`. Run the existing separate read-only repaired-series
+qualification once for batch 41 to measure explicit provider repair behavior.
+Do not persist repaired data, retry the batch, or continue to batch 42 pending
+that evidence and a separate provenance decision.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

@@ -167,6 +167,7 @@
 **Phase 7 Package 133 manifest-drain restart audit:** COMPLETE
 **Phase 7 Package 134 batches 20-44 drain result:** COMPLETE - HALTED AT 41
 **Phase 7 Package 135 batch-41 checkpoint result:** COMPLETE - ONE FAILURE
+**Phase 7 Package 136 batch-41 normal-path result:** COMPLETE - INTERIOR NUMERIC DEFECT
 
 ## Current State
 
@@ -174,11 +175,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run the existing schema-version-3 manifest failed-series diagnostic exactly
-once for batch 41. It may fetch only the single failed series through normal
-`repair=False` retrieval and must apply unchanged strict projection to the same
-frame. Return only its redacted report. Do not retry batch 41, use repaired
-retrieval, execute batch 42, or resume the drain before review.
+Run the existing manifest-bound repaired-series qualification exactly once for
+batch 41. It may fetch only the single failed series through explicit
+`repair=True` retrieval and must apply unchanged strict projection. Return only
+its redacted schema-version-2 report. Do not persist repaired data, retry batch
+41, execute batch 42, or resume the drain before review and a separate
+provenance decision.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

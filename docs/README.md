@@ -77,6 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_135_BATCH_41_CHECKPOINT_RESULT.md`: batch 41 contains 19
-successes and one isolated Yahoo candle-validation failure. Run one existing
-schema-version-3 failed-series diagnostic before retry or batch 42.
+`PHASE_7_PACKAGE_136_BATCH_41_NORMAL_PATH_RESULT.md`: normal retrieval
+reproduces one interior non-positive OHLC row and strict projection rejects the
+series. Run one separate read-only repaired-series qualification before any
+retry, persistence, or batch 42.

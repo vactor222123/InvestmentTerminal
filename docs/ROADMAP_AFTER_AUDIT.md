@@ -931,3 +931,13 @@ successes and exactly one `YahooCandleInvalidResponseError`. Run one existing
 schema-version-3 manifest failed-series diagnostic for that outcome through
 normal `repair=False` retrieval and unchanged strict projection. Retry, repaired
 retrieval, batch 42, and the broader drain remain blocked pending review.
+
+## Phase 7 Package 136 checkpoint
+
+The schema-version-3 normal-path diagnostic reproduces one interior row with
+non-positive open and low among 2,514 rows. The trailing-row omission policy
+correctly rejects it as `INVALID_ROW_NOT_FINAL`, and unchanged strict projection
+is `REJECTED/RESPONSE_NUMERIC`. Run the existing separate manifest-bound
+repaired-series qualification once for batch 41. Repaired persistence, batch
+retry, batch 42, and the broader drain remain blocked pending review and an
+explicit provenance decision.

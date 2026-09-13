@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `2d7d4e35585c3e8c81686a73afca76b55058a350`
-**Current local package:** Phase 7 Package 135 - Batch-41 Checkpoint Result
+**Current GitHub baseline:** `7d5a24f7a7477071deed362535e9e1fe818cf6f7`
+**Current local package:** Phase 7 Package 136 - Batch-41 Normal-Path Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one schema-3 failed-series diagnostic for batch 41
+**Current next action:** Run one read-only repaired-series qualification for batch 41
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -624,12 +624,14 @@ Market / external data
 
 ## Current Audit Conclusion
 
-Package 135 records exact batch-41 checkpoint coverage: 19 successes, zero
-empty outcomes, and one `YahooCandleInvalidResponseError`. Run the existing
-schema-version-3 manifest failed-series diagnostic once for that single failed
-outcome through normal `repair=False` retrieval and unchanged strict
-projection. Do not retry batch 41, use repaired retrieval, or execute batch 42
-before reviewing its redacted report.
+Package 136 confirms that normal `repair=False` retrieval still contains one
+interior row with non-positive open and low among 2,514 rows. The established
+trailing-row policy correctly rejects it, and unchanged strict projection
+returns `REJECTED/RESPONSE_NUMERIC`. Do not retry batch 41 through the normal
+path or discard the row. Run the existing separate read-only repaired-series
+qualification exactly once for batch 41; repaired persistence, batch 42, and
+the broader drain remain blocked pending its redacted result and a separate
+provenance decision.
 
 Package 134 records a correct halt at batch 41. Batches 20–40 completed; the
 run attempted 22 batches and 440 items, downloaded and inserted 602,174
