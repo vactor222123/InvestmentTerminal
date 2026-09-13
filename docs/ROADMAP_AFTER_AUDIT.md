@@ -923,3 +923,11 @@ The bounded drain completed batches 20–40 and halted at batch 41 before batch
 duplicates or omissions, and SQLite integrity is `ok`. Run the existing
 read-only manifest-bound checkpoint diagnostic for batch 41 next. Retry and
 later batches remain blocked pending that aggregate result.
+
+## Phase 7 Package 135 checkpoint
+
+The read-only batch-41 checkpoint diagnostic accounts for all 20 outcomes: 19
+successes and exactly one `YahooCandleInvalidResponseError`. Run one existing
+schema-version-3 manifest failed-series diagnostic for that outcome through
+normal `repair=False` retrieval and unchanged strict projection. Retry, repaired
+retrieval, batch 42, and the broader drain remain blocked pending review.

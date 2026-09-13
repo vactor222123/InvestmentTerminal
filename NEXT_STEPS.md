@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 455d52867d20aa0286109fb49bc14326d8645f72`
+**Current repository baseline:** `develop @ 2d7d4e35585c3e8c81686a73afca76b55058a350`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -166,6 +166,7 @@
 **Phase 7 Package 132 batch-19 recovery result:** COMPLETE - SUCCESS
 **Phase 7 Package 133 manifest-drain restart audit:** COMPLETE
 **Phase 7 Package 134 batches 20-44 drain result:** COMPLETE - HALTED AT 41
+**Phase 7 Package 135 batch-41 checkpoint result:** COMPLETE - ONE FAILURE
 
 ## Current State
 
@@ -173,10 +174,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run the existing read-only manifest-bound checkpoint diagnostic exactly once
-for batch 41. Return only its redacted report; keep the manifest, checkpoint,
-database, cache, symbols, currencies, and candles private. Do not retry batch
-41, execute batch 42, or resume the drain before review.
+Run the existing schema-version-3 manifest failed-series diagnostic exactly
+once for batch 41. It may fetch only the single failed series through normal
+`repair=False` retrieval and must apply unchanged strict projection to the same
+frame. Return only its redacted report. Do not retry batch 41, use repaired
+retrieval, execute batch 42, or resume the drain before review.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

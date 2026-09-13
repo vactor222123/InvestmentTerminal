@@ -449,6 +449,12 @@ batch 41 before batch 42. It attempted 440 items, downloaded and inserted
 `ok`. Run the existing read-only batch-checkpoint diagnostic for batch 41 next;
 retry and later batches remain blocked pending its aggregate result.
 
+Package 135 confirms that batch 41 contains 19 successes and exactly one
+`YahooCandleInvalidResponseError`. Run one existing schema-version-3 manifest
+failed-series diagnostic for that outcome next, using normal `repair=False`
+retrieval and unchanged strict projection. Batch retry, repaired retrieval,
+batch 42, and the broader drain remain blocked pending review.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

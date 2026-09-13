@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `455d52867d20aa0286109fb49bc14326d8645f72`
-**Current local package:** Phase 7 Package 134 - Batch-20-to-44 Drain Result
+**Current GitHub baseline:** `2d7d4e35585c3e8c81686a73afca76b55058a350`
+**Current local package:** Phase 7 Package 135 - Batch-41 Checkpoint Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Diagnose the batch-41 checkpoint read-only
+**Current next action:** Run one schema-3 failed-series diagnostic for batch 41
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -624,11 +624,17 @@ Market / external data
 
 ## Current Audit Conclusion
 
+Package 135 records exact batch-41 checkpoint coverage: 19 successes, zero
+empty outcomes, and one `YahooCandleInvalidResponseError`. Run the existing
+schema-version-3 manifest failed-series diagnostic once for that single failed
+outcome through normal `repair=False` retrieval and unchanged strict
+projection. Do not retry batch 41, use repaired retrieval, or execute batch 42
+before reviewing its redacted report.
+
 Package 134 records a correct halt at batch 41. Batches 20–40 completed; the
 run attempted 22 batches and 440 items, downloaded and inserted 602,174
 candles, and recorded zero duplicates or omissions. Batch 42 was not attempted
-and SQLite integrity is `ok`. Run the existing read-only checkpoint diagnostic
-once for batch 41 next. Do not retry batch 41 or resume the drain first.
+and SQLite integrity is `ok`.
 
 Package 133 confirms that the existing drain safely resumes from the first
 checksum-valid unfinished checkpoint, enforces its 1–25 batch budget, rejects

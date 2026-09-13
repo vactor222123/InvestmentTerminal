@@ -77,7 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_134_BATCH_20_44_DRAIN_RESULT.md`: batches 20–40 completed and
-the coordinator halted at batch 41 before batch 42, with SQLite integrity
-`ok`. Diagnose the private batch-41 checkpoint through the existing read-only
-aggregate boundary before any retry.
+`PHASE_7_PACKAGE_135_BATCH_41_CHECKPOINT_RESULT.md`: batch 41 contains 19
+successes and one isolated Yahoo candle-validation failure. Run one existing
+schema-version-3 failed-series diagnostic before retry or batch 42.
