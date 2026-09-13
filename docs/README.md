@@ -77,6 +77,6 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_132_BATCH_19_RECOVERY_RESULT.md`: batch 19 is complete with 20
-successes, the normal path inserted one candle, and SQLite integrity is `ok`.
-Audit the manifest-drain restart boundary before batch 20 or broader execution.
+`PHASE_7_PACKAGE_133_MANIFEST_DRAIN_RESTART_AUDIT.md`: the existing bounded
+coordinator may resume from batch 20 with one explicit 25-batch budget, reaching
+at most batch 44 and stopping on the first non-success result.

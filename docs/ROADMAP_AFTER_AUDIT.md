@@ -906,3 +906,12 @@ retry attempted one item, skipped 19, inserted one candle, and completed all 20
 outcomes with zero failures, duplicates, or omissions. SQLite integrity is
 `ok`. Audit the checkpoint-derived drain restart boundary, budget, stop rules,
 and report semantics before authorizing batch 20 or broader execution.
+
+## Phase 7 Package 133 checkpoint
+
+The existing manifest coordinator safely derives the first unfinished batch
+from exact checksum-bound checkpoint coverage, rejects out-of-order progress,
+enforces a maximum 25-batch budget, and stops before the next batch on
+non-success. Existing evidence establishes batches 1–19 complete. One
+`max_batches=25` run may start at batch 20 and reach at most batch 44; review
+its redacted report and SQLite integrity before any further drain.

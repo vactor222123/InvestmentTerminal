@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ f049595cef476db75bf4f23da59c945b47a9227d`
+**Current repository baseline:** `develop @ 6687c7221400ea141b5393de4a45ca2837f1a465`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -164,6 +164,7 @@
 **Phase 7 Package 130 normal-path strict-projection evidence:** COMPLETE
 **Phase 7 Package 131 normal-path projection result:** COMPLETE - QUALIFIED
 **Phase 7 Package 132 batch-19 recovery result:** COMPLETE - SUCCESS
+**Phase 7 Package 133 manifest-drain restart audit:** COMPLETE
 
 ## Current State
 
@@ -171,11 +172,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit the manifest-drain restart boundary after successful batch-19 recovery.
-Verify checkpoint-derived first-unfinished selection, the existing 25-batch
-budget and stop rules, report semantics, and operational prerequisites before
-authorizing any run beginning at batch 20. Do not execute batch 20 or resume the
-broader drain during the audit. Repaired retrieval remains outside persistence.
+Run one existing manifest drain with `max_batches=25`. Its validated private
+checkpoint state must select batch 20 first, and the explicit budget may reach
+at most batch 44. Stop on the first non-success batch and return only the
+redacted aggregate report plus the privacy-safe SQLite integrity result. Do not
+run batch 45, schedule another drain, or persist repaired retrieval before
+review.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

@@ -436,6 +436,13 @@ or omissions. SQLite integrity is `ok`. Audit the checkpoint-derived drain
 restart boundary and existing budget/stop semantics before authorizing batch 20
 or any broader continuation.
 
+Package 133 confirms that the existing coordinator needs no restart change. It
+derives the first unfinished batch from exact checksum-bound checkpoint
+coverage, rejects out-of-order progress, enforces a maximum 25-batch budget,
+and stops before the next batch on non-success. One controlled
+`max_batches=25` run may start at batch 20 and reach at most batch 44. Review
+its redacted report and SQLite integrity before batch 45 or another drain.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
