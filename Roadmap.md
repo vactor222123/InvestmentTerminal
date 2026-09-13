@@ -471,6 +471,14 @@ series remains visible in evidence without indefinitely blocking unrelated
 manifest batches. No runtime mutation or later batch is authorized by this
 result.
 
+Package 138 confirms that the current `FAILED` outcome is always retryable and
+the drain cannot legally pass its batch. The selected implementation introduces
+an evidence-bound `FINAL_FAILED` state only when matching normal and repaired
+strict projections reject one fixed series with the same allowlisted numeric or
+OHLC category. Versioned checkpoint, batch, manifest, drain, and diagnostic
+evidence must keep the exclusion explicit while permitting later unrelated
+batches. Implementation precedes any runtime transition or batch 42.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

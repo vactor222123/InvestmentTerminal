@@ -169,6 +169,7 @@
 **Phase 7 Package 135 batch-41 checkpoint result:** COMPLETE - ONE FAILURE
 **Phase 7 Package 136 batch-41 normal-path result:** COMPLETE - INTERIOR NUMERIC DEFECT
 **Phase 7 Package 137 batch-41 repaired result:** COMPLETE - REPAIR REJECTED
+**Phase 7 Package 138 terminal-series isolation audit:** COMPLETE
 
 ## Current State
 
@@ -176,12 +177,13 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit the existing manifest checkpoint, one-batch report, and drain contracts
-for the smallest versioned terminal-series isolation boundary. One irreparable
-series must remain explicit and checksum-bound without silently becoming
-success or blocking unrelated later batches. Do not contact Yahoo, mutate
-private evidence, retry batch 41, execute batch 42, or resume the drain during
-the audit.
+Implement the evidence-bound terminal-series isolation vertical slice selected
+in `docs/PHASE_7_PACKAGE_138_TERMINAL_SERIES_ISOLATION_AUDIT.md`. Add the
+schema-version-3 `FINAL_FAILED` checkpoint transition and propagate explicit
+final-failure counts through versioned batch, manifest, drain, and diagnostic
+reports. Preserve legacy reads, exact-resume, privacy, and all fail-closed
+guards. Do not contact Yahoo or mutate private runtime evidence in the
+implementation package.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

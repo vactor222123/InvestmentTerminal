@@ -950,3 +950,14 @@ persist either returned frame. Audit a versioned terminal-series isolation
 boundary across checkpoint, one-batch report, and drain consumers so the
 failure remains explicit without blocking unrelated later batches. Runtime
 mutation and batch 42 remain blocked during that audit.
+
+## Phase 7 Package 138 checkpoint
+
+Legacy `FAILED` outcomes are always retryable, and the drain correctly rejects
+later progress while batch 41 remains unfinished. Implement a generic,
+evidence-bound schema-version-3 `FINAL_FAILED` transition for matching normal
+and repaired strict rejection in an allowlisted numeric or OHLC category.
+Propagate explicit exclusion evidence through versioned batch, manifest, drain,
+and checkpoint-diagnostic reports while preserving legacy reads, exact resume,
+privacy, and fail-closed guards. Do not mutate runtime evidence or execute batch
+42 before implementation and review.

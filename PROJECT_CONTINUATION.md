@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `2bfb7f7bbbb4b725119669f7e364b13fc9d21879`
-**Current local package:** Phase 7 Package 137 - Batch-41 Repaired Result
+**Current GitHub baseline:** `f4e109ccb0c8b36c125e5dffff9322637fa284b9`
+**Current local package:** Phase 7 Package 138 - Terminal-Series Isolation Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit terminal-series isolation across manifest batches
+**Current next action:** Implement evidence-bound terminal-series isolation
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -624,13 +624,13 @@ Market / external data
 
 ## Current Audit Conclusion
 
-Package 137 confirms that explicit yfinance repair marked one of 2,514 rows as
-repaired but unchanged strict projection still returned
-`REJECTED/RESPONSE_NUMERIC`. Do not retry either retrieval mode, persist the
-rejected frame, discard the interior row, or weaken validation. Audit a durable
-terminal-series isolation boundary so this explicit failure can remain visible
-without blocking unrelated later batches. Batch 42 and the broader drain remain
-blocked until the checkpoint/report/drain contract and consumers are audited.
+Package 138 confirms that legacy `FAILED` is always retryable and that the drain
+cannot skip batch 41 without violating checkpoint order. Implement one
+evidence-bound schema-version-3 `FINAL_FAILED` checkpoint transition, together
+with versioned batch, manifest, drain, and checkpoint-diagnostic propagation.
+Only matching normal and repaired strict rejection in an allowlisted
+deterministic category may authorize isolation. Runtime mutation, Yahoo access,
+batch 42, and the broader drain remain blocked until implementation is reviewed.
 
 Package 134 records a correct halt at batch 41. Batches 20–40 completed; the
 run attempted 22 batches and 440 items, downloaded and inserted 602,174
