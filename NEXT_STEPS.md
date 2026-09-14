@@ -176,6 +176,7 @@
 **Phase 7 Package 142 batches 42-66 drain result:** COMPLETE - SUCCESS
 **Phase 7 Package 143 manifest-drain budget 100:** COMPLETE
 **Phase 7 Package 144 batches 67-166 drain result:** COMPLETE - HALTED AT 105
+**Phase 7 Package 145 batch-105 checkpoint result:** COMPLETE - ONE FAILURE
 
 ## Current State
 
@@ -183,9 +184,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run the existing read-only manifest batch checkpoint diagnostic for batch 105.
-Return only its redacted diagnostic report. Do not retry batch 105 or start
-batch 106 before reviewing that evidence.
+Run the existing manifest-bound failed-series raw candle diagnostic for batch
+105. Return only its redacted report. Do not retry batch 105 or start batch 106
+before reviewing that evidence.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

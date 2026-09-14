@@ -1013,3 +1013,11 @@ with zero duplicates or trailing omissions. Ordered progress is 104 completed
 batches and 497 remaining; the existing final `RESPONSE_NUMERIC` exclusion is
 unchanged. Run the existing read-only checkpoint diagnostic for batch 105 next;
 do not retry it or start batch 106 before review.
+
+## Phase 7 Package 145 checkpoint
+
+The read-only batch-105 checkpoint diagnostic accounts for all 20 outcomes: 19
+successes, zero empty results, one retryable
+`YahooCandleInvalidResponseError`, and zero final exclusions. Run the existing
+manifest-bound failed-series raw candle diagnostic for batch 105 next. Do not
+retry the batch or start batch 106 before reviewing that redacted evidence.

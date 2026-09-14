@@ -77,7 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_144_BATCHES_67_166_DRAIN_RESULT.md`: the 100-batch-authorized
-drain completed batches 67–104 and halted safely at batch 105 after inserting
-1,050,735 candles. The next gate is the existing read-only batch checkpoint
-diagnostic for batch 105.
+`PHASE_7_PACKAGE_145_BATCH_105_CHECKPOINT_RESULT.md`: the read-only diagnostic
+found 19 successes and one retryable Yahoo invalid-response failure in batch
+105. The next gate is the existing manifest-bound failed-series raw candle
+diagnostic for only that one private series.
