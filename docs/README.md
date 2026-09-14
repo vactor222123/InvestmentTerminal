@@ -77,7 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_143_MANIFEST_DRAIN_BUDGET_100.md`: the manifest drain now
-accepts a caller-owned maximum of 100 sequential batches while preserving exact
-resume, checkpointing, and first-non-success stopping. The next gate is one
-100-batch-bounded drain beginning at batch 67.
+`PHASE_7_PACKAGE_144_BATCHES_67_166_DRAIN_RESULT.md`: the 100-batch-authorized
+drain completed batches 67–104 and halted safely at batch 105 after inserting
+1,050,735 candles. The next gate is the existing read-only batch checkpoint
+diagnostic for batch 105.

@@ -513,6 +513,12 @@ item remains atomically checkpointed, exact ordered resume is unchanged, and
 the first non-success batch still stops progress. One 100-batch-bounded run may
 now process at most batches 67–166 before another review.
 
+Package 144 records that the authorized run completed batches 67–104 and then
+halted correctly at batch 105. The run attempted 780 items and downloaded and
+inserted 1,050,735 candles without duplicates or trailing omissions. Ordered
+progress now has 104 completed batches and 497 remaining. Diagnose only the
+batch-105 checkpoint before retrying it or allowing batch 106.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

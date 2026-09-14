@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `de8416fe7942758728c37b55a2e70c3ed6307e6e`
-**Current local package:** Phase 7 Package 143 - Manifest Drain Budget 100
+**Current GitHub baseline:** `925932f0b9849bbf3b8508747590bb0992a19e2e`
+**Current local package:** Phase 7 Package 144 - Batches 67-166 Drain Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run a 100-batch-bounded drain at batch 67
+**Current next action:** Diagnose the failed batch-105 checkpoint
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -623,6 +623,15 @@ Market / external data
 ---
 
 ## Current Audit Conclusion
+
+Package 144 records a correctly bounded halt at batch 105. The drain completed
+batches 67–104, attempted 39 batches and 780 items, and downloaded and inserted
+1,050,735 candles with zero duplicates or trailing omissions. Ordered progress
+advanced from 66 to 104 completed batches, leaving 497. The failed batch added
+no final exclusion and reported `YahooCandleInvalidResponseError`; the existing
+batch-41 final `RESPONSE_NUMERIC` exclusion remains explicit. Separately
+reported SQLite integrity is `ok`. Run the existing read-only checkpoint
+diagnostic for batch 105 next; do not retry batch 105 or start batch 106 first.
 
 Package 143 raises only the manifest drain's caller-owned maximum budget from
 25 to 100 batches. Sequential execution, 20-item requests, per-item atomic

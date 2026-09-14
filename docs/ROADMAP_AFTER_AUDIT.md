@@ -1004,3 +1004,12 @@ remains sequential, checkpointed per item, checksum-bound, exactly resumable,
 and stopped by the first non-success batch. The unchanged report records the
 exact budget. Run one `max_batches=100` drain next; ordered progress must begin
 at batch 67 and stop by batch 166 or on the first non-success result.
+
+## Phase 7 Package 144 checkpoint
+
+The 100-batch-authorized drain completed batches 67–104 and halted correctly at
+batch 105. It attempted 780 items and downloaded and inserted 1,050,735 candles
+with zero duplicates or trailing omissions. Ordered progress is 104 completed
+batches and 497 remaining; the existing final `RESPONSE_NUMERIC` exclusion is
+unchanged. Run the existing read-only checkpoint diagnostic for batch 105 next;
+do not retry it or start batch 106 before review.
