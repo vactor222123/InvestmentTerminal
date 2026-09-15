@@ -532,7 +532,7 @@ caller-owned 1–100 batch budget and stops before later requests
 on the first non-success result. This preserves bounded failure impact and does
 not grant scheduled or complete-manifest execution authority.
 
-A complete collection sweep is a separately planned operations boundary, not a
+A complete collection sweep is a separate implemented operations boundary, not a
 relaxation of the fail-fast drain. Its attempted-coverage authority remains the
 exact request-bound private checkpoints. It may advance past a fully attempted
 batch only when every retryable outcome is exactly
@@ -541,6 +541,11 @@ projection before repository persistence. Existing retryable outcomes are not
 retried during the same sweep. Every other provider, rate-limit, persistence,
 checkpoint, or unknown failure stops the sweep before the next batch. SQLite
 contents, redacted reports, and an unbound skip list are not progress authority.
+`ManifestCollectionSweepPlan` owns the explicit one-to-manifest-size budget;
+`ManifestCollectionSweepService` owns exact resume and stopping semantics. The
+schema-version-1 CLI report separates sweep coverage, full completion, and
+deferred defects without exposing private identities. The old drain remains the
+ordered remediation boundary.
 # Phase 7 read-only batch checkpoint boundary
 
 `ManifestBatchCheckpointDiagnostic` is an offline operations boundary over one

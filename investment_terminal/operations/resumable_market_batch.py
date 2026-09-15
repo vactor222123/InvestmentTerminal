@@ -1,5 +1,6 @@
 """Sequential resumable ingestion for one bounded market-data batch."""
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 from hashlib import sha256
@@ -64,9 +65,22 @@ class ResumableMarketBatchService:
         self.checkpoint_writer = checkpoint_writer
         self.clock = clock
 
-    def run(self, request: MarketBatchRequest, checkpoint: object | None = None) -> dict[str, object]:
+    def run(
+        self,
+        request: MarketBatchRequest,
+        checkpoint: object | None = None,
+        *,
+        retry_failed: bool = True,
+        continue_after_failure: Callable[[BaseException], bool] | None = None,
+    ) -> dict[str, object]:
         if not isinstance(request, MarketBatchRequest):
             raise TypeError("request must be a MarketBatchRequest")
+        if not isinstance(retry_failed, bool):
+            raise TypeError("retry_failed must be a boolean")
+        if continue_after_failure is not None and not callable(
+            continue_after_failure
+        ):
+            raise TypeError("continue_after_failure must be callable or None")
         started = validate_aware_datetime(self.clock(), field_name="started_at")
         outcomes = self._outcomes(checkpoint, request.checksum)
         skipped = 0
@@ -75,9 +89,14 @@ class ResumableMarketBatchService:
             previous = outcomes.get(item.symbol)
             if previous is not None and previous["status"] in {
                 "SUCCESS", "EMPTY", "FINAL_FAILED"
-            }:
+            } or (
+                previous is not None
+                and previous["status"] == "FAILED"
+                and not retry_failed
+            ):
                 skipped += 1
                 continue
+            failure = None
             try:
                 result = self.importer.import_candles(
                     symbol=item.symbol, resolution=request.resolution,
@@ -89,6 +108,7 @@ class ResumableMarketBatchService:
                     "omitted_trailing_count": omitted,
                     "omission_types": list(omission_types), "failure_type": None}
             except Exception as exc:
+                failure = exc
                 outcomes[item.symbol] = {"status": "FAILED", "downloaded": None,
                     "inserted": None, "duplicates": None,
                     "omitted_trailing_count": 0, "omission_types": [],
@@ -96,6 +116,12 @@ class ResumableMarketBatchService:
             current_outcomes.append(outcomes[item.symbol])
             self.checkpoint_writer({"schema_version": 3, "request_checksum": request.checksum,
                                     "outcomes": outcomes})
+            if (
+                failure is not None
+                and continue_after_failure is not None
+                and not continue_after_failure(failure)
+            ):
+                raise failure
         completed = validate_aware_datetime(self.clock(), field_name="completed_at")
         values = [outcomes[item.symbol] for item in request.items]
         success = sum(x["status"] == "SUCCESS" for x in values)

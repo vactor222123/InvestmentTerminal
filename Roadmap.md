@@ -532,6 +532,13 @@ attempted coverage. The sweep may defer only local pre-persistence
 for every other failure. Implement this boundary while retaining the existing
 fail-fast drain unchanged; batch 106 remains blocked until review.
 
+Package 147 implements that separate boundary. Exact checkpoint coverage,
+non-retry resume, local-defect-only deferral, immediate systemic halt, an
+explicit manifest-sized budget, and a redacted schema-version-1 report are now
+enforced. The existing fail-fast drain is unchanged. Run one controlled private
+collection sweep next; the recorded state should begin provider work at batch
+106. Review the redacted report and SQLite integrity before remediation.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

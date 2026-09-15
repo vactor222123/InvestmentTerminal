@@ -81,3 +81,8 @@ Current Phase 7 continuation is recorded in
 collection sweep may defer only local pre-persistence Yahoo candle validation
 failures while all other failures stop progress. Implementation is the next
 gate; the existing fail-fast drain remains unchanged.
+
+`PHASE_7_PACKAGE_147_MANIFEST_COLLECTION_SWEEP.md`: implements exact checkpoint-
+derived attempted coverage, non-retry resume, local-defect-only deferral,
+immediate systemic halt, and the redacted collection-sweep report while leaving
+the fail-fast drain unchanged.

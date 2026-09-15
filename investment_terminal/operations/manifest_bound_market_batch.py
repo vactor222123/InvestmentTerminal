@@ -1,6 +1,7 @@
 """Execute one request selected from a checksum-bound private manifest."""
 
 from dataclasses import dataclass
+from collections.abc import Callable
 
 from investment_terminal.operations.market_batch_manifest import _manifest_checksum
 from investment_terminal.operations.resumable_market_batch import (
@@ -46,10 +47,18 @@ class ManifestBoundMarketBatchService:
         self,
         selection: ManifestBatchSelection,
         checkpoint: object | None = None,
+        *,
+        retry_failed: bool = True,
+        continue_after_failure: Callable[[BaseException], bool] | None = None,
     ) -> dict[str, object]:
         if not isinstance(selection, ManifestBatchSelection):
             raise TypeError("selection must be a ManifestBatchSelection")
-        result = self.service.run(selection.request, checkpoint)
+        result = self.service.run(
+            selection.request,
+            checkpoint,
+            retry_failed=retry_failed,
+            continue_after_failure=continue_after_failure,
+        )
         return {
             "schema_version": 3,
             "operation_identity": "MANIFEST_BOUND_MARKET_BATCH",

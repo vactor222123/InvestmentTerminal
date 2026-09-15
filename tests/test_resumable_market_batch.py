@@ -47,6 +47,33 @@ def test_resume_skips_success_and_retries_failure():
         "downloaded_total":2,"inserted_total":2,"duplicate_total":0,
         "omitted_trailing_total":0,"omission_types":[]}
 
+def test_nonretry_mode_preserves_failed_outcome_and_processes_missing_item():
+    req=request();importer=Importer();written=[]
+    checkpoint={"schema_version":1,"request_checksum":req.checksum,"outcomes":{
+        "AAA":{"status":"FAILED","downloaded":None,"inserted":None,"duplicates":None,
+               "failure_type":"YahooCandleInvalidResponseError"}}}
+    report=ResumableMarketBatchService(importer=importer,checkpoint_writer=written.append,
+        clock=lambda:NOW).run(req,checkpoint,retry_failed=False)
+    assert importer.calls==["BBB"] and len(written)==1
+    assert report["status"]=="PARTIAL"
+    assert report["coverage"]["current_run"]["skipped_count"]==1
+
+def test_failure_policy_checkpoints_then_stops_before_next_item():
+    req=request();importer=Importer(("AAA",));written=[]
+    with pytest.raises(TimeoutError):
+        ResumableMarketBatchService(importer=importer,checkpoint_writer=written.append,
+            clock=lambda:NOW).run(req,continue_after_failure=lambda error: False)
+    assert importer.calls==["AAA"]
+    assert written[-1]["outcomes"]["AAA"]["failure_type"]=="TimeoutError"
+
+@pytest.mark.parametrize("options",[
+    {"retry_failed":1}, {"continue_after_failure":"yes"},
+])
+def test_rejects_invalid_execution_policy(options):
+    with pytest.raises(TypeError):
+        ResumableMarketBatchService(importer=Importer(),checkpoint_writer=lambda x:None,
+            clock=lambda:NOW).run(request(),**options)
+
 def test_exact_resume_reports_zero_current_transfer_totals():
     req=request();importer=Importer()
     outcome={"status":"SUCCESS","downloaded":2,"inserted":2,"duplicates":0,"failure_type":None}

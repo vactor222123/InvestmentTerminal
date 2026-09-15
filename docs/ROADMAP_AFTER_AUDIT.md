@@ -1031,3 +1031,12 @@ existing fail-fast drain. It may advance only past deferred
 persistence, checkpoint, or unknown failure stops before the next batch. Add
 no unbound skip list and do not retry prior failures during the sweep.
 Implementation is next; batch 106 remains blocked.
+
+## Phase 7 Package 147 checkpoint
+
+The separate manifest collection sweep is implemented. It derives progress
+only from exact private checkpoints, preserves prior failed outcomes without
+retry, defers only exact local `YahooCandleInvalidResponseError`, and stops
+immediately on every other failure. Its redacted report separates sweep-covered
+from fully complete batches. Run one controlled private sweep next; expected
+provider work begins at batch 106. Return only its report and SQLite integrity.

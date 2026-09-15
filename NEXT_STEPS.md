@@ -178,6 +178,7 @@
 **Phase 7 Package 144 batches 67-166 drain result:** COMPLETE - HALTED AT 105
 **Phase 7 Package 145 batch-105 checkpoint result:** COMPLETE - ONE FAILURE
 **Phase 7 Package 146 complete collection sweep audit:** COMPLETE
+**Phase 7 Package 147 manifest collection sweep:** COMPLETE
 
 ## Current State
 
@@ -185,10 +186,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the separate manifest collection sweep selected by Package 146. It
-must defer only exact `YahooCandleInvalidResponseError` outcomes, preserve all
-private request-bound checkpoints, and halt on every other failure before the
-next batch. Do not run batch 106 before that implementation is reviewed.
+Run one controlled private manifest collection sweep using the implementation
+from Package 147. Exact recorded checkpoint coverage should make batch 106 the
+first provider batch. Return only the redacted report and a separately computed
+SQLite integrity result. Do not remediate deferred series or draw analytical
+conclusions before reviewing that evidence.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
