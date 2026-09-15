@@ -94,3 +94,7 @@ current-run deferred-counter defect that must be audited before resume.
 `PHASE_7_PACKAGE_149_SWEEP_FAILURE_EVIDENCE_AUDIT.md`: confirms lost persisted
 API causality, preserves exact diagnostic guards, and selects a read-only
 partial-failure qualification plus the exact deferred-counter correction.
+
+`PHASE_7_PACKAGE_150_PARTIAL_FAILURE_QUALIFICATION.md`: implements one read-only
+production-path qualification for a proper partial-checkpoint `APIError` and
+corrects the sweep's current deferred aggregate without runtime mutation.

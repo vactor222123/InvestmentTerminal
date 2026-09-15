@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `76aa06c14b0800ac8b971ff21183d0c65e6f248a`
-**Current local package:** Phase 7 Package 149 - Sweep Failure Evidence Audit
+**Current GitHub baseline:** `0f044346824a91e677fa8cb3a788a52d74082420`
+**Current local package:** Phase 7 Package 150 - Partial Failure Qualification
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement partial-failure qualification and counter fix
+**Current next action:** Run one read-only batch-106 failure qualification
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -660,6 +660,14 @@ read-only one-failure production-path qualification for the validated partial
 checkpoint plus the exact counter correction. Existing diagnostics, checkpoint
 schema, SQLite, and the private checkpoint remain unchanged. No provider call
 or batch-106 retry is yet authorized.
+
+Package 150 implements a separate read-only production-path qualification for
+the one `APIError` in the proper partial batch-106 checkpoint. It makes one
+manifest-bound projection request, validates returned evidence, and reports
+only aggregates or the existing privacy-safe causal category/type chain without
+opening SQLite or writing the checkpoint. The sweep's schema-1 current deferred
+counter now includes only exact local candle defects. Run one qualification
+next; sweep resume and ingestion retry remain blocked pending its report.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

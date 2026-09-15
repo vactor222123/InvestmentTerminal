@@ -783,6 +783,17 @@ The contract above remains authoritative; correcting the aggregate is a
 schema-version-1 bug fix. Checkpoint schema 3 stores only `failure_type` for a
 retryable `FAILED` outcome, so a persisted `APIError` has no recoverable causal
 category or exception chain. No category may be inferred retroactively.
+
+Package 150 corrects the schema-version-1 aggregate to count only exact
+`YahooCandleInvalidResponseError`. The separate schema-version-1
+`MANIFEST_PARTIAL_FAILURE_QUALIFICATION` report binds manifest, batch, request,
+and requested-window evidence. Its selection contains only requested,
+checkpoint, missing, failed-candidate, and selected counts plus the fixed
+checkpoint failure type. `QUALIFIED` and `EMPTY` carry aggregate candle and
+omission coverage with no failure. `FAILED` carries no coverage and records the
+existing stable Yahoo category, bounded allowlisted exception type chain, and a
+fixed reason. It contains no identity, currency, price, path, provider text,
+exception message, raw row, or candle value.
 # Manifest batch checkpoint diagnostic report schema 1
 
 The report binds `manifest_checksum`, `batch_index`, `batch_count`, and

@@ -552,6 +552,11 @@ of the one failed partial-checkpoint item through the exact production path,
 plus correction of the schema-1 current deferred aggregate. Implement this
 without weakening existing exact-coverage diagnostics or mutating runtime state.
 
+Package 150 implements that read-only partial-failure qualification and fixes
+the current deferred aggregate without changing checkpoint schema or existing
+diagnostics. Run it once for batch 106 and review only its redacted current-
+behavior evidence before selecting retry or durable causal persistence.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

@@ -550,11 +550,17 @@ ordered remediation boundary.
 A partial sweep checkpoint containing a systemic `APIError` is not causal
 evidence. The Yahoo adapter retains its typed cause only in memory, while the
 current resumable checkpoint stores only the outer class name. The selected
-follow-up boundary is a separate read-only, manifest-bound one-failure
+follow-up boundary is the separate read-only, manifest-bound one-failure
 production-path qualification. It must accept the validated partial checkpoint
 without weakening existing exact-coverage diagnostics, make one provider
 request, and emit only aggregate result or existing privacy-safe causal
 projection. It has no database or checkpoint-write authority.
+
+`ManifestPartialFailureQualificationService` implements that boundary. It
+requires a proper request-subset checkpoint with exactly one failed `APIError`,
+selects that item internally, validates any returned projection against the
+exact request, and emits only aggregate current behavior. This does not restore
+the original lost cause or authorize checkpoint mutation.
 # Phase 7 read-only batch checkpoint boundary
 
 `ManifestBatchCheckpointDiagnostic` is an offline operations boundary over one

@@ -170,6 +170,7 @@ def test_systemic_failure_is_checkpointed_and_halts_before_next_item():
     assert report["stop_batch_index"] == 1
     assert report["failure_types"] == ["TimeoutError"]
     assert report["current_run"]["attempted_item_count"] == 1
+    assert report["current_run"]["deferred_failure_count"] == 0
     assert checkpoints[1]["outcomes"][first]["status"] == "FAILED"
 
 

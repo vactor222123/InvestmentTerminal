@@ -1057,3 +1057,11 @@ batch-106 `APIError`; it cannot be recovered or safely inferred. Implement a
 separate read-only qualification for exactly that one partial-checkpoint
 failure and correct the current-run deferred counter to count only exact local
 candle defects. Do not mutate runtime evidence or contact Yahoo first.
+
+## Phase 7 Package 150 checkpoint
+
+The separate read-only partial-failure qualification is implemented and the
+sweep's current deferred aggregate now counts only exact local candle defects.
+Run one manifest-bound qualification for the batch-106 `APIError` and return
+only its redacted report. Checkpoint, SQLite, sweep, and later batches remain
+unchanged pending review.

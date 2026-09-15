@@ -145,7 +145,9 @@ class ManifestCollectionSweepService:
                 for omission_type in item["omission_types"]
             )
             deferred_current += sum(
-                item["status"] == "FAILED" for item in new_outcomes
+                item["status"] == "FAILED"
+                and item["failure_type"] == DEFERRED_FAILURE_TYPE
+                for item in new_outcomes
             )
 
             if halted_error is not None:
