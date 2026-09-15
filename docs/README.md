@@ -90,3 +90,7 @@ the fail-fast drain unchanged.
 `PHASE_7_PACKAGE_148_COLLECTION_SWEEP_HALT_RESULT.md`: records the safe batch-
 106 `APIError` halt, partial transfer evidence, SQLite integrity, and the
 current-run deferred-counter defect that must be audited before resume.
+
+`PHASE_7_PACKAGE_149_SWEEP_FAILURE_EVIDENCE_AUDIT.md`: confirms lost persisted
+API causality, preserves exact diagnostic guards, and selects a read-only
+partial-failure qualification plus the exact deferred-counter correction.

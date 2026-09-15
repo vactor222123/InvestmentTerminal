@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `27bb76ce8199c8deb8e31e79fc4cc0512bf25e8a`
-**Current local package:** Phase 7 Package 148 - Collection Sweep Halt Result
+**Current GitHub baseline:** `76aa06c14b0800ac8b971ff21183d0c65e6f248a`
+**Current local package:** Phase 7 Package 149 - Sweep Failure Evidence Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit batch-106 failure evidence and report aggregation
+**Current next action:** Implement partial-failure qualification and counter fix
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -651,6 +651,15 @@ incorrectly counts that stopping failure, although ending deferred coverage
 correctly remains the one existing batch-105 candle defect. Audit failure
 aggregation and available persisted causal evidence next. Do not rerun the
 sweep or retry batch 106 first.
+
+Package 149 confirms the halt/checkpoint boundary is safe but isolates two
+evidence gaps. The current-run deferred counter counts every new failure rather
+than only exact local candle defects, and checkpoint schema 3 retains only the
+outer `APIError` class after its typed cause is lost. Implement a separate
+read-only one-failure production-path qualification for the validated partial
+checkpoint plus the exact counter correction. Existing diagnostics, checkpoint
+schema, SQLite, and the private checkpoint remain unchanged. No provider call
+or batch-106 retry is yet authorized.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

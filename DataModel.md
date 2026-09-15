@@ -775,6 +775,14 @@ preflight/runtime `FAILED`. The only deferred type is exact
 `YahooCandleInvalidResponseError`; completion means attempted coverage and may
 therefore coexist with deferred failures. The report contains no symbol,
 currency, path, price, provider text, or exception message.
+
+Package 148 exposed an implementation defect in
+`current_run.deferred_failure_count`: a stopping generic `FAILED` outcome was
+included even though only exact `YahooCandleInvalidResponseError` is deferred.
+The contract above remains authoritative; correcting the aggregate is a
+schema-version-1 bug fix. Checkpoint schema 3 stores only `failure_type` for a
+retryable `FAILED` outcome, so a persisted `APIError` has no recoverable causal
+category or exception chain. No category may be inferred retroactively.
 # Manifest batch checkpoint diagnostic report schema 1
 
 The report binds `manifest_checksum`, `batch_index`, `batch_count`, and

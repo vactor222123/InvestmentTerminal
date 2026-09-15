@@ -1049,3 +1049,11 @@ batch ran. The current-run deferred counter incorrectly includes the stopping
 systemic failure, although ending deferred coverage remains the single prior
 candle defect. Audit aggregation and persisted causal evidence next; do not
 rerun the sweep or retry batch 106 first.
+
+## Phase 7 Package 149 checkpoint
+
+The audit confirms that checkpoint schema 3 discarded the typed cause of the
+batch-106 `APIError`; it cannot be recovered or safely inferred. Implement a
+separate read-only qualification for exactly that one partial-checkpoint
+failure and correct the current-run deferred counter to count only exact local
+candle defects. Do not mutate runtime evidence or contact Yahoo first.

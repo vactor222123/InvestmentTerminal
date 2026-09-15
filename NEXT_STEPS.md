@@ -180,6 +180,7 @@
 **Phase 7 Package 146 complete collection sweep audit:** COMPLETE
 **Phase 7 Package 147 manifest collection sweep:** COMPLETE
 **Phase 7 Package 148 collection sweep halt result:** COMPLETE - HALTED AT 106
+**Phase 7 Package 149 sweep failure evidence audit:** COMPLETE
 
 ## Current State
 
@@ -187,12 +188,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit the collection sweep's current-run deferred-failure aggregation and the
-privacy-safe causal evidence available for the persisted batch-106 `APIError`.
-The operational sweep halted safely after seven items and SQLite integrity is
-`ok`, but its current deferred counter incorrectly includes the stopping
-systemic failure. Do not rerun the sweep, edit the private checkpoint, retry
-batch 106, or permit batch 107 before this audit.
+Implement the separate read-only manifest partial-failure qualification selected
+by Package 149 and correct the sweep's current-run deferred counter to count
+only exact `YahooCandleInvalidResponseError`. Preserve checkpoint schema 3 and
+all existing exact-coverage diagnostics. Do not contact Yahoo, retry batch 106,
+or permit batch 107 before implementation review.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

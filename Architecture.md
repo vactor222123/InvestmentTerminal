@@ -546,6 +546,15 @@ contents, redacted reports, and an unbound skip list are not progress authority.
 schema-version-1 CLI report separates sweep coverage, full completion, and
 deferred defects without exposing private identities. The old drain remains the
 ordered remediation boundary.
+
+A partial sweep checkpoint containing a systemic `APIError` is not causal
+evidence. The Yahoo adapter retains its typed cause only in memory, while the
+current resumable checkpoint stores only the outer class name. The selected
+follow-up boundary is a separate read-only, manifest-bound one-failure
+production-path qualification. It must accept the validated partial checkpoint
+without weakening existing exact-coverage diagnostics, make one provider
+request, and emit only aggregate result or existing privacy-safe causal
+projection. It has no database or checkpoint-write authority.
 # Phase 7 read-only batch checkpoint boundary
 
 `ManifestBatchCheckpointDiagnostic` is an offline operations boundary over one
