@@ -525,6 +525,13 @@ The halt is isolated to one private series. Run only the existing read-only
 manifest failed-series raw candle diagnostic next; batch retry and batch 106
 remain blocked pending that evidence.
 
+Package 146 replaces serial defect-first handling with a separately bounded
+collection sweep design. Exact request checkpoints, not SQLite or reports, own
+attempted coverage. The sweep may defer only local pre-persistence
+`YahooCandleInvalidResponseError` outcomes and must stop before the next batch
+for every other failure. Implement this boundary while retaining the existing
+fail-fast drain unchanged; batch 106 remains blocked until review.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

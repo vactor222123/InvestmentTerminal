@@ -762,6 +762,17 @@ starting/ending completed and remaining batch counts, current attempted
 batch/item and transfer totals, an optional stopping batch index, and aggregated
 failure types. `COMPLETE`, `BUDGET_EXHAUSTED`, `HALTED`, and `FAILED` remain
 distinct outcomes.
+
+## Planned manifest collection sweep report
+
+The selected `MANIFEST_COLLECTION_SWEEP` report will bind one bounded sweep to
+the manifest checksum and explicit batch budget. Starting and ending coverage
+must separately count fully attempted batches, fully complete batches, and
+deferred retryable outcomes; current-run evidence must retain batch/item,
+transfer, duplicate, and omission totals. `stop_batch_index` and failure types
+remain explicit. The report contains no symbol, currency, path, price, provider
+text, or exception message. This contract is not operational until its separate
+implementation package passes.
 # Manifest batch checkpoint diagnostic report schema 1
 
 The report binds `manifest_checksum`, `batch_index`, `batch_count`, and

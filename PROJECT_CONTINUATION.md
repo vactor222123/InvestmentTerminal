@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `bb9aa70da3ca86fa54a7ed601479c076c30e70cd`
-**Current local package:** Phase 7 Package 145 - Batch-105 Checkpoint Result
+**Current GitHub baseline:** `e603e510d13044deef7430ec58f21a5ce9052881`
+**Current local package:** Phase 7 Package 146 - Complete Collection Sweep Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Diagnose the one failed batch-105 raw series
+**Current next action:** Implement the separate manifest collection sweep
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -623,6 +623,17 @@ Market / external data
 ---
 
 ## Current Audit Conclusion
+
+Package 146 selects a separate collection sweep instead of diagnosing every
+isolated candle defect before later retrieval. Existing checkpoints can define
+attempted coverage, but the current drain accepts only fully terminal batches,
+rejects later checkpoints as out of order, and erases causal categories by
+catching every importer exception as a retryable item failure. The new sweep
+must leave that fail-fast drain unchanged, skip previously attempted failures,
+continue only after exact `YahooCandleInvalidResponseError`, and halt before the
+next batch on `APIError`, persistence, rate-limit, or unknown failures. Its
+redacted report must distinguish swept coverage, complete coverage, and
+deferred failures. Implementation precedes batch 106.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

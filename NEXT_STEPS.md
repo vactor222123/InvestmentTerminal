@@ -177,6 +177,7 @@
 **Phase 7 Package 143 manifest-drain budget 100:** COMPLETE
 **Phase 7 Package 144 batches 67-166 drain result:** COMPLETE - HALTED AT 105
 **Phase 7 Package 145 batch-105 checkpoint result:** COMPLETE - ONE FAILURE
+**Phase 7 Package 146 complete collection sweep audit:** COMPLETE
 
 ## Current State
 
@@ -184,9 +185,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run the existing manifest-bound failed-series raw candle diagnostic for batch
-105. Return only its redacted report. Do not retry batch 105 or start batch 106
-before reviewing that evidence.
+Implement the separate manifest collection sweep selected by Package 146. It
+must defer only exact `YahooCandleInvalidResponseError` outcomes, preserve all
+private request-bound checkpoints, and halt on every other failure before the
+next batch. Do not run batch 106 before that implementation is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

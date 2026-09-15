@@ -1021,3 +1021,13 @@ successes, zero empty results, one retryable
 `YahooCandleInvalidResponseError`, and zero final exclusions. Run the existing
 manifest-bound failed-series raw candle diagnostic for batch 105 next. Do not
 retry the batch or start batch 106 before reviewing that redacted evidence.
+
+## Phase 7 Package 146 checkpoint
+
+The collection-sweep audit selects a separate coordinator that derives
+attempted coverage from exact private request checkpoints and never changes the
+existing fail-fast drain. It may advance only past deferred
+`YahooCandleInvalidResponseError` outcomes; every other provider, rate-limit,
+persistence, checkpoint, or unknown failure stops before the next batch. Add
+no unbound skip list and do not retry prior failures during the sweep.
+Implementation is next; batch 106 remains blocked.

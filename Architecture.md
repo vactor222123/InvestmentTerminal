@@ -531,6 +531,16 @@ implement the coordinator. It processes the first unfinished request under a
 caller-owned 1–100 batch budget and stops before later requests
 on the first non-success result. This preserves bounded failure impact and does
 not grant scheduled or complete-manifest execution authority.
+
+A complete collection sweep is a separately planned operations boundary, not a
+relaxation of the fail-fast drain. Its attempted-coverage authority remains the
+exact request-bound private checkpoints. It may advance past a fully attempted
+batch only when every retryable outcome is exactly
+`YahooCandleInvalidResponseError`, which is raised by local Yahoo frame
+projection before repository persistence. Existing retryable outcomes are not
+retried during the same sweep. Every other provider, rate-limit, persistence,
+checkpoint, or unknown failure stops the sweep before the next batch. SQLite
+contents, redacted reports, and an unbound skip list are not progress authority.
 # Phase 7 read-only batch checkpoint boundary
 
 `ManifestBatchCheckpointDiagnostic` is an offline operations boundary over one

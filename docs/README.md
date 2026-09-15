@@ -77,7 +77,7 @@ project should perform a focused architecture/product audit before selecting
 Sprint 32.
 
 Current Phase 7 continuation is recorded in
-`PHASE_7_PACKAGE_145_BATCH_105_CHECKPOINT_RESULT.md`: the read-only diagnostic
-found 19 successes and one retryable Yahoo invalid-response failure in batch
-105. The next gate is the existing manifest-bound failed-series raw candle
-diagnostic for only that one private series.
+`PHASE_7_PACKAGE_146_COMPLETE_COLLECTION_SWEEP_AUDIT.md`: a separate resumable
+collection sweep may defer only local pre-persistence Yahoo candle validation
+failures while all other failures stop progress. Implementation is the next
+gate; the existing fail-fast drain remains unchanged.
