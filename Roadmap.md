@@ -539,6 +539,13 @@ enforced. The existing fail-fast drain is unchanged. Run one controlled private
 collection sweep next; the recorded state should begin provider work at batch
 106. Review the redacted report and SQLite integrity before remediation.
 
+Package 148 records the first sweep measurement. It halted safely at batch 106
+after seven items and 7,543 inserted candles on `APIError`; SQLite integrity is
+`ok`, and batches 107–601 were not attempted. The current-run deferred counter
+incorrectly includes the stopping systemic failure, while ending deferred
+coverage correctly remains one. Audit this aggregation and persisted API-error
+evidence before retry or resume.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

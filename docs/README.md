@@ -86,3 +86,7 @@ gate; the existing fail-fast drain remains unchanged.
 derived attempted coverage, non-retry resume, local-defect-only deferral,
 immediate systemic halt, and the redacted collection-sweep report while leaving
 the fail-fast drain unchanged.
+
+`PHASE_7_PACKAGE_148_COLLECTION_SWEEP_HALT_RESULT.md`: records the safe batch-
+106 `APIError` halt, partial transfer evidence, SQLite integrity, and the
+current-run deferred-counter defect that must be audited before resume.

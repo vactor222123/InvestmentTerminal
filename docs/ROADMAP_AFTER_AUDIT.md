@@ -1040,3 +1040,12 @@ retry, defers only exact local `YahooCandleInvalidResponseError`, and stops
 immediately on every other failure. Its redacted report separates sweep-covered
 from fully complete batches. Run one controlled private sweep next; expected
 provider work begins at batch 106. Return only its report and SQLite integrity.
+
+## Phase 7 Package 148 checkpoint
+
+The controlled sweep halted safely at batch 106 after seven attempted items
+and 7,543 inserted candles on `APIError`; SQLite integrity is `ok` and no later
+batch ran. The current-run deferred counter incorrectly includes the stopping
+systemic failure, although ending deferred coverage remains the single prior
+candle defect. Audit aggregation and persisted causal evidence next; do not
+rerun the sweep or retry batch 106 first.

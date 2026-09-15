@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `0e9dcd9f79da64ffaa289c8bd017b69beb93d9a5`
-**Current local package:** Phase 7 Package 147 - Manifest Collection Sweep
+**Current GitHub baseline:** `27bb76ce8199c8deb8e31e79fc4cc0512bf25e8a`
+**Current local package:** Phase 7 Package 148 - Collection Sweep Halt Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run the controlled private manifest collection sweep
+**Current next action:** Audit batch-106 failure evidence and report aggregation
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -643,6 +643,14 @@ other importer failure halts immediately inside the current request. The
 manifest-sized caller budget and schema-version-1 redacted report support one
 controlled full-remaining run. Expected provider work starts at batch 106; the
 next handoff must contain only the redacted report and SQLite integrity.
+
+Package 148 records the controlled sweep halt at batch 106. Seven items were
+attempted and 7,543 candles inserted before a systemic `APIError`; no later
+batch ran and SQLite integrity is `ok`. The current-run deferred counter
+incorrectly counts that stopping failure, although ending deferred coverage
+correctly remains the one existing batch-105 candle defect. Audit failure
+aggregation and available persisted causal evidence next. Do not rerun the
+sweep or retry batch 106 first.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable
