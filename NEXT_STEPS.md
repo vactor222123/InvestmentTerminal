@@ -183,6 +183,7 @@
 **Phase 7 Package 149 sweep failure evidence audit:** COMPLETE
 **Phase 7 Package 150 partial failure qualification:** COMPLETE
 **Phase 7 Package 151 partial failure qualification result:** COMPLETE - NO PRICE DATA
+**Phase 7 Package 152 no-price terminal evidence audit:** COMPLETE
 
 ## Current State
 
@@ -190,10 +191,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit an evidence-bound partial-checkpoint terminal transition for the
-reproduced batch-106 `NO_PRICE_DATA` result and versioned causal failure
-persistence for future attempts. Do not contact Yahoo, mutate the checkpoint or
-SQLite, rerun the sweep, retry batch 106, or permit batch 107 during the audit.
+Implement private checkpoint schema 4 with privacy-safe causal evidence for new
+retryable failures and a separate checksum-bound no-price terminal transition.
+Preserve schemas 1–3, existing strict-rejection isolation, and public report
+shapes. Do not contact Yahoo, mutate runtime evidence, rerun the sweep, retry
+batch 106, or permit batch 107 in the implementation package.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

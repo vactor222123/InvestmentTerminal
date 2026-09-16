@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `1a38534de1ccf6c2c5069f1f280db1a9cd0ce9a1`
-**Current local package:** Phase 7 Package 151 - Partial Failure Qualification Result
+**Current GitHub baseline:** `ae51a17749bf56ec1a43585c2301beddfc69adde`
+**Current local package:** Phase 7 Package 152 - No-Price Terminal Evidence Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit partial no-price terminal evidence
+**Current next action:** Implement checkpoint schema 4 and no-price transition
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -676,6 +676,15 @@ The private checkpoint and SQLite were not changed. Existing terminal isolation
 cannot accept a partial checkpoint or this category. Audit a separate
 evidence-bound transition and future at-failure causal persistence next; no
 Yahoo request, retry, sweep resume, or batch 107 is authorized by that audit.
+
+Package 152 selects private checkpoint schema 4 instead of weakening the
+existing strict-rejection policy. New retryable failures must atomically retain
+the stable Yahoo category and bounded allowlisted exception-type chain. A
+separate offline transition may convert only checksum-verified, fully bound
+reproduced Yahoo `NO_PRICE_DATA` evidence into its own terminal policy while
+leaving the 13 missing batch-106 items pending. Implement and test that contract
+next without Yahoo access or runtime mutation; operational transition and sweep
+resume remain separate gates.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

@@ -102,3 +102,7 @@ corrects the sweep's current deferred aggregate without runtime mutation.
 `PHASE_7_PACKAGE_151_PARTIAL_FAILURE_QUALIFICATION_RESULT.md`: records the
 checksum-bound batch-106 `NO_PRICE_DATA` reproduction and selects an audit of
 partial terminal evidence plus future causal checkpoint persistence.
+
+`PHASE_7_PACKAGE_152_NO_PRICE_TERMINAL_EVIDENCE_AUDIT.md`: selects private
+checkpoint schema 4 for future causal failure evidence and a separate
+checksum-bound policy for the reproduced partial no-price result.

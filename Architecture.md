@@ -561,6 +561,16 @@ requires a proper request-subset checkpoint with exactly one failed `APIError`,
 selects that item internally, validates any returned projection against the
 exact request, and emits only aggregate current behavior. This does not restore
 the original lost cause or authorize checkpoint mutation.
+
+The selected follow-up design uses private checkpoint schema 4 rather than
+weakening schema-3 terminal isolation. New retryable failures preserve the
+existing privacy-safe category and bounded exception-type chain at the atomic
+checkpoint boundary. A separate offline manifest-bound policy may terminalize
+only reproduced Yahoo `NO_PRICE_DATA` evidence after strict report-byte,
+checksum, binding, partial-selection, category, and causal-chain validation.
+The current observation remains evidence for the transition, not a rewrite of
+the lost original cause. Existing numeric/OHLC isolation and public reports
+remain separate and unchanged.
 # Phase 7 read-only batch checkpoint boundary
 
 `ManifestBatchCheckpointDiagnostic` is an offline operations boundary over one

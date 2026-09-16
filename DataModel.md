@@ -794,6 +794,22 @@ omission coverage with no failure. `FAILED` carries no coverage and records the
 existing stable Yahoo category, bounded allowlisted exception type chain, and a
 fixed reason. It contains no identity, currency, price, path, provider text,
 exception message, raw row, or candle value.
+
+The selected private checkpoint schema version 4 preserves schemas 1–3 and all
+existing fields. A retryable `FAILED` outcome additionally carries
+`causal_failure_evidence`: null only for explicitly migrated legacy evidence,
+or the existing stable Yahoo category plus bounded allowlisted
+`exception_type_chain` for a newly observed failure. Non-failed outcomes cannot
+carry this retryable evidence.
+
+The new final policy `REPRODUCED_YAHOO_NO_PRICE_DATA_V1` is distinct from
+`NORMAL_AND_REPAIRED_STRICT_REJECTION_V1`. Its `FINAL_FAILED` outcome retains
+outer `failure_type=APIError`, category `NO_PRICE_DATA`, and exactly one
+`partial_failure_qualification_checksum` in isolation evidence. Only a strict,
+checksum-verified, fully bound schema-version-1 partial-failure qualification
+with `FAILED/NO_PRICE_DATA`, null coverage, matching partial selection counts,
+and a recognized yfinance missing-price causal type may create it. Missing
+request members are not outcomes and remain pending.
 # Manifest batch checkpoint diagnostic report schema 1
 
 The report binds `manifest_checksum`, `batch_index`, `batch_count`, and

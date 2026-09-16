@@ -1073,3 +1073,11 @@ The one read-only batch-106 qualification reproduced `NO_PRICE_DATA` through
 modify runtime state. Audit a checksum-bound partial-checkpoint terminal
 transition and versioned causal persistence for future failures before retrying
 or resuming collection.
+
+## Phase 7 Package 152 checkpoint
+
+The audit selects private checkpoint schema 4 to retain privacy-safe causal
+evidence for every new retryable failure. A separate offline, checksum-bound
+policy may terminalize only the reproduced Yahoo `NO_PRICE_DATA` result while
+preserving missing batch-106 members. Implementation precedes any runtime
+transition, retry, sweep resume, or batch 107 execution.

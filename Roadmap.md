@@ -563,6 +563,12 @@ the partial checkpoint remains unchanged. Audit an evidence-bound partial
 terminal transition and future causal checkpoint persistence before any retry,
 sweep resume, or batch 107 execution.
 
+Package 152 audits every checkpoint consumer and selects private schema 4:
+new retryable failures retain redacted causal evidence, while one separate
+checksum-bound policy may terminalize the reproduced Yahoo no-price result.
+Implement that versioned contract without runtime mutation before any
+operational transition or collection resume.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
