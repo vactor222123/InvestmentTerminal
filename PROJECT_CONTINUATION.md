@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `ae51a17749bf56ec1a43585c2301beddfc69adde`
-**Current local package:** Phase 7 Package 152 - No-Price Terminal Evidence Audit
+**Current GitHub baseline:** `b298ca9ee4d99e66051d8c8c2d60240ea35d2bff`
+**Current local package:** Phase 7 Package 153 - No-Price Terminal Isolation
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement checkpoint schema 4 and no-price transition
+**Current next action:** Run one offline batch-106 no-price transition
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -685,6 +685,18 @@ reproduced Yahoo `NO_PRICE_DATA` evidence into its own terminal policy while
 leaving the 13 missing batch-106 items pending. Implement and test that contract
 next without Yahoo access or runtime mutation; operational transition and sweep
 resume remain separate gates.
+
+Package 153 implements that contract. `ResumableMarketBatchService` now writes
+checkpoint schema 4 and records the stable Yahoo category plus bounded
+allowlisted exception-type chain for every newly caught failure. Schemas 1–3
+remain readable; legacy failed evidence becomes explicit null only when a later
+checkpoint write occurs. The separate offline
+`ManifestPartialNoPriceIsolationService` accepts only strict checksum-verified,
+fully bound Package 151 `FAILED/NO_PRICE_DATA` evidence with an `APIError` to
+recognized yfinance missing-price chain. It changes only that outcome, keeps
+the 13 missing request members pending, is exact-repeat idempotent, and writes
+the checkpoint before its redacted report. Run one controlled transition next;
+Yahoo access, SQLite, ingestion, sweep resume, and batch 107 remain blocked.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

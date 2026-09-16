@@ -6,11 +6,23 @@ from datetime import datetime
 from hashlib import sha256
 import json
 
+from investment_terminal.clients.yahoo_finance_client import (
+    YahooCandleFailureCategory,
+    project_yahoo_candle_failure,
+)
 from investment_terminal.utils.validation import normalize_required_text, validate_aware_datetime
 
 
 FINAL_FAILURE_POLICY_IDENTITY = "NORMAL_AND_REPAIRED_STRICT_REJECTION_V1"
 FINAL_FAILURE_CATEGORIES = frozenset({"RESPONSE_NUMERIC", "RESPONSE_OHLC"})
+NO_PRICE_FINAL_FAILURE_POLICY_IDENTITY = "REPRODUCED_YAHOO_NO_PRICE_DATA_V1"
+_PROJECTED_EXCEPTION_NAMESPACES = frozenset({
+    "builtins", "curl_cffi", "investment_terminal", "numpy", "pandas",
+    "peewee", "requests", "sqlite3", "urllib3", "yfinance",
+})
+_PROJECTED_EXCEPTION_SENTINELS = frozenset({
+    "UNRECOGNIZED_EXCEPTION_TYPE", "EXCEPTION_CHAIN_TRUNCATED",
+})
 
 
 @dataclass(frozen=True, slots=True, order=True)
@@ -83,6 +95,7 @@ class ResumableMarketBatchService:
             raise TypeError("continue_after_failure must be callable or None")
         started = validate_aware_datetime(self.clock(), field_name="started_at")
         outcomes = self._outcomes(checkpoint, request.checksum)
+        checkpoint_schema = checkpoint.get("schema_version") if isinstance(checkpoint, dict) else None
         skipped = 0
         current_outcomes: list[dict[str, object]] = []
         for item in request.items:
@@ -109,13 +122,23 @@ class ResumableMarketBatchService:
                     "omission_types": list(omission_types), "failure_type": None}
             except Exception as exc:
                 failure = exc
+                causal = project_yahoo_candle_failure(exc)
                 outcomes[item.symbol] = {"status": "FAILED", "downloaded": None,
                     "inserted": None, "duplicates": None,
                     "omitted_trailing_count": 0, "omission_types": [],
-                    "failure_type": type(exc).__name__}
+                    "failure_type": type(exc).__name__,
+                    "causal_failure_evidence": {
+                        "category": causal.category.value,
+                        "exception_type_chain": list(causal.exception_type_chain),
+                    }}
             current_outcomes.append(outcomes[item.symbol])
-            self.checkpoint_writer({"schema_version": 3, "request_checksum": request.checksum,
+            if checkpoint_schema in {1, 2, 3}:
+                for outcome in outcomes.values():
+                    if outcome["status"] == "FAILED":
+                        outcome.setdefault("causal_failure_evidence", None)
+            self.checkpoint_writer({"schema_version": 4, "request_checksum": request.checksum,
                                     "outcomes": outcomes})
+            checkpoint_schema = 4
             if (
                 failure is not None
                 and continue_after_failure is not None
@@ -160,7 +183,7 @@ class ResumableMarketBatchService:
     def _outcomes(value: object | None, checksum: str) -> dict[str, dict[str, object]]:
         if value is None:
             return {}
-        if not isinstance(value, dict) or value.get("schema_version") not in {1, 2, 3} or value.get("request_checksum") != checksum:
+        if not isinstance(value, dict) or value.get("schema_version") not in {1, 2, 3, 4} or value.get("request_checksum") != checksum:
             raise ValueError("Checkpoint does not match request")
         outcomes = value.get("outcomes")
         if not isinstance(outcomes, dict) or any(not isinstance(k, str) or not isinstance(v, dict) for k, v in outcomes.items()):
@@ -205,6 +228,13 @@ def _validate_outcome_status(
     status = outcome.get("status")
     if status not in {"SUCCESS", "EMPTY", "FAILED", "FINAL_FAILED"}:
         raise ValueError("Checkpoint outcome status is invalid")
+    causal_field = "causal_failure_evidence"
+    if schema_version == 4 and status == "FAILED":
+        if causal_field not in outcome:
+            raise ValueError("Schema-4 failure requires causal evidence")
+        _validate_causal_failure_evidence(outcome[causal_field])
+    elif causal_field in outcome:
+        raise ValueError("Checkpoint outcome has invalid causal evidence")
     final_fields = {
         "failure_category",
         "isolation_policy_identity",
@@ -214,25 +244,74 @@ def _validate_outcome_status(
         if any(field in outcome for field in final_fields):
             raise ValueError("Non-final checkpoint outcome has isolation evidence")
         return
-    if schema_version != 3:
-        raise ValueError("FINAL_FAILED requires checkpoint schema version 3")
+    if schema_version not in {3, 4}:
+        raise ValueError("FINAL_FAILED requires checkpoint schema version 3 or 4")
     if any(outcome.get(field) is not None for field in ("downloaded", "inserted", "duplicates")):
         raise ValueError("FINAL_FAILED transfer counts must be null")
     failure_type = outcome.get("failure_type")
     if not isinstance(failure_type, str) or not failure_type.strip():
         raise ValueError("FINAL_FAILED requires a failure type")
-    if outcome.get("failure_category") not in FINAL_FAILURE_CATEGORIES:
-        raise ValueError("FINAL_FAILED category is invalid")
-    if outcome.get("isolation_policy_identity") != FINAL_FAILURE_POLICY_IDENTITY:
-        raise ValueError("FINAL_FAILED policy identity is invalid")
+    category = outcome.get("failure_category")
+    policy = outcome.get("isolation_policy_identity")
     evidence = outcome.get("isolation_evidence")
-    if not isinstance(evidence, dict) or set(evidence) != {
-        "normal_diagnostic_checksum",
-        "repaired_qualification_checksum",
-    }:
+    if policy == FINAL_FAILURE_POLICY_IDENTITY:
+        if category not in FINAL_FAILURE_CATEGORIES:
+            raise ValueError("FINAL_FAILED category is invalid")
+        expected_evidence = {
+            "normal_diagnostic_checksum", "repaired_qualification_checksum",
+        }
+    elif schema_version == 4 and policy == NO_PRICE_FINAL_FAILURE_POLICY_IDENTITY:
+        if category != "NO_PRICE_DATA" or failure_type != "APIError":
+            raise ValueError("FINAL_FAILED no-price evidence is invalid")
+        expected_evidence = {"partial_failure_qualification_checksum"}
+    else:
+        raise ValueError("FINAL_FAILED policy identity is invalid")
+    if not isinstance(evidence, dict) or set(evidence) != expected_evidence:
         raise ValueError("FINAL_FAILED isolation evidence is invalid")
     if any(not _is_sha256(value) for value in evidence.values()):
         raise ValueError("FINAL_FAILED evidence checksum is invalid")
+
+
+def _validate_causal_failure_evidence(value: object) -> None:
+    if value is None:
+        return
+    if not isinstance(value, dict) or set(value) != {
+        "category", "exception_type_chain",
+    }:
+        raise ValueError("Checkpoint causal evidence is invalid")
+    try:
+        YahooCandleFailureCategory(value.get("category"))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Checkpoint causal category is invalid") from exc
+    chain = value.get("exception_type_chain")
+    if (
+        not isinstance(chain, list)
+        or not 1 <= len(chain) <= 8
+        or any(not _is_projected_exception_type(item) for item in chain)
+        or "EXCEPTION_CHAIN_TRUNCATED" in chain[:-1]
+    ):
+        raise ValueError("Checkpoint causal type chain is invalid")
+
+
+def _is_projected_exception_type(value: object) -> bool:
+    if isinstance(value, str) and value in _PROJECTED_EXCEPTION_SENTINELS:
+        return True
+    if not isinstance(value, str) or "." not in value:
+        return False
+    segments = value.split(".")
+    return segments[0] in _PROJECTED_EXCEPTION_NAMESPACES and all(
+        _is_ascii_identifier(segment) for segment in segments
+    )
+
+
+def _is_ascii_identifier(value: str) -> bool:
+    if not value:
+        return False
+    first, remainder = value[0], value[1:]
+    return (first == "_" or first.isascii() and first.isalpha()) and all(
+        character == "_" or character.isascii() and character.isalnum()
+        for character in remainder
+    )
 
 
 def _is_sha256(value: object) -> bool:

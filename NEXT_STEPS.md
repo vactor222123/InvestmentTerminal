@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 2d7d4e35585c3e8c81686a73afca76b55058a350`
+**Current repository baseline:** `develop @ b298ca9ee4d99e66051d8c8c2d60240ea35d2bff`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -184,6 +184,7 @@
 **Phase 7 Package 150 partial failure qualification:** COMPLETE
 **Phase 7 Package 151 partial failure qualification result:** COMPLETE - NO PRICE DATA
 **Phase 7 Package 152 no-price terminal evidence audit:** COMPLETE
+**Phase 7 Package 153 no-price terminal isolation implementation:** COMPLETE
 
 ## Current State
 
@@ -191,11 +192,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement private checkpoint schema 4 with privacy-safe causal evidence for new
-retryable failures and a separate checksum-bound no-price terminal transition.
-Preserve schemas 1–3, existing strict-rejection isolation, and public report
-shapes. Do not contact Yahoo, mutate runtime evidence, rerun the sweep, retry
-batch 106, or permit batch 107 in the implementation package.
+Run exactly one controlled offline batch-106 no-price isolation using the
+existing private manifest/checkpoint and the immutable Package 151
+qualification bytes plus caller-supplied SHA-256. Return only the redacted
+transition report. Do not contact Yahoo, open SQLite, resume the sweep, ingest
+the 13 missing items, or permit batch 107 until the transition is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

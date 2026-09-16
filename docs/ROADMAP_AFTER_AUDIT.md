@@ -1081,3 +1081,13 @@ evidence for every new retryable failure. A separate offline, checksum-bound
 policy may terminalize only the reproduced Yahoo `NO_PRICE_DATA` result while
 preserving missing batch-106 members. Implementation precedes any runtime
 transition, retry, sweep resume, or batch 107 execution.
+
+## Phase 7 Package 153 checkpoint
+
+Checkpoint schema 4 and the offline no-price isolation transition are
+implemented. Newly caught failures retain privacy-safe causal evidence, legacy
+failures migrate explicitly to unknown evidence only when a later write is
+required, and the separate transition accepts only checksum-bound reproduced
+Yahoo missing-price evidence. Run one controlled offline transition for batch
+106 next; do not contact Yahoo, open SQLite, resume the sweep, or execute batch
+107 before reviewing its redacted report.

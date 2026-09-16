@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 import pytest
 
 from investment_terminal.operations.resumable_market_batch import MarketBatchRequest, ResumableMarketBatchService
+from investment_terminal.utils.exceptions import APIError
+from yfinance.exceptions import YFTzMissingError
 
 NOW=datetime(2026,8,27,tzinfo=timezone.utc)
 
@@ -92,7 +94,7 @@ def test_schema2_checkpoint_persists_and_replays_omission_evidence():
         "duplicates":0,"omitted_trailing_count":1,
         "omission_types":("TRAILING_NON_FINITE_NUMERIC",)})()
     report=ResumableMarketBatchService(importer=importer,checkpoint_writer=written.append,clock=lambda:NOW).run(req)
-    assert written[-1]["schema_version"]==3
+    assert written[-1]["schema_version"]==4
     assert report["coverage"]["cumulative"]["omitted_trailing_total"]==2
     assert report["coverage"]["cumulative"]["omission_types"]==["TRAILING_NON_FINITE_NUMERIC"]
     replay=ResumableMarketBatchService(importer=Importer(),checkpoint_writer=lambda x:None,clock=lambda:NOW).run(req,written[-1])
@@ -105,6 +107,58 @@ def test_rejects_inconsistent_schema2_omission_before_resume():
     checkpoint={"schema_version":2,"request_checksum":req.checksum,"outcomes":{"AAA":outcome,"BBB":outcome}}
     with pytest.raises(ValueError,match="omission"):
         ResumableMarketBatchService(importer=Importer(),checkpoint_writer=lambda x:None,clock=lambda:NOW).run(req,checkpoint)
+
+def test_schema4_persists_privacy_safe_causal_failure_evidence():
+    class MissingImporter(Importer):
+        def import_candles(self, **kw):
+            try:
+                raise YFTzMissingError(kw["symbol"])
+            except YFTzMissingError as exc:
+                raise APIError("private provider text") from exc
+
+    written=[]
+    report=ResumableMarketBatchService(importer=MissingImporter(),
+        checkpoint_writer=written.append,clock=lambda:NOW).run(request())
+
+    outcome=written[-1]["outcomes"]["AAA"]
+    assert written[-1]["schema_version"]==4
+    assert outcome["causal_failure_evidence"]=={
+        "category":"NO_PRICE_DATA",
+        "exception_type_chain":[
+            "investment_terminal.utils.exceptions.APIError",
+            "yfinance.exceptions.YFTzMissingError",
+        ],
+    }
+    assert "private provider text" not in str(written[-1])
+    assert report["status"]=="FAILED"
+
+def test_schema4_write_marks_legacy_failed_evidence_unknown():
+    req=request();written=[]
+    checkpoint={"schema_version":1,"request_checksum":req.checksum,"outcomes":{
+        "AAA":{"status":"FAILED","downloaded":None,"inserted":None,
+            "duplicates":None,"failure_type":"APIError"}}}
+
+    ResumableMarketBatchService(importer=Importer(),checkpoint_writer=written.append,
+        clock=lambda:NOW).run(req,checkpoint,retry_failed=False)
+
+    assert written[-1]["schema_version"]==4
+    assert written[-1]["outcomes"]["AAA"]["causal_failure_evidence"] is None
+
+@pytest.mark.parametrize("evidence",[
+    {"category":"PRIVATE","exception_type_chain":["builtins.TimeoutError"]},
+    {"category":"TIMEOUT","exception_type_chain":["private.SecretError"]},
+    {"category":"TIMEOUT","exception_type_chain":[]},
+])
+def test_rejects_invalid_schema4_causal_evidence(evidence):
+    req=request()
+    outcome={"status":"FAILED","downloaded":None,"inserted":None,
+        "duplicates":None,"omitted_trailing_count":0,"omission_types":[],
+        "failure_type":"TimeoutError","causal_failure_evidence":evidence}
+    checkpoint={"schema_version":4,"request_checksum":req.checksum,
+        "outcomes":{"AAA":outcome}}
+    with pytest.raises(ValueError,match="causal"):
+        ResumableMarketBatchService(importer=Importer(),checkpoint_writer=lambda x:None,
+            clock=lambda:NOW).run(req,checkpoint)
 
 def test_schema3_final_failure_is_terminal_and_explicit():
     req=request();importer=Importer();written=[]

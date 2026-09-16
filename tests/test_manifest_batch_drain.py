@@ -138,7 +138,7 @@ def test_aggregates_versioned_omission_evidence():
     assert report["current_run"]["omission_types"] == [
         "TRAILING_NON_FINITE_NUMERIC"
     ]
-    assert checkpoints[1]["schema_version"] == 3
+    assert checkpoints[1]["schema_version"] == 4
     assert checkpoints[1]["outcomes"]["S1"]["omitted_trailing_count"] == 1
 
 

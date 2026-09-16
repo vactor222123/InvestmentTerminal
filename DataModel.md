@@ -795,7 +795,7 @@ existing stable Yahoo category, bounded allowlisted exception type chain, and a
 fixed reason. It contains no identity, currency, price, path, provider text,
 exception message, raw row, or candle value.
 
-The selected private checkpoint schema version 4 preserves schemas 1–3 and all
+Private checkpoint schema version 4 preserves schemas 1–3 and all
 existing fields. A retryable `FAILED` outcome additionally carries
 `causal_failure_evidence`: null only for explicitly migrated legacy evidence,
 or the existing stable Yahoo category plus bounded allowlisted
@@ -810,6 +810,13 @@ checksum-verified, fully bound schema-version-1 partial-failure qualification
 with `FAILED/NO_PRICE_DATA`, null coverage, matching partial selection counts,
 and a recognized yfinance missing-price causal type may create it. Missing
 request members are not outcomes and remain pending.
+
+The schema-version-1 `MANIFEST_PARTIAL_NO_PRICE_ISOLATION` report binds the
+manifest checksum, batch index/count, request checksum, requested window,
+policy, category, and qualification checksum. Coverage separates requested,
+checkpoint, missing, success, empty, retryable, final, transitioned, and
+already-final counts. It contains no symbol, currency, price, path, provider
+payload, or exception text. Exact matching repeats are idempotent.
 # Manifest batch checkpoint diagnostic report schema 1
 
 The report binds `manifest_checksum`, `batch_index`, `batch_count`, and
