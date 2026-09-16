@@ -580,6 +580,11 @@ baseline, checksum, binding, checkpoint, and redacted-report validation. Run
 the handoff once and review only its report before collection resume; Yahoo,
 SQLite, the 13 missing members, and batch 107 remain outside this package.
 
+Package 155 records the successful transition: batch 106 now has six successes,
+one final `NO_PRICE_DATA` exclusion, zero retryable failures, and 13 missing
+members. One existing 496-batch collection sweep is authorized to finish those
+members and continue through batch 601 before aggregate failure analysis.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

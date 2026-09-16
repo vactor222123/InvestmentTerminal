@@ -1100,3 +1100,12 @@ qualification checksum, manifest/request bindings, and unique private
 batch-106 checkpoint; it performs no Yahoo or SQLite work. Execute it once and
 return only the redacted transition report before authorizing collection of the
 13 missing members or any later batch.
+
+## Phase 7 Package 155 checkpoint
+
+The checksum-bound offline transition succeeded: batch 106 retains six
+successes, one final `NO_PRICE_DATA` exclusion, zero retryable failures, and 13
+missing members. The existing collection sweep may now run once with a budget
+of 496 batches, starting with those missing members and continuing through
+batch 601. Review its redacted report and SQLite integrity before aggregate
+failure remediation.
