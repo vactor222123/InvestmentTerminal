@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `b298ca9ee4d99e66051d8c8c2d60240ea35d2bff`
-**Current local package:** Phase 7 Package 153 - No-Price Terminal Isolation
+**Current GitHub baseline:** `bc340ebb693cdfe2937b410f88f55730c8e26e94`
+**Current local package:** Phase 7 Package 154 - No-Price Transition Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one offline batch-106 no-price transition
+**Current next action:** User runs Package 154 offline transition command
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -697,6 +697,14 @@ recognized yfinance missing-price chain. It changes only that outcome, keeps
 the 13 missing request members pending, is exact-repeat idempotent, and writes
 the checkpoint before its redacted report. Run one controlled transition next;
 Yahoo access, SQLite, ingestion, sweep resume, and batch 107 remain blocked.
+
+Package 154 prepares the single user-executed offline transition. Its complete
+ASCII PowerShell block verifies exact repository HEAD/branch/clean state,
+manifest and qualification inputs, the immutable qualification SHA-256, and a
+unique request-bound batch-106 checkpoint before invoking the Package 153 CLI.
+It then validates the private schema-4 checkpoint locally and prints only the
+redacted report path and checksum. Return that report for review; Yahoo,
+SQLite, the 13 missing items, collection resume, and batch 107 remain blocked.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

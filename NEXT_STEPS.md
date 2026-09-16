@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ b298ca9ee4d99e66051d8c8c2d60240ea35d2bff`
+**Current repository baseline:** `develop @ bc340ebb693cdfe2937b410f88f55730c8e26e94`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -185,6 +185,7 @@
 **Phase 7 Package 151 partial failure qualification result:** COMPLETE - NO PRICE DATA
 **Phase 7 Package 152 no-price terminal evidence audit:** COMPLETE
 **Phase 7 Package 153 no-price terminal isolation implementation:** COMPLETE
+**Phase 7 Package 154 no-price transition handoff:** READY FOR USER EXECUTION
 
 ## Current State
 
@@ -192,11 +193,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run exactly one controlled offline batch-106 no-price isolation using the
-existing private manifest/checkpoint and the immutable Package 151
-qualification bytes plus caller-supplied SHA-256. Return only the redacted
-transition report. Do not contact Yahoo, open SQLite, resume the sweep, ingest
-the 13 missing items, or permit batch 107 until the transition is reviewed.
+Execute the Package 154 ASCII PowerShell block once and return only
+`C:\runtime\reports\manifest_batch_0106_no_price_isolation_001.json`. Do not
+send the private manifest or checkpoint. Do not contact Yahoo, open SQLite,
+resume the sweep, ingest the 13 missing items, or permit batch 107 until the
+redacted transition report is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

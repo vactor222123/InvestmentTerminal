@@ -575,6 +575,11 @@ privacy-safe causal evidence; legacy evidence migrates explicitly to null on a
 later write. Run one controlled checksum-bound batch-106 transition next and
 review its redacted report before resuming the 13 missing members.
 
+Package 154 prepares that single user-executed offline transition with exact
+baseline, checksum, binding, checkpoint, and redacted-report validation. Run
+the handoff once and review only its report before collection resume; Yahoo,
+SQLite, the 13 missing members, and batch 107 remain outside this package.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

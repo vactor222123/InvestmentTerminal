@@ -1091,3 +1091,12 @@ required, and the separate transition accepts only checksum-bound reproduced
 Yahoo missing-price evidence. Run one controlled offline transition for batch
 106 next; do not contact Yahoo, open SQLite, resume the sweep, or execute batch
 107 before reviewing its redacted report.
+
+## Phase 7 Package 154 checkpoint
+
+The bounded user-executed offline transition handoff is ready. Its ASCII
+PowerShell block verifies the exact repository baseline, immutable
+qualification checksum, manifest/request bindings, and unique private
+batch-106 checkpoint; it performs no Yahoo or SQLite work. Execute it once and
+return only the redacted transition report before authorizing collection of the
+13 missing members or any later batch.
