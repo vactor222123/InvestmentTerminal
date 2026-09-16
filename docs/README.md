@@ -98,3 +98,7 @@ partial-failure qualification plus the exact deferred-counter correction.
 `PHASE_7_PACKAGE_150_PARTIAL_FAILURE_QUALIFICATION.md`: implements one read-only
 production-path qualification for a proper partial-checkpoint `APIError` and
 corrects the sweep's current deferred aggregate without runtime mutation.
+
+`PHASE_7_PACKAGE_151_PARTIAL_FAILURE_QUALIFICATION_RESULT.md`: records the
+checksum-bound batch-106 `NO_PRICE_DATA` reproduction and selects an audit of
+partial terminal evidence plus future causal checkpoint persistence.

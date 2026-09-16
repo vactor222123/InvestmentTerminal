@@ -1065,3 +1065,11 @@ sweep's current deferred aggregate now counts only exact local candle defects.
 Run one manifest-bound qualification for the batch-106 `APIError` and return
 only its redacted report. Checkpoint, SQLite, sweep, and later batches remain
 unchanged pending review.
+
+## Phase 7 Package 151 checkpoint
+
+The one read-only batch-106 qualification reproduced `NO_PRICE_DATA` through
+`APIError -> YFPricesMissingError`. It did not recover the original cause or
+modify runtime state. Audit a checksum-bound partial-checkpoint terminal
+transition and versioned causal persistence for future failures before retrying
+or resuming collection.

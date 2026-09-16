@@ -182,6 +182,7 @@
 **Phase 7 Package 148 collection sweep halt result:** COMPLETE - HALTED AT 106
 **Phase 7 Package 149 sweep failure evidence audit:** COMPLETE
 **Phase 7 Package 150 partial failure qualification:** COMPLETE
+**Phase 7 Package 151 partial failure qualification result:** COMPLETE - NO PRICE DATA
 
 ## Current State
 
@@ -189,10 +190,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run exactly one read-only manifest partial-failure qualification for batch 106
-against its existing private checkpoint. Return only the redacted report. Do
-not run the sweep, mutate the checkpoint or SQLite, retry ingestion, or permit
-batch 107 until that current production-path evidence is reviewed.
+Audit an evidence-bound partial-checkpoint terminal transition for the
+reproduced batch-106 `NO_PRICE_DATA` result and versioned causal failure
+persistence for future attempts. Do not contact Yahoo, mutate the checkpoint or
+SQLite, rerun the sweep, retry batch 106, or permit batch 107 during the audit.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

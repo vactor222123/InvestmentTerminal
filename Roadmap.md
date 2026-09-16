@@ -557,6 +557,12 @@ the current deferred aggregate without changing checkpoint schema or existing
 diagnostics. Run it once for batch 106 and review only its redacted current-
 behavior evidence before selecting retry or durable causal persistence.
 
+Package 151 records a reproduced current `NO_PRICE_DATA` outcome with causal
+chain `APIError -> YFPricesMissingError`. The original cause remains lost and
+the partial checkpoint remains unchanged. Audit an evidence-bound partial
+terminal transition and future causal checkpoint persistence before any retry,
+sweep resume, or batch 107 execution.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
