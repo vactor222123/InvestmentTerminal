@@ -931,3 +931,14 @@ aggregate failure count with `retryable_failure_count` and
 through starting, current, and ending coverage. Checkpoint diagnostic schema 2
 reports retryable and final failures separately. These report changes do not
 alter `Candle`, candle uniqueness, or SQLite storage.
+
+## Manifest Partial Causal-Evidence Diagnostic
+
+The schema-version-1 `MANIFEST_PARTIAL_CAUSAL_EVIDENCE_DIAGNOSTIC` report binds
+the manifest checksum, batch index/count, request checksum, requested window,
+and proper-partial selection counts. `EVIDENCE_AVAILABLE` contains only the
+checkpoint's validated stable category and allowlisted exception-type chain;
+`LEGACY_EVIDENCE_UNAVAILABLE` contains null causal evidence and makes no
+inference. `FAILED` is reserved for preflight or validation failure. The report
+contains no symbol, currency, price, path, provider text, exception message,
+raw row, or candle value.

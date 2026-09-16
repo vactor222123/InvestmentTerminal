@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 9ff65c72ab90f5f1f6d0ef0dcf37578c8d5a909b`
+**Current repository baseline:** `develop @ b811978b9413bf3b3c21716531c234141df811b5`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -186,7 +186,8 @@
 **Phase 7 Package 152 no-price terminal evidence audit:** COMPLETE
 **Phase 7 Package 153 no-price terminal isolation implementation:** COMPLETE
 **Phase 7 Package 154 no-price transition:** COMPLETE - SUCCESS
-**Phase 7 Package 155 complete collection resume:** READY FOR USER EXECUTION
+**Phase 7 Package 155 complete collection resume:** COMPLETE - HALTED AT 109
+**Phase 7 Package 156 stored causal-evidence diagnostic:** COMPLETE
 
 ## Current State
 
@@ -194,12 +195,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute the Package 155 ASCII PowerShell block once. It resumes with the 13
-missing batch-106 members and uses the exact 496-batch budget needed to reach
-batch 601. Return only
-`C:\runtime\reports\manifest_collection_sweep_resume_0106_0601_10y.json` and
-the printed SQLite integrity result. Do not send the manifest, checkpoint
-directory, database, cache, symbols, currencies, prices, or candles.
+Apply Package 156 and return the resulting exact `develop` commit SHA. The next
+operational handoff will run the new offline read-only diagnostic against only
+the batch-109 partial checkpoint and return its redacted causal-evidence report.
+Do not repeat Yahoo access, mutate the checkpoint, resume batch 109, or execute
+batch 110 before that evidence is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

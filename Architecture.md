@@ -666,3 +666,11 @@ exclusion totals. The service has no provider, repository, database, candle-
 repair, analysis, or trading authority. Its CLI commits the private checkpoint
 before writing a separate redacted report; mismatches and conflicting repeat
 evidence fail before mutation.
+
+`ManifestPartialCausalEvidenceDiagnostic` is a separate read-only offline
+boundary for a proper partial checkpoint containing exactly one `APIError`.
+It validates manifest/request/checkpoint binding and projects only the stored
+schema-4 category and allowlisted exception-type chain. Legacy null evidence
+remains explicitly unavailable. The boundary has no provider, SQLite,
+repository, importer, or checkpoint-write dependency and grants no terminal
+transition or later-batch authority.

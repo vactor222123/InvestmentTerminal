@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `9ff65c72ab90f5f1f6d0ef0dcf37578c8d5a909b`
-**Current local package:** Phase 7 Package 155 - Collection Resume Handoff
+**Current GitHub baseline:** `b811978b9413bf3b3c21716531c234141df811b5`
+**Current local package:** Phase 7 Package 156 - Stored Causal Evidence Diagnostic
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** User runs Package 155 full-remaining collection sweep
+**Current next action:** Apply Package 156 and return the exact develop SHA
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -714,6 +714,14 @@ Package 155 authorizes one existing collection sweep with the exact remaining
 496-batch budget. It starts with only those 13 missing members, then continues
 through batch 601, deferring only exact local candle defects and halting safely
 on systemic failure. Return only its redacted report and SQLite integrity.
+
+The Package 155 sweep report is valid and has SHA-256
+`7f069958b4e5a95ca5f2002e1e43b8d5991c2feccd4dcb4f8be81648063b99c7`.
+It inserted 79,735 candles for 54 attempted items, completed sweep coverage
+through batch 108, and halted safely at batch 109 on `APIError`; 493 batches
+remain unswept. Package 156 adds one offline read-only diagnostic that exposes
+only the stored schema-4 causal category and allowlisted type chain. It performs
+no Yahoo, SQLite, checkpoint mutation, ingestion, or later-batch work.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

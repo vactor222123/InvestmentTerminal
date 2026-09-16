@@ -1109,3 +1109,12 @@ missing members. The existing collection sweep may now run once with a budget
 of 496 batches, starting with those missing members and continuing through
 batch 601. Review its redacted report and SQLite integrity before aggregate
 failure remediation.
+
+## Phase 7 Package 156 checkpoint
+
+The resumed collection sweep inserted 79,735 candles and advanced attempted
+coverage through batch 108 before safely halting at batch 109 on one `APIError`.
+Checkpoint schema 4 now preserves that new failure's privacy-safe category and
+allowlisted exception-type chain. A separate offline read-only diagnostic is
+implemented to project only that evidence before any terminal transition,
+provider retry, sweep resume, or batch 110 execution.
