@@ -613,6 +613,13 @@ checkpoint is committed before the redacted report. Prepare one exact-baseline
 operator handoff next; Yahoo, SQLite, collection resume, and batch 110 remain
 separate gates.
 
+Package 160 prepares the exact-baseline, user-executed offline transition. Its
+ASCII PowerShell block validates the private manifest/checkpoint, immutable
+diagnostic bytes and checksum, exact causal-evidence equality, final checkpoint
+shape, and detached redacted report. Run it before applying Package 160 and
+return only the report; Yahoo, SQLite, collection resume, and batch 110 remain
+separate gates pending review.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

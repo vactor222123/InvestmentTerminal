@@ -1147,3 +1147,12 @@ missing members, supports exact idempotent repeat, and writes the checkpoint
 before its separate redacted report. Prepare one exact-baseline operational
 handoff next. Yahoo access, SQLite access, sweep resume, and batch 110 remain
 blocked until that transition report is reviewed.
+
+## Phase 7 Package 160 checkpoint
+
+The exact-baseline operational handoff is ready. Its ASCII PowerShell block
+validates the private manifest, unique request-bound schema-4 checkpoint,
+reviewed diagnostic checksum/contract, and exact stored causal-evidence match;
+runs only the offline transition; and validates the resulting final outcome and
+redacted report. Run it before applying Package 160 and return only the report.
+Yahoo, SQLite, collection resume, and batch 110 remain blocked pending review.

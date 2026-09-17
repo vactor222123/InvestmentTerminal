@@ -191,6 +191,7 @@
 **Phase 7 Package 157 batch-109 causal-evidence handoff:** COMPLETE - NO PRICE DATA
 **Phase 7 Package 158 stored no-price terminal audit:** COMPLETE
 **Phase 7 Package 159 stored no-price terminal isolation:** COMPLETE
+**Phase 7 Package 160 stored no-price transition handoff:** COMPLETE - READY FOR USER EXECUTION
 
 ## Current State
 
@@ -198,12 +199,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Prepare one exact-baseline operational handoff for the implemented
-`STORED_YAHOO_NO_PRICE_DATA_V1` offline transition. It must validate the
-private manifest/checkpoint and returned diagnostic checksum, execute only the
-new transition, validate the resulting private checkpoint and detached redacted
-report locally, and print no private values. Do not contact Yahoo, open SQLite,
-resume batch 109, or execute batch 110 in the handoff package.
+Before applying Package 160, run its exact-baseline ASCII PowerShell block and
+return only the redacted
+`manifest_batch_0109_stored_no_price_isolation_001.json` report. Do not send the
+private manifest or checkpoint. Do not resume batch 109 or execute batch 110
+until the report is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
