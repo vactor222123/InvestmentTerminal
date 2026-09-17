@@ -1137,3 +1137,13 @@ at-failure evidence without changing its meaning. Implement a distinct
 `STORED_YAHOO_NO_PRICE_DATA_V1` offline transition with exact diagnostic-byte,
 checksum, binding, and checkpoint-evidence equality checks. Runtime mutation,
 Yahoo access, SQLite access, sweep resume, and batch 110 remain blocked.
+
+## Phase 7 Package 159 checkpoint
+
+The distinct `STORED_YAHOO_NO_PRICE_DATA_V1` transition is implemented. It
+accepts only exact checksum-bound schema-4 stored evidence for one proper
+partial request, mutates only that retryable outcome, preserves all other and
+missing members, supports exact idempotent repeat, and writes the checkpoint
+before its separate redacted report. Prepare one exact-baseline operational
+handoff next. Yahoo access, SQLite access, sweep resume, and batch 110 remain
+blocked until that transition report is reviewed.

@@ -190,6 +190,7 @@
 **Phase 7 Package 156 stored causal-evidence diagnostic:** COMPLETE
 **Phase 7 Package 157 batch-109 causal-evidence handoff:** COMPLETE - NO PRICE DATA
 **Phase 7 Package 158 stored no-price terminal audit:** COMPLETE
+**Phase 7 Package 159 stored no-price terminal isolation:** COMPLETE
 
 ## Current State
 
@@ -197,12 +198,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement `STORED_YAHOO_NO_PRICE_DATA_V1` as a separate offline transition. It
-must checksum and validate the returned causal-evidence diagnostic, require an
-exact match with the source schema-4 checkpoint evidence, mutate only that one
-outcome, and produce a separate redacted report. Do not contact Yahoo, open
-SQLite, mutate private runtime evidence, resume batch 109, or execute batch 110
-in the implementation package.
+Prepare one exact-baseline operational handoff for the implemented
+`STORED_YAHOO_NO_PRICE_DATA_V1` offline transition. It must validate the
+private manifest/checkpoint and returned diagnostic checksum, execute only the
+new transition, validate the resulting private checkpoint and detached redacted
+report locally, and print no private values. Do not contact Yahoo, open SQLite,
+resume batch 109, or execute batch 110 in the handoff package.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

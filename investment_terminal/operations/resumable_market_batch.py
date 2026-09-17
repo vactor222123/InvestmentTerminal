@@ -16,6 +16,7 @@ from investment_terminal.utils.validation import normalize_required_text, valida
 FINAL_FAILURE_POLICY_IDENTITY = "NORMAL_AND_REPAIRED_STRICT_REJECTION_V1"
 FINAL_FAILURE_CATEGORIES = frozenset({"RESPONSE_NUMERIC", "RESPONSE_OHLC"})
 NO_PRICE_FINAL_FAILURE_POLICY_IDENTITY = "REPRODUCED_YAHOO_NO_PRICE_DATA_V1"
+STORED_NO_PRICE_FINAL_FAILURE_POLICY_IDENTITY = "STORED_YAHOO_NO_PRICE_DATA_V1"
 _PROJECTED_EXCEPTION_NAMESPACES = frozenset({
     "builtins", "curl_cffi", "investment_terminal", "numpy", "pandas",
     "peewee", "requests", "sqlite3", "urllib3", "yfinance",
@@ -264,6 +265,13 @@ def _validate_outcome_status(
         if category != "NO_PRICE_DATA" or failure_type != "APIError":
             raise ValueError("FINAL_FAILED no-price evidence is invalid")
         expected_evidence = {"partial_failure_qualification_checksum"}
+    elif (
+        schema_version == 4
+        and policy == STORED_NO_PRICE_FINAL_FAILURE_POLICY_IDENTITY
+    ):
+        if category != "NO_PRICE_DATA" or failure_type != "APIError":
+            raise ValueError("FINAL_FAILED stored no-price evidence is invalid")
+        expected_evidence = {"causal_evidence_diagnostic_checksum"}
     else:
         raise ValueError("FINAL_FAILED policy identity is invalid")
     if not isinstance(evidence, dict) or set(evidence) != expected_evidence:

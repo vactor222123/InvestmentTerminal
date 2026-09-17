@@ -604,6 +604,15 @@ existing reproduced policy cannot consume it without falsifying provenance.
 Implement a separate checksum-bound `STORED_YAHOO_NO_PRICE_DATA_V1` offline
 transition next; runtime mutation and collection resume remain separate gates.
 
+Package 159 implements that separate offline transition. Exact diagnostic-byte,
+checksum, manifest/request/window/selection, and checkpoint causal-evidence
+equality checks fail closed before mutation. Only one retryable schema-4
+outcome can become a `STORED_YAHOO_NO_PRICE_DATA_V1` final exclusion; exact
+repeat is idempotent, other and missing members are preserved, and the private
+checkpoint is committed before the redacted report. Prepare one exact-baseline
+operator handoff next; Yahoo, SQLite, collection resume, and batch 110 remain
+separate gates.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

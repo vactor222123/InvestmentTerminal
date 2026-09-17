@@ -198,6 +198,39 @@ def test_rejects_final_failure_without_exact_evidence():
         ResumableMarketBatchService(importer=Importer(),
             checkpoint_writer=lambda x:None,clock=lambda:NOW).run(req,checkpoint)
 
+def test_schema4_stored_no_price_final_failure_is_terminal():
+    req=request();importer=Importer();written=[]
+    final={"status":"FINAL_FAILED","downloaded":None,"inserted":None,
+        "duplicates":None,"omitted_trailing_count":0,"omission_types":[],
+        "failure_type":"APIError","failure_category":"NO_PRICE_DATA",
+        "isolation_policy_identity":"STORED_YAHOO_NO_PRICE_DATA_V1",
+        "isolation_evidence":{"causal_evidence_diagnostic_checksum":"a"*64}}
+    success={"status":"SUCCESS","downloaded":2,"inserted":2,"duplicates":0,
+        "omitted_trailing_count":0,"omission_types":[],"failure_type":None}
+    checkpoint={"schema_version":4,"request_checksum":req.checksum,
+        "outcomes":{"AAA":final,"BBB":success}}
+
+    report=ResumableMarketBatchService(importer=importer,
+        checkpoint_writer=written.append,clock=lambda:NOW).run(req,checkpoint)
+
+    assert importer.calls==[] and written==[]
+    assert report["status"]=="SUCCESS_WITH_EXCLUSIONS"
+    assert report["final_failure_categories"]==["NO_PRICE_DATA"]
+
+def test_rejects_stored_no_price_policy_outside_schema4():
+    req=request()
+    final={"status":"FINAL_FAILED","downloaded":None,"inserted":None,
+        "duplicates":None,"omitted_trailing_count":0,"omission_types":[],
+        "failure_type":"APIError","failure_category":"NO_PRICE_DATA",
+        "isolation_policy_identity":"STORED_YAHOO_NO_PRICE_DATA_V1",
+        "isolation_evidence":{"causal_evidence_diagnostic_checksum":"a"*64}}
+    checkpoint={"schema_version":3,"request_checksum":req.checksum,
+        "outcomes":{"AAA":final}}
+
+    with pytest.raises(ValueError,match="policy identity"):
+        ResumableMarketBatchService(importer=Importer(),
+            checkpoint_writer=lambda x:None,clock=lambda:NOW).run(req,checkpoint)
+
 def test_rejects_mismatched_checkpoint_before_import():
     importer=Importer()
     with pytest.raises(ValueError,match="does not match"):

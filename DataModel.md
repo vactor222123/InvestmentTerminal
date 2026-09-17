@@ -945,7 +945,7 @@ raw row, or candle value.
 
 ## Stored No-Price Terminal Policy
 
-Checkpoint schema version 4 may additionally represent policy
+Checkpoint schema version 4 additionally represents policy
 `STORED_YAHOO_NO_PRICE_DATA_V1`. Its `FINAL_FAILED` outcome retains
 `failure_type=APIError`, category `NO_PRICE_DATA`, and exactly one isolation
 evidence field: `causal_evidence_diagnostic_checksum`. The checksum binds strict

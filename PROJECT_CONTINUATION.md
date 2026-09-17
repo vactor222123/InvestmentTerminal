@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `d146eafb5e7c3628672eabba6b2de9762b481d2d`
-**Current local package:** Phase 7 Package 158 - Stored No-Price Terminal Audit
+**Current GitHub baseline:** `bf1f3aa4deb0881c0cadd0d51b3b3fa4df7b6462`
+**Current local package:** Phase 7 Package 159 - Stored No-Price Terminal Isolation
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement the separate stored-evidence no-price transition
+**Current next action:** Prepare the exact-baseline operational transition handoff
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -739,6 +739,16 @@ original at-failure evidence, not a later reproduction, the next implementation
 uses a distinct `STORED_YAHOO_NO_PRICE_DATA_V1` policy and requires exact report
 and checkpoint-evidence equality. Yahoo, SQLite, private runtime mutation,
 sweep resume, and batch 110 remain separate gates.
+
+Package 159 implements that distinct offline boundary. It verifies the exact
+diagnostic bytes/checksum and manifest/request/window/selection bindings,
+requires exact equality with the source schema-4 causal evidence, and accepts
+only an allowlisted yfinance missing-price chain rooted at `APIError`. It can
+transition only the single retryable outcome to the versioned stored-evidence
+policy, preserves every other and still-missing item, supports exact idempotent
+repeat, and commits the private checkpoint before its redacted report. It has
+no Yahoo, SQLite, importer, sweep, or later-batch authority. Prepare one
+operator handoff next; do not mutate private runtime data in this package.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable
