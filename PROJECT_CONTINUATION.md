@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `991b1c08b50c4a168c2fbca50c9e8feaab3202bf`
-**Current local package:** Phase 7 Package 160 - Stored No-Price Transition Handoff
+**Current GitHub baseline:** `2df941adaa4d4a418f591a58c14c0396711547b9`
+**Current local package:** Phase 7 Package 161 - Causal No-Price Sweep Deferral
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run the Package 160 handoff before applying its files
+**Current next action:** Prepare the optimized complete-sweep operational handoff
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -757,6 +757,16 @@ before invoking only the offline transition. It then validates the one final
 outcome and detached redacted report locally and prints no private identity.
 Run it before applying Package 160 and return only the report. Yahoo, SQLite,
 collection resume, and batch 110 remain blocked pending review.
+
+The returned Package 160 report is valid at SHA-256
+`80370a101725f22ea582b9d68d4e06d3c77b0b6c2f272f33e67bdfae2cd4ae13`:
+batch 109 now has one final stored-evidence `NO_PRICE_DATA` exclusion, zero
+retryable failures, and 19 missing members. Package 161 removes the repeated
+manual bottleneck by allowing the collection sweep to defer a future `APIError`
+only when schema-4 causal evidence exactly proves a recognized Yahoo
+`NO_PRICE_DATA` chain. Every generic, legacy, redacted, truncated, rate-limit,
+timeout, transport, persistence, and checkpoint failure still halts. Prepare
+one complete remaining-budget handoff next; runtime execution is separate.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

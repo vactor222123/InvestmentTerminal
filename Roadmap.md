@@ -620,6 +620,15 @@ shape, and detached redacted report. Run it before applying Package 160 and
 return only the report; Yahoo, SQLite, collection resume, and batch 110 remain
 separate gates pending review.
 
+Package 161 records the successful stored-evidence transition and implements
+the selected collection optimization. Sweep report schema 2 may defer an
+`APIError` only when validated schema-4 causal evidence proves a recognized
+Yahoo `NO_PRICE_DATA` chain; it does not retry or terminalize that failure.
+Local candle defects remain deferable, while legacy/generic API, rate-limit,
+timeout, transport, persistence, checkpoint, and unknown failures remain hard
+stops. Prepare one complete remaining-budget operational handoff next, then
+analyze the aggregate deferred inventory after collection.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

@@ -1156,3 +1156,14 @@ reviewed diagnostic checksum/contract, and exact stored causal-evidence match;
 runs only the offline transition; and validates the resulting final outcome and
 redacted report. Run it before applying Package 160 and return only the report.
 Yahoo, SQLite, collection resume, and batch 110 remain blocked pending review.
+
+## Phase 7 Package 161 checkpoint
+
+The batch-109 stored-evidence transition succeeded with one final
+`NO_PRICE_DATA` exclusion and 19 missing members. Collection sweep schema 2 now
+defers future `APIError` outcomes only when schema-4 causal evidence proves a
+recognized Yahoo missing-price chain, so identical evidence no longer requires
+an immediate per-series stop. Generic/legacy API, rate-limit, timeout,
+transport, persistence, checkpoint, and unknown failures still halt. Prepare
+one exact-baseline remaining-budget sweep handoff next; runtime execution and
+aggregate remediation remain separate gates.

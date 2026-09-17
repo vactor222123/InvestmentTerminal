@@ -3,7 +3,9 @@
 from dataclasses import dataclass
 
 from investment_terminal.clients.yahoo_finance_client import (
+    YahooCandleFailureCategory,
     YahooCandleInvalidResponseError,
+    project_yahoo_candle_failure,
 )
 from investment_terminal.operations.manifest_bound_market_batch import (
     ManifestBatchSelection,
@@ -14,6 +16,7 @@ from investment_terminal.operations.resumable_market_batch import (
     MarketBatchRequest,
     ResumableMarketBatchService,
 )
+from investment_terminal.utils.exceptions import APIError
 from investment_terminal.utils.validation import (
     normalize_required_text,
     validate_aware_datetime,
@@ -21,6 +24,16 @@ from investment_terminal.utils.validation import (
 
 
 DEFERRED_FAILURE_TYPE = "YahooCandleInvalidResponseError"
+DEFERRED_NO_PRICE_FAILURE_TYPE = "APIError"
+_MISSING_PRICE_TYPES = frozenset({
+    "yfinance.exceptions.YFPricesMissingError",
+    "yfinance.exceptions.YFTickerMissingError",
+    "yfinance.exceptions.YFTzMissingError",
+})
+_REDACTED_TYPES = frozenset({
+    "UNRECOGNIZED_EXCEPTION_TYPE",
+    "EXCEPTION_CHAIN_TRUNCATED",
+})
 
 
 @dataclass(frozen=True, slots=True)
@@ -47,6 +60,7 @@ class _CheckpointState:
     covered: bool
     complete: bool
     deferred_failure_count: int
+    deferred_failure_types: frozenset[str]
     blocking_failure_types: frozenset[str]
 
 
@@ -145,8 +159,7 @@ class ManifestCollectionSweepService:
                 for omission_type in item["omission_types"]
             )
             deferred_current += sum(
-                item["status"] == "FAILED"
-                and item["failure_type"] == DEFERRED_FAILURE_TYPE
+                self._is_deferable_outcome(item)
                 for item in new_outcomes
             )
 
@@ -167,7 +180,7 @@ class ManifestCollectionSweepService:
 
         completed = validate_aware_datetime(self.clock(), field_name="completed_at")
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "operation_identity": "MANIFEST_COLLECTION_SWEEP",
             "provider_identity": "YAHOO_FINANCE",
             "status": status,
@@ -199,7 +212,32 @@ class ManifestCollectionSweepService:
 
     @staticmethod
     def _is_deferable_failure(error: BaseException) -> bool:
-        return type(error) is YahooCandleInvalidResponseError
+        if type(error) is YahooCandleInvalidResponseError:
+            return True
+        if type(error) is not APIError:
+            return False
+        evidence = project_yahoo_candle_failure(error)
+        return _is_verified_no_price_evidence(
+            evidence.category.value,
+            evidence.exception_type_chain,
+        )
+
+    @staticmethod
+    def _is_deferable_outcome(outcome: dict[str, object]) -> bool:
+        if outcome.get("status") != "FAILED":
+            return False
+        failure_type = outcome.get("failure_type")
+        if failure_type == DEFERRED_FAILURE_TYPE:
+            return True
+        causal = outcome.get("causal_failure_evidence")
+        if failure_type != DEFERRED_NO_PRICE_FAILURE_TYPE or not isinstance(
+            causal, dict
+        ):
+            return False
+        return _is_verified_no_price_evidence(
+            causal.get("category"),
+            causal.get("exception_type_chain"),
+        )
 
     @staticmethod
     def _checkpoint_state(
@@ -214,6 +252,7 @@ class ManifestCollectionSweepService:
             raise ValueError("Checkpoint outcomes are outside the request")
 
         blocking_failure_types: set[str] = set()
+        deferred_failure_types: set[str] = set()
         deferred = 0
         for outcome in outcomes.values():
             failure_type = outcome.get("failure_type")
@@ -221,8 +260,9 @@ class ManifestCollectionSweepService:
                 normalized = normalize_required_text(
                     failure_type, field_name="failure_type"
                 )
-                if normalized == DEFERRED_FAILURE_TYPE:
+                if ManifestCollectionSweepService._is_deferable_outcome(outcome):
                     deferred += 1
+                    deferred_failure_types.add(normalized)
                 else:
                     blocking_failure_types.add(normalized)
             elif outcome["status"] != "FINAL_FAILED" and failure_type is not None:
@@ -238,6 +278,7 @@ class ManifestCollectionSweepService:
             covered,
             complete,
             deferred,
+            frozenset(deferred_failure_types),
             frozenset(blocking_failure_types),
         )
 
@@ -255,11 +296,24 @@ class ManifestCollectionSweepService:
                 state.deferred_failure_count for state in covered_states
             ),
             "deferred_failure_types": (
-                [DEFERRED_FAILURE_TYPE]
-                if any(state.deferred_failure_count for state in covered_states)
-                else []
+                sorted({
+                    failure_type
+                    for state in covered_states
+                    for failure_type in state.deferred_failure_types
+                })
             ),
         }
+
+
+def _is_verified_no_price_evidence(category: object, chain: object) -> bool:
+    return (
+        category == YahooCandleFailureCategory.NO_PRICE_DATA.value
+        and isinstance(chain, (list, tuple))
+        and bool(chain)
+        and chain[0] == "investment_terminal.utils.exceptions.APIError"
+        and not any(item in _REDACTED_TYPES for item in chain)
+        and any(item in _MISSING_PRICE_TYPES for item in chain)
+    )
 
 
 def _validated_checkpoint_sequence(plan, checkpoint_reader):

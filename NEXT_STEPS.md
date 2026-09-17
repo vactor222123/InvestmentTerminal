@@ -192,6 +192,7 @@
 **Phase 7 Package 158 stored no-price terminal audit:** COMPLETE
 **Phase 7 Package 159 stored no-price terminal isolation:** COMPLETE
 **Phase 7 Package 160 stored no-price transition handoff:** COMPLETE - READY FOR USER EXECUTION
+**Phase 7 Package 161 causal no-price sweep deferral:** COMPLETE
 
 ## Current State
 
@@ -199,11 +200,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Before applying Package 160, run its exact-baseline ASCII PowerShell block and
-return only the redacted
-`manifest_batch_0109_stored_no_price_isolation_001.json` report. Do not send the
-private manifest or checkpoint. Do not resume batch 109 or execute batch 110
-until the report is reviewed.
+Prepare one exact-baseline operational handoff for the optimized schema-2
+collection sweep. It must resume the 19 missing batch-109 members, then continue
+through the remaining manifest budget while deferring only exact local candle
+defects and verified schema-4 Yahoo no-price evidence. It must still halt on
+rate limit, timeout, transport, generic/legacy API errors, persistence, or
+checkpoint failure. Return only the redacted sweep report and SQLite integrity.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

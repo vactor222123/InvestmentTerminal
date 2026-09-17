@@ -795,6 +795,17 @@ existing stable Yahoo category, bounded allowlisted exception type chain, and a
 fixed reason. It contains no identity, currency, price, path, provider text,
 exception message, raw row, or candle value.
 
+Manifest collection sweep report schema 2 preserves every schema-1 field and
+status while expanding the deferable retryable vocabulary. Exact
+`YahooCandleInvalidResponseError` remains deferable. An `APIError` is deferable
+only when schema-4 causal evidence has category `NO_PRICE_DATA`, begins with the
+allowlisted InvestmentTerminal `APIError` type, contains a recognized yfinance
+missing-price type, and contains no redaction or truncation marker. Coverage
+reports the sorted deferred failure types. Legacy/null, generic, timeout,
+transport, rate-limit, redacted, truncated, persistence, checkpoint, and
+unknown failures remain blocking. Deferred evidence is not terminalized or
+retried by the sweep.
+
 Private checkpoint schema version 4 preserves schemas 1–3 and all
 existing fields. A retryable `FAILED` outcome additionally carries
 `causal_failure_evidence`: null only for explicitly migrated legacy evidence,

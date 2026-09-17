@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 
 import pytest
+from yfinance.exceptions import YFPricesMissingError, YFRateLimitError
 
 from investment_terminal.clients.yahoo_finance_client import (
     YahooCandleFailureCategory,
@@ -13,6 +14,7 @@ from investment_terminal.operations.manifest_collection_sweep import (
 )
 from investment_terminal.operations.market_batch_manifest import _manifest_checksum
 from investment_terminal.operations.resumable_market_batch import MarketBatchRequest
+from investment_terminal.utils.exceptions import APIError
 
 
 NOW = datetime(2026, 9, 15, tzinfo=timezone.utc)
@@ -109,6 +111,30 @@ def invalid_candle():
     )
 
 
+def no_price_error():
+    error = APIError("private")
+    error.__cause__ = YFPricesMissingError("PRIVATE", "")
+    return error
+
+
+def wrapped_api_error(cause):
+    error = APIError("private")
+    error.__cause__ = cause
+    return error
+
+
+def no_price_outcome():
+    value = outcome("FAILED", "APIError")
+    value["causal_failure_evidence"] = {
+        "category": "NO_PRICE_DATA",
+        "exception_type_chain": [
+            "investment_terminal.utils.exceptions.APIError",
+            "yfinance.exceptions.YFPricesMissingError",
+        ],
+    }
+    return value
+
+
 def test_resumes_after_preexisting_deferred_batch_without_retrying_it():
     value, checksum = manifest(batch_count=3, items_per_batch=2)
     plan = ManifestCollectionSweepPlan.from_manifest(value, checksum, max_batches=1)
@@ -156,6 +182,80 @@ def test_defers_local_candle_error_and_continues_to_later_batch():
     assert report["ending_coverage"]["deferred_failure_count"] == 1
 
 
+def test_defers_verified_no_price_error_and_continues_to_later_batch():
+    value, checksum = manifest(batch_count=2)
+    plan = ManifestCollectionSweepPlan.from_manifest(value, checksum, max_batches=2)
+    failed_symbol = plan.requests[0].items[0].symbol
+    importer = Importer({failed_symbol: no_price_error()})
+
+    report = service({}, importer).run(plan)
+
+    assert importer.calls == ["S1_1", "S2_1"]
+    assert report["schema_version"] == 2
+    assert report["status"] == "COMPLETE"
+    assert report["current_run"]["deferred_failure_count"] == 1
+    assert report["ending_coverage"]["deferred_failure_types"] == ["APIError"]
+
+
+def test_resumes_after_preexisting_verified_no_price_without_retrying_it():
+    value, checksum = manifest(batch_count=2)
+    plan = ManifestCollectionSweepPlan.from_manifest(value, checksum, max_batches=1)
+    first_item = plan.requests[0].items[0]
+    first_checkpoint = {
+        "schema_version": 4,
+        "request_checksum": plan.requests[0].checksum,
+        "outcomes": {first_item.symbol: no_price_outcome()},
+    }
+    importer = Importer()
+
+    report = service({1: first_checkpoint}, importer).run(plan)
+
+    assert importer.calls == ["S2_1"]
+    assert report["status"] == "COMPLETE"
+    assert report["starting_coverage"]["sweep_covered_batch_count"] == 1
+    assert report["starting_coverage"]["deferred_failure_types"] == ["APIError"]
+
+
+@pytest.mark.parametrize(
+    "causal",
+    [
+        None,
+        {
+            "category": "TIMEOUT",
+            "exception_type_chain": [
+                "investment_terminal.utils.exceptions.APIError",
+                "builtins.TimeoutError",
+            ],
+        },
+        {
+            "category": "NO_PRICE_DATA",
+            "exception_type_chain": [
+                "investment_terminal.utils.exceptions.APIError",
+                "UNRECOGNIZED_EXCEPTION_TYPE",
+            ],
+        },
+    ],
+)
+def test_preexisting_api_error_without_verified_no_price_remains_blocking(causal):
+    value, checksum = manifest(batch_count=2)
+    plan = ManifestCollectionSweepPlan.from_manifest(value, checksum, max_batches=1)
+    item = plan.requests[0].items[0]
+    failed = outcome("FAILED", "APIError")
+    failed["causal_failure_evidence"] = causal
+    checkpoint_value = {
+        "schema_version": 4,
+        "request_checksum": plan.requests[0].checksum,
+        "outcomes": {item.symbol: failed},
+    }
+    importer = Importer()
+
+    report = service({1: checkpoint_value}, importer).run(plan)
+
+    assert importer.calls == []
+    assert report["status"] == "HALTED"
+    assert report["failure_types"] == ["APIError"]
+
+
 def test_systemic_failure_is_checkpointed_and_halts_before_next_item():
     value, checksum = manifest(batch_count=2, items_per_batch=2)
     plan = ManifestCollectionSweepPlan.from_manifest(value, checksum, max_batches=2)
@@ -172,6 +272,21 @@ def test_systemic_failure_is_checkpointed_and_halts_before_next_item():
     assert report["current_run"]["attempted_item_count"] == 1
     assert report["current_run"]["deferred_failure_count"] == 0
     assert checkpoints[1]["outcomes"][first]["status"] == "FAILED"
+
+
+@pytest.mark.parametrize("cause", [TimeoutError("private"), YFRateLimitError()])
+def test_wrapped_timeout_and_rate_limit_remain_systemic(cause):
+    value, checksum = manifest(batch_count=2, items_per_batch=2)
+    plan = ManifestCollectionSweepPlan.from_manifest(value, checksum, max_batches=2)
+    first = plan.requests[0].items[0].symbol
+    importer = Importer({first: wrapped_api_error(cause)})
+
+    report = service({}, importer).run(plan)
+
+    assert importer.calls == [first]
+    assert report["status"] == "HALTED"
+    assert report["stop_batch_index"] == 1
+    assert report["failure_types"] == ["APIError"]
 
 
 def test_partial_resume_preserves_deferred_failure_and_attempts_only_missing():

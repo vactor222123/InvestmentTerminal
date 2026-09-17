@@ -535,17 +535,21 @@ not grant scheduled or complete-manifest execution authority.
 A complete collection sweep is a separate implemented operations boundary, not a
 relaxation of the fail-fast drain. Its attempted-coverage authority remains the
 exact request-bound private checkpoints. It may advance past a fully attempted
-batch only when every retryable outcome is exactly
+batch when every retryable outcome is either exact
 `YahooCandleInvalidResponseError`, which is raised by local Yahoo frame
-projection before repository persistence. Existing retryable outcomes are not
-retried during the same sweep. Every other provider, rate-limit, persistence,
-checkpoint, or unknown failure stops the sweep before the next batch. SQLite
+projection before repository persistence, or exact schema-4 `APIError` evidence
+whose allowlisted causal chain proves `NO_PRICE_DATA` from a recognized yfinance
+missing-price type. Existing retryable outcomes are not retried during the same
+sweep. Legacy/null, redacted, truncated, generic, timeout, transport,
+rate-limit, persistence, checkpoint, and unknown failures stop the sweep before
+the next batch. SQLite
 contents, redacted reports, and an unbound skip list are not progress authority.
 `ManifestCollectionSweepPlan` owns the explicit one-to-manifest-size budget;
 `ManifestCollectionSweepService` owns exact resume and stopping semantics. The
-schema-version-1 CLI report separates sweep coverage, full completion, and
-deferred defects without exposing private identities. The old drain remains the
-ordered remediation boundary.
+schema-version-2 CLI report preserves the coverage shape, versions the expanded
+deferred-type vocabulary, and separates sweep coverage, full completion, and
+deferred defects without exposing private identities. The old drain remains
+the ordered remediation boundary.
 
 A partial sweep checkpoint containing a systemic `APIError` is not causal
 evidence. The Yahoo adapter retains its typed cause only in memory, while the

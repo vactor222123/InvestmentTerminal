@@ -69,7 +69,7 @@ def main(argv=None, *, client=None, clock=None, writer=write_json_atomic) -> int
     except Exception as exc:
         now = runtime_clock()
         payload = {
-            "schema_version": 1,
+            "schema_version": 2,
             "operation_identity": "MANIFEST_COLLECTION_SWEEP",
             "provider_identity": "YAHOO_FINANCE",
             "status": "FAILED",

@@ -54,6 +54,7 @@ def test_cli_resumes_after_sweep_covered_checkpoint(tmp_path):
     report_text = (tmp_path / "report.json").read_text(encoding="utf-8")
     report = json.loads(report_text)
     assert result == 0
+    assert report["schema_version"] == 2
     assert report["status"] == "COMPLETE"
     assert report["starting_coverage"]["sweep_covered_batch_count"] == 1
     assert report["ending_coverage"]["sweep_covered_batch_count"] == 2
@@ -75,6 +76,7 @@ def test_invalid_manifest_fails_before_database_open(tmp_path, monkeypatch):
     report_text = (tmp_path / "report.json").read_text(encoding="utf-8")
     report = json.loads(report_text)
     assert result == 1
+    assert report["schema_version"] == 2
     assert report["status"] == "FAILED"
     assert report["failure_types"] == ["ValueError"]
     assert "database opened" not in report_text
