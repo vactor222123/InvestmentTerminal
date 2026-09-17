@@ -942,3 +942,21 @@ checkpoint's validated stable category and allowlisted exception-type chain;
 inference. `FAILED` is reserved for preflight or validation failure. The report
 contains no symbol, currency, price, path, provider text, exception message,
 raw row, or candle value.
+
+## Stored No-Price Terminal Policy
+
+Checkpoint schema version 4 may additionally represent policy
+`STORED_YAHOO_NO_PRICE_DATA_V1`. Its `FINAL_FAILED` outcome retains
+`failure_type=APIError`, category `NO_PRICE_DATA`, and exactly one isolation
+evidence field: `causal_evidence_diagnostic_checksum`. The checksum binds strict
+schema-version-1 `MANIFEST_PARTIAL_CAUSAL_EVIDENCE_DIAGNOSTIC` bytes whose
+manifest, batch, request, window, partial-selection counts, category, and
+allowlisted exception chain exactly match the source retryable outcome's stored
+causal evidence. Legacy null evidence is ineligible.
+
+The separate schema-version-1 `MANIFEST_STORED_NO_PRICE_ISOLATION` report binds
+the same manifest/request/window, the stored policy/category, diagnostic
+checksum, and aggregate requested/checkpoint/missing/success/empty/retryable/
+final/transitioned/already-final counts. It excludes symbols, currencies,
+prices, paths, provider payloads, exception messages, and raw candle evidence.
+Existing reproduced no-price and numeric/OHLC policy contracts are unchanged.

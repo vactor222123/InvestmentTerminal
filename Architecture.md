@@ -674,3 +674,13 @@ schema-4 category and allowlisted exception-type chain. Legacy null evidence
 remains explicitly unavailable. The boundary has no provider, SQLite,
 repository, importer, or checkpoint-write dependency and grants no terminal
 transition or later-batch authority.
+
+Stored at-failure `NO_PRICE_DATA` evidence requires a distinct terminal policy,
+not the existing reproduced-evidence policy. The selected
+`STORED_YAHOO_NO_PRICE_DATA_V1` boundary verifies strict diagnostic bytes and
+SHA-256, exact manifest/request/window/partial-selection binding, and exact
+equality between the redacted diagnostic causal object and the checkpoint's
+stored schema-4 evidence. It may change only that outcome to `FINAL_FAILED` and
+records `causal_evidence_diagnostic_checksum`. It has no provider, SQLite,
+repository, importer, sweep, or later-batch authority. Existing reproduced
+no-price and numeric/OHLC policy meanings remain unchanged.

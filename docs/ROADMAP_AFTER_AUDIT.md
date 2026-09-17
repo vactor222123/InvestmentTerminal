@@ -1127,3 +1127,13 @@ checkpoint, runs only the read-only stored-causal-evidence diagnostic, and
 validates the redacted report. It does not contact Yahoo, open SQLite, mutate
 the checkpoint, ingest, retry batch 109, or execute batch 110. Run it before
 applying Package 157 and return only the redacted report.
+
+## Phase 7 Package 158 checkpoint
+
+The returned batch-109 diagnostic is valid and exposes stored schema-4
+`NO_PRICE_DATA` evidence with `APIError -> YFPricesMissingError`. Audit confirms
+that the existing reproduced-evidence policy cannot accept this original
+at-failure evidence without changing its meaning. Implement a distinct
+`STORED_YAHOO_NO_PRICE_DATA_V1` offline transition with exact diagnostic-byte,
+checksum, binding, and checkpoint-evidence equality checks. Runtime mutation,
+Yahoo access, SQLite access, sweep resume, and batch 110 remain blocked.

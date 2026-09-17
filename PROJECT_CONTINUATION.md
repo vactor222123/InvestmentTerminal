@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `2bed0d12ed20d470920cdb42024859acc006f7d9`
-**Current local package:** Phase 7 Package 157 - Batch-109 Causal-Evidence Handoff
+**Current GitHub baseline:** `d146eafb5e7c3628672eabba6b2de9762b481d2d`
+**Current local package:** Phase 7 Package 158 - Stored No-Price Terminal Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run the Package 157 offline diagnostic before applying it
+**Current next action:** Implement the separate stored-evidence no-price transition
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -730,6 +730,15 @@ outcome, and validates the detached redacted report. It prints no private
 identity and performs no Yahoo, SQLite, checkpoint mutation, ingestion, retry,
 or batch-110 work. Run the block before applying Package 157 and return only the
 redacted report for the next decision gate.
+
+Package 158 validates that returned report at SHA-256
+`509769c10ef7a4617104b80c5ed3ca626cd763e98c97e76353d52586507b64ef`.
+Batch 109 has one stored schema-4 `NO_PRICE_DATA` failure with causal chain
+`APIError -> YFPricesMissingError` and 19 missing members. Because this is the
+original at-failure evidence, not a later reproduction, the next implementation
+uses a distinct `STORED_YAHOO_NO_PRICE_DATA_V1` policy and requires exact report
+and checkpoint-evidence equality. Yahoo, SQLite, private runtime mutation,
+sweep resume, and batch 110 remain separate gates.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

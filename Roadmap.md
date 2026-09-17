@@ -597,6 +597,13 @@ complete redacted diagnostic report without Yahoo access, SQLite access,
 checkpoint mutation, ingestion, retry, or later-batch execution. Review the
 returned causal evidence before selecting any remediation.
 
+Package 158 records valid batch-109 stored evidence as
+`NO_PRICE_DATA` with chain `APIError -> YFPricesMissingError`. Because this is
+the original schema-4 at-failure evidence rather than a later reproduction, the
+existing reproduced policy cannot consume it without falsifying provenance.
+Implement a separate checksum-bound `STORED_YAHOO_NO_PRICE_DATA_V1` offline
+transition next; runtime mutation and collection resume remain separate gates.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
