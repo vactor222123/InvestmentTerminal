@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `b811978b9413bf3b3c21716531c234141df811b5`
-**Current local package:** Phase 7 Package 156 - Stored Causal Evidence Diagnostic
+**Current GitHub baseline:** `2bed0d12ed20d470920cdb42024859acc006f7d9`
+**Current local package:** Phase 7 Package 157 - Batch-109 Causal-Evidence Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Apply Package 156 and return the exact develop SHA
+**Current next action:** Run the Package 157 offline diagnostic before applying it
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -722,6 +722,14 @@ through batch 108, and halted safely at batch 109 on `APIError`; 493 batches
 remain unswept. Package 156 adds one offline read-only diagnostic that exposes
 only the stored schema-4 causal category and allowlisted type chain. It performs
 no Yahoo, SQLite, checkpoint mutation, ingestion, or later-batch work.
+
+Package 157 prepares the exact-baseline operational handoff for that diagnostic.
+Its ASCII PowerShell block validates the private manifest, locates exactly one
+request-bound schema-4 batch-109 checkpoint, requires one `FAILED/APIError`
+outcome, and validates the detached redacted report. It prints no private
+identity and performs no Yahoo, SQLite, checkpoint mutation, ingestion, retry,
+or batch-110 work. Run the block before applying Package 157 and return only the
+redacted report for the next decision gate.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

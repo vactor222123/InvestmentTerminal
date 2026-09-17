@@ -591,6 +591,12 @@ new batch-109 `APIError`. Because the failure was written under checkpoint
 schema 4, a new offline diagnostic projects its stored privacy-safe causal
 evidence without another Yahoo request or any runtime mutation.
 
+Package 157 prepares the exact-baseline, user-executed offline handoff for that
+boundary. It validates one request-bound schema-4 batch-109 checkpoint and the
+complete redacted diagnostic report without Yahoo access, SQLite access,
+checkpoint mutation, ingestion, retry, or later-batch execution. Review the
+returned causal evidence before selecting any remediation.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

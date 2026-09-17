@@ -1118,3 +1118,12 @@ Checkpoint schema 4 now preserves that new failure's privacy-safe category and
 allowlisted exception-type chain. A separate offline read-only diagnostic is
 implemented to project only that evidence before any terminal transition,
 provider retry, sweep resume, or batch 110 execution.
+
+## Phase 7 Package 157 checkpoint
+
+The exact-baseline operational handoff is ready. Its ASCII PowerShell block
+validates the private manifest and unique request-bound schema-4 batch-109
+checkpoint, runs only the read-only stored-causal-evidence diagnostic, and
+validates the redacted report. It does not contact Yahoo, open SQLite, mutate
+the checkpoint, ingest, retry batch 109, or execute batch 110. Run it before
+applying Package 157 and return only the redacted report.

@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ b811978b9413bf3b3c21716531c234141df811b5`
+**Current repository baseline:** `develop @ 2bed0d12ed20d470920cdb42024859acc006f7d9`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -188,6 +188,7 @@
 **Phase 7 Package 154 no-price transition:** COMPLETE - SUCCESS
 **Phase 7 Package 155 complete collection resume:** COMPLETE - HALTED AT 109
 **Phase 7 Package 156 stored causal-evidence diagnostic:** COMPLETE
+**Phase 7 Package 157 batch-109 causal-evidence handoff:** READY FOR USER EXECUTION
 
 ## Current State
 
@@ -195,11 +196,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Apply Package 156 and return the resulting exact `develop` commit SHA. The next
-operational handoff will run the new offline read-only diagnostic against only
-the batch-109 partial checkpoint and return its redacted causal-evidence report.
-Do not repeat Yahoo access, mutate the checkpoint, resume batch 109, or execute
-batch 110 before that evidence is reviewed.
+Before applying Package 157, run the exact-baseline ASCII PowerShell block in
+`docs/PHASE_7_PACKAGE_157_BATCH_109_CAUSAL_EVIDENCE_HANDOFF.md`. Return only the
+redacted `manifest_batch_0109_causal_evidence_diagnostic_001.json` report. Do
+not return the private manifest or checkpoint. Do not contact Yahoo, open
+SQLite, mutate the checkpoint, resume batch 109, or execute batch 110 before
+that evidence is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
