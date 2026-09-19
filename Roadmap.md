@@ -629,6 +629,13 @@ timeout, transport, persistence, checkpoint, and unknown failures remain hard
 stops. Prepare one complete remaining-budget operational handoff next, then
 analyze the aggregate deferred inventory after collection.
 
+Package 162 prepares the exact-baseline operational handoff for that optimized
+sweep. It binds the transitioned partial batch 109, the 493-batch remaining
+budget, schema-2 redacted report validation, systemic hard-stop semantics, and
+read-only SQLite integrity. Runtime collection remains user-executed; after its
+report is reviewed, complete collection leads to one aggregate failure
+inventory rather than per-series remediation.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

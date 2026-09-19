@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ d146eafb5e7c3628672eabba6b2de9762b481d2d`
+**Current repository baseline:** `develop @ 6a9de4fa0f5dee2e28eea78a99568495d4055ff0`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -193,6 +193,7 @@
 **Phase 7 Package 159 stored no-price terminal isolation:** COMPLETE
 **Phase 7 Package 160 stored no-price transition handoff:** COMPLETE - READY FOR USER EXECUTION
 **Phase 7 Package 161 causal no-price sweep deferral:** COMPLETE
+**Phase 7 Package 162 optimized collection sweep handoff:** COMPLETE - READY FOR USER EXECUTION
 
 ## Current State
 
@@ -200,12 +201,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Prepare one exact-baseline operational handoff for the optimized schema-2
-collection sweep. It must resume the 19 missing batch-109 members, then continue
-through the remaining manifest budget while deferring only exact local candle
-defects and verified schema-4 Yahoo no-price evidence. It must still halt on
-rate limit, timeout, transport, generic/legacy API errors, persistence, or
-checkpoint failure. Return only the redacted sweep report and SQLite integrity.
+Before applying Package 162, run its exact-baseline ASCII PowerShell block at
+`develop @ 6a9de4fa0f5dee2e28eea78a99568495d4055ff0`. Return only the redacted
+`manifest_collection_sweep_resume_0109_0601_schema2.json` report and the printed
+SQLite integrity result. Do not send the private manifest, checkpoints,
+database, cache, symbols, currencies, prices, or candles.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

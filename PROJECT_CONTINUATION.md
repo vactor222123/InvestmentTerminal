@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `2df941adaa4d4a418f591a58c14c0396711547b9`
-**Current local package:** Phase 7 Package 161 - Causal No-Price Sweep Deferral
+**Current GitHub baseline:** `6a9de4fa0f5dee2e28eea78a99568495d4055ff0`
+**Current local package:** Phase 7 Package 162 - Optimized Collection Sweep Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Prepare the optimized complete-sweep operational handoff
+**Current next action:** Run the Package 162 handoff before applying its files
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -767,6 +767,14 @@ only when schema-4 causal evidence exactly proves a recognized Yahoo
 `NO_PRICE_DATA` chain. Every generic, legacy, redacted, truncated, rate-limit,
 timeout, transport, persistence, and checkpoint failure still halts. Prepare
 one complete remaining-budget handoff next; runtime execution is separate.
+
+Package 162 prepares that exact-baseline operational handoff. It validates the
+stored batch-109 terminal evidence, resumes the 19 missing members, and permits
+the schema-2 sweep to cover the remaining 493 batches through index 601 while
+deferring only exact local candle defects and verified causal no-price results.
+The command retains hard stops for all systemic failures and separately checks
+SQLite read-only integrity. Run it at the Package 161 GitHub baseline before
+applying Package 162, then return only its redacted report and integrity line.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

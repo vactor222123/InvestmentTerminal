@@ -1167,3 +1167,12 @@ an immediate per-series stop. Generic/legacy API, rate-limit, timeout,
 transport, persistence, checkpoint, and unknown failures still halt. Prepare
 one exact-baseline remaining-budget sweep handoff next; runtime execution and
 aggregate remediation remain separate gates.
+
+## Phase 7 Package 162 checkpoint
+
+The optimized schema-2 collection-sweep handoff is ready for user execution at
+the Package 161 GitHub baseline. It validates the stored batch-109 terminal
+evidence, resumes its 19 missing members, and uses the exact 493-batch budget
+through batch 601. Verified no-price and local candle defects may be deferred;
+systemic failures still halt. Return only the redacted sweep report and SQLite
+integrity before aggregate remediation is designed.
