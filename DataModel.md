@@ -968,6 +968,15 @@ The report excludes identities, currencies, prices, paths, private outer
 failure-type strings, provider text, exception messages, raw rows, and candle
 values.
 
+The batch-576 operational inventory records one unique blocking `TIMEOUT`, one
+deferable `NO_PRICE_DATA`, and one deferable `RESPONSE_OHLC` signature. A
+planned partial-timeout retry report must bind the immutable inventory checksum
+in addition to manifest, batch, request, and requested-window evidence. Its
+coverage must distinguish selected, attempted, unchanged deferable, success,
+empty, retryable, final, and missing counts without serializing identities or
+values. The retry operation may update only the unique timeout outcome; the
+existing private checkpoint remains schema-version-4 evidence.
+
 ## Stored No-Price Terminal Policy
 
 Checkpoint schema version 4 additionally represents policy

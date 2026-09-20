@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `1f5685957814194adca12f882b94b9b18ed8c666`
-**Current local package:** Phase 7 Package 163 - Partial Causal Inventory
+**Current GitHub baseline:** `b0d2f28156ceee9b05d7f0be8711540ecba2ca03`
+**Current local package:** Phase 7 Package 164 - Batch-576 Timeout Retry Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Prepare the batch-576 causal-inventory handoff
+**Current next action:** Implement one evidence-bound batch-576 timeout retry
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -785,6 +785,16 @@ one blocking `APIError`, so the one-failure diagnostic is inapplicable.
 Package 163 implements a read-only aggregate causal inventory for that partial
 checkpoint. Prepare its offline handoff next; SQLite integrity remains
 unverified because the requested line was not returned.
+
+The returned Package 163 inventory is valid at SHA-256
+`67fd4eca4ede8205c5e669a44d70cbd269601227c7a939b80b5776d29d35e069`.
+Batch 576 contains 15 successes, two missing members, two deferable failures,
+and one blocking `TIMEOUT` whose stored chain is
+`APIError -> curl_cffi Timeout -> CurlError`. Package 164 confirms that a sweep
+repeat would halt before provider access, while the general batch retry would
+also repeat both deferable outcomes. Implement a separate evidence-bound
+one-time partial-timeout retry next; do not resume collection until its
+redacted result is reviewed. SQLite integrity remains unverified.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

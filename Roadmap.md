@@ -644,6 +644,14 @@ checkpoint contains multiple deferable failures plus at least one blocking
 exposing member identities or repeating Yahoo. Run that diagnostic before any
 sweep resume or terminal transition.
 
+Package 164 records the returned inventory: batch 576 has one blocking
+`TIMEOUT`, one deferable `NO_PRICE_DATA`, one deferable `RESPONSE_OHLC`, 15
+successes, and two missing members. A sweep repeat cannot retry the stored
+timeout, and a general batch retry would also repeat both deferable outcomes.
+Implement one reusable evidence-bound partial-timeout retry next. It must select
+only the unique timeout, attempt it once, preserve every unrelated outcome, and
+publish redacted evidence before collection resumes.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
