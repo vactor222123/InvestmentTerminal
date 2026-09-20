@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 6a9de4fa0f5dee2e28eea78a99568495d4055ff0`
+**Current repository baseline:** `develop @ 1f5685957814194adca12f882b94b9b18ed8c666`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -194,6 +194,8 @@
 **Phase 7 Package 160 stored no-price transition handoff:** COMPLETE - READY FOR USER EXECUTION
 **Phase 7 Package 161 causal no-price sweep deferral:** COMPLETE
 **Phase 7 Package 162 optimized collection sweep handoff:** COMPLETE - READY FOR USER EXECUTION
+**Phase 7 Package 162 optimized collection sweep:** COMPLETE - HALTED AT 576
+**Phase 7 Package 163 partial causal inventory:** COMPLETE
 
 ## Current State
 
@@ -201,11 +203,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Before applying Package 162, run its exact-baseline ASCII PowerShell block at
-`develop @ 6a9de4fa0f5dee2e28eea78a99568495d4055ff0`. Return only the redacted
-`manifest_collection_sweep_resume_0109_0601_schema2.json` report and the printed
-SQLite integrity result. Do not send the private manifest, checkpoints,
-database, cache, symbols, currencies, prices, or candles.
+Prepare one exact-baseline operational handoff for the offline batch-576
+partial causal inventory. Return only its redacted report. Do not rerun Yahoo,
+resume the sweep, inspect or send the private checkpoint, or infer the blocking
+cause before that aggregate evidence is reviewed. The prior sweep's separately
+requested SQLite integrity remains unverified.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

@@ -636,6 +636,14 @@ read-only SQLite integrity. Runtime collection remains user-executed; after its
 report is reviewed, complete collection leads to one aggregate failure
 inventory rather than per-series remediation.
 
+The Package 162 run advanced sweep coverage through batch 575 and halted at
+batch 576 after inserting 13,640,007 candles; 26 batches remain. Package 163
+adds an offline aggregate causal inventory because the stopping partial
+checkpoint contains multiple deferable failures plus at least one blocking
+`APIError`. The new redacted boundary groups stored schema-4 signatures without
+exposing member identities or repeating Yahoo. Run that diagnostic before any
+sweep resume or terminal transition.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

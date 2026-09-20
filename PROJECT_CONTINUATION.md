@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `6a9de4fa0f5dee2e28eea78a99568495d4055ff0`
-**Current local package:** Phase 7 Package 162 - Optimized Collection Sweep Handoff
+**Current GitHub baseline:** `1f5685957814194adca12f882b94b9b18ed8c666`
+**Current local package:** Phase 7 Package 163 - Partial Causal Inventory
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run the Package 162 handoff before applying its files
+**Current next action:** Prepare the batch-576 causal-inventory handoff
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -775,6 +775,16 @@ deferring only exact local candle defects and verified causal no-price results.
 The command retains hard stops for all systemic failures and separately checks
 SQLite read-only integrity. Run it at the Package 161 GitHub baseline before
 applying Package 162, then return only its redacted report and integrity line.
+
+The Package 162 sweep report is valid at SHA-256
+`356feed607a4d8a235757818718c443caf3b42f85b5d8bd82d2727b4ff9bfee2`.
+It inserted 13,640,007 candles, advanced coverage from batch 108 through 575,
+and halted safely at batch 576 with 26 batches remaining. Two deferable
+failures are already stored in the uncovered stopping batch alongside at least
+one blocking `APIError`, so the one-failure diagnostic is inapplicable.
+Package 163 implements a read-only aggregate causal inventory for that partial
+checkpoint. Prepare its offline handoff next; SQLite integrity remains
+unverified because the requested line was not returned.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

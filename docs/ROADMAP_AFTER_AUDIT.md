@@ -1176,3 +1176,13 @@ evidence, resumes its 19 missing members, and uses the exact 493-batch budget
 through batch 601. Verified no-price and local candle defects may be deferred;
 systemic failures still halt. Return only the redacted sweep report and SQLite
 integrity before aggregate remediation is designed.
+
+## Phase 7 Package 163 checkpoint
+
+The optimized sweep reached batch 575 and halted at partial batch 576 with 26
+batches remaining. The redacted accounting proves that the stopping checkpoint
+contains two deferable outcomes plus at least one blocking `APIError`, so the
+existing exactly-one-failure diagnostic cannot select safely. A new offline
+partial causal inventory now groups all stored retryable signatures and their
+exact sweep disposition without identities, provider access, SQLite, or state
+mutation. Prepare one batch-576 operational handoff next.

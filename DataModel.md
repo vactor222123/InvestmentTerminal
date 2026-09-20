@@ -954,6 +954,20 @@ inference. `FAILED` is reserved for preflight or validation failure. The report
 contains no symbol, currency, price, path, provider text, exception message,
 raw row, or candle value.
 
+## Manifest Partial Causal Inventory
+
+The schema-version-1 `MANIFEST_PARTIAL_CAUSAL_INVENTORY` report binds one
+proper partial checkpoint to manifest, batch, request, and requested-window
+evidence. Coverage separates requested, checkpoint, missing, success, empty,
+retryable, final, deferable, and blocking counts. `causal_signatures` groups
+retryable failures by optional stored category, bounded allowlisted
+exception-type chain, exact
+`DEFERABLE | BLOCKING` sweep disposition, and count. Legacy null evidence uses
+null category, an empty chain, and blocking disposition; it is never inferred.
+The report excludes identities, currencies, prices, paths, private outer
+failure-type strings, provider text, exception messages, raw rows, and candle
+values.
+
 ## Stored No-Price Terminal Policy
 
 Checkpoint schema version 4 additionally represents policy

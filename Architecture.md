@@ -679,6 +679,15 @@ remains explicitly unavailable. The boundary has no provider, SQLite,
 repository, importer, or checkpoint-write dependency and grants no terminal
 transition or later-batch authority.
 
+`ManifestPartialCausalInventoryDiagnostic` is the multiple-failure companion
+boundary. It validates one proper partial manifest checkpoint and groups every
+retryable failure by stored schema-4 causal category, complete
+allowlisted type chain, and the collection sweep's exact deferable/blocking
+predicate. The private outer failure type is not copied to its aggregate
+report, which contains no member identity or value. The boundary has no
+provider, cache, SQLite, repository, importer, checkpoint
+writer, retry, terminal transition, or later-batch authority.
+
 Stored at-failure `NO_PRICE_DATA` evidence uses a distinct terminal policy,
 not the existing reproduced-evidence policy. The implemented
 `STORED_YAHOO_NO_PRICE_DATA_V1` boundary verifies strict diagnostic bytes and
