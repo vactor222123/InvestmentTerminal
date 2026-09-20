@@ -652,6 +652,13 @@ Implement one reusable evidence-bound partial-timeout retry next. It must select
 only the unique timeout, attempt it once, preserve every unrelated outcome, and
 publish redacted evidence before collection resumes.
 
+Package 165 implements that one-attempt boundary. Strict immutable-inventory
+and current-checkpoint parity precede database/provider composition; only the
+unique recognized timeout is selected, and only its schema-4 outcome may be
+replaced. The redacted result distinguishes a cleared/deferable outcome from a
+still-blocking systemic failure. Prepare one operator handoff next; collection
+resume remains a separate gate.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

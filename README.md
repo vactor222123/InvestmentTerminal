@@ -302,6 +302,12 @@ One manifest-bound batch execution:
 the private manifest, selected index, and request checksum before executing only
 that request through the existing resumable ingestion boundary.
 
+Evidence-bound partial timeout retry:
+`python -m investment_terminal.cli.manifest_partial_timeout_retry`. It verifies
+an immutable redacted causal inventory against the current private checkpoint,
+retries only the unique stored timeout once, and atomically preserves the new
+outcome without processing unrelated failures or missing members.
+
 Bounded manifest drain:
 `python -m investment_terminal.cli.manifest_batch_drain`. It resumes from
 validated private per-batch checkpoints and processes at most 100 explicitly

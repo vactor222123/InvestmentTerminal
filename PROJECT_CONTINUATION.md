@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `b0d2f28156ceee9b05d7f0be8711540ecba2ca03`
-**Current local package:** Phase 7 Package 164 - Batch-576 Timeout Retry Audit
+**Current GitHub baseline:** `db28c798c38db3430754199ee51ea965cabc5d6f`
+**Current local package:** Phase 7 Package 165 - Partial Timeout Retry
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement one evidence-bound batch-576 timeout retry
+**Current next action:** Prepare the controlled batch-576 timeout-retry handoff
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -795,6 +795,14 @@ repeat would halt before provider access, while the general batch retry would
 also repeat both deferable outcomes. Implement a separate evidence-bound
 one-time partial-timeout retry next; do not resume collection until its
 redacted result is reviewed. SQLite integrity remains unverified.
+
+Package 165 implements that reusable one-attempt boundary. It verifies strict
+inventory bytes/checksum and exact current checkpoint parity before runtime
+composition, selects only the unique recognized timeout, preserves every other
+outcome and missing member, and atomically replaces only the selected schema-4
+outcome. Its redacted report distinguishes `READY_FOR_SWEEP` from `BLOCKED`.
+Prepare one exact-baseline user handoff next; do not resume collection in the
+same command.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

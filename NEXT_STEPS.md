@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ b0d2f28156ceee9b05d7f0be8711540ecba2ca03`
+**Current repository baseline:** `develop @ db28c798c38db3430754199ee51ea965cabc5d6f`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -197,6 +197,7 @@
 **Phase 7 Package 162 optimized collection sweep:** COMPLETE - HALTED AT 576
 **Phase 7 Package 163 partial causal inventory:** COMPLETE
 **Phase 7 Package 164 batch-576 timeout retry audit:** COMPLETE
+**Phase 7 Package 165 evidence-bound partial timeout retry:** COMPLETE
 
 ## Current State
 
@@ -204,13 +205,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement one evidence-bound partial-timeout retry for batch 576. It must use
-the immutable causal-inventory report to select only the unique stored blocking
-`TIMEOUT`, make at most one production-path retry, leave the deferable
-`NO_PRICE_DATA` and `RESPONSE_OHLC` outcomes untouched, and atomically preserve
-the result in the private checkpoint. Do not resume the sweep or execute later
-batches until the redacted retry result is reviewed. The prior sweep's
-separately requested SQLite integrity remains unverified.
+Prepare one exact-baseline operational handoff for the evidence-bound batch-576
+timeout retry. It must validate the immutable causal-inventory checksum, retry
+only the unique stored `TIMEOUT`, preserve the two deferable failures and two
+missing members, validate the redacted report and private checkpoint aggregate
+shape, and report read-only SQLite integrity. Do not resume the sweep or execute
+later batches in the same command.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

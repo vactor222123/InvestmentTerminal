@@ -688,14 +688,15 @@ report, which contains no member identity or value. The boundary has no
 provider, cache, SQLite, repository, importer, checkpoint
 writer, retry, terminal transition, or later-batch authority.
 
-The batch-576 inventory establishes a separate transient-retry requirement.
-A stored blocking `TIMEOUT` cannot be retried by the collection sweep, while a
-general batch retry would also repeat unrelated deferable outcomes. The
-selected next boundary is therefore a manifest- and immutable-inventory-bound
-partial timeout retry. It may internally select only one exact stored timeout,
-make one production-path attempt, and atomically replace only that private
-outcome. Timeout remains blocking; the boundary grants neither automatic retry
-loops nor collection-resume authority.
+The implemented manifest- and immutable-inventory-bound partial timeout retry
+handles the distinct batch-576 transient-retry requirement. A stored blocking
+`TIMEOUT` cannot be retried by the collection sweep, while a general batch retry
+would also repeat unrelated deferable outcomes. The separate operation verifies
+exact checkpoint/inventory parity, internally selects only one non-redacted
+timeout, makes one production-path attempt, and atomically replaces only that
+private outcome. Repeated timeout and other systemic evidence remain blocking;
+the boundary grants neither automatic retry loops nor collection-resume
+authority.
 
 Stored at-failure `NO_PRICE_DATA` evidence uses a distinct terminal policy,
 not the existing reproduced-evidence policy. The implemented
