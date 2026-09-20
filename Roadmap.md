@@ -659,6 +659,12 @@ replaced. The redacted result distinguishes a cleared/deferable outcome from a
 still-blocking systemic failure. Prepare one operator handoff next; collection
 resume remains a separate gate.
 
+Package 166 prepares the exact-baseline operator handoff for that one attempt.
+It validates all batch-576 evidence and aggregate state before runtime access,
+proves every non-target outcome is preserved after the attempt, validates the
+redacted result, and checks SQLite integrity read-only. Execute it once and
+review the result before separately authorizing any collection resume.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

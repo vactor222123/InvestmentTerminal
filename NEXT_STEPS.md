@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ db28c798c38db3430754199ee51ea965cabc5d6f`
+**Current repository baseline:** `develop @ 440dd4856437ee9eeac1321778130f4129fbe99d`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -198,6 +198,7 @@
 **Phase 7 Package 163 partial causal inventory:** COMPLETE
 **Phase 7 Package 164 batch-576 timeout retry audit:** COMPLETE
 **Phase 7 Package 165 evidence-bound partial timeout retry:** COMPLETE
+**Phase 7 Package 166 partial timeout retry handoff:** COMPLETE - READY FOR USER EXECUTION
 
 ## Current State
 
@@ -205,12 +206,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Prepare one exact-baseline operational handoff for the evidence-bound batch-576
-timeout retry. It must validate the immutable causal-inventory checksum, retry
-only the unique stored `TIMEOUT`, preserve the two deferable failures and two
-missing members, validate the redacted report and private checkpoint aggregate
-shape, and report read-only SQLite integrity. Do not resume the sweep or execute
-later batches in the same command.
+Run the Package 166 exact-baseline PowerShell handoff once. Return only
+`C:\runtime\reports\manifest_batch_0576_timeout_retry_001.json` and the printed
+`SQLite integrity: ok` line. Do not resume the sweep or retry another outcome
+until the redacted retry disposition is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

@@ -1186,3 +1186,12 @@ existing exactly-one-failure diagnostic cannot select safely. A new offline
 partial causal inventory now groups all stored retryable signatures and their
 exact sweep disposition without identities, provider access, SQLite, or state
 mutation. Prepare one batch-576 operational handoff next.
+
+## Phase 7 Package 166 checkpoint
+
+The returned aggregate inventory proved one unique blocking timeout alongside
+two deferable failures. The evidence-bound one-attempt implementation is now
+paired with an exact-baseline ASCII-only PowerShell handoff that validates
+inventory bytes, private checkpoint parity, non-target preservation, redacted
+result shape, and read-only SQLite integrity. Run it once; collection resume is
+a separate gate after report review.
