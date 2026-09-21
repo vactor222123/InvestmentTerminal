@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `31bb14f5f88a885acad7176313b1b32635a5654b`
-**Current local package:** Phase 7 Package 168 - Timeout Retry Result
+**Current GitHub baseline:** `d5d9281f4558f15f6598beb8b8e966b983615fa4`
+**Current local package:** Phase 7 Package 169 - Remaining Collection Sweep Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Prepare the remaining 26-batch sweep handoff
+**Current next action:** Run the remaining 26-batch sweep handoff
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -825,6 +825,13 @@ The unique timeout cleared after 1,573 candles were inserted: batch 576 now has
 failures. SQLite integrity is `ok`. Package 168 records this result and selects
 an exact 26-batch handoff for batches 576–601 next; no sweep ran in the result
 package.
+
+Package 169 prepares that exact-baseline, ASCII-only PowerShell handoff. It
+validates immutable retry evidence and current batch-576 state, derives the
+checkpoint directory without the PowerShell 5.1 `Split-Path` ambiguity, runs
+one schema-2 sweep with `max_batches=26`, validates the redacted result, and
+checks SQLite integrity read-only. Run it before applying Package 169 and
+return only the redacted report plus `SQLite integrity: ok`.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

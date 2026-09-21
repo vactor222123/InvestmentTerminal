@@ -675,6 +675,11 @@ were inserted, batch 576 now has zero blocking failures, and SQLite integrity
 is `ok`. Two deferable failures and two missing members remain explicit. Prepare
 one separate exact-baseline 26-batch sweep handoff for batches 576–601 next.
 
+Package 169 prepares that exact-baseline operational handoff. It binds the
+successful timeout-retry report, verifies the current batch-576 aggregate, and
+authorizes exactly one schema-2 sweep over the remaining 26 batches. Execute it
+before applying Package 169; aggregate failure inventory remains a later gate.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

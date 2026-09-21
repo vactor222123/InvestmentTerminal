@@ -1210,3 +1210,10 @@ The evidence-bound retry cleared the unique batch-576 timeout and inserted
 failures, two missing members, and zero blocking failures; SQLite integrity is
 `ok`. Prepare a separate exact-baseline handoff with a 26-batch budget to resume
 batch 576 and continue through batch 601. Do not execute it in this package.
+
+## Phase 7 Package 169 checkpoint
+
+Prepare one exact-baseline, ASCII-only operational handoff for batches 576–601.
+The command validates immutable retry evidence and current batch-576 state,
+uses a 26-batch budget, validates the schema-2 redacted result, and checks
+SQLite integrity read-only. Run it before applying Package 169.
