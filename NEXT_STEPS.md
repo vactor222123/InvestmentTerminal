@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ f3ed7bac471f598fc368d4a1b309fc4982c16848`
+**Current repository baseline:** `develop @ 31bb14f5f88a885acad7176313b1b32635a5654b`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -200,6 +200,7 @@
 **Phase 7 Package 165 evidence-bound partial timeout retry:** COMPLETE
 **Phase 7 Package 166 partial timeout retry handoff:** COMPLETE - READY FOR USER EXECUTION
 **Phase 7 Package 167 timeout retry execution rebaseline:** COMPLETE - READY FOR USER EXECUTION
+**Phase 7 Package 168 batch-576 timeout retry result:** COMPLETE - READY FOR SWEEP HANDOFF
 
 ## Current State
 
@@ -207,10 +208,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run the Package 167 rebaselined PowerShell handoff once. Return only
-`C:\runtime\reports\manifest_batch_0576_timeout_retry_001.json` and the printed
-`SQLite integrity: ok` line. Do not resume the sweep or retry another outcome
-until the redacted retry disposition is reviewed.
+Prepare one exact-baseline operational handoff for the remaining collection
+sweep. It must resume the two missing members in batch 576, use the exact
+26-batch budget through batch 601, preserve both existing deferable outcomes,
+retain all systemic hard stops, validate the redacted report, and report
+read-only SQLite integrity. Do not execute the sweep in the result package.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

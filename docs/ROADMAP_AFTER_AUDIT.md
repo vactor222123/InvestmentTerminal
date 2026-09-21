@@ -1202,3 +1202,11 @@ Package 166 was applied before its operational block ran, so the original exact
 HEAD guard is now stale. Only that guard is rebound to the Package 166 GitHub
 commit; every runtime evidence binding and the one-time retry scope remains
 unchanged. Execute the rebaselined block before applying Package 167.
+
+## Phase 7 Package 168 checkpoint
+
+The evidence-bound retry cleared the unique batch-576 timeout and inserted
+1,573 candles. The checkpoint now contains 16 successes, two deferable
+failures, two missing members, and zero blocking failures; SQLite integrity is
+`ok`. Prepare a separate exact-baseline handoff with a 26-batch budget to resume
+batch 576 and continue through batch 601. Do not execute it in this package.

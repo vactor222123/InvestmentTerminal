@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `f3ed7bac471f598fc368d4a1b309fc4982c16848`
-**Current local package:** Phase 7 Package 167 - Timeout Retry Rebaseline
+**Current GitHub baseline:** `31bb14f5f88a885acad7176313b1b32635a5654b`
+**Current local package:** Phase 7 Package 168 - Timeout Retry Result
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run the controlled batch-576 timeout retry once
+**Current next action:** Prepare the remaining 26-batch sweep handoff
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -817,6 +817,14 @@ Package 166 GitHub commit. All runtime checksums, causal evidence, one-attempt
 scope, report validation, preservation checks, and sweep prohibition remain
 unchanged. Run it once before applying Package 167 and return only the redacted
 report plus SQLite integrity.
+
+The Package 167 operation returned a valid `READY_FOR_SWEEP` report at SHA-256
+`59b8d58ac76903edbb03f55ee6ec8f79220ad0f38ecedb156412170c2d1385aa`.
+The unique timeout cleared after 1,573 candles were inserted: batch 576 now has
+16 successes, two deferable failures, two missing members, and zero blocking
+failures. SQLite integrity is `ok`. Package 168 records this result and selects
+an exact 26-batch handoff for batches 576–601 next; no sweep ran in the result
+package.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable
