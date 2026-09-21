@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `d5d9281f4558f15f6598beb8b8e966b983615fa4`
-**Current local package:** Phase 7 Package 169 - Remaining Collection Sweep Handoff
+**Current GitHub baseline:** `46ecae73235492ba7479003b98b61f1800074222`
+**Current local package:** Phase 7 Package 170 - Collection Failure Inventory
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run the remaining 26-batch sweep handoff
+**Current next action:** Prepare the collection failure inventory handoff
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -832,6 +832,14 @@ checkpoint directory without the PowerShell 5.1 `Split-Path` ambiguity, runs
 one schema-2 sweep with `max_batches=26`, validates the redacted result, and
 checks SQLite integrity read-only. Run it before applying Package 169 and
 return only the redacted report plus `SQLite integrity: ok`.
+
+The returned sweep report is `COMPLETE` at SHA-256
+`b8e7504cd1a6ff8b5755ed60ffde9ff20bd70a32111ea845e624105ab65be0dc`:
+all 601 batches are covered, 594,088 candles were inserted in the final run,
+and 124 deferable failures remain explicit. Package 170 implements a read-only,
+checksum-bound aggregate inventory over every private checkpoint. SQLite
+integrity was not returned and remains unverified. Prepare its exact-baseline
+operator handoff next.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

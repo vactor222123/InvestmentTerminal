@@ -997,3 +997,15 @@ checksum, and aggregate requested/checkpoint/missing/success/empty/retryable/
 final/transitioned/already-final counts. It excludes symbols, currencies,
 prices, paths, provider payloads, exception messages, and raw candle evidence.
 Existing reproduced no-price and numeric/OHLC policy contracts are unchanged.
+
+## Completed Collection Failure Inventory
+
+The schema-version-1 `MANIFEST_COLLECTION_FAILURE_INVENTORY` report binds the
+manifest checksum and exact completed sweep-report SHA-256. Coverage counts
+batches, complete batches, requested/checkpoint/missing outcomes, successes,
+empty outcomes, retryable failures, final failures, and deferable/blocking
+failures. Retryable signatures contain only optional stored causal category,
+bounded allowlisted exception-type chain, `DEFERABLE` disposition, and count.
+Final signatures contain only failure category, isolation-policy identity, and
+count. The report excludes symbols, currencies, prices, paths, provider text,
+exception messages, evidence checksums, raw rows, and candle values.

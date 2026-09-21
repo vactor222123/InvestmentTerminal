@@ -308,6 +308,11 @@ an immutable redacted causal inventory against the current private checkpoint,
 retries only the unique stored timeout once, and atomically preserves the new
 outcome without processing unrelated failures or missing members.
 
+Completed-sweep failure inventory:
+`python -m investment_terminal.cli.manifest_collection_failure_inventory`. It
+verifies the checksum-bound completed sweep and all private request checkpoints,
+then writes only aggregate retryable-causal and terminal-policy evidence.
+
 Bounded manifest drain:
 `python -m investment_terminal.cli.manifest_batch_drain`. It resumes from
 validated private per-batch checkpoints and processes at most 100 explicitly

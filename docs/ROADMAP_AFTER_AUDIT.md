@@ -1217,3 +1217,11 @@ Prepare one exact-baseline, ASCII-only operational handoff for batches 576–601
 The command validates immutable retry evidence and current batch-576 state,
 uses a 26-batch budget, validates the schema-2 redacted result, and checks
 SQLite integrity read-only. Run it before applying Package 169.
+
+## Phase 7 Package 170 checkpoint
+
+The remaining sweep completed all 601 batches and retained 124 explicit
+deferable failures. Implement one read-only checksum-bound aggregate inventory
+over the complete private checkpoint set. Its report groups only causal and
+terminal-policy evidence and exposes no identity or value. Operational
+execution remains a separate exact-baseline handoff.

@@ -707,3 +707,10 @@ stored schema-4 evidence. It may change only that outcome to `FINAL_FAILED` and
 records `causal_evidence_diagnostic_checksum`. It has no provider, SQLite,
 repository, importer, sweep, or later-batch authority. Existing reproduced
 no-price and numeric/OHLC policy meanings remain unchanged.
+
+The completed-sweep failure inventory is a separate read-only operations
+boundary over the immutable manifest, every request-bound checkpoint, and the
+checksum-bound completed sweep report. It verifies exact full coverage before
+grouping retryable causal evidence and final isolation policies into a redacted
+aggregate. It has no provider, cache, SQLite, repository, importer, checkpoint
+writer, retry, terminalization, analysis, scheduling, or trading authority.

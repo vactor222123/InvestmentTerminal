@@ -202,6 +202,7 @@
 **Phase 7 Package 167 timeout retry execution rebaseline:** COMPLETE - READY FOR USER EXECUTION
 **Phase 7 Package 168 batch-576 timeout retry result:** COMPLETE - READY FOR SWEEP HANDOFF
 **Phase 7 Package 169 remaining collection sweep handoff:** COMPLETE - READY FOR USER EXECUTION
+**Phase 7 Package 170 collection failure inventory:** COMPLETE
 
 ## Current State
 
@@ -209,10 +210,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run the exact-baseline operational handoff for the remaining collection sweep.
-It resumes the two missing members in batch 576, uses the exact 26-batch budget
-through batch 601, preserves deferable outcomes, retains systemic hard stops,
-validates the redacted report, and reports read-only SQLite integrity.
+Prepare one exact-baseline operational handoff for the completed-sweep failure
+inventory. It must validate all 601 private checkpoints and the immutable sweep
+report, emit only redacted aggregate failure evidence, and check SQLite
+integrity read-only.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

@@ -680,6 +680,12 @@ successful timeout-retry report, verifies the current batch-576 aggregate, and
 authorizes exactly one schema-2 sweep over the remaining 26 batches. Execute it
 before applying Package 169; aggregate failure inventory remains a later gate.
 
+The Package 169 operation completes sweep coverage for all 601 batches and
+inserts 594,088 candles in its final 26-batch run. Package 170 implements the
+separate read-only aggregate failure inventory, binding all checkpoints to the
+manifest and immutable completed-sweep report without exposing identities.
+Prepare one exact-baseline operational handoff for that inventory next.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
