@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 440dd4856437ee9eeac1321778130f4129fbe99d`
+**Current repository baseline:** `develop @ f3ed7bac471f598fc368d4a1b309fc4982c16848`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -199,6 +199,7 @@
 **Phase 7 Package 164 batch-576 timeout retry audit:** COMPLETE
 **Phase 7 Package 165 evidence-bound partial timeout retry:** COMPLETE
 **Phase 7 Package 166 partial timeout retry handoff:** COMPLETE - READY FOR USER EXECUTION
+**Phase 7 Package 167 timeout retry execution rebaseline:** COMPLETE - READY FOR USER EXECUTION
 
 ## Current State
 
@@ -206,7 +207,7 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run the Package 166 exact-baseline PowerShell handoff once. Return only
+Run the Package 167 rebaselined PowerShell handoff once. Return only
 `C:\runtime\reports\manifest_batch_0576_timeout_retry_001.json` and the printed
 `SQLite integrity: ok` line. Do not resume the sweep or retry another outcome
 until the redacted retry disposition is reviewed.

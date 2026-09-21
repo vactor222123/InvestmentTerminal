@@ -4,8 +4,8 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `440dd4856437ee9eeac1321778130f4129fbe99d`
-**Current local package:** Phase 7 Package 166 - Partial Timeout Retry Handoff
+**Current GitHub baseline:** `f3ed7bac471f598fc368d4a1b309fc4982c16848`
+**Current local package:** Phase 7 Package 167 - Timeout Retry Rebaseline
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
 **Current next action:** Run the controlled batch-576 timeout retry once
 
@@ -811,6 +811,12 @@ members remain unchanged, validates the redacted report, and checks SQLite
 integrity read-only. Run it once at the Package 165 GitHub baseline and return
 only its report plus the integrity line. Collection resume remains a separate
 gate.
+
+Package 167 rebinds only that operator block's repository guard to the applied
+Package 166 GitHub commit. All runtime checksums, causal evidence, one-attempt
+scope, report validation, preservation checks, and sweep prohibition remain
+unchanged. Run it once before applying Package 167 and return only the redacted
+report plus SQLite integrity.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

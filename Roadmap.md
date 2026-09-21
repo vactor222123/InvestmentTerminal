@@ -665,6 +665,11 @@ proves every non-target outcome is preserved after the attempt, validates the
 redacted result, and checks SQLite integrity read-only. Execute it once and
 review the result before separately authorizing any collection resume.
 
+Package 167 rebinds only the handoff's exact repository guard after Package 166
+was applied before runtime execution. All evidence checksums, selected retry,
+privacy rules, and sweep exclusions remain unchanged. Run the rebaselined
+command once before applying Package 167.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

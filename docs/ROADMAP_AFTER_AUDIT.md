@@ -1195,3 +1195,10 @@ paired with an exact-baseline ASCII-only PowerShell handoff that validates
 inventory bytes, private checkpoint parity, non-target preservation, redacted
 result shape, and read-only SQLite integrity. Run it once; collection resume is
 a separate gate after report review.
+
+## Phase 7 Package 167 checkpoint
+
+Package 166 was applied before its operational block ran, so the original exact
+HEAD guard is now stale. Only that guard is rebound to the Package 166 GitHub
+commit; every runtime evidence binding and the one-time retry scope remains
+unchanged. Execute the rebaselined block before applying Package 167.

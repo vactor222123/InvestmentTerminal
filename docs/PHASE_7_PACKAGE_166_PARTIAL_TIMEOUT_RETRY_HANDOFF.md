@@ -10,6 +10,19 @@
 develop @ 440dd4856437ee9eeac1321778130f4129fbe99d
 ```
 
+## Package 167 Execution Rebaseline
+
+Package 166 was applied before its operational block was run. Package 167
+therefore rebinds only the command's repository guard to the new exact GitHub
+baseline:
+
+```text
+develop @ f3ed7bac471f598fc368d4a1b309fc4982c16848
+```
+
+No runtime binding, checksum, selected operation, validation rule, report
+contract, or scope permission changes.
+
 ## Scope
 
 Package 165 implemented one evidence-bound attempt for the unique blocking
@@ -26,15 +39,15 @@ check. It does not resume the collection sweep or execute batch 577.
 
 ## Execution Order
 
-Run this block **before applying Package 166**, because it deliberately
-requires the Package 165 GitHub baseline above. The PowerShell source and all
-emitted command messages are ASCII-only.
+Run this block **before applying Package 167**. It deliberately requires the
+Package 166 GitHub baseline recorded in the rebaseline section above. The
+PowerShell source and all emitted command messages are ASCII-only.
 
 ```powershell
 $ErrorActionPreference = "Stop"
 
 $Repository = "C:\Users\tu\Desktop\InvestmentTerminal"
-$ExpectedHead = "440dd4856437ee9eeac1321778130f4129fbe99d"
+$ExpectedHead = "f3ed7bac471f598fc368d4a1b309fc4982c16848"
 $ExpectedBranch = "develop"
 $ManifestPath = "C:\runtime\data\market_batch_manifest_10y.json"
 $CheckpointSearchRoot = "C:\runtime\data"
