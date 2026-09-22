@@ -736,3 +736,13 @@ inventory-bound final evidence. Its distinct
 existing no-price policy. Checkpoint files are separate transaction boundaries;
 the operation never claims cross-file atomicity and has no Yahoo, cache, SQLite,
 repository, importer, diagnostic, analysis, scheduling, or trading authority.
+
+Package 177 adds a separate read-only reconciliation boundary after that
+transition. `ManifestPostTransitionResidualInventoryService` checksum-binds the
+immutable source inventory and completed transition report, validates their
+manifest, provider, policy, status, budget, and coverage relationships, and
+reconciles the complete ordered checkpoint set. It emits deterministic
+aggregate coverage, residual retryable signatures, and final signatures only.
+It does not reuse or weaken the original sweep-bound inventory contract and has
+no Yahoo, cache, candle persistence, SQLite, retry, terminalization, checkpoint
+write, diagnostic, analysis, scheduling, or trading authority.

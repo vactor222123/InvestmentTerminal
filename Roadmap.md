@@ -27,6 +27,16 @@
 - Expose only aggregate current coverage and the 11 preserved causal
   signatures before selecting automated per-series diagnostics.
 
+## Phase 7 post-transition residual inventory — Package 177
+
+- Implement the separate checksum-bound read-only service and CLI selected by
+  Package 176.
+- Reconcile both immutable source reports with the complete current checkpoint
+  set and emit privacy-safe aggregate coverage plus deterministic signatures.
+- Keep Yahoo, SQLite, retries, terminalization, and checkpoint writes outside
+  the boundary.
+- Prepare one exact-baseline ASCII-only operational handoff next.
+
 **Status:** Canonical Roadmap  
 **Updated after:** Sprint 31 — Evidence Integrity & Delivery Hardening  
 **Current development branch:** `develop`

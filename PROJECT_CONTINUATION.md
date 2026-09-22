@@ -1,5 +1,16 @@
 # InvestmentTerminal — Project Continuation
 
+## Package 177 — post-transition residual inventory
+
+The selected read-only schema-version-1 boundary is implemented as
+`ManifestPostTransitionResidualInventoryService` and a dedicated CLI. It binds
+the manifest, complete ordered checkpoints, immutable source inventory, and
+completed transition report before emitting deterministic aggregate coverage,
+residual retryable signatures, and final signatures. It does not weaken the
+original sweep inventory, expose private identities, contact Yahoo, access
+SQLite, retry outcomes, terminalize failures, or write checkpoints. The next
+package is one exact-baseline ASCII-only operational handoff for this CLI.
+
 ## Package 176 — post-transition residual inventory audit
 
 The original failure inventory cannot be rerun against post-transition
@@ -16,10 +27,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `09774b9e99f1279af741c3b1c483e4af32907a69`
-**Current local package:** Phase 7 Package 176 - Post-Transition Residual Inventory Audit
+**Current GitHub baseline:** `ec9807343a3c4e0092f91ddf89c9b026357a0bdb`
+**Current local package:** Phase 7 Package 177 - Post-Transition Residual Inventory
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement the read-only post-transition residual inventory
+**Current next action:** Prepare the exact-baseline read-only residual-inventory handoff
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

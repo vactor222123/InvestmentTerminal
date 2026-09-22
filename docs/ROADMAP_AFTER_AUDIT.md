@@ -30,6 +30,17 @@ and full current checkpoint set. It records aggregate coverage and residual
 causal signatures only. Provider access, SQLite, checkpoint mutation, retry,
 and terminalization remain outside the boundary.
 
+## Package 177 post-transition residual inventory
+
+Package 177 implements the selected schema-version-1 read-only service and
+CLI. It checksum-binds the immutable source inventory and completed transition
+report, verifies their manifest and policy bindings, reconciles the complete
+ordered checkpoint set, and emits only aggregate current coverage, residual
+retryable causal signatures, and final signatures. It neither weakens the
+original inventory nor contacts Yahoo, reads SQLite, retries outcomes,
+terminalizes failures, or writes checkpoints. The next package is an
+exact-baseline ASCII-only operational handoff for one private execution.
+
 ## Purpose
 
 This document defines the development order after the complete product alignment audit.

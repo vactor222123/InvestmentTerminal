@@ -1038,3 +1038,23 @@ coverage contains eligible, already-final, current transitioned,
 total final, and remaining counts. `COMPLETE`, `BUDGET_EXHAUSTED`, and `FAILED`
 remain distinct. The report contains no identity, currency, price, path,
 provider text, exception message, or candle value.
+
+## Manifest Post-Transition Residual Inventory Report
+
+`MANIFEST_POST_TRANSITION_RESIDUAL_INVENTORY` schema version 1 is a detached,
+read-only aggregate evidence document. It binds one manifest checksum, one
+immutable source-inventory checksum, one completed transition-report checksum,
+and `COMPLETED_SWEEP_STORED_YAHOO_NO_PRICE_DATA_V1`.
+
+Its `coverage` object records batch, requested, checkpoint-outcome, missing,
+success, empty, retryable-failure, total-final, transition-policy-final, and
+other-final counts. `residual_causal_signatures` contain only optional stored
+category, an allowlisted exception-type chain, `DEFERABLE`, and count.
+`final_signatures` contain only optional category, optional policy, and count.
+Both arrays have deterministic ordering.
+
+The report never contains symbols, currencies, prices, paths, provider text,
+exception messages, request payloads, candle values, or per-series evidence.
+`SUCCESS` has complete bindings and aggregates; `FAILED` is a schema-valid
+redacted CLI result with null source bindings and coverage. The report does not
+authorize retry, terminalization, checkpoint mutation, or market-data access.

@@ -1,16 +1,15 @@
 # Investment Terminal — Next Steps
 
-## Package 176 immediate next step
+## Package 177 immediate next step
 
-Implement the audited schema-version-1
-`MANIFEST_POST_TRANSITION_RESIDUAL_INVENTORY` as a separate read-only service
-and CLI. Bind the manifest, immutable source inventory, completed transition
-report, and full checkpoint set before emitting aggregate current status and
-the 11 preserved retryable signatures. Do not weaken or reuse the original
-sweep-bound inventory contract. Yahoo, SQLite, retries, and checkpoint writes
-remain excluded.
+Prepare one exact-baseline, ASCII-only PowerShell handoff for a single read-only
+`MANIFEST_POST_TRANSITION_RESIDUAL_INVENTORY` execution. Bind the private
+manifest, complete checkpoint directory, immutable source inventory, and
+completed transition report with their exact SHA-256 values before invoking
+the Package 177 CLI. Return only the redacted report. Yahoo, SQLite, retries,
+terminalization, and checkpoint writes remain excluded.
 
-**Current repository baseline:** `develop @ 09774b9e99f1279af741c3b1c483e4af32907a69`
+**Current repository baseline:** `develop @ ec9807343a3c4e0092f91ddf89c9b026357a0bdb`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -216,6 +215,8 @@ remain excluded.
 **Phase 7 Package 171 collection failure inventory handoff:** COMPLETE - READY FOR USER EXECUTION
 **Phase 7 Package 172 post-sweep failure remediation audit:** COMPLETE
 **Phase 7 Package 173 completed-sweep no-price transition:** COMPLETE
+**Phase 7 Package 176 post-transition residual inventory audit:** COMPLETE
+**Phase 7 Package 177 post-transition residual inventory:** COMPLETE
 
 ## Current State
 
@@ -223,12 +224,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Prepare one exact-baseline operational handoff for the inventory-bound
-completed-sweep no-price transition. It must validate the private manifest,
-complete checkpoint set, and immutable inventory checksum before invoking the
-offline CLI with an explicit checkpoint budget. Return only the redacted report;
-Yahoo, SQLite, numeric/OHLC diagnostics, and legacy revalidation remain outside
-that handoff.
+Prepare one exact-baseline operational handoff for the read-only
+post-transition residual inventory. It must validate the private manifest,
+complete checkpoint set, immutable inventory checksum, and completed transition
+report checksum before invoking the Package 177 CLI. Return only the redacted
+report; Yahoo, SQLite, retries, terminalization, and checkpoint writes remain
+outside that handoff.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
