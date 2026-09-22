@@ -20,6 +20,16 @@ The next bounded package audits a read-only post-transition residual inventory;
 it does not restart collection, contact Yahoo, mutate SQLite, or infer missing
 causality for legacy evidence.
 
+## Package 176 residual-inventory audit
+
+The existing collection-failure inventory remains immutable and cannot be
+recomputed from the old sweep report after legitimate checkpoint transitions.
+The selected next implementation is a distinct read-only post-transition
+inventory bound to the source inventory, completed transition report, manifest,
+and full current checkpoint set. It records aggregate coverage and residual
+causal signatures only. Provider access, SQLite, checkpoint mutation, retry,
+and terminalization remain outside the boundary.
+
 ## Purpose
 
 This document defines the development order after the complete product alignment audit.

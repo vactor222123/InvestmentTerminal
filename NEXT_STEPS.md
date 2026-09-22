@@ -1,15 +1,16 @@
 # Investment Terminal — Next Steps
 
-## Package 175 immediate next step
+## Package 176 immediate next step
 
-The completed-sweep `NO_PRICE_DATA` transition is operationally complete: all
-113 eligible outcomes are final, zero eligible outcomes remain, and 11
-non-eligible retryable outcomes were preserved. Audit the smallest read-only
-post-transition residual-inventory boundary next. Keep the eight
-`RESPONSE_OHLC`, two `RESPONSE_NUMERIC`, and one legacy null-causal outcome
-distinct. Do not restart broad collection or contact Yahoo.
+Implement the audited schema-version-1
+`MANIFEST_POST_TRANSITION_RESIDUAL_INVENTORY` as a separate read-only service
+and CLI. Bind the manifest, immutable source inventory, completed transition
+report, and full checkpoint set before emitting aggregate current status and
+the 11 preserved retryable signatures. Do not weaken or reuse the original
+sweep-bound inventory contract. Yahoo, SQLite, retries, and checkpoint writes
+remain excluded.
 
-**Current repository baseline:** `develop @ 9385465ddf6874827f24225432256ed8338de960`
+**Current repository baseline:** `develop @ 09774b9e99f1279af741c3b1c483e4af32907a69`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE

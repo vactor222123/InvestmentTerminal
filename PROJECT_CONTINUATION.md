@@ -1,23 +1,25 @@
 # InvestmentTerminal — Project Continuation
 
-## Package 175 — completed-sweep `NO_PRICE_DATA` transition result
+## Package 176 — post-transition residual inventory audit
 
-The privacy-safe transition report is `COMPLETE`: 113 eligible stored Yahoo
-`NO_PRICE_DATA` outcomes were finalized across 100 checkpoint files, zero remain,
-and failure is null. Together with the immutable pre-transition inventory, the
-state reconciles to 11,892 successes, 116 final failures, and 11 intentionally
-preserved retryable outcomes. No Yahoo or SQLite access occurred. Package 175
-also corrects Package 174's invalid raw-file hash comparison for the canonical
-manifest checksum; the operational failure preceded all mutation.
+The original failure inventory cannot be rerun against post-transition
+checkpoints without violating its exact sweep-report coverage binding. The
+transition exact-repeat already validates all 113 inventory-bound finals and
+preservation of the non-eligible cohort, but it does not emit a durable current
+residual inventory. Package 176 selects a separate read-only, checksum-bound
+schema-version-1 inventory over the manifest, original inventory, completed
+transition report, and full checkpoint set. It will expose only aggregate
+coverage and the 11 residual signatures; Yahoo, SQLite, checkpoint writes,
+retry, and terminalization remain excluded.
 
 **Document role:** Durable project handoff and execution checkpoint
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `9385465ddf6874827f24225432256ed8338de960`
-**Current local package:** Phase 7 Package 175 - Completed-Sweep No-Price Transition Result
+**Current GitHub baseline:** `09774b9e99f1279af741c3b1c483e4af32907a69`
+**Current local package:** Phase 7 Package 176 - Post-Transition Residual Inventory Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit a read-only residual inventory for the 11 preserved retryable outcomes
+**Current next action:** Implement the read-only post-transition residual inventory
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

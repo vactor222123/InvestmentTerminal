@@ -18,6 +18,15 @@
 - Audit a read-only residual inventory next; broad collection, Yahoo access,
   SQLite mutation, and inferred terminalization remain excluded.
 
+## Phase 7 residual inventory audit — Package 176
+
+- Preserve the immutable sweep-bound inventory rather than weakening its
+  pre-transition coverage binding.
+- Add a separate read-only post-transition inventory bound to the manifest,
+  original inventory, completed transition report, and current checkpoints.
+- Expose only aggregate current coverage and the 11 preserved causal
+  signatures before selecting automated per-series diagnostics.
+
 **Status:** Canonical Roadmap  
 **Updated after:** Sprint 31 — Evidence Integrity & Delivery Hardening  
 **Current development branch:** `develop`
