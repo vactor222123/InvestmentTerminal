@@ -1,5 +1,15 @@
 # Investment Terminal — Next Steps
 
+## Weekly candle refresh implementation
+
+The `weekly_candle_refresh` CLI is implemented and locally tested from the
+verified `f11f6736ddadaf523f4ffb6346c9caaa87db1682` baseline. See
+`docs/PHASE_7_WEEKLY_CANDLES.md`. Next, identify the actual private manifest,
+complete source-checkpoint directory, and SQLite database; run one bounded
+live item with a UTC-midnight end and inspect the redacted report plus SQLite
+integrity. Do not assert operational completion, schedule a weekly task, or
+run all selected series until that qualification succeeds.
+
 ## Package 178 immediate next step
 
 Run the Package 178 ASCII-only PowerShell block once at its exact baseline and

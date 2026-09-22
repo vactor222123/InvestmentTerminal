@@ -954,3 +954,11 @@ Shared diagnostic evidence identifies
 `TRAILING_PARTIAL_OHLC_INCONSISTENT`; omission is correctly rejected. Audit a
 separate read-only automatic recovery qualification before ingestion or batch
 20.
+
+## Weekly market-data update checkpoint
+
+The bounded, resumable daily-candle refresh implementation is complete for
+previously successful manifest series. A controlled one-item live run, SQLite
+integrity and repeat verification, then full-universe operational measurement
+remain before a weekly scheduler or analysis-readiness claim. The remaining
+collection defects are tracked separately and do not block this path.

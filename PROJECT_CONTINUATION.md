@@ -1741,3 +1741,14 @@ Verification:
 - focused coverage, calendar, model, and architecture checks: 40 passed;
 - complete local suite: 2720 passed, 4 skipped, 1 existing Starlette warning;
 - `git diff --check`: clean.
+
+## Weekly daily-candle refresh implementation
+
+From exact fresh-clone baseline `f11f6736ddadaf523f4ffb6346c9caaa87db1682`,
+a separate manifest-bound weekly refresh operation and CLI now select only
+successful source series, fetch a bounded overlap-to-exclusive-end window,
+check stored-candle drift, atomically insert new candles and checkpoint each
+series, and emit aggregate redacted evidence. This is implementation and
+local-test evidence, not a claim that the private 11,892-series universe has
+been refreshed. See `docs/PHASE_7_WEEKLY_CANDLES.md` for the operational
+qualification boundary.

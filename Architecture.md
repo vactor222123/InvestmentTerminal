@@ -1,5 +1,17 @@
 # Investment Terminal — Software Architecture
 
+## Weekly candle refresh boundary
+
+The post-bootstrap weekly operation is separate from ten-year collection.
+Operations validate the canonical manifest and complete source checkpoints,
+select only source `SUCCESS` daily series, own a run-specific private atomic
+checkpoint and aggregate redacted report, and stop on rate limiting. The
+existing Yahoo client owns retrieval/projection and the existing candle
+repository owns transactional SQLite insertion. An overlap check refuses
+provider revisions to previously stored OHLCV rather than silently replacing
+historical facts. Indicator calculation consumes repository reads in a later
+boundary; this operation does not interpret investments or schedule itself.
+
 ## Phase 7 eligibility schema-version-4 boundary
 
 Yahoo symbol-currency qualification is a separate operations boundary after

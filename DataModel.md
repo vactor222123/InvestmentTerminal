@@ -1,5 +1,17 @@
 # Investment Terminal — Data Model
 
+## Weekly candle refresh evidence
+
+Private `WEEKLY_CANDLE_REFRESH` checkpoint schema version 1 binds manifest
+checksum, UTC-midnight exclusive end, and selected-success checksum. Outcomes
+are keyed by symbol and record terminal status, stable category, downloaded,
+inserted, duplicate, omitted-trailing, and total stored counts. The separate
+schema-version-1 report aggregates coverage and categories without identities,
+currencies, prices, paths, or raw exceptions. Daily OHLCV remains in the
+existing `candles` SQLite table, unique by symbol/resolution/timestamp and
+queryable through `CandleRepository.get_range`. No new candle schema or
+indicator values are persisted.
+
 ## Eligibility checkpoint/report schema version 4
 
 The distinct complete-drain report uses schema version 1. It aggregates slice,
