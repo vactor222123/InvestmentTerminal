@@ -1,13 +1,29 @@
 # InvestmentTerminal — Project Continuation
 
+## Package 174 — completed-sweep `NO_PRICE_DATA` transition operational handoff
+
+Package 174 is a documentation-only operational handoff for the bounded,
+resumable transition implemented in Package 173. It freezes the exact baseline,
+manifest and immutable-inventory checksums, complete 601-file checkpoint-set
+discovery, a full-run checkpoint budget, and privacy-safe post-run validation.
+
+The handoff transitions only the 113 outcomes proven by the immutable inventory
+to be stored Yahoo `NO_PRICE_DATA`. It validates that the operation reaches
+`COMPLETE`, ending final coverage is 113 of 113, the changed-file count matches
+the report, and the 11 response-shape/legacy retryable outcomes remain outside
+the transition. It does not read or mutate SQLite and does not restart market
+collection. The only artifact the operator returns is
+`manifest_completed_sweep_no_price_transition_001.json`; manifest and
+checkpoint files remain private.
+
 **Document role:** Durable project handoff and execution checkpoint
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `fab4d0d6fe58e2f38e26ea82df06cce8d6b574ec`
-**Current local package:** Phase 7 Package 173 - Completed-Sweep No-Price Transition
+**Current GitHub baseline:** `281b057c46dc8bf24f5c29fb9188b346377d594b`
+**Current local package:** Phase 7 Package 174 - Completed-Sweep No-Price Transition Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Prepare the exact-baseline Package 174 operational handoff
+**Current next action:** Run and review the Package 174 privacy-safe transition report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

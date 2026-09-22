@@ -1,5 +1,14 @@
 # Investment Terminal — Product Roadmap
 
+## Phase 7 operational checkpoint — Package 174
+
+- Run the completed-sweep stored Yahoo `NO_PRICE_DATA` transition on the frozen
+  601-checkpoint set with immutable evidence and a full-set checkpoint ceiling.
+- Require all 113 eligible outcomes to reach the existing final-isolation
+  policy while preserving the 11 non-eligible retryable outcomes.
+- Review the privacy-safe transition report before any new broad collection or
+  further failure classification.
+
 **Status:** Canonical Roadmap  
 **Updated after:** Sprint 31 — Evidence Integrity & Delivery Hardening  
 **Current development branch:** `develop`

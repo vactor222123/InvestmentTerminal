@@ -1,5 +1,16 @@
 # InvestmentTerminal — Roadmap After Audit
 
+## Package 174 operational gate
+
+Package 174 operationalizes the Package 173 transition without changing its
+contract. The full completed-sweep checkpoint set is locally discovered and
+validated, the immutable manifest and inventory are checksum-bound, and the
+checkpoint ceiling is raised to the complete 601-batch scope so all 113
+eligible stored Yahoo `NO_PRICE_DATA` outcomes can be finalized in one bounded
+run. The 11 response-shape and legacy retryable outcomes remain explicitly out
+of scope. Broad collection remains paused until the privacy-safe transition
+report is reviewed.
+
 ## Purpose
 
 This document defines the development order after the complete product alignment audit.
