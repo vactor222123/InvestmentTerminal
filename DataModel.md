@@ -1018,3 +1018,23 @@ current, and ending eligible/transitioned/already-final/remaining counts and
 completion, budget, or failure status. Exact field names and schema version are
 owned by the implementation package; no runtime checkpoint currently supports
 this policy.
+
+## Completed-Sweep No-Price Transition
+
+Checkpoint schema version 4 additionally accepts final policy
+`COMPLETED_SWEEP_STORED_YAHOO_NO_PRICE_DATA_V1`. The outcome retains
+`failure_type=APIError` and `failure_category=NO_PRICE_DATA`; its sole isolation
+evidence field is `collection_failure_inventory_checksum`. The source outcome
+must be a retryable schema-4 failure with recognized stored Yahoo missing-price
+causal evidence. Numeric/OHLC, legacy-null, success, empty, and existing final
+outcomes are not eligible.
+
+The schema-version-1 `MANIFEST_COMPLETED_SWEEP_NO_PRICE_TRANSITION` report binds
+the manifest, immutable inventory checksum, policy, and caller-owned checkpoint
+budget. Starting coverage contains eligible, already-final, and remaining
+counts; current-run evidence contains processed-checkpoint and transitioned
+counts together with the same eligible/already-final/remaining context; ending
+coverage contains eligible, already-final, current transitioned,
+total final, and remaining counts. `COMPLETE`, `BUDGET_EXHAUSTED`, and `FAILED`
+remain distinct. The report contains no identity, currency, price, path,
+provider text, exception message, or candle value.

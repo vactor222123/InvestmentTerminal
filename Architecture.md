@@ -723,3 +723,16 @@ and preserve atomic ownership at one checkpoint file per write. Bounded exact
 resume must report partial progress without pretending that multiple checkpoint
 files form one transaction. Numeric/OHLC defects and legacy null-causal
 evidence remain outside that boundary.
+
+Package 173 implements that boundary as
+`ManifestCompletedSweepNoPriceTransitionService`. Before any write it verifies
+the immutable inventory checksum and contract, exact manifest binding, complete
+ordered checkpoint coverage, aggregate signature parity, and every current
+outcome. It processes eligible checkpoint files in canonical order under an
+explicit bound, changes all and only recognized stored `NO_PRICE_DATA` outcomes
+within one checkpoint through one atomic replacement, and resumes from exact
+inventory-bound final evidence. Its distinct
+`COMPLETED_SWEEP_STORED_YAHOO_NO_PRICE_DATA_V1` policy does not change either
+existing no-price policy. Checkpoint files are separate transaction boundaries;
+the operation never claims cross-file atomicity and has no Yahoo, cache, SQLite,
+repository, importer, diagnostic, analysis, scheduling, or trading authority.

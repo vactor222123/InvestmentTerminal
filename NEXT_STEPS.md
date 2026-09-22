@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 2867c6702e778f6789d9c6a4946efd59d0feb931`
+**Current repository baseline:** `develop @ fab4d0d6fe58e2f38e26ea82df06cce8d6b574ec`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -205,6 +205,7 @@
 **Phase 7 Package 170 collection failure inventory:** COMPLETE
 **Phase 7 Package 171 collection failure inventory handoff:** COMPLETE - READY FOR USER EXECUTION
 **Phase 7 Package 172 post-sweep failure remediation audit:** COMPLETE
+**Phase 7 Package 173 completed-sweep no-price transition:** COMPLETE
 
 ## Current State
 
@@ -212,11 +213,12 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement the inventory-bound resumable completed-sweep no-price transition.
-It must transition only the 113 exact stored `NO_PRICE_DATA` outcomes under a
-new versioned policy, preserve all numeric/OHLC and legacy-null evidence, write
-one checkpoint atomically at a time, and support exact bounded resume. Runtime
-execution remains a separate operational package.
+Prepare one exact-baseline operational handoff for the inventory-bound
+completed-sweep no-price transition. It must validate the private manifest,
+complete checkpoint set, and immutable inventory checksum before invoking the
+offline CLI with an explicit checkpoint budget. Return only the redacted report;
+Yahoo, SQLite, numeric/OHLC diagnostics, and legacy revalidation remain outside
+that handoff.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

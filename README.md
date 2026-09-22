@@ -313,6 +313,12 @@ Completed-sweep failure inventory:
 verifies the checksum-bound completed sweep and all private request checkpoints,
 then writes only aggregate retryable-causal and terminal-policy evidence.
 
+Completed-sweep no-price transition:
+`python -m investment_terminal.cli.manifest_completed_sweep_no_price_transition`.
+It operates offline, verifies immutable inventory and complete checkpoint parity
+before writing, atomically finalizes only recognized stored no-price outcomes
+under a bounded checkpoint budget, and emits a redacted resumable report.
+
 Bounded manifest drain:
 `python -m investment_terminal.cli.manifest_batch_drain`. It resumes from
 validated private per-batch checkpoints and processes at most 100 explicitly

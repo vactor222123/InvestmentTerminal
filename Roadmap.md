@@ -700,6 +700,14 @@ atomic per-checkpoint writes, bounded exact resume, and a redacted aggregate
 report. Local-defect diagnostics and legacy revalidation remain later separate
 gates.
 
+Package 173 implements that transition as a distinct offline operation. It
+verifies immutable inventory and complete current-checkpoint parity before the
+first write, transitions all eligible no-price outcomes in one checkpoint per
+atomic replacement, processes checkpoint groups in canonical order under an
+explicit bound, and resumes exactly from inventory-bound final evidence. A
+separate operational handoff is next; Yahoo, SQLite, the ten local defects, and
+the legacy null-causal outcome remain untouched.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

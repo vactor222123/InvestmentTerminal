@@ -1240,3 +1240,13 @@ blocking failures. Implement a separate inventory-bound resumable offline
 transition for only the no-price cohort. Use a distinct policy, atomic
 per-checkpoint writes, bounded exact resume, and a redacted aggregate report;
 preserve all other failure evidence unchanged.
+
+## Phase 7 Package 173 checkpoint
+
+The inventory-bound completed-sweep no-price transition is implemented. It
+preflights the immutable inventory and every complete request checkpoint before
+any mutation, uses a distinct inventory-checksum-bound final policy, writes one
+checkpoint atomically at a time, and supports bounded exact resume including a
+zero-write completed repeat. Prepare one exact-baseline operational handoff;
+provider access, SQLite, local-defect diagnostics, and legacy revalidation are
+separate later gates.

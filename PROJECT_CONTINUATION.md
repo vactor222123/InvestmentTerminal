@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `2867c6702e778f6789d9c6a4946efd59d0feb931`
-**Current local package:** Phase 7 Package 172 - Post-Sweep Failure Remediation Audit
+**Current GitHub baseline:** `fab4d0d6fe58e2f38e26ea82df06cce8d6b574ec`
+**Current local package:** Phase 7 Package 173 - Completed-Sweep No-Price Transition
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement the inventory-bound resumable no-price transition
+**Current next action:** Prepare the exact-baseline Package 174 operational handoff
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -858,6 +858,17 @@ new inventory-bound resumable offline transition for only the 113 no-price
 outcomes. It must preserve local-defect and legacy evidence, write atomically
 per checkpoint, and resume exactly. The requested SQLite integrity line was not
 returned and remains unverified for this package.
+
+Package 173 implements the selected offline transition. The new operation binds
+the immutable inventory checksum to a distinct completed-sweep no-price final
+policy, validates every complete request checkpoint before its first write,
+processes eligible checkpoint groups canonically under an explicit bound, and
+atomically replaces one checkpoint file at a time. It preserves all local
+numeric/OHLC, legacy-null, success, empty, and prior final evidence, supports
+exact resume after partial progress or report-write failure, and performs a
+zero-write completed repeat. Prepare one user-executed handoff next; do not
+contact Yahoo, access SQLite, diagnose local defects, or revalidate legacy
+evidence in that package.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable
