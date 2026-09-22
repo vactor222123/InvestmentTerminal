@@ -1,5 +1,16 @@
 # InvestmentTerminal — Project Continuation
 
+## Package 178 — post-transition residual inventory handoff
+
+The exact-baseline ASCII-only PowerShell handoff is ready. It validates both
+immutable report byte checksums, canonical manifest evidence, the complete
+601-checkpoint set, and expected source aggregates before one read-only Package
+177 CLI execution. It proves every checkpoint hash remains unchanged and
+accepts only the expected privacy-safe `11892/11/116` current coverage with the
+known `8/2/1` residual cohort. Return only the generated redacted report; Yahoo,
+SQLite, automatic rerun, retry, terminalization, and checkpoint mutation remain
+excluded.
+
 ## Package 177 — post-transition residual inventory
 
 The selected read-only schema-version-1 boundary is implemented as
@@ -27,10 +38,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `ec9807343a3c4e0092f91ddf89c9b026357a0bdb`
-**Current local package:** Phase 7 Package 177 - Post-Transition Residual Inventory
+**Current GitHub baseline:** `fc40dad7c6290a79b7704da962e24e4236349ee2`
+**Current local package:** Phase 7 Package 178 - Post-Transition Residual Inventory Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Prepare the exact-baseline read-only residual-inventory handoff
+**Current next action:** Run the Package 178 handoff and return only its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

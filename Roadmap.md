@@ -37,6 +37,13 @@
   the boundary.
 - Prepare one exact-baseline ASCII-only operational handoff next.
 
+## Phase 7 residual inventory handoff — Package 178
+
+- Provide one exact-baseline ASCII-only read-only execution block.
+- Verify both immutable source checksums, all 601 checkpoint inputs, exact
+  output aggregates, and checkpoint immutability.
+- Return only the redacted residual inventory for the next review gate.
+
 **Status:** Canonical Roadmap  
 **Updated after:** Sprint 31 — Evidence Integrity & Delivery Hardening  
 **Current development branch:** `develop`

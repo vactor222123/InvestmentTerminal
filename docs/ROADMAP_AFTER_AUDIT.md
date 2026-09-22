@@ -41,6 +41,16 @@ original inventory nor contacts Yahoo, reads SQLite, retries outcomes,
 terminalizes failures, or writes checkpoints. The next package is an
 exact-baseline ASCII-only operational handoff for one private execution.
 
+## Package 178 residual-inventory handoff
+
+Package 178 prepares that exact-baseline ASCII-only handoff. It byte-hash binds
+both immutable reports, validates the canonical manifest and complete private
+checkpoint set, executes the read-only Package 177 CLI once, proves all 601
+checkpoint hashes remain unchanged, and accepts only the expected aggregate
+coverage and residual signatures. Return only its redacted report. Yahoo,
+SQLite, automatic reruns, retries, terminalization, and checkpoint writes remain
+outside the operation.
+
 ## Purpose
 
 This document defines the development order after the complete product alignment audit.

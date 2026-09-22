@@ -1,15 +1,15 @@
 # Investment Terminal — Next Steps
 
-## Package 177 immediate next step
+## Package 178 immediate next step
 
-Prepare one exact-baseline, ASCII-only PowerShell handoff for a single read-only
-`MANIFEST_POST_TRANSITION_RESIDUAL_INVENTORY` execution. Bind the private
-manifest, complete checkpoint directory, immutable source inventory, and
-completed transition report with their exact SHA-256 values before invoking
-the Package 177 CLI. Return only the redacted report. Yahoo, SQLite, retries,
-terminalization, and checkpoint writes remain excluded.
+Run the Package 178 ASCII-only PowerShell block once at its exact baseline and
+return only
+`C:\runtime\reports\manifest_post_transition_residual_inventory_001.json`.
+Do not send the private manifest, checkpoint set, source inventory, or
+transition report. Do not rerun automatically if the CLI returns a redacted
+`FAILED` report.
 
-**Current repository baseline:** `develop @ ec9807343a3c4e0092f91ddf89c9b026357a0bdb`
+**Current repository baseline:** `develop @ fc40dad7c6290a79b7704da962e24e4236349ee2`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -217,6 +217,7 @@ terminalization, and checkpoint writes remain excluded.
 **Phase 7 Package 173 completed-sweep no-price transition:** COMPLETE
 **Phase 7 Package 176 post-transition residual inventory audit:** COMPLETE
 **Phase 7 Package 177 post-transition residual inventory:** COMPLETE
+**Phase 7 Package 178 residual inventory handoff:** COMPLETE - READY FOR USER EXECUTION
 
 ## Current State
 
@@ -224,12 +225,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Prepare one exact-baseline operational handoff for the read-only
-post-transition residual inventory. It must validate the private manifest,
-complete checkpoint set, immutable inventory checksum, and completed transition
-report checksum before invoking the Package 177 CLI. Return only the redacted
-report; Yahoo, SQLite, retries, terminalization, and checkpoint writes remain
-outside that handoff.
+Execute the Package 178 handoff once and return only its redacted residual
+inventory report. Review that aggregate evidence before selecting separate
+numeric/OHLC diagnostics or a distinct legacy-null path. Yahoo, SQLite,
+automatic reruns, retries, terminalization, and checkpoint writes remain
+excluded.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
