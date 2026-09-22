@@ -691,6 +691,15 @@ all aggregate inventory invariants, derives checkpoint ownership without the
 PowerShell 5.1 `Split-Path` ambiguity, and checks SQLite integrity read-only.
 Execute it before applying Package 171; remediation remains a later decision.
 
+The completed inventory accounts for every manifest outcome and isolates 113
+stored `NO_PRICE_DATA`, ten local numeric/OHLC defects, and one legacy
+null-causal retryable outcome, with zero blocking failures. Package 172 audits
+the remediation boundary and selects a new inventory-bound resumable offline
+transition for only the stored no-price cohort. It must use a distinct policy,
+atomic per-checkpoint writes, bounded exact resume, and a redacted aggregate
+report. Local-defect diagnostics and legacy revalidation remain later separate
+gates.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline

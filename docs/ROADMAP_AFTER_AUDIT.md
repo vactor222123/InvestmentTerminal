@@ -1231,3 +1231,12 @@ execution remains a separate exact-baseline handoff.
 Prepare one exact-baseline ASCII-only handoff for the completed-sweep failure
 inventory. It must validate the immutable sweep and aggregate inventory result,
 perform no provider or runtime mutation, and check SQLite integrity read-only.
+
+## Phase 7 Package 172 checkpoint
+
+The completed inventory records 113 exact stored `NO_PRICE_DATA`, ten local
+numeric/OHLC defects, one legacy null-causal retryable outcome, and zero
+blocking failures. Implement a separate inventory-bound resumable offline
+transition for only the no-price cohort. Use a distinct policy, atomic
+per-checkpoint writes, bounded exact resume, and a redacted aggregate report;
+preserve all other failure evidence unchanged.

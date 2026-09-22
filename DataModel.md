@@ -1009,3 +1009,12 @@ bounded allowlisted exception-type chain, `DEFERABLE` disposition, and count.
 Final signatures contain only failure category, isolation-policy identity, and
 count. The report excludes symbols, currencies, prices, paths, provider text,
 exception messages, evidence checksums, raw rows, and candle values.
+
+The selected next contract introduces a distinct completed-sweep stored
+no-price final policy rather than changing `STORED_YAHOO_NO_PRICE_DATA_V1`.
+Its final evidence will bind the immutable collection-failure-inventory
+checksum. A resumable redacted transition report will separate starting,
+current, and ending eligible/transitioned/already-final/remaining counts and
+completion, budget, or failure status. Exact field names and schema version are
+owned by the implementation package; no runtime checkpoint currently supports
+this policy.

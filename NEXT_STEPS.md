@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-**Current repository baseline:** `develop @ 31bb14f5f88a885acad7176313b1b32635a5654b`
+**Current repository baseline:** `develop @ 2867c6702e778f6789d9c6a4946efd59d0feb931`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -204,6 +204,7 @@
 **Phase 7 Package 169 remaining collection sweep handoff:** COMPLETE - READY FOR USER EXECUTION
 **Phase 7 Package 170 collection failure inventory:** COMPLETE
 **Phase 7 Package 171 collection failure inventory handoff:** COMPLETE - READY FOR USER EXECUTION
+**Phase 7 Package 172 post-sweep failure remediation audit:** COMPLETE
 
 ## Current State
 
@@ -211,9 +212,11 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run the exact-baseline completed-sweep failure inventory handoff. Return only
-its redacted aggregate report and the printed SQLite integrity result. Do not
-retry or terminalize any failure before that evidence is reviewed.
+Implement the inventory-bound resumable completed-sweep no-price transition.
+It must transition only the 113 exact stored `NO_PRICE_DATA` outcomes under a
+new versioned policy, preserve all numeric/OHLC and legacy-null evidence, write
+one checkpoint atomically at a time, and support exact bounded resume. Runtime
+execution remains a separate operational package.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

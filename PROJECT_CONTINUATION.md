@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `f278da4dd5497d609e96b9b5d70a15960a8d2d44`
-**Current local package:** Phase 7 Package 171 - Collection Failure Inventory Handoff
+**Current GitHub baseline:** `2867c6702e778f6789d9c6a4946efd59d0feb931`
+**Current local package:** Phase 7 Package 172 - Post-Sweep Failure Remediation Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run the collection failure inventory handoff
+**Current next action:** Implement the inventory-bound resumable no-price transition
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -847,6 +847,17 @@ without `Split-Path`, runs the offline inventory once, validates aggregate
 coverage and signature arithmetic, and checks SQLite integrity read-only. Run
 it before applying Package 171 and return only the redacted inventory plus the
 printed integrity result.
+
+The returned Package 171 inventory is valid at SHA-256
+`1ae8fb0a6b7a915bb0567b6a5b48d1b328adfe6725f282acf203b181fd5c42f6`.
+All 12,019 outcomes reconcile: 11,892 successes, 124 retryable failures, three
+final failures, zero missing outcomes, and zero blocking failures. Retryable
+evidence contains 113 exact stored `NO_PRICE_DATA`, eight `RESPONSE_OHLC`, two
+`RESPONSE_NUMERIC`, and one legacy null-causal outcome. Package 172 selects a
+new inventory-bound resumable offline transition for only the 113 no-price
+outcomes. It must preserve local-defect and legacy evidence, write atomically
+per checkpoint, and resume exactly. The requested SQLite integrity line was not
+returned and remains unverified for this package.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

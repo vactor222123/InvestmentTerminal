@@ -714,3 +714,12 @@ checksum-bound completed sweep report. It verifies exact full coverage before
 grouping retryable causal evidence and final isolation policies into a redacted
 aggregate. It has no provider, cache, SQLite, repository, importer, checkpoint
 writer, retry, terminalization, analysis, scheduling, or trading authority.
+
+The selected post-sweep no-price remediation is a separate future offline
+boundary, not added authority for the inventory. It will bind immutable
+inventory evidence to the complete private checkpoint set, transition only
+recognized stored `NO_PRICE_DATA` outcomes under a distinct versioned policy,
+and preserve atomic ownership at one checkpoint file per write. Bounded exact
+resume must report partial progress without pretending that multiple checkpoint
+files form one transaction. Numeric/OHLC defects and legacy null-causal
+evidence remain outside that boundary.
