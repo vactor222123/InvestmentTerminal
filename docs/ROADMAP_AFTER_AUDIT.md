@@ -1225,3 +1225,9 @@ deferable failures. Implement one read-only checksum-bound aggregate inventory
 over the complete private checkpoint set. Its report groups only causal and
 terminal-policy evidence and exposes no identity or value. Operational
 execution remains a separate exact-baseline handoff.
+
+## Phase 7 Package 171 checkpoint
+
+Prepare one exact-baseline ASCII-only handoff for the completed-sweep failure
+inventory. It must validate the immutable sweep and aggregate inventory result,
+perform no provider or runtime mutation, and check SQLite integrity read-only.

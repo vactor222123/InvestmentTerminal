@@ -4,10 +4,10 @@
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `46ecae73235492ba7479003b98b61f1800074222`
-**Current local package:** Phase 7 Package 170 - Collection Failure Inventory
+**Current GitHub baseline:** `f278da4dd5497d609e96b9b5d70a15960a8d2d44`
+**Current local package:** Phase 7 Package 171 - Collection Failure Inventory Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Prepare the collection failure inventory handoff
+**Current next action:** Run the collection failure inventory handoff
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
@@ -840,6 +840,13 @@ and 124 deferable failures remain explicit. Package 170 implements a read-only,
 checksum-bound aggregate inventory over every private checkpoint. SQLite
 integrity was not returned and remains unverified. Prepare its exact-baseline
 operator handoff next.
+
+Package 171 prepares that exact-baseline ASCII-only operator handoff. It binds
+the immutable completed sweep, locates the request-bound checkpoint directory
+without `Split-Path`, runs the offline inventory once, validates aggregate
+coverage and signature arithmetic, and checks SQLite integrity read-only. Run
+it before applying Package 171 and return only the redacted inventory plus the
+printed integrity result.
 
 Package 145 records the read-only batch-105 checkpoint diagnostic. All 20
 outcomes reconcile exactly: 19 successes, zero empty results, one retryable

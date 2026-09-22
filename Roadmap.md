@@ -686,6 +686,11 @@ separate read-only aggregate failure inventory, binding all checkpoints to the
 manifest and immutable completed-sweep report without exposing identities.
 Prepare one exact-baseline operational handoff for that inventory next.
 
+Package 171 prepares that offline handoff. It validates the completed sweep and
+all aggregate inventory invariants, derives checkpoint ownership without the
+PowerShell 5.1 `Split-Path` ambiguity, and checks SQLite integrity read-only.
+Execute it before applying Package 171; remediation remains a later decision.
+
 Phases 1–6 of the post-audit product roadmap are complete. The Phase 6
 Integrated Investment Review Workflow boundary audit is recorded in
 `docs/PHASE_6_WORKFLOW_BOUNDARY_AUDIT.md` at verified baseline
