@@ -101,10 +101,8 @@ if (-not (Test-Path -LiteralPath $ReportDirectory -PathType Container)) {
     New-Item -ItemType Directory -Path $ReportDirectory -Force | Out-Null
 }
 
-$ActualManifestChecksum = (Get-FileHash -LiteralPath $ManifestPath -Algorithm SHA256).Hash.ToLowerInvariant()
-if ($ActualManifestChecksum -ne $ExpectedManifestChecksum) {
-    throw "Manifest checksum mismatch"
-}
+# The manifest checksum is defined over canonical parsed JSON, not raw file
+# bytes. The CLI validates it through the versioned manifest contract below.
 
 $ActualInventoryChecksum = (Get-FileHash -LiteralPath $InventoryPath -Algorithm SHA256).Hash.ToLowerInvariant()
 if ($ActualInventoryChecksum -ne $ExpectedInventoryChecksum) {

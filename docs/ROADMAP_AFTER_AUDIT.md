@@ -11,6 +11,15 @@ run. The 11 response-shape and legacy retryable outcomes remain explicitly out
 of scope. Broad collection remains paused until the privacy-safe transition
 report is reviewed.
 
+## Package 175 transition result
+
+The checksum-bound transition report reached `COMPLETE`: 113 eligible stored
+Yahoo `NO_PRICE_DATA` outcomes are final under the dedicated policy and zero
+remain. Eleven non-eligible retryable outcomes remain deliberately unchanged.
+The next bounded package audits a read-only post-transition residual inventory;
+it does not restart collection, contact Yahoo, mutate SQLite, or infer missing
+causality for legacy evidence.
+
 ## Purpose
 
 This document defines the development order after the complete product alignment audit.

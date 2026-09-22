@@ -9,6 +9,15 @@
 - Review the privacy-safe transition report before any new broad collection or
   further failure classification.
 
+## Phase 7 operational result — Package 175
+
+- The stored Yahoo `NO_PRICE_DATA` transition completed for all 113 eligible
+  outcomes across 100 checkpoint files, with zero remaining and no failure.
+- The reconciled state preserves 11 retryable outcomes outside the no-price
+  policy: eight OHLC, two numeric, and one legacy null-causal outcome.
+- Audit a read-only residual inventory next; broad collection, Yahoo access,
+  SQLite mutation, and inferred terminalization remain excluded.
+
 **Status:** Canonical Roadmap  
 **Updated after:** Sprint 31 — Evidence Integrity & Delivery Hardening  
 **Current development branch:** `develop`

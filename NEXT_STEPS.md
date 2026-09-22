@@ -1,15 +1,15 @@
 # Investment Terminal — Next Steps
 
-## Package 174 immediate operational step
+## Package 175 immediate next step
 
-Run the completed-sweep `NO_PRICE_DATA` transition handoff in
-`docs/PHASE_7_PACKAGE_174_COMPLETED_SWEEP_NO_PRICE_TRANSITION_HANDOFF.md`.
-Return only `manifest_completed_sweep_no_price_transition_001.json`. The exact
-gate is 113 eligible outcomes final, 11 other retryable outcomes preserved,
-zero ending remainder, and report status `COMPLETE`. Do not restart broad
-collection before that privacy-safe report is reviewed.
+The completed-sweep `NO_PRICE_DATA` transition is operationally complete: all
+113 eligible outcomes are final, zero eligible outcomes remain, and 11
+non-eligible retryable outcomes were preserved. Audit the smallest read-only
+post-transition residual-inventory boundary next. Keep the eight
+`RESPONSE_OHLC`, two `RESPONSE_NUMERIC`, and one legacy null-causal outcome
+distinct. Do not restart broad collection or contact Yahoo.
 
-**Current repository baseline:** `develop @ 281b057c46dc8bf24f5c29fb9188b346377d594b`
+**Current repository baseline:** `develop @ 9385465ddf6874827f24225432256ed8338de960`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
