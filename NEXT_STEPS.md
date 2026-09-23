@@ -1,12 +1,20 @@
 # Investment Terminal — Next Steps
 
-## Weekly one-item operational handoff
+## Weekly overlap-drift diagnostic
 
-At verified baseline `75fe7919174246ca3a6e1259c739cb54e3d96a5a`, run
-the single-item PowerShell handoff in
-`docs/PHASE_7_WEEKLY_ONE_ITEM_HANDOFF.md` once and return only its redacted
-report. Review that result before a repeat, SQLite integrity check, full
-refresh, or scheduler setup.
+The returned 120-series report has nine `STORED_CANDLE_DRIFT` failures and
+SQLite integrity was `ok`. The separate read-only one-series diagnostic is
+implemented at baseline `8a3fc092def8dca952ee8119932672131a0024e7`.
+Run it once on the private manifest, source checkpoints, weekly checkpoint,
+and database, then return only its redacted report. See
+`docs/PHASE_7_WEEKLY_DRIFT_DIAGNOSTIC.md`. Do not launch the remaining 11,772
+series or rewrite stored candles before reviewing that evidence.
+
+## Historical weekly one-item operational handoff
+
+The single-item handoff at baseline
+`75fe7919174246ca3a6e1259c739cb54e3d96a5a` was executed and reviewed.
+This section is historical; the active gate is the drift diagnostic above.
 
 ## Weekly candle refresh implementation
 
@@ -24,7 +32,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**Current repository baseline:** `develop @ 75fe7919174246ca3a6e1259c739cb54e3d96a5a`
+**Current repository baseline:** `develop @ 8a3fc092def8dca952ee8119932672131a0024e7`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -240,9 +248,8 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute only the weekly one-item handoff documented above, then return its
-redacted report. Review that evidence before a repeat, SQLite integrity check,
-broader refresh, or scheduler setup.
+Execute only the one-series weekly drift diagnostic, then return its redacted
+report. Review that evidence before broader refresh or scheduler setup.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

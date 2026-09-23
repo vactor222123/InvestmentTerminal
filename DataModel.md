@@ -1,5 +1,15 @@
 # Investment Terminal — Data Model
 
+## Weekly drift diagnostic report
+
+`WEEKLY_CANDLE_DRIFT_DIAGNOSTIC` schema version 1 records manifest checksum,
+weekly selection checksum, exclusive end, one-series current overlap counts,
+changed-field counts, omission count, and an optional stable provider failure
+category. It contains no per-series identity, timestamp, price, currency,
+volume value, private path, or exception text. `REPRODUCED`, `NOT_REPRODUCED`,
+`INCONCLUSIVE`, `PROVIDER_FAILURE`, and `FAILED` are distinct statuses.
+No candle or weekly-checkpoint schema changes are introduced.
+
 ## Weekly candle refresh evidence
 
 Private `WEEKLY_CANDLE_REFRESH` checkpoint schema version 1 binds manifest

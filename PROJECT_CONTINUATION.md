@@ -1,5 +1,16 @@
 # InvestmentTerminal — Project Continuation
 
+## Weekly stored-candle drift diagnostic
+
+From exact clean `develop` baseline
+`8a3fc092def8dca952ee8119932672131a0024e7`, a separate read-only
+one-series overlap comparison has been implemented. The returned 120-series
+aggregate had 96 successes, nine drift failures, twelve numeric failures,
+three no-price failures, and 89 bounded trailing omissions; SQLite integrity
+was reported `ok`. The next step is one private diagnostic execution and
+review of only its redacted report. No private runtime data was modified in
+this package. Details: `docs/PHASE_7_WEEKLY_DRIFT_DIAGNOSTIC.md`.
+
 ## Weekly one-item operational handoff
 
 From exact clean `develop` baseline
@@ -49,10 +60,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `75fe7919174246ca3a6e1259c739cb54e3d96a5a`
-**Current local package:** Weekly Candle One-Item Qualification Handoff
+**Current GitHub baseline:** `8a3fc092def8dca952ee8119932672131a0024e7`
+**Current local package:** Weekly Stored-Candle Drift Diagnostic
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one weekly refresh item and return only its redacted report
+**Current next action:** Run one read-only weekly drift diagnostic and return its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

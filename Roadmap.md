@@ -962,3 +962,9 @@ previously successful manifest series. A controlled one-item live run, SQLite
 integrity and repeat verification, then full-universe operational measurement
 remain before a weekly scheduler or analysis-readiness claim. The remaining
 collection defects are tracked separately and do not block this path.
+
+## Weekly drift evidence gate
+
+The first 120-series weekly slice exposed nine stored-overlap drift outcomes.
+One read-only, redacted current-overlap diagnostic is implemented; review one
+live result before deciding whether broader collection can safely continue.

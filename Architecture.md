@@ -1,5 +1,15 @@
 # Investment Terminal — Software Architecture
 
+## Weekly drift diagnostic boundary
+
+The weekly refresh checkpoint owns private failure categories, while the
+separate drift diagnostic owns only one read-only overlap comparison. It
+reconstructs the success selection from the bound manifest and complete source
+checkpoints, selects the first recorded drift, queries SQLite with
+`query_only`, makes at most one provider request, and emits a redacted report.
+It does not mutate candles or checkpoints, infer a corporate-action policy,
+or authorize wider refresh. Numeric-response diagnostics remain separate.
+
 ## Weekly candle refresh boundary
 
 The post-bootstrap weekly operation is separate from ten-year collection.
