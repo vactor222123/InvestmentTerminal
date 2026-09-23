@@ -1,13 +1,24 @@
 # Investment Terminal — Next Steps
 
-## Complete weekly drift-cohort diagnostic
+## Controlled continuation of weekly collection
+
+The returned aggregate diagnostic is `COMPLETE`: all nine checkpointed drifts
+currently reproduce as volume-only differences; no OHLC change was observed
+in 54 compared overlap rows. The diagnostic did not insert its 90 new candles.
+The existing weekly service isolates these failed outcomes and can continue
+the other 11,772 series without changing persistence policy. Run one
+checkpoint-resuming `--max-items 1000` slice, review its redacted report and
+SQLite integrity, then decide the next collection budget. Do not reopen the
+nine terminal outcomes or overwrite stored volume. See
+`docs/PHASE_7_WEEKLY_DRIFT_COHORT_RESULT.md`.
+
+## Historical complete weekly drift-cohort diagnostic
 
 The first read-only diagnostic reproduced volume-only drift in one of nine
 failed series. The complete bounded aggregate mode is now implemented from
-exact baseline `352a5a3feab3450f305980fc488db73a5f16e9f1`. Run it once
-with `--max-items 9` and return only its redacted schema-version-2 report.
-Do not change candle persistence policy or resume the remaining 11,772 series
-before reviewing that evidence. See `docs/PHASE_7_WEEKLY_DRIFT_AGGREGATE.md`.
+exact baseline `352a5a3feab3450f305980fc488db73a5f16e9f1`. Its
+`--max-items 9` report has since been reviewed. This section is historical;
+see `docs/PHASE_7_WEEKLY_DRIFT_AGGREGATE.md` for the original boundary.
 
 ## Historical one-series overlap-drift diagnostic
 
@@ -38,7 +49,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**Current repository baseline:** `develop @ 352a5a3feab3450f305980fc488db73a5f16e9f1`
+**Current repository baseline:** `develop @ 92e28ce408e8d6b48869dfd44e10fc31f9981f63`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -254,9 +265,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute only the complete nine-series drift diagnostic, then return its
-redacted aggregate report. Review that evidence before broader refresh or
-scheduler setup.
+Execute one 1000-item checkpoint-resuming weekly slice and return its redacted
+aggregate report plus read-only SQLite integrity. Do not claim full-universe
+freshness or schedule updates before broader measured coverage.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

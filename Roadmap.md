@@ -973,3 +973,10 @@ The first result reproduced a volume-only mismatch. A complete, bounded
 nine-series read-only aggregate is implemented to establish whether that
 pattern generalizes. Review its private live result before selecting any
 volume-drift policy or resuming the remaining weekly universe.
+
+The aggregate result found all nine current overlap drifts volume-only, with
+no observed OHLC change and no provider failure. Because the existing weekly
+checkpoint isolates those terminal failures, a controlled 1000-item slice may
+continue the other 11,772 series without changing stored-candle policy.
+Volume-only acceptance, replay of terminal outcomes, and scheduler readiness
+remain separate future gates.

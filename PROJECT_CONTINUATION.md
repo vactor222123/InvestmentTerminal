@@ -1,5 +1,17 @@
 # InvestmentTerminal — Project Continuation
 
+## Weekly drift cohort reviewed; collection continuation selected
+
+The exact-baseline audit of the returned aggregate report found nine of nine
+current volume-only overlap drifts, zero observed non-volume field changes,
+zero provider failures, and 90 new candles that the read-only diagnostic did
+not save. The existing weekly checkpoint keeps these nine failed outcomes;
+the refresh service can independently process the other 11,772 remaining
+series. Run one `--max-items 1000` slice against the unchanged checkpoint/end,
+then review its redacted report and SQLite integrity. No volume policy or
+stored-candle rewrite was implemented. Details:
+`docs/PHASE_7_WEEKLY_DRIFT_COHORT_RESULT.md`.
+
 ## Complete weekly drift-cohort diagnostic
 
 From exact clean `develop` baseline
@@ -72,10 +84,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `352a5a3feab3450f305980fc488db73a5f16e9f1`
-**Current local package:** Complete Weekly Drift-Cohort Diagnostic
+**Current GitHub baseline:** `92e28ce408e8d6b48869dfd44e10fc31f9981f63`
+**Current local package:** Weekly Drift-Cohort Result Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run the nine-series read-only drift diagnostic and return its redacted aggregate report
+**Current next action:** Run one 1000-item checkpoint-resuming weekly slice and review its redacted report and SQLite integrity
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
