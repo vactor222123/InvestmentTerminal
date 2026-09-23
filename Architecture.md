@@ -2,6 +2,13 @@
 
 ## Weekly drift diagnostic boundary
 
+The versioned aggregate mode reuses the same read-only single-series
+comparison for the complete bounded drift cohort. It produces only summary
+counts and changed-field histograms, stops on rate limiting, and preserves the
+default one-series JSON contract. It grants no authority to overwrite stored
+candles, reinterpret volume drift as price completeness, or resume the broad
+refresh.
+
 The weekly refresh checkpoint owns private failure categories, while the
 separate drift diagnostic owns only one read-only overlap comparison. It
 reconstructs the success selection from the bound manifest and complete source

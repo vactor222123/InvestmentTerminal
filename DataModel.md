@@ -2,6 +2,12 @@
 
 ## Weekly drift diagnostic report
 
+Schema version 2 is the aggregate report for the complete bounded cohort. It
+adds attempted/remaining and status counts, volume-only/non-volume-only series
+counts, summed overlap/new/omission counts, sorted changed-field counts, and
+sorted stable provider-failure categories. No per-series array or identity is
+included. Schema version 1 remains the default single-series contract.
+
 `WEEKLY_CANDLE_DRIFT_DIAGNOSTIC` schema version 1 records manifest checksum,
 weekly selection checksum, exclusive end, one-series current overlap counts,
 changed-field counts, omission count, and an optional stable provider failure

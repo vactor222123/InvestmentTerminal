@@ -968,3 +968,8 @@ collection defects are tracked separately and do not block this path.
 The first 120-series weekly slice exposed nine stored-overlap drift outcomes.
 One read-only, redacted current-overlap diagnostic is implemented; review one
 live result before deciding whether broader collection can safely continue.
+
+The first result reproduced a volume-only mismatch. A complete, bounded
+nine-series read-only aggregate is implemented to establish whether that
+pattern generalizes. Review its private live result before selecting any
+volume-drift policy or resuming the remaining weekly universe.

@@ -1,4 +1,4 @@
-"""CLI for one read-only, privacy-safe weekly candle drift diagnosis."""
+"""CLI for read-only, privacy-safe weekly candle drift diagnosis."""
 
 import argparse
 from datetime import datetime, timezone
@@ -8,6 +8,7 @@ from pathlib import Path
 from investment_terminal.clients.yahoo_finance_client import YahooFinanceClient
 from investment_terminal.database.database import Database
 from investment_terminal.operations.weekly_candle_drift_diagnostic import (
+    WeeklyCandleDriftAggregateService,
     WeeklyCandleDriftDiagnosticService,
 )
 from investment_terminal.operations.weekly_candle_refresh import (
@@ -19,7 +20,7 @@ from investment_terminal.utils.atomic_write import write_json_atomic
 
 def main(argv=None, *, client=None, clock=None, writer=write_json_atomic) -> int:
     parser = argparse.ArgumentParser(
-        description="Diagnose one stored weekly candle drift without mutation."
+        description="Diagnose checkpointed weekly candle drift without mutation."
     )
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--manifest-checksum", required=True)
@@ -28,6 +29,7 @@ def main(argv=None, *, client=None, clock=None, writer=write_json_atomic) -> int
     parser.add_argument("--database", type=Path, required=True)
     parser.add_argument("--cache-directory", type=Path, required=True)
     parser.add_argument("--report-output", type=Path, required=True)
+    parser.add_argument("--max-items", type=int, default=1)
     parser.add_argument("--json", action="store_true")
     options = parser.parse_args(argv)
     if options.report_output.exists():
@@ -60,15 +62,22 @@ def main(argv=None, *, client=None, clock=None, writer=write_json_atomic) -> int
         )
         database = Database(options.database)
         database.connection.execute("PRAGMA query_only = ON")
-        payload = WeeklyCandleDriftDiagnosticService(
-            client=client or YahooFinanceClient(cache_directory=options.cache_directory),
-            repository=CandleRepository(database),
-            clock=runtime_clock,
-        ).run(plan, checkpoint)
+        runtime_client = client or YahooFinanceClient(
+            cache_directory=options.cache_directory
+        )
+        repository = CandleRepository(database)
+        if options.max_items == 1:
+            payload = WeeklyCandleDriftDiagnosticService(
+                client=runtime_client, repository=repository, clock=runtime_clock,
+            ).run(plan, checkpoint)
+        else:
+            payload = WeeklyCandleDriftAggregateService(
+                client=runtime_client, repository=repository, clock=runtime_clock,
+            ).run(plan, checkpoint, max_items=options.max_items)
     except Exception:
         now = runtime_clock()
         payload = {
-            "schema_version": 1,
+            "schema_version": 1 if options.max_items == 1 else 2,
             "operation_identity": "WEEKLY_CANDLE_DRIFT_DIAGNOSTIC",
             "provider_identity": "YAHOO_FINANCE",
             "status": "FAILED",
@@ -90,13 +99,26 @@ def main(argv=None, *, client=None, clock=None, writer=write_json_atomic) -> int
                 "failed report excludes identities, prices, currencies, paths, timestamps, provider text, and exception messages"
             ],
         }
+        if options.max_items != 1:
+            for field in (
+                "attempted_count", "remaining_count", "reproduced_count",
+                "not_reproduced_count", "inconclusive_count",
+                "provider_failure_count", "volume_only_count",
+                "non_volume_only_drift_count", "overlap_total",
+                "changed_overlap_total", "new_candle_total",
+                "omitted_trailing_total",
+            ):
+                payload[field] = None
+            payload["provider_failure_categories"] = []
     finally:
         if database is not None:
             database.close()
     writer(options.report_output, payload)
     if options.json:
         print(json.dumps(payload, indent=2, allow_nan=False))
-    return 0 if payload["status"] in {"REPRODUCED", "NOT_REPRODUCED", "INCONCLUSIVE"} else 1
+    return 0 if payload["status"] in {
+        "REPRODUCED", "NOT_REPRODUCED", "INCONCLUSIVE", "COMPLETE"
+    } else 1
 
 
 if __name__ == "__main__":

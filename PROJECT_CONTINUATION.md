@@ -1,5 +1,17 @@
 # InvestmentTerminal — Project Continuation
 
+## Complete weekly drift-cohort diagnostic
+
+From exact clean `develop` baseline
+`352a5a3feab3450f305980fc488db73a5f16e9f1`, the default one-series
+diagnostic remains unchanged and a schema-version-2 aggregate mode now
+compares the complete bounded nine-drift cohort without database or checkpoint
+writes. The returned first diagnostic reproduced one volume-only mismatch in
+six overlap rows, with ten new rows and one trailing omission. That does not
+establish the other eight field patterns. Run `--max-items 9` once and return
+only the redacted aggregate report; do not resume broad ingestion first.
+Details: `docs/PHASE_7_WEEKLY_DRIFT_AGGREGATE.md`.
+
 ## Weekly stored-candle drift diagnostic
 
 From exact clean `develop` baseline
@@ -60,10 +72,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `8a3fc092def8dca952ee8119932672131a0024e7`
-**Current local package:** Weekly Stored-Candle Drift Diagnostic
+**Current GitHub baseline:** `352a5a3feab3450f305980fc488db73a5f16e9f1`
+**Current local package:** Complete Weekly Drift-Cohort Diagnostic
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one read-only weekly drift diagnostic and return its redacted report
+**Current next action:** Run the nine-series read-only drift diagnostic and return its redacted aggregate report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

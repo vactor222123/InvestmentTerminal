@@ -1,14 +1,20 @@
 # Investment Terminal — Next Steps
 
-## Weekly overlap-drift diagnostic
+## Complete weekly drift-cohort diagnostic
 
-The returned 120-series report has nine `STORED_CANDLE_DRIFT` failures and
-SQLite integrity was `ok`. The separate read-only one-series diagnostic is
-implemented at baseline `8a3fc092def8dca952ee8119932672131a0024e7`.
-Run it once on the private manifest, source checkpoints, weekly checkpoint,
-and database, then return only its redacted report. See
-`docs/PHASE_7_WEEKLY_DRIFT_DIAGNOSTIC.md`. Do not launch the remaining 11,772
-series or rewrite stored candles before reviewing that evidence.
+The first read-only diagnostic reproduced volume-only drift in one of nine
+failed series. The complete bounded aggregate mode is now implemented from
+exact baseline `352a5a3feab3450f305980fc488db73a5f16e9f1`. Run it once
+with `--max-items 9` and return only its redacted schema-version-2 report.
+Do not change candle persistence policy or resume the remaining 11,772 series
+before reviewing that evidence. See `docs/PHASE_7_WEEKLY_DRIFT_AGGREGATE.md`.
+
+## Historical one-series overlap-drift diagnostic
+
+The one-series diagnostic at baseline
+`8a3fc092def8dca952ee8119932672131a0024e7` was executed and reviewed.
+It reproduced a volume-only mismatch. This section is historical; the active
+gate is the complete cohort above.
 
 ## Historical weekly one-item operational handoff
 
@@ -32,7 +38,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**Current repository baseline:** `develop @ 8a3fc092def8dca952ee8119932672131a0024e7`
+**Current repository baseline:** `develop @ 352a5a3feab3450f305980fc488db73a5f16e9f1`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -248,8 +254,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute only the one-series weekly drift diagnostic, then return its redacted
-report. Review that evidence before broader refresh or scheduler setup.
+Execute only the complete nine-series drift diagnostic, then return its
+redacted aggregate report. Review that evidence before broader refresh or
+scheduler setup.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
