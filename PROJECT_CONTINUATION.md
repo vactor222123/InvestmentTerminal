@@ -1,5 +1,16 @@
 # InvestmentTerminal — Project Continuation
 
+## Weekly one-item operational handoff
+
+From exact clean `develop` baseline
+`75fe7919174246ca3a6e1259c739cb54e3d96a5a`, the next bounded action is
+one user-executed weekly refresh item. The repository-recorded manifest and
+SQLite paths are explicit; the full 601-file checkpoint directory is discovered
+by a request checksum, not guessed. The handoff is
+`docs/PHASE_7_WEEKLY_ONE_ITEM_HANDOFF.md`. No private runtime execution or
+SQLite mutation was performed while preparing this package. Return only the
+redacted report; inspect it before further ingestion or scheduling.
+
 ## Package 178 — post-transition residual inventory handoff
 
 The exact-baseline ASCII-only PowerShell handoff is ready. It validates both
@@ -38,10 +49,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `fc40dad7c6290a79b7704da962e24e4236349ee2`
-**Current local package:** Phase 7 Package 178 - Post-Transition Residual Inventory Handoff
+**Current GitHub baseline:** `75fe7919174246ca3a6e1259c739cb54e3d96a5a`
+**Current local package:** Weekly Candle One-Item Qualification Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run the Package 178 handoff and return only its redacted report
+**Current next action:** Run one weekly refresh item and return only its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

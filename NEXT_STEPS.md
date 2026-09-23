@@ -1,5 +1,13 @@
 # Investment Terminal — Next Steps
 
+## Weekly one-item operational handoff
+
+At verified baseline `75fe7919174246ca3a6e1259c739cb54e3d96a5a`, run
+the single-item PowerShell handoff in
+`docs/PHASE_7_WEEKLY_ONE_ITEM_HANDOFF.md` once and return only its redacted
+report. Review that result before a repeat, SQLite integrity check, full
+refresh, or scheduler setup.
+
 ## Weekly candle refresh implementation
 
 The `weekly_candle_refresh` CLI is implemented and locally tested from the
@@ -10,16 +18,13 @@ live item with a UTC-midnight end and inspect the redacted report plus SQLite
 integrity. Do not assert operational completion, schedule a weekly task, or
 run all selected series until that qualification succeeds.
 
-## Package 178 immediate next step
+## Historical Package 178 handoff (superseded)
 
-Run the Package 178 ASCII-only PowerShell block once at its exact baseline and
-return only
-`C:\runtime\reports\manifest_post_transition_residual_inventory_001.json`.
-Do not send the private manifest, checkpoint set, source inventory, or
-transition report. Do not rerun automatically if the CLI returns a redacted
-`FAILED` report.
+Package 178 previously instructed a one-time residual inventory handoff. Its
+result has since been reviewed; this paragraph is historical, not an active
+instruction. The private manifest and checkpoint set remain private.
 
-**Current repository baseline:** `develop @ fc40dad7c6290a79b7704da962e24e4236349ee2`
+**Current repository baseline:** `develop @ 75fe7919174246ca3a6e1259c739cb54e3d96a5a`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -235,11 +240,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute the Package 178 handoff once and return only its redacted residual
-inventory report. Review that aggregate evidence before selecting separate
-numeric/OHLC diagnostics or a distinct legacy-null path. Yahoo, SQLite,
-automatic reruns, retries, terminalization, and checkpoint writes remain
-excluded.
+Execute only the weekly one-item handoff documented above, then return its
+redacted report. Review that evidence before a repeat, SQLite integrity check,
+broader refresh, or scheduler setup.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
