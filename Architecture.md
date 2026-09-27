@@ -1,5 +1,11 @@
 # Investment Terminal — Software Architecture
 
+The Phase 7 offline stored-coverage CLI reads only a manifest, bound
+checkpoints, and an existing SQLite database opened in read-only mode. Its
+operations-layer measurement produces aggregate counts, never per-symbol
+records. It does not depend on the provider client, modify the candle store,
+or infer exchange-session completeness from row counts.
+
 ## Weekly drift diagnostic boundary
 
 The versioned aggregate mode reuses the same read-only single-series

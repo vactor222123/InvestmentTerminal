@@ -1,5 +1,13 @@
 # Investment Terminal — Product Roadmap
 
+Phase 7 current gate: the weekly 2026-09-23 drain attempted all 11,892
+selected daily series, but aggregate refresh success does not establish
+ten-year session completeness. The offline stored-coverage measurement is
+implemented from baseline `eacc9990601ed1084c801e950a2a0b04350eedcb`;
+its private operational result and any bounded remediation precede automatic
+weekly scheduling or analysis-readiness claims. See
+`docs/PHASE_7_WEEKLY_STORED_COVERAGE.md`.
+
 ## Phase 7 operational checkpoint — Package 174
 
 - Run the completed-sweep stored Yahoo `NO_PRICE_DATA` transition on the frozen

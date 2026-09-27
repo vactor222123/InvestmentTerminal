@@ -1,5 +1,12 @@
 # Investment Terminal — Data Model
 
+`WEEKLY_STORED_COVERAGE` report schema 1 is a redacted aggregate projection
+bound by manifest checksum, selection checksum, and exclusive end. Its
+`coverage` object reports selected-series and stored-row counts, zero/1–49/
+50–199/200+ bins, 50/200-row sample readiness, seven-calendar-day latest-row
+proxy, and checkpoint success/empty/failure counts. The failure-category
+array is aggregate only. No candle table or checkpoint schema changes.
+
 ## Weekly drift diagnostic report
 
 Schema version 2 is the aggregate report for the complete bounded cohort. It

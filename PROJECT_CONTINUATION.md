@@ -1,5 +1,17 @@
 # InvestmentTerminal — Project Continuation
 
+## Current Phase 7 gate — stored coverage, not another collection sweep
+
+The user-provided complete weekly drain report for exclusive end
+`2026-09-23T00:00:00+00:00` records 11,892 attempted selected series,
+11,678 successes, and 214 isolated failures (42 `NO_PRICE_DATA`, 140
+`RESPONSE_NUMERIC`, 32 `STORED_CANDLE_DRIFT`). The user independently
+reported SQLite integrity `ok`. This package adds a read-only, redacted
+aggregate SQLite coverage audit, locally tested but not run on private data.
+It must be run before interpreting 50/200-row readiness as analysis-ready
+history or enabling unattended weekly refresh. See
+`docs/PHASE_7_WEEKLY_STORED_COVERAGE.md`.
+
 ## Weekly rate-limit resume
 
 From exact clean `develop` baseline

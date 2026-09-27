@@ -1,16 +1,23 @@
 # Investment Terminal — Next Steps
 
-## Explicit weekly rate-limit retry
+## Current gate — offline stored-coverage measurement
 
-The three-part continuation reached 5,178 of 11,892 selected series and
-halted on one `RATE_LIMITED`; 6,714 were still unattempted. SQLite integrity
-was reported `ok`. Ordinary resume skips the checkpointed rate-limit outcome.
-The opt-in retry mode is implemented from exact baseline
-`5b7905df339c98a6c7d48f54e51e7f6a70ed112f`. After applying it and
-allowing the provider restriction to clear, run one
-`--retry-rate-limited --max-items 1` qualification against the same private
-checkpoint/end, then review its schema-2 redacted report and SQLite integrity.
-Do not launch the remaining 6,714 or change stored volume first. See
+The 2026-09-23 weekly refresh attempted all 11,892 selected daily series:
+11,678 successes and 214 isolated failures. SQLite integrity was reported
+`ok`. This does not prove ten-year per-series history or session freshness.
+Run the read-only `weekly_stored_coverage` CLI against the private complete
+weekly checkpoint and SQLite database, then return only its redacted report
+and a separate integrity result. Do not start another mass scan or enable a
+weekly scheduler before evaluating measured gaps. See
+`docs/PHASE_7_WEEKLY_STORED_COVERAGE.md`.
+
+## Historical explicit weekly rate-limit retry
+
+The earlier three-part continuation reached 5,178 of 11,892 selected series
+and halted on one `RATE_LIMITED`; 6,714 were then unattempted. The opt-in
+retry mode was implemented from exact baseline
+`5b7905df339c98a6c7d48f54e51e7f6a70ed112f`. The later completed
+weekly drain supersedes that operational handoff. See
 `docs/PHASE_7_WEEKLY_RATE_LIMIT_RESUME.md`.
 
 ## Historical controlled continuation of weekly collection
@@ -61,7 +68,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**Current repository baseline:** `develop @ 92e28ce408e8d6b48869dfd44e10fc31f9981f63`
+**This package verified baseline:** `develop @ eacc9990601ed1084c801e950a2a0b04350eedcb`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -277,10 +284,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute one explicit retry of the checkpointed rate-limited series after the
-provider restriction clears, then return its redacted report and read-only
-SQLite integrity. Do not claim full-universe freshness or schedule updates
-before broader measured coverage.
+Execute the offline stored-coverage measurement on the complete private
+weekly checkpoint, then return its redacted report and read-only SQLite
+integrity. Do not claim full-universe freshness or schedule updates before
+broader measured coverage.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
