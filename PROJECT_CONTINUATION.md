@@ -1,14 +1,26 @@
 # InvestmentTerminal — Project Continuation
 
-## Weekly drift cohort reviewed; collection continuation selected
+## Weekly rate-limit resume
+
+From exact clean `develop` baseline
+`5b7905df339c98a6c7d48f54e51e7f6a70ed112f`, a separate opt-in
+`--retry-rate-limited` mode now retries checkpointed rate-limit failures before
+new series and emits a schema-2 report with explicit retry/new counts. The
+default CLI/report and private schema-1 checkpoint remain unchanged. The live
+three-part continuation reached 5,178 selected series, then halted on one
+rate limit; SQLite integrity was reported `ok`. After package application and
+provider recovery, run only one opt-in retry item and review its redacted
+report. Details: `docs/PHASE_7_WEEKLY_RATE_LIMIT_RESUME.md`.
+
+## Historical weekly drift cohort and collection continuation
 
 The exact-baseline audit of the returned aggregate report found nine of nine
 current volume-only overlap drifts, zero observed non-volume field changes,
 zero provider failures, and 90 new candles that the read-only diagnostic did
 not save. The existing weekly checkpoint keeps these nine failed outcomes;
-the refresh service can independently process the other 11,772 remaining
-series. Run one `--max-items 1000` slice against the unchanged checkpoint/end,
-then review its redacted report and SQLite integrity. No volume policy or
+the refresh service can independently process the other 11,772 then-remaining
+series. A `--max-items 1000` slice and later three-part drain followed; the
+latter halted on rate limiting. No volume policy or
 stored-candle rewrite was implemented. Details:
 `docs/PHASE_7_WEEKLY_DRIFT_COHORT_RESULT.md`.
 
@@ -84,10 +96,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `92e28ce408e8d6b48869dfd44e10fc31f9981f63`
-**Current local package:** Weekly Drift-Cohort Result Audit
+**Current GitHub baseline:** `5b7905df339c98a6c7d48f54e51e7f6a70ed112f`
+**Current local package:** Explicit Weekly Rate-Limit Resume
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one 1000-item checkpoint-resuming weekly slice and review its redacted report and SQLite integrity
+**Current next action:** Run one opt-in rate-limit retry item and review its redacted report and SQLite integrity
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

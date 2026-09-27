@@ -18,6 +18,14 @@ No candle or weekly-checkpoint schema changes are introduced.
 
 ## Weekly candle refresh evidence
 
+Opt-in weekly rate-limit resume retains the same private checkpoint schema
+version 1. Its redacted report uses schema version 2 and adds
+`budget.retry_rate_limited=true`, `coverage.current_run_retry_count`, and
+`coverage.current_run_new_count`; the latter two sum to
+`current_run_attempted_count`. A retried outcome replaces its prior mutable
+checkpoint value, so completed coverage can remain constant during a retry.
+The default schema-version-1 report is unchanged.
+
 Private `WEEKLY_CANDLE_REFRESH` checkpoint schema version 1 binds manifest
 checksum, UTC-midnight exclusive end, and selected-success checksum. Outcomes
 are keyed by symbol and record terminal status, stable category, downloaded,

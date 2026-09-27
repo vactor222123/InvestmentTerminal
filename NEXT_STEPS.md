@@ -1,15 +1,27 @@
 # Investment Terminal — Next Steps
 
-## Controlled continuation of weekly collection
+## Explicit weekly rate-limit retry
+
+The three-part continuation reached 5,178 of 11,892 selected series and
+halted on one `RATE_LIMITED`; 6,714 were still unattempted. SQLite integrity
+was reported `ok`. Ordinary resume skips the checkpointed rate-limit outcome.
+The opt-in retry mode is implemented from exact baseline
+`5b7905df339c98a6c7d48f54e51e7f6a70ed112f`. After applying it and
+allowing the provider restriction to clear, run one
+`--retry-rate-limited --max-items 1` qualification against the same private
+checkpoint/end, then review its schema-2 redacted report and SQLite integrity.
+Do not launch the remaining 6,714 or change stored volume first. See
+`docs/PHASE_7_WEEKLY_RATE_LIMIT_RESUME.md`.
+
+## Historical controlled continuation of weekly collection
 
 The returned aggregate diagnostic is `COMPLETE`: all nine checkpointed drifts
 currently reproduce as volume-only differences; no OHLC change was observed
 in 54 compared overlap rows. The diagnostic did not insert its 90 new candles.
-The existing weekly service isolates these failed outcomes and can continue
-the other 11,772 series without changing persistence policy. Run one
-checkpoint-resuming `--max-items 1000` slice, review its redacted report and
-SQLite integrity, then decide the next collection budget. Do not reopen the
-nine terminal outcomes or overwrite stored volume. See
+The existing weekly service isolates these failed outcomes. A
+checkpoint-resuming `--max-items 1000` slice was followed by a three-part
+drain, which stopped on rate limiting. The nine terminal drift outcomes were
+not reopened, and stored volume was not overwritten. See
 `docs/PHASE_7_WEEKLY_DRIFT_COHORT_RESULT.md`.
 
 ## Historical complete weekly drift-cohort diagnostic
@@ -265,9 +277,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute one 1000-item checkpoint-resuming weekly slice and return its redacted
-aggregate report plus read-only SQLite integrity. Do not claim full-universe
-freshness or schedule updates before broader measured coverage.
+Execute one explicit retry of the checkpointed rate-limited series after the
+provider restriction clears, then return its redacted report and read-only
+SQLite integrity. Do not claim full-universe freshness or schedule updates
+before broader measured coverage.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

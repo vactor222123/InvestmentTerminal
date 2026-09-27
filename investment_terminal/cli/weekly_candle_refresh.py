@@ -26,6 +26,7 @@ def main(argv=None, *, client=None, clock=None, writer=write_json_atomic) -> int
     parser.add_argument("--report-output", type=Path, required=True)
     parser.add_argument("--end", type=datetime.fromisoformat, required=True)
     parser.add_argument("--max-items", type=int, required=True)
+    parser.add_argument("--retry-rate-limited", action="store_true")
     parser.add_argument("--json", action="store_true")
     options = parser.parse_args(argv)
     runtime_clock = clock or (lambda: datetime.now(timezone.utc))
@@ -67,11 +68,14 @@ def main(argv=None, *, client=None, clock=None, writer=write_json_atomic) -> int
             checkpoint_writer=lambda payload: writer(options.weekly_checkpoint, payload),
             clock=runtime_clock,
         )
-        payload = service.run(plan, checkpoint, max_items=options.max_items)
+        payload = service.run(
+            plan, checkpoint, max_items=options.max_items,
+            retry_rate_limited=options.retry_rate_limited,
+        )
     except Exception as exc:
         now = runtime_clock()
         payload = {
-            "schema_version": 1,
+            "schema_version": 2 if options.retry_rate_limited else 1,
             "operation_identity": "WEEKLY_CANDLE_REFRESH",
             "provider_identity": "YAHOO_FINANCE",
             "status": "FAILED",
@@ -81,7 +85,10 @@ def main(argv=None, *, client=None, clock=None, writer=write_json_atomic) -> int
             "manifest_checksum": plan.manifest_checksum if plan else None,
             "end": plan.end.isoformat() if plan else None,
             "selection_checksum": plan.selection_checksum if plan else None,
-            "budget": {"max_items": options.max_items},
+            "budget": (
+                {"max_items": options.max_items, "retry_rate_limited": True}
+                if options.retry_rate_limited else {"max_items": options.max_items}
+            ),
             "coverage": None,
             "failure_categories": [],
             "failure": "PRECONDITION_OR_RUNTIME_FAILURE",

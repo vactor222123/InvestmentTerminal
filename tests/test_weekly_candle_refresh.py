@@ -148,6 +148,135 @@ def test_rate_limit_halts_and_invalid_resume_does_not_call_provider(tmp_path):
     db.close()
 
 
+def test_opt_in_retry_recovers_rate_limit_before_new_series(tmp_path):
+    value, checksum, sources = plan_and_sources()
+    plan = WeeklyCandleRefreshPlan.from_manifest(value, checksum, sources.get, end=END)
+    db = Database(tmp_path / "candles.db")
+    db.initialize()
+    repo = CandleRepository(db)
+    for symbol, _ in plan.items:
+        repo.save(candle(symbol, LAST))
+    error = APIError("private provider text")
+    error.__cause__ = YFRateLimitError()
+    writes = []
+    first = WeeklyCandleRefreshService(
+        client=Client(failure=error), repository=repo,
+        checkpoint_writer=writes.append, clock=lambda: END,
+    ).run(plan, max_items=2)
+    assert first["status"] == "HALTED"
+    checkpoint_before_retry = writes[-1]
+
+    recovered = Client()
+    service = WeeklyCandleRefreshService(
+        client=recovered, repository=repo,
+        checkpoint_writer=writes.append, clock=lambda: END,
+    )
+    report = service.run(
+        plan, checkpoint_before_retry, max_items=2, retry_rate_limited=True,
+    )
+    assert report["schema_version"] == 2
+    assert report["status"] == "COMPLETE"
+    assert report["budget"] == {"max_items": 2, "retry_rate_limited": True}
+    assert report["coverage"]["current_run_attempted_count"] == 2
+    assert report["coverage"]["current_run_retry_count"] == 1
+    assert report["coverage"]["current_run_new_count"] == 1
+    assert report["coverage"]["completed_count"] == 2
+    assert report["failure_categories"] == []
+    assert len(recovered.calls) == 2
+    assert recovered.calls[0]["symbol"] == plan.items[0][0]
+    assert writes[-1]["schema_version"] == 1
+    assert all(repo.count(symbol, "D") == 2 for symbol, _ in plan.items)
+    assert all(symbol not in str(report) for symbol, _ in plan.items)
+    with pytest.raises(ValueError, match="No checkpointed rate limit"):
+        service.run(plan, writes[-1], max_items=1, retry_rate_limited=True)
+    assert len(recovered.calls) == 2
+    db.close()
+
+
+def test_repeated_rate_limit_retries_only_same_series_and_preserves_checkpoint(tmp_path):
+    value, checksum, sources = plan_and_sources()
+    plan = WeeklyCandleRefreshPlan.from_manifest(value, checksum, sources.get, end=END)
+    db = Database(tmp_path / "candles.db")
+    db.initialize()
+    repo = CandleRepository(db)
+    for symbol, _ in plan.items:
+        repo.save(candle(symbol, LAST))
+    error = APIError("private provider text")
+    error.__cause__ = YFRateLimitError()
+    client = Client(failure=error)
+    writes = []
+    service = WeeklyCandleRefreshService(
+        client=client, repository=repo,
+        checkpoint_writer=writes.append, clock=lambda: END,
+    )
+    service.run(plan, max_items=2)
+    previous = writes[-1]
+    report = service.run(plan, previous, max_items=2, retry_rate_limited=True)
+    assert report["status"] == "HALTED"
+    assert report["schema_version"] == 2
+    assert report["coverage"]["current_run_attempted_count"] == 1
+    assert report["coverage"]["current_run_retry_count"] == 1
+    assert report["coverage"]["current_run_new_count"] == 0
+    assert report["coverage"]["completed_count"] == 1
+    assert report["coverage"]["remaining_count"] == 1
+    assert writes[-1] == previous
+    assert len(client.calls) == 2
+    assert all(call["symbol"] == plan.items[0][0] for call in client.calls)
+    assert "private provider text" not in str(report)
+    ordinary_client = Client()
+    ordinary = WeeklyCandleRefreshService(
+        client=ordinary_client, repository=repo,
+        checkpoint_writer=lambda payload: None, clock=lambda: END,
+    ).run(plan, previous, max_items=1)
+    assert ordinary["schema_version"] == 1
+    assert ordinary["coverage"]["current_run_attempted_count"] == 1
+    assert ordinary["failure_categories"] == [
+        {"category": "RATE_LIMITED", "count": 1}
+    ]
+    assert ordinary_client.calls[0]["symbol"] == plan.items[1][0]
+    db.close()
+
+
+def test_retry_checkpoint_write_failure_can_repeat_idempotently(tmp_path):
+    value, checksum, sources = plan_and_sources(excluded=True)
+    plan = WeeklyCandleRefreshPlan.from_manifest(value, checksum, sources.get, end=END)
+    db = Database(tmp_path / "candles.db")
+    db.initialize()
+    repo = CandleRepository(db)
+    symbol = plan.items[0][0]
+    repo.save(candle(symbol, LAST))
+    error = APIError("private provider text")
+    error.__cause__ = YFRateLimitError()
+    writes = []
+    WeeklyCandleRefreshService(
+        client=Client(failure=error), repository=repo,
+        checkpoint_writer=writes.append, clock=lambda: END,
+    ).run(plan, max_items=1)
+    original = writes[-1]
+
+    def fail_write(payload):
+        raise RuntimeError("checkpoint write failed")
+
+    with pytest.raises(RuntimeError, match="checkpoint write failed"):
+        WeeklyCandleRefreshService(
+            client=Client(), repository=repo,
+            checkpoint_writer=fail_write, clock=lambda: END,
+        ).run(plan, original, max_items=1, retry_rate_limited=True)
+    assert repo.count(symbol, "D") == 2
+    assert original["outcomes"][symbol]["category"] == "RATE_LIMITED"
+
+    report = WeeklyCandleRefreshService(
+        client=Client(), repository=repo,
+        checkpoint_writer=writes.append, clock=lambda: END,
+    ).run(plan, original, max_items=1, retry_rate_limited=True)
+    assert report["status"] == "COMPLETE"
+    assert report["coverage"]["current_run_retry_count"] == 1
+    assert report["coverage"]["inserted_total"] == 0
+    assert report["coverage"]["duplicate_total"] == 2
+    assert repo.count(symbol, "D") == 2
+    db.close()
+
+
 def test_cli_writes_private_checkpoint_and_redacted_report(tmp_path):
     value, checksum, sources = plan_and_sources()
     plan = WeeklyCandleRefreshPlan.from_manifest(value, checksum, sources.get, end=END)
@@ -204,6 +333,64 @@ def test_cli_preflight_does_not_create_missing_database(tmp_path):
     assert result == 1
     assert not (tmp_path / "missing.db").exists()
     assert json.loads(report.read_text(encoding="utf-8"))["status"] == "FAILED"
+
+
+def test_cli_opt_in_retry_versions_report_and_keeps_checkpoint_schema(tmp_path):
+    value, checksum, sources = plan_and_sources()
+    plan = WeeklyCandleRefreshPlan.from_manifest(value, checksum, sources.get, end=END)
+    manifest_path = tmp_path / "manifest.json"
+    source_directory = tmp_path / "source"
+    source_directory.mkdir()
+    manifest_path.write_text(json.dumps(value), encoding="utf-8")
+    for index, source in sources.items():
+        (source_directory / f"batch_{index:04d}.json").write_text(
+            json.dumps(source), encoding="utf-8"
+        )
+    database_path = tmp_path / "candles.db"
+    db = Database(database_path)
+    db.initialize()
+    repo = CandleRepository(db)
+    for symbol, _ in plan.items:
+        repo.save(candle(symbol, LAST))
+    db.close()
+    checkpoint_path = tmp_path / "weekly.json"
+    args = [
+        "--manifest", str(manifest_path), "--manifest-checksum", checksum,
+        "--source-checkpoint-directory", str(source_directory),
+        "--weekly-checkpoint", str(checkpoint_path),
+        "--database", str(database_path),
+        "--cache-directory", str(tmp_path / "cache"),
+        "--end", END.isoformat(), "--max-items", "1",
+    ]
+    error = APIError("private provider text")
+    error.__cause__ = YFRateLimitError()
+    first_report = tmp_path / "first.json"
+    assert main(args + ["--report-output", str(first_report)],
+                client=Client(failure=error), clock=lambda: END) == 1
+    assert json.loads(first_report.read_text(encoding="utf-8"))["status"] == "HALTED"
+    retry_report = tmp_path / "retry.json"
+    client = Client()
+    assert main(args + [
+        "--report-output", str(retry_report), "--retry-rate-limited",
+    ], client=client, clock=lambda: END) == 0
+    report = json.loads(retry_report.read_text(encoding="utf-8"))
+    assert report["schema_version"] == 2
+    assert report["status"] == "BUDGET_EXHAUSTED"
+    assert report["coverage"]["completed_count"] == 1
+    assert report["coverage"]["current_run_retry_count"] == 1
+    assert report["coverage"]["current_run_new_count"] == 0
+    assert json.loads(checkpoint_path.read_text(encoding="utf-8"))["schema_version"] == 1
+    assert len(client.calls) == 1
+    assert client.calls[0]["symbol"] == plan.items[0][0]
+    failed_report = tmp_path / "no-rate-limit.json"
+    assert main(args + [
+        "--report-output", str(failed_report), "--retry-rate-limited",
+    ], client=client, clock=lambda: END) == 1
+    failed = json.loads(failed_report.read_text(encoding="utf-8"))
+    assert failed["schema_version"] == 2
+    assert failed["status"] == "FAILED"
+    assert failed["coverage"] is None
+    assert len(client.calls) == 1
 
 
 def test_per_series_provider_failure_continues_but_persistence_failure_stops(tmp_path):

@@ -19,6 +19,13 @@ or authorize wider refresh. Numeric-response diagnostics remain separate.
 
 ## Weekly candle refresh boundary
 
+An explicit rate-limit-resume mode may retry only checkpointed
+`FAILED/RATE_LIMITED` outcomes before never-attempted series. It preserves the
+schema-1 private checkpoint, unchanged default refresh behavior, strict stored
+OHLCV comparison, per-series SQLite commit, and atomic checkpoint write. Its
+separate schema-2 aggregate report distinguishes retries from new attempts;
+another rate limit stops the run without consuming an unrelated series.
+
 The post-bootstrap weekly operation is separate from ten-year collection.
 Operations validate the canonical manifest and complete source checkpoints,
 select only source `SUCCESS` daily series, own a run-specific private atomic

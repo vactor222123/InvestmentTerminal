@@ -140,7 +140,7 @@ class WeeklyCandleRefreshService:
         self.checkpoint_writer = checkpoint_writer
         self.clock = clock
 
-    def run(self, plan, checkpoint=None, *, max_items):
+    def run(self, plan, checkpoint=None, *, max_items, retry_rate_limited=False):
         if not isinstance(plan, WeeklyCandleRefreshPlan):
             raise TypeError("plan must be a WeeklyCandleRefreshPlan")
         if isinstance(max_items, bool) or not isinstance(max_items, int) or not (
@@ -148,19 +148,38 @@ class WeeklyCandleRefreshService:
         ):
             raise ValueError("max_items is outside the selected series")
         outcomes = _validated_outcomes(checkpoint, plan)
+        if not isinstance(retry_rate_limited, bool):
+            raise TypeError("retry_rate_limited must be a boolean")
+        retry_symbols = [
+            symbol for symbol, _ in plan.items
+            if symbol in outcomes
+            and outcomes[symbol]["status"] == "FAILED"
+            and outcomes[symbol]["category"] == "RATE_LIMITED"
+        ]
+        if retry_rate_limited and not retry_symbols:
+            raise ValueError("No checkpointed rate limit exists to retry")
         started = validate_aware_datetime(self.clock(), field_name="started_at")
         if plan.end > started.astimezone(plan.end.tzinfo).replace(
             hour=0, minute=0, second=0, microsecond=0
         ):
             raise ValueError("end cannot be after the last completed UTC day")
         attempted = 0
+        retried = 0
         halted = False
-        for symbol, currency in plan.items:
-            if symbol in outcomes:
+        retry_set = set(retry_symbols)
+        selected = (
+            [item for item in plan.items if item[0] in retry_set]
+            + [item for item in plan.items if item[0] not in outcomes]
+            if retry_rate_limited else plan.items
+        )
+        for symbol, currency in selected:
+            if not retry_rate_limited and symbol in outcomes:
                 continue
             if attempted >= max_items:
                 break
             attempted += 1
+            if symbol in retry_set:
+                retried += 1
             result = self._refresh_one(symbol, currency, plan.end)
             outcomes[symbol] = result
             self.checkpoint_writer({
@@ -187,8 +206,8 @@ class WeeklyCandleRefreshService:
             "HALTED" if halted else "BUDGET_EXHAUSTED" if remaining
             else "COMPLETE_WITH_FAILURES" if counts["FAILED"] else "COMPLETE"
         )
-        return {
-            "schema_version": 1,
+        report = {
+            "schema_version": 2 if retry_rate_limited else 1,
             "operation_identity": "WEEKLY_CANDLE_REFRESH",
             "provider_identity": "YAHOO_FINANCE",
             "status": status,
@@ -198,7 +217,10 @@ class WeeklyCandleRefreshService:
             "manifest_checksum": plan.manifest_checksum,
             "end": plan.end.isoformat(),
             "selection_checksum": plan.selection_checksum,
-            "budget": {"max_items": max_items},
+            "budget": (
+                {"max_items": max_items, "retry_rate_limited": True}
+                if retry_rate_limited else {"max_items": max_items}
+            ),
             "coverage": {
                 "selected_count": len(plan.items),
                 "source_excluded_count": plan.excluded_count,
@@ -229,6 +251,10 @@ class WeeklyCandleRefreshService:
                 "report excludes identities, currencies, prices, paths, provider text, and exception messages",
             ],
         }
+        if retry_rate_limited:
+            report["coverage"]["current_run_retry_count"] = retried
+            report["coverage"]["current_run_new_count"] = attempted - retried
+        return report
 
     def _refresh_one(self, symbol, currency, end):
         try:

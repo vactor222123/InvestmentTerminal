@@ -980,3 +980,9 @@ checkpoint isolates those terminal failures, a controlled 1000-item slice may
 continue the other 11,772 series without changing stored-candle policy.
 Volume-only acceptance, replay of terminal outcomes, and scheduler readiness
 remain separate future gates.
+
+The subsequent three-part weekly drain reached 5,178 selected series and
+halted on one provider rate limit. An explicit opt-in resume now retries only
+stored rate-limit outcomes before new series, reporting retries separately.
+Qualify one retry after provider recovery before continuing the remaining
+6,714; volume/numeric/no-price remediation and scheduling remain separate.
