@@ -1,6 +1,20 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — private ten-year span measurement
+## Current handoff — ten-year stored-span result reviewed
+
+Fresh clean `develop` matches caller baseline
+`27b15d6f3ff828e5ffb1850614b92f68b7fdd707`. The returned redacted
+schema-2 report measured 17,242,630 rows in the explicit ten-year window
+across 11,892 non-empty selected series. Only 4,410 satisfy both seven-day
+endpoint proxies; 36 series have a gap over seven calendar days. These are
+not exchange-session or listing-age conclusions. The separate SQLite
+integrity result was not returned in this handoff. This AUDIT package makes
+no runtime or application-code changes. Next: a versioned read-only cohort
+measurement to separate observed age, endpoint, gap, and weekly-failure
+groups before targeted remediation or scheduler decisions. See
+`docs/PHASE_7_TEN_YEAR_SPAN_RESULT_AUDIT.md`.
+
+## Historical handoff — private ten-year span measurement
 
 Fresh clean `develop` matches the caller's exact baseline
 `650a85b09390da8914515b3725b391be85da8fc1`. This operational package
@@ -12,7 +26,7 @@ integrity, and returns only the redacted report. Run it before applying the
 handoff ZIP. See `docs/PHASE_7_TEN_YEAR_SPAN_HANDOFF.md`. No Yahoo request,
 checkpoint mutation, mass collection, or scheduler is authorized.
 
-## Current Phase 7 gate — explicit ten-year stored span
+## Historical Phase 7 gate — explicit ten-year stored span
 
 Fresh clean `develop` matched caller-supplied
 `b76220fe7bfcd6ae9d1d052f2e2a22c3b5998ac4`. The returned schema-1
@@ -132,10 +146,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `5b7905df339c98a6c7d48f54e51e7f6a70ed112f`
-**Current local package:** Explicit Weekly Rate-Limit Resume
+**Current GitHub baseline:** `27b15d6f3ff828e5ffb1850614b92f68b7fdd707`
+**Current local package:** Ten-Year Stored-Span Result Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one opt-in rate-limit retry item and review its redacted report and SQLite integrity
+**Current next action:** Implement a read-only, versioned ten-year cohort breakdown
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

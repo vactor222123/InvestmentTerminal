@@ -1,6 +1,21 @@
 # Investment Terminal — Next Steps
 
-## Current gate — explicit ten-year stored span
+## Current gate — interpret the measured ten-year span
+
+The returned explicit-window schema-2 report has 17,242,630 stored rows
+across 11,892 non-empty selected series. The start/end seven-calendar-day
+proxies are both present for 4,410 series; 36 series have an interior gap
+over seven calendar days. The missing start proxy for 7,435 series is not
+automatically a data defect: listing and fund-inception dates are unknown.
+The separate SQLite integrity result was not returned with this report.
+Next package: implement one versioned, read-only, redacted cohort breakdown
+of observed age, endpoints, gaps, and weekly outcomes using the existing
+private evidence; test failure paths and preserve schema 1/2. Then review
+its private aggregate result before targeted quality work. Do not perform
+another mass acquisition or enable a weekly scheduler yet. See
+`docs/PHASE_7_TEN_YEAR_SPAN_RESULT_AUDIT.md`.
+
+## Historical gate — explicit ten-year stored span
 
 The completed offline stored-coverage report measured 17,300,242 daily rows
 across 11,892 selected series; 10,221 have at least 200 rows and 245 have no
@@ -81,7 +96,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 650a85b09390da8914515b3725b391be85da8fc1`
+**This package verified baseline:** `develop @ 27b15d6f3ff828e5ffb1850614b92f68b7fdd707`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -297,10 +312,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute one explicit-window offline stored-span measurement with the complete
-private weekly checkpoint, then return only its redacted schema-2 report and
-read-only SQLite integrity. Do not claim full-universe session completeness
-or schedule updates before this evidence is reviewed.
+Implement one read-only versioned cohort breakdown over the existing private
+evidence, then review its redacted aggregate report and separate SQLite
+integrity result. Do not claim full-universe session completeness or schedule
+updates before cohort evidence is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
