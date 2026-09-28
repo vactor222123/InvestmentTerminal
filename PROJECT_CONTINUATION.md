@@ -1,6 +1,18 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — observed-history cohorts implemented
+## Current handoff — private observed-history cohort scan
+
+Fresh clean `develop` matched caller baseline
+`bc90efe5976138a6d4690c004713f86064ab0f77`. This OPERATIONAL package
+changes no application code and does not access private runtime data. One
+ASCII-only, read-only PowerShell block binds the 601 source checkpoints,
+complete weekly checkpoint, ten-year window, cohort aggregate reconciliation,
+and SQLite integrity. Run it before applying the handoff ZIP; return only the
+redacted report and integrity line. See
+`docs/PHASE_7_TEN_YEAR_COHORT_HANDOFF.md`. No Yahoo request, database or
+checkpoint mutation, mass collection, or scheduler is authorized.
+
+## Historical handoff — observed-history cohorts implemented
 
 Fresh clean `develop` matched `9bc6644bda3a48ac655d67f55b0909f26144328c`.
 A separate read-only, redacted cohort command now partitions observed first
@@ -158,10 +170,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `9bc6644bda3a48ac655d67f55b0909f26144328c`
-**Current local package:** Observed-History Cohort Measurement
+**Current GitHub baseline:** `bc90efe5976138a6d4690c004713f86064ab0f77`
+**Current local package:** Observed-History Cohort Operational Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Prepare one exact-baseline private cohort-report handoff
+**Current next action:** Run the private cohort handoff and review its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

@@ -1,6 +1,16 @@
 # Investment Terminal — Next Steps
 
-## Current gate — qualify the cohort command privately
+## Current gate — execute one private cohort scan
+
+Run the exact-baseline ASCII-only PowerShell block in
+`docs/PHASE_7_TEN_YEAR_COHORT_HANDOFF.md` before applying its ZIP. Return only
+the redacted `weekly_stored_cohorts_20160923_20260923_001.json` report and
+`SQLite integrity: ok` line. The command reads the existing private
+manifest/checkpoints/database without Yahoo or persistence changes. Review
+its observed-age, endpoint, gap, and weekly-outcome intersections before any
+targeted remediation or unattended weekly schedule.
+
+## Historical gate — qualify the cohort command privately
 
 The new `weekly_stored_cohorts` CLI has a separate redacted report contract
 and preserves stored-coverage schema 1/2. Prepare one exact-baseline,
@@ -106,7 +116,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 9bc6644bda3a48ac655d67f55b0909f26144328c`
+**This package verified baseline:** `develop @ bc90efe5976138a6d4690c004713f86064ab0f77`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -322,8 +332,8 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Prepare one exact-baseline private read-only cohort-report handoff, then review
-its redacted aggregate result and separate SQLite integrity. Do not claim
+Run one exact-baseline private read-only cohort report, then review its
+redacted aggregate result and separate SQLite integrity. Do not claim
 full-universe session completeness or schedule updates before that evidence.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
