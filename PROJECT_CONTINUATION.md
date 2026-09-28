@@ -1,5 +1,17 @@
 # InvestmentTerminal — Project Continuation
 
+## Current handoff — private ten-year span measurement
+
+Fresh clean `develop` matches the caller's exact baseline
+`650a85b09390da8914515b3725b391be85da8fc1`. This operational package
+changes no application code and does not access private runtime data. One
+ASCII-only PowerShell block runs the existing schema-2 read-only scan for
+`2016-09-23T00:00:00Z` through the exclusive
+`2026-09-23T00:00:00Z` bound, validates aggregate bindings and SQLite
+integrity, and returns only the redacted report. Run it before applying the
+handoff ZIP. See `docs/PHASE_7_TEN_YEAR_SPAN_HANDOFF.md`. No Yahoo request,
+checkpoint mutation, mass collection, or scheduler is authorized.
+
 ## Current Phase 7 gate — explicit ten-year stored span
 
 Fresh clean `develop` matched caller-supplied

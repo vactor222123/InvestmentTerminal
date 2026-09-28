@@ -9,7 +9,9 @@ of ten-year continuity. The `weekly_stored_coverage` CLI now has an optional
 schema-2 explicit-window measurement. Run one private read-only invocation
 with `--history-start 2016-09-23T00:00:00+00:00`, return only its redacted
 report and SQLite integrity, and review before another market scan or weekly
-scheduler. See `docs/PHASE_7_TEN_YEAR_STORED_SPAN.md`.
+scheduler. The exact-baseline ASCII-only PowerShell handoff is
+`docs/PHASE_7_TEN_YEAR_SPAN_HANDOFF.md`; execute it once before applying the
+handoff documentation ZIP. See `docs/PHASE_7_TEN_YEAR_STORED_SPAN.md`.
 
 ## Historical gate — offline stored-coverage measurement
 
@@ -79,7 +81,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ b76220fe7bfcd6ae9d1d052f2e2a22c3b5998ac4`
+**This package verified baseline:** `develop @ 650a85b09390da8914515b3725b391be85da8fc1`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
