@@ -10,7 +10,9 @@ from investment_terminal.operations.weekly_candle_refresh import (
 from investment_terminal.utils.validation import validate_aware_datetime
 
 
-def measure_weekly_stored_coverage(plan, checkpoint, connection, *, history_start=None):
+def measure_weekly_stored_coverage(
+    plan, checkpoint, connection, *, history_start=None, _cohort_observer=None,
+):
     """Measure SQLite rows before the bound exclusive end, without identities."""
     if not isinstance(plan, WeeklyCandleRefreshPlan):
         raise TypeError("plan must be a WeeklyCandleRefreshPlan")
@@ -93,6 +95,7 @@ def measure_weekly_stored_coverage(plan, checkpoint, connection, *, history_star
             previous_jd = None
             series_gap_7 = False
             series_gap_30 = False
+            largest_gap = 0
             for (day_jd,) in connection.execute(
                 """SELECT julianday(timestamp) FROM candles
                    WHERE symbol = ? AND resolution = 'D'
@@ -105,6 +108,7 @@ def measure_weekly_stored_coverage(plan, checkpoint, connection, *, history_star
                     first_window_jd = day_jd
                 if previous_jd is not None:
                     gap = day_jd - previous_jd
+                    largest_gap = max(largest_gap, gap)
                     if gap > 7.000001:
                         gap_7_count += 1
                         series_gap_7 = True
@@ -123,6 +127,11 @@ def measure_weekly_stored_coverage(plan, checkpoint, connection, *, history_star
                 both_proxy_count += at_start and at_end
             series_gap_7_count += series_gap_7
             series_gap_30_count += series_gap_30
+            if _cohort_observer is not None:
+                _cohort_observer(
+                    first_window_jd, last_window_jd, largest_gap,
+                    outcomes[symbol], start_jd, end_jd,
+                )
 
     selected = len(plan.items)
     report = {

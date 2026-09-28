@@ -1,5 +1,12 @@
 # Investment Terminal — Software Architecture
 
+The separate `weekly_stored_cohorts` operation reuses the validated,
+read-only stored-coverage scan in one SQLite snapshot. Its versioned redacted
+report groups observed first-candle offsets, endpoint proxies, maximum
+calendar gaps, and weekly-outcome intersections without changing existing
+coverage reports, candles, checkpoints, or provider behavior. It does not
+infer listing age, missing trading sessions, or analysis readiness.
+
 The optional explicit-start weekly stored-coverage scan holds one read-only
 SQLite snapshot and emits only aggregate window-endpoint and calendar-gap
 proxies. The default report remains schema 1; the opt-in report is schema 2.

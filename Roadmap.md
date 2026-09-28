@@ -1,5 +1,13 @@
 # Investment Terminal — Product Roadmap
 
+The measured ten-year span has 17,242,630 in-window rows over 11,892 series,
+but only 4,410 meet both endpoint proxies. A separate read-only cohort report
+is now implemented to partition observed start age, endpoints, interior gaps,
+and weekly-outcome overlaps without labeling late listings as defects. A
+private qualification and any targeted quality policy must precede unattended
+weekly scheduling or analysis-readiness claims. See
+`docs/PHASE_7_TEN_YEAR_COHORTS.md`.
+
 The offline schema-1 weekly stored-coverage measurement confirms 17,300,242
 rows but not ten-year continuity. An optional schema-2 explicit-window
 span/calendar-gap report is implemented from baseline

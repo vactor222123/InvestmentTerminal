@@ -1,5 +1,13 @@
 # Investment Terminal — Data Model
 
+`WEEKLY_STORED_COHORTS` schema version 1 is a separate redacted report bound
+to manifest/selection checksums and an explicit half-open history window. It
+contains mutually exclusive first-observation-age, endpoint-proxy, and
+maximum-calendar-gap bins plus aggregate weekly-outcome intersections. It
+contains no per-series identity or exact per-series timestamp. Existing
+`WEEKLY_STORED_COVERAGE` schema 1/2, candle storage, and private weekly
+checkpoint contracts are unchanged.
+
 `WEEKLY_STORED_COVERAGE` schema 2 is opt-in via an explicit UTC-midnight
 `history_start` before the checkpoint's exclusive end. It preserves all
 schema-1 fields and adds the start plus aggregate half-open-window row/zero

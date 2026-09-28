@@ -1,6 +1,16 @@
 # Investment Terminal — Next Steps
 
-## Current gate — interpret the measured ten-year span
+## Current gate — qualify the cohort command privately
+
+The new `weekly_stored_cohorts` CLI has a separate redacted report contract
+and preserves stored-coverage schema 1/2. Prepare one exact-baseline,
+user-executed read-only PowerShell handoff using the complete existing private
+manifest/checkpoints/database and the same explicit 2016–2026 window. Review
+only its redacted aggregate result plus independent SQLite integrity before
+targeted quality work. The command is reusable for later checkpoints but is
+not yet an automatic weekly gate. See `docs/PHASE_7_TEN_YEAR_COHORTS.md`.
+
+## Historical gate — interpret the measured ten-year span
 
 The returned explicit-window schema-2 report has 17,242,630 stored rows
 across 11,892 non-empty selected series. The start/end seven-calendar-day
@@ -96,7 +106,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 27b15d6f3ff828e5ffb1850614b92f68b7fdd707`
+**This package verified baseline:** `develop @ 9bc6644bda3a48ac655d67f55b0909f26144328c`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -312,10 +322,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement one read-only versioned cohort breakdown over the existing private
-evidence, then review its redacted aggregate report and separate SQLite
-integrity result. Do not claim full-universe session completeness or schedule
-updates before cohort evidence is reviewed.
+Prepare one exact-baseline private read-only cohort-report handoff, then review
+its redacted aggregate result and separate SQLite integrity. Do not claim
+full-universe session completeness or schedule updates before that evidence.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

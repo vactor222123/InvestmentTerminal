@@ -1,6 +1,18 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — ten-year stored-span result reviewed
+## Current handoff — observed-history cohorts implemented
+
+Fresh clean `develop` matched `9bc6644bda3a48ac655d67f55b0909f26144328c`.
+A separate read-only, redacted cohort command now partitions observed first
+timestamps, endpoint proxies, maximum calendar gaps, and weekly-outcome
+intersections in one validated SQLite scan. It preserves existing coverage
+report schemas and does not classify listing age or missing sessions. No
+private runtime command was executed. Next: one exact-baseline operational
+handoff for the complete private manifest/checkpoint/SQLite inputs; return
+only its redacted cohort report and independent SQLite integrity. See
+`docs/PHASE_7_TEN_YEAR_COHORTS.md`.
+
+## Historical handoff — ten-year stored-span result reviewed
 
 Fresh clean `develop` matches caller baseline
 `27b15d6f3ff828e5ffb1850614b92f68b7fdd707`. The returned redacted
@@ -146,10 +158,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `27b15d6f3ff828e5ffb1850614b92f68b7fdd707`
-**Current local package:** Ten-Year Stored-Span Result Audit
+**Current GitHub baseline:** `9bc6644bda3a48ac655d67f55b0909f26144328c`
+**Current local package:** Observed-History Cohort Measurement
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement a read-only, versioned ten-year cohort breakdown
+**Current next action:** Prepare one exact-baseline private cohort-report handoff
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
