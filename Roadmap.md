@@ -1,5 +1,11 @@
 # Investment Terminal — Product Roadmap
 
+The offline schema-1 weekly stored-coverage measurement confirms 17,300,242
+rows but not ten-year continuity. An optional schema-2 explicit-window
+span/calendar-gap report is implemented from baseline
+`b76220fe7bfcd6ae9d1d052f2e2a22c3b5998ac4`; its private operational
+result is required before targeted remediation or scheduler readiness.
+
 Phase 7 current gate: the weekly 2026-09-23 drain attempted all 11,892
 selected daily series, but aggregate refresh success does not establish
 ten-year session completeness. The offline stored-coverage measurement is

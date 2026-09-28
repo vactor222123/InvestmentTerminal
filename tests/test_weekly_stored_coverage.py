@@ -46,6 +46,9 @@ def test_aggregate_is_read_only_and_redacted(tmp_path):
     assert result["coverage"]["sample_50_ready_count"] == 0
     assert result["coverage"]["last_candle_within_7_calendar_days_count"] == 2
     assert all(symbol not in str(result) for symbol, _ in plan.items)
+    assert result["schema_version"] == 1
+    assert "history_start" not in result
+    assert "history_window_row_count" not in result["coverage"]
     database.close()
     assert path.read_bytes() == before
 
@@ -150,3 +153,92 @@ def test_invalid_stored_data_fails_closed(tmp_path, field, value):
     with pytest.raises(ValueError, match="invalid timestamps or currency"):
         measure_weekly_stored_coverage(plan, _checkpoint(plan), database.connection)
     database.close()
+
+
+def test_history_window_endpoints_and_long_gaps_are_aggregate_only(tmp_path):
+    manifest, checksum, sources = plan_and_sources()
+    plan = WeeklyCandleRefreshPlan.from_manifest(manifest, checksum, sources.get, end=END)
+    start = END - timedelta(days=40)
+    database = Database(tmp_path / "candles.db")
+    database.initialize()
+    repository = CandleRepository(database)
+    symbol = plan.items[0][0]
+    for offset in (1, 8, 39):
+        repository.save(candle(symbol, start + timedelta(days=offset)))
+    repository.save(candle(plan.items[1][0], start - timedelta(days=1)))
+    result = measure_weekly_stored_coverage(
+        plan, _checkpoint(plan), database.connection, history_start=start,
+    )
+    assert result["schema_version"] == 2
+    assert result["history_start"] == start.isoformat()
+    coverage = result["coverage"]
+    assert coverage["history_window_row_count"] == 3
+    assert coverage["history_window_zero_count"] == 1
+    assert coverage["first_candle_within_7_calendar_days_of_start_count"] == 1
+    assert coverage["last_candle_within_7_calendar_days_of_end_count"] == 1
+    assert coverage["both_endpoint_proxy_count"] == 1
+    assert coverage["series_with_gap_over_7_calendar_days_count"] == 1
+    assert coverage["gap_over_7_calendar_days_count"] == 1
+    assert coverage["series_with_gap_over_30_calendar_days_count"] == 1
+    assert coverage["gap_over_30_calendar_days_count"] == 1
+    assert all(item[0] not in str(result) for item in plan.items)
+    database.close()
+
+
+@pytest.mark.parametrize("start", [
+    END.replace(tzinfo=None), END, END - timedelta(hours=1),
+])
+def test_history_start_must_be_utc_midnight_before_end(tmp_path, start):
+    manifest, checksum, sources = plan_and_sources()
+    plan = WeeklyCandleRefreshPlan.from_manifest(manifest, checksum, sources.get, end=END)
+    database = Database(tmp_path / "candles.db")
+    database.initialize()
+    with pytest.raises(ValueError):
+        measure_weekly_stored_coverage(
+            plan, _checkpoint(plan), database.connection, history_start=start,
+        )
+    database.close()
+
+
+def test_cli_history_start_reports_version_two_and_bad_value_fails(tmp_path):
+    manifest, checksum, sources = plan_and_sources()
+    plan = WeeklyCandleRefreshPlan.from_manifest(manifest, checksum, sources.get, end=END)
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    source_dir = tmp_path / "sources"
+    source_dir.mkdir()
+    for index, source in sources.items():
+        (source_dir / f"batch_{index:04d}.json").write_text(json.dumps(source), encoding="utf-8")
+    checkpoint_path = tmp_path / "weekly.json"
+    checkpoint_path.write_text(json.dumps(_checkpoint(plan)), encoding="utf-8")
+    database_path = tmp_path / "candles.db"
+    database = Database(database_path)
+    database.initialize()
+    CandleRepository(database).save(candle(plan.items[0][0], LAST))
+    database.close()
+    before_database = database_path.read_bytes()
+    args = [
+        "--manifest", str(manifest_path), "--manifest-checksum", checksum,
+        "--source-checkpoint-directory", str(source_dir),
+        "--weekly-checkpoint", str(checkpoint_path),
+        "--database", str(database_path),
+    ]
+    start = END - timedelta(days=40)
+    report = tmp_path / "history.json"
+    assert main(args + [
+        "--history-start", start.isoformat(), "--report-output", str(report),
+    ]) == 0
+    payload = json.loads(report.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == 2
+    assert payload["history_start"] == start.isoformat()
+    assert payload["coverage"]["history_window_row_count"] == 1
+    assert database_path.read_bytes() == before_database
+    bad_report = tmp_path / "bad-history.json"
+    assert main(args + [
+        "--history-start", "not-a-date", "--report-output", str(bad_report),
+    ]) == 1
+    failed = json.loads(bad_report.read_text(encoding="utf-8"))
+    assert failed["schema_version"] == 2
+    assert failed["status"] == "FAILED"
+    assert failed["history_start"] is None
+    assert "not-a-date" not in str(failed)

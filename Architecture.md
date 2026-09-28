@@ -1,5 +1,10 @@
 # Investment Terminal — Software Architecture
 
+The optional explicit-start weekly stored-coverage scan holds one read-only
+SQLite snapshot and emits only aggregate window-endpoint and calendar-gap
+proxies. The default report remains schema 1; the opt-in report is schema 2.
+Neither infers missing exchange sessions or acquires market data.
+
 The Phase 7 offline stored-coverage CLI reads only a manifest, bound
 checkpoints, and an existing SQLite database opened in read-only mode. Its
 operations-layer measurement produces aggregate counts, never per-symbol

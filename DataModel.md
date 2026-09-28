@@ -1,5 +1,13 @@
 # Investment Terminal — Data Model
 
+`WEEKLY_STORED_COVERAGE` schema 2 is opt-in via an explicit UTC-midnight
+`history_start` before the checkpoint's exclusive end. It preserves all
+schema-1 fields and adds the start plus aggregate half-open-window row/zero
+counts, seven-calendar-day start/end/both endpoint proxies, and series/event
+counts for consecutive-candle gaps over seven and 30 calendar days. These
+are not exchange-session-completeness or indicator-value claims. Omitting
+the start retains the exact schema-1 shape.
+
 `WEEKLY_STORED_COVERAGE` report schema 1 is a redacted aggregate projection
 bound by manifest checksum, selection checksum, and exclusive end. Its
 `coverage` object reports selected-series and stored-row counts, zero/1–49/

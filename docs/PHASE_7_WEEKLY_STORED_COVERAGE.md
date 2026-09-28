@@ -1,6 +1,7 @@
 # Phase 7 — offline weekly stored-coverage audit
 
-Classification: implementation and local qualification; private operational run pending.
+Classification: implementation and local qualification; private operational
+schema-1 run subsequently completed.
 Baseline: `eacc9990601ed1084c801e950a2a0b04350eedcb` on `develop`.
 
 The completed 2026-09-23 weekly checkpoint records 11,892 attempted selected
@@ -20,11 +21,14 @@ readiness, a seven-calendar-day latest-row proxy, and weekly outcome counts.
 It excludes symbols, currencies, prices, paths, per-series dates, and raw
 exception text. Any invalid selected timestamp or currency fails closed.
 
+The returned private schema-1 report records 17,300,242 daily rows,
+11,566 series with at least 50 rows, 10,221 with at least 200, and 245
+without a candle in the final seven calendar days. The user reported SQLite
+integrity `ok`. See `docs/PHASE_7_TEN_YEAR_STORED_SPAN.md` for the separate
+explicit-window follow-up.
+
 The count bins and seven-day proxy do not prove exchange-session coverage,
 corporate-action-adjusted prices, data quality of OHLC, or computed SMA
 values. Do not activate unattended weekly scheduling or claim analysis-ready
-coverage from this report alone. The next operational step is one private
-read-only run with the existing manifest, source checkpoint directory,
-complete weekly checkpoint, and SQLite database; return only the redacted
-report plus a separate SQLite integrity result. Review aggregate gaps before
+coverage from this report alone. Review explicit-window aggregate gaps before
 selecting a bounded quality-remediation package.

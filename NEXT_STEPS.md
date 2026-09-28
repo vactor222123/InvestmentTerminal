@@ -1,14 +1,25 @@
 # Investment Terminal — Next Steps
 
-## Current gate — offline stored-coverage measurement
+## Current gate — explicit ten-year stored span
+
+The completed offline stored-coverage report measured 17,300,242 daily rows
+across 11,892 selected series; 10,221 have at least 200 rows and 245 have no
+candle within seven calendar days of the exclusive end. This is not evidence
+of ten-year continuity. The `weekly_stored_coverage` CLI now has an optional
+schema-2 explicit-window measurement. Run one private read-only invocation
+with `--history-start 2016-09-23T00:00:00+00:00`, return only its redacted
+report and SQLite integrity, and review before another market scan or weekly
+scheduler. See `docs/PHASE_7_TEN_YEAR_STORED_SPAN.md`.
+
+## Historical gate — offline stored-coverage measurement
 
 The 2026-09-23 weekly refresh attempted all 11,892 selected daily series:
 11,678 successes and 214 isolated failures. SQLite integrity was reported
 `ok`. This does not prove ten-year per-series history or session freshness.
-Run the read-only `weekly_stored_coverage` CLI against the private complete
-weekly checkpoint and SQLite database, then return only its redacted report
-and a separate integrity result. Do not start another mass scan or enable a
-weekly scheduler before evaluating measured gaps. See
+The read-only `weekly_stored_coverage` CLI was run against the private complete
+weekly checkpoint and SQLite database; its returned redacted schema-1 report
+and separate integrity result were reviewed. Do not start another mass scan
+or enable a weekly scheduler before evaluating measured gaps. See
 `docs/PHASE_7_WEEKLY_STORED_COVERAGE.md`.
 
 ## Historical explicit weekly rate-limit retry
@@ -68,7 +79,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ eacc9990601ed1084c801e950a2a0b04350eedcb`
+**This package verified baseline:** `develop @ b76220fe7bfcd6ae9d1d052f2e2a22c3b5998ac4`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -284,10 +295,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute the offline stored-coverage measurement on the complete private
-weekly checkpoint, then return its redacted report and read-only SQLite
-integrity. Do not claim full-universe freshness or schedule updates before
-broader measured coverage.
+Execute one explicit-window offline stored-span measurement with the complete
+private weekly checkpoint, then return only its redacted schema-2 report and
+read-only SQLite integrity. Do not claim full-universe session completeness
+or schedule updates before this evidence is reviewed.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

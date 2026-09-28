@@ -20,6 +20,7 @@ def main(argv=None, *, writer=write_json_atomic):
     parser.add_argument("--weekly-checkpoint", required=True, type=Path)
     parser.add_argument("--database", required=True, type=Path)
     parser.add_argument("--report-output", required=True, type=Path)
+    parser.add_argument("--history-start")
     parser.add_argument("--json", action="store_true")
     options = parser.parse_args(argv)
     if options.report_output.exists():
@@ -45,12 +46,19 @@ def main(argv=None, *, writer=write_json_atomic):
             end=datetime.fromisoformat(checkpoint["end"]),
         )
         uri = options.database.resolve().as_uri() + "?mode=ro"
+        history_start = (
+            datetime.fromisoformat(options.history_start)
+            if options.history_start is not None else None
+        )
         with closing(sqlite3.connect(uri, uri=True)) as connection:
             connection.execute("PRAGMA query_only = ON")
-            payload = measure_weekly_stored_coverage(plan, checkpoint, connection)
+            connection.execute("BEGIN")
+            payload = measure_weekly_stored_coverage(
+                plan, checkpoint, connection, history_start=history_start,
+            )
     except Exception:
         payload = {
-            "schema_version": 1,
+            "schema_version": 2 if options.history_start is not None else 1,
             "operation_identity": "WEEKLY_STORED_COVERAGE",
             "status": "FAILED",
             "manifest_checksum": None,
@@ -61,6 +69,8 @@ def main(argv=None, *, writer=write_json_atomic):
             "failure": "PRECONDITION_OR_RUNTIME_FAILURE",
             "limitations": ["failed report excludes identities, prices, paths, and exception messages"],
         }
+        if options.history_start is not None:
+            payload["history_start"] = None
     writer(options.report_output, payload)
     if options.json:
         print(json.dumps(payload, indent=2, allow_nan=False))

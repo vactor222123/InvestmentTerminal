@@ -1,15 +1,27 @@
 # InvestmentTerminal — Project Continuation
 
-## Current Phase 7 gate — stored coverage, not another collection sweep
+## Current Phase 7 gate — explicit ten-year stored span
+
+Fresh clean `develop` matched caller-supplied
+`b76220fe7bfcd6ae9d1d052f2e2a22c3b5998ac4`. The returned schema-1
+offline report measured 17,300,242 rows over 11,892 selected series; 10,221
+have at least 200 rows, 245 lack a candle within seven calendar days of the
+exclusive end, and user-reported SQLite integrity is `ok`. This package adds
+an optional schema-2, explicit-start, read-only span/gap projection while
+preserving the schema-1 default. Next: one private run for
+2016-09-23T00:00:00Z to 2026-09-23T00:00:00Z and review only its redacted
+report plus integrity. See `docs/PHASE_7_TEN_YEAR_STORED_SPAN.md`.
+
+## Prior Phase 7 gate — stored coverage, not another collection sweep
 
 The user-provided complete weekly drain report for exclusive end
 `2026-09-23T00:00:00+00:00` records 11,892 attempted selected series,
 11,678 successes, and 214 isolated failures (42 `NO_PRICE_DATA`, 140
 `RESPONSE_NUMERIC`, 32 `STORED_CANDLE_DRIFT`). The user independently
 reported SQLite integrity `ok`. This package adds a read-only, redacted
-aggregate SQLite coverage audit, locally tested but not run on private data.
-It must be run before interpreting 50/200-row readiness as analysis-ready
-history or enabling unattended weekly refresh. See
+aggregate SQLite coverage audit; its private redacted result has now been
+reviewed above. It does not justify interpreting 50/200-row readiness as
+analysis-ready history or enabling unattended weekly refresh. See
 `docs/PHASE_7_WEEKLY_STORED_COVERAGE.md`.
 
 ## Weekly rate-limit resume
