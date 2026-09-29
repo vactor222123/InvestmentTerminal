@@ -1,5 +1,13 @@
 # Investment Terminal — Software Architecture
 
+The profile-backed `weekly_run` CLI is an outer composition root over the
+existing weekly refresh CLI/service. It validates private static paths and
+manifest/source binding, derives separate per-end private checkpoints and
+per-slice redacted reports, holds an exclusive profile-local operator lock during
+each slice, and preserves the existing refresh and failure
+semantics. It does not introduce a second downloader, scheduler, or quality
+authority; stored-coverage diagnostics remain separate read-only operations.
+
 `weekly_stale_gap_diagnostic` is a separate read-only operations/CLI boundary
 over the existing validated stored-coverage scan and one SQLite snapshot. It
 selects only weekly `SUCCESS` series that lack the end proxy or have an

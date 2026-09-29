@@ -1,6 +1,18 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — repeatable weekly-run boundary audited
+## Current handoff — short bounded weekly-run CLI implemented
+
+Fresh clean GitHub `develop` matched
+`5f82f1984cbef824b01a62edaca8aa4635db1b30`. A profile-backed
+`weekly_run` CLI now validates private static inputs, derives per-end
+checkpoints and per-slice non-overwriting reports, and delegates one bounded
+slice to the existing refresh service. Explicit rate-limit retry remains
+optional; all existing refresh JSON contracts are unchanged. No private
+profile, provider request, or runtime database mutation occurred. Next:
+prepare a checksum-bound operational handoff to bootstrap the profile and
+qualify one new-end item. See `docs/PHASE_7_WEEKLY_RUN_CLI.md`.
+
+## Historical handoff — repeatable weekly-run boundary audited
 
 Fresh clean GitHub `develop` matched
 `2e3aceeb51a133db3f280d97097b5ce91209c5a5`. The existing weekly
@@ -231,10 +243,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `2e3aceeb51a133db3f280d97097b5ce91209c5a5`
-**Current local package:** Repeatable Weekly-Run Boundary Audit
+**Current GitHub baseline:** `5f82f1984cbef824b01a62edaca8aa4635db1b30`
+**Current local package:** Profile-Backed Weekly-Run CLI
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement one bounded profile-backed weekly-slice CLI
+**Current next action:** Bootstrap private weekly profile and qualify one new-end item
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

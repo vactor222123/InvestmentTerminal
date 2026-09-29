@@ -1,15 +1,16 @@
 # Investment Terminal — Next Steps
 
-## Current gate — implement a bounded short-command weekly slice
+## Current gate — qualify the short weekly-run command privately
 
-The audit in `docs/PHASE_7_WEEKLY_RUN_BOUNDARY_AUDIT.md` found that the
-existing refresh service already owns bounded resume and persistence, while
-the CLI requires nine explicit inputs and no reusable private runtime
-profile exists. Implement one profile-backed CLI for a bounded weekly slice,
-with explicit UTC-midnight end and budget, cross-end checkpoint isolation,
-unique redacted report output, and unchanged existing refresh JSON contracts.
-Add normal and failure-path tests. Keep a separate read-only quality summary
-for a later package; do not add a scheduler, automatic retry, or backfill.
+The profile-backed `weekly_run` CLI now accepts one private static profile,
+an explicit UTC-midnight exclusive end, item budget, and slice ID. It derives
+separate per-end checkpoints and per-slice reports, validates source evidence
+before provider access, and preserves existing refresh JSON contracts.
+Prepare one exact-baseline ASCII-only user handoff to build the private profile
+from verified runtime evidence and execute `--max-items 1` for a new end.
+Return only its redacted report and SQLite integrity. Do not schedule, retry
+other failures, backfill, or infer indicator/session quality yet. See
+`docs/PHASE_7_WEEKLY_RUN_CLI.md`.
 
 ## Historical gate — diagnose successful-but-stale and long-gap series
 
@@ -139,7 +140,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 2e3aceeb51a133db3f280d97097b5ce91209c5a5`
+**This package verified baseline:** `develop @ 5f82f1984cbef824b01a62edaca8aa4635db1b30`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -355,9 +356,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement one bounded profile-backed weekly-slice CLI and test its fail-closed
-profile/end/report handling before a new-end operational qualification. Keep
-quality classification separate and do not schedule updates yet.
+Prepare one checksum-bound private profile bootstrap and one new-end item
+qualification handoff. Keep quality classification separate and do not
+schedule updates yet.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

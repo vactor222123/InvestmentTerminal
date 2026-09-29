@@ -1,5 +1,13 @@
 # Investment Terminal — Data Model
 
+`WEEKLY_RUN_PROFILE` schema version 1 is a private, path-bearing runtime
+configuration with exact fields for the manifest and checksum, complete
+source checkpoint directory, existing candle database, cache, and separate
+weekly checkpoint/report directories. It is not a shareable report or market
+evidence. The short weekly CLI derives filenames from the explicit exclusive
+UTC end and three-digit slice ID. Existing `WEEKLY_CANDLE_REFRESH` private
+checkpoint schema 1 and redacted report schemas 1/2 remain unchanged.
+
 `WEEKLY_STALE_GAP_DIAGNOSTIC` schema version 1 is a separate aggregate report
 bound by manifest/selection checksums and explicit start/exclusive end. It
 contains stale/long-gap/intersection/union counts, duration bins, and

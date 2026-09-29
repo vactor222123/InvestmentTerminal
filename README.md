@@ -177,6 +177,16 @@ depend on developer-local personal portfolio files.
 
 ## Operational CLIs
 
+Bounded profile-backed weekly candle slice:
+
+```text
+python -m investment_terminal.cli.weekly_run
+```
+
+It requires a verified private runtime profile, explicit exclusive UTC end,
+item budget, and slice ID. It is not a scheduler or a data-quality verdict;
+see `docs/PHASE_7_WEEKLY_RUN_CLI.md`.
+
 Integrated investment review:
 
 ```text
