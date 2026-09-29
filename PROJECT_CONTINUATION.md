@@ -1,6 +1,19 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — private stale-success/gap diagnostic
+## Current handoff — stale-success/gap result reviewed
+
+Fresh direct GitHub clone of clean `develop` matched
+`7e6655f1bdac67bab6f16d61c966452544a1e73a`. The returned redacted
+diagnostic reconciles 31 stale weekly successes and 36 successes with a
+gap over seven calendar days: 19 overlap, 48 distinct. Their aggregate
+transfers are 325 downloaded, 115 inserted, 210 duplicates, and zero
+trailing omissions. The user reported SQLite integrity `ok`. This AUDIT
+package makes no application or runtime change. Next: audit a repeatable,
+short-command weekly-run boundary and separate quality summary; do not
+retry or backfill the flagged series from aggregate evidence. See
+`docs/PHASE_7_WEEKLY_STALE_GAP_RESULT_AUDIT.md`.
+
+## Historical handoff — private stale-success/gap diagnostic
 
 Fresh clean `develop` matched `1deeefa785a85b845650a6ca94d68a58e67edcc8`.
 This OPERATIONAL package prepares one ASCII-only, read-only PowerShell
@@ -206,10 +219,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `1deeefa785a85b845650a6ca94d68a58e67edcc8`
-**Current local package:** Stale-Success and Gap Operational Handoff
+**Current GitHub baseline:** `7e6655f1bdac67bab6f16d61c966452544a1e73a`
+**Current local package:** Weekly Stale-Success and Gap Result Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one private read-only diagnostic and review its redacted report
+**Current next action:** Audit the repeatable short-command weekly-run boundary
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

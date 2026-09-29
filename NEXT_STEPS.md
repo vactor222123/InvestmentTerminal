@@ -1,13 +1,15 @@
 # Investment Terminal — Next Steps
 
-## Current gate — run one private stale-success/gap diagnostic
+## Current gate — audit the repeatable weekly run
 
-Run the exact-baseline ASCII-only PowerShell block in
-`docs/PHASE_7_WEEKLY_STALE_GAP_HANDOFF.md` on the Desktop repository before
-applying its ZIP. Return only the redacted aggregate report and independent
-`SQLite integrity: ok` line. Review union/intersection, duration bins, and
-transfer evidence before any targeted repair decision. Do not retry Yahoo,
-backfill, change weekly `SUCCESS`, or schedule updates yet.
+The returned diagnostic and independent SQLite integrity have been reviewed:
+48 distinct weekly `SUCCESS` series have a stale end proxy, a long calendar
+gap, or both; 214 earlier weekly failures are separate. Do not chase those
+48 from aggregate evidence. Audit the existing CLI and private checkpoint
+ownership for a new weekly end, then select one short operator command and
+a separate nonblocking quality summary. Preserve transfer `SUCCESS` and
+keep warnings visible. Do not retry Yahoo, backfill, or schedule updates yet.
+See `docs/PHASE_7_WEEKLY_STALE_GAP_RESULT_AUDIT.md`.
 
 ## Historical gate — diagnose successful-but-stale and long-gap series
 
@@ -137,7 +139,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 1deeefa785a85b845650a6ca94d68a58e67edcc8`
+**This package verified baseline:** `develop @ 7e6655f1bdac67bab6f16d61c966452544a1e73a`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -353,9 +355,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one exact-baseline read-only diagnostic, then review its private redacted
-result and independent SQLite integrity. Do not claim
-full-universe session completeness or schedule updates before that evidence.
+Audit one repeatable, short-command weekly-run boundary and a separate
+quality summary before a new-end operational qualification. Do not claim
+full-universe session completeness or schedule updates from this aggregate.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
