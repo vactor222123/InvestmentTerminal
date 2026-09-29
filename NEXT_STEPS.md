@@ -1,15 +1,15 @@
 # Investment Terminal — Next Steps
 
-## Current gate — audit the repeatable weekly run
+## Current gate — implement a bounded short-command weekly slice
 
-The returned diagnostic and independent SQLite integrity have been reviewed:
-48 distinct weekly `SUCCESS` series have a stale end proxy, a long calendar
-gap, or both; 214 earlier weekly failures are separate. Do not chase those
-48 from aggregate evidence. Audit the existing CLI and private checkpoint
-ownership for a new weekly end, then select one short operator command and
-a separate nonblocking quality summary. Preserve transfer `SUCCESS` and
-keep warnings visible. Do not retry Yahoo, backfill, or schedule updates yet.
-See `docs/PHASE_7_WEEKLY_STALE_GAP_RESULT_AUDIT.md`.
+The audit in `docs/PHASE_7_WEEKLY_RUN_BOUNDARY_AUDIT.md` found that the
+existing refresh service already owns bounded resume and persistence, while
+the CLI requires nine explicit inputs and no reusable private runtime
+profile exists. Implement one profile-backed CLI for a bounded weekly slice,
+with explicit UTC-midnight end and budget, cross-end checkpoint isolation,
+unique redacted report output, and unchanged existing refresh JSON contracts.
+Add normal and failure-path tests. Keep a separate read-only quality summary
+for a later package; do not add a scheduler, automatic retry, or backfill.
 
 ## Historical gate — diagnose successful-but-stale and long-gap series
 
@@ -139,7 +139,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 7e6655f1bdac67bab6f16d61c966452544a1e73a`
+**This package verified baseline:** `develop @ 2e3aceeb51a133db3f280d97097b5ce91209c5a5`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -355,9 +355,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Audit one repeatable, short-command weekly-run boundary and a separate
-quality summary before a new-end operational qualification. Do not claim
-full-universe session completeness or schedule updates from this aggregate.
+Implement one bounded profile-backed weekly-slice CLI and test its fail-closed
+profile/end/report handling before a new-end operational qualification. Keep
+quality classification separate and do not schedule updates yet.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

@@ -1,6 +1,18 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — stale-success/gap result reviewed
+## Current handoff — repeatable weekly-run boundary audited
+
+Fresh clean GitHub `develop` matched
+`2e3aceeb51a133db3f280d97097b5ce91209c5a5`. The existing weekly
+service already supports bounded same-end resume, atomic private checkpoints,
+per-series persistence, and rate-limit halt; the CLI still requires nine
+operational inputs and has no reusable short-command profile. This AUDIT
+package makes no application or runtime change. Next: implement one bounded
+profile-backed weekly-slice composition root without changing the existing
+refresh/checkpoint JSON contracts; keep quality summary separate. See
+`docs/PHASE_7_WEEKLY_RUN_BOUNDARY_AUDIT.md`.
+
+## Historical handoff — stale-success/gap result reviewed
 
 Fresh direct GitHub clone of clean `develop` matched
 `7e6655f1bdac67bab6f16d61c966452544a1e73a`. The returned redacted
@@ -219,10 +231,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `7e6655f1bdac67bab6f16d61c966452544a1e73a`
-**Current local package:** Weekly Stale-Success and Gap Result Audit
+**Current GitHub baseline:** `2e3aceeb51a133db3f280d97097b5ce91209c5a5`
+**Current local package:** Repeatable Weekly-Run Boundary Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Audit the repeatable short-command weekly-run boundary
+**Current next action:** Implement one bounded profile-backed weekly-slice CLI
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
