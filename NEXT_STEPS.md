@@ -1,16 +1,14 @@
 # Investment Terminal — Next Steps
 
-## Current gate — qualify the short weekly-run command privately
+## Current gate — execute the one-item weekly handoff
 
-The profile-backed `weekly_run` CLI now accepts one private static profile,
-an explicit UTC-midnight exclusive end, item budget, and slice ID. It derives
-separate per-end checkpoints and per-slice reports, validates source evidence
-before provider access, and preserves existing refresh JSON contracts.
-Prepare one exact-baseline ASCII-only user handoff to build the private profile
-from verified runtime evidence and execute `--max-items 1` for a new end.
-Return only its redacted report and SQLite integrity. Do not schedule, retry
-other failures, backfill, or infer indicator/session quality yet. See
-`docs/PHASE_7_WEEKLY_RUN_CLI.md`.
+Run the exact-baseline ASCII-only PowerShell block in
+`docs/PHASE_7_WEEKLY_RUN_ONE_ITEM_HANDOFF.md` before applying its ZIP. It
+creates a private profile from verified source evidence and executes only
+`--max-items 1` for exclusive end `2026-09-29T00:00:00Z`. Return only the
+redacted report and independent SQLite integrity. Do not rerun automatically
+after any failure, continue the remaining items, or schedule updates before
+review.
 
 ## Historical gate — diagnose successful-but-stale and long-gap series
 
@@ -140,7 +138,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 5f82f1984cbef824b01a62edaca8aa4635db1b30`
+**This package verified baseline:** `develop @ f817a22c6ce2b5f82e8609c3d947426d276012a2`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -356,9 +354,8 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Prepare one checksum-bound private profile bootstrap and one new-end item
-qualification handoff. Keep quality classification separate and do not
-schedule updates yet.
+Execute one checksum-bound profile bootstrap and one new-end item; review its
+redacted report and independent SQLite integrity before continuing.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

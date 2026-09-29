@@ -1,6 +1,18 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — short bounded weekly-run CLI implemented
+## Current handoff — private weekly profile and one item
+
+Fresh clean GitHub `develop` matched
+`f817a22c6ce2b5f82e8609c3d947426d276012a2`. This OPERATIONAL package
+prepares one ASCII-only user command to bootstrap the private weekly profile
+from checksum-verified existing source evidence and run exactly one new-end
+item through `weekly_run`. It changes no application code and does not access
+or mutate private runtime data here. Execute the block in
+`docs/PHASE_7_WEEKLY_RUN_ONE_ITEM_HANDOFF.md` before applying the ZIP; return
+only its redacted report and SQLite integrity. Do not broaden the run or
+schedule updates before review.
+
+## Historical handoff — short bounded weekly-run CLI implemented
 
 Fresh clean GitHub `develop` matched
 `5f82f1984cbef824b01a62edaca8aa4635db1b30`. A profile-backed
@@ -243,10 +255,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `5f82f1984cbef824b01a62edaca8aa4635db1b30`
-**Current local package:** Profile-Backed Weekly-Run CLI
+**Current GitHub baseline:** `f817a22c6ce2b5f82e8609c3d947426d276012a2`
+**Current local package:** Private Weekly Profile and One-Item Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Bootstrap private weekly profile and qualify one new-end item
+**Current next action:** Execute one private weekly item and review its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
