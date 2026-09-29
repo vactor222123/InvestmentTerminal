@@ -1,14 +1,15 @@
 # Investment Terminal — Next Steps
 
-## Current gate — execute the one-item weekly handoff
+## Current gate — execute the first weekly continuation
 
-Run the exact-baseline ASCII-only PowerShell block in
-`docs/PHASE_7_WEEKLY_RUN_ONE_ITEM_HANDOFF.md` before applying its ZIP. It
-creates a private profile from verified source evidence and executes only
-`--max-items 1` for exclusive end `2026-09-29T00:00:00Z`. Return only the
-redacted report and independent SQLite integrity. Do not rerun automatically
-after any failure, continue the remaining items, or schedule updates before
-review.
+The first profile-backed item succeeded: 11 downloaded, five inserted,
+six duplicates, no failures, with 11,891 selected series still unattempted;
+SQLite integrity was separately reported `ok`. Run the exact-baseline
+ASCII-only PowerShell block in `docs/PHASE_7_WEEKLY_RUN_100_ITEM_HANDOFF.md`
+before applying its ZIP. It verifies the previous report and one-item private
+checkpoint, then attempts at most 100 new items for the same exclusive end.
+Return only the redacted slice-002 report, hash, and SQLite integrity. Do not
+auto-rerun after failure or schedule/broaden before review.
 
 ## Historical gate — diagnose successful-but-stale and long-gap series
 
@@ -138,7 +139,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ f817a22c6ce2b5f82e8609c3d947426d276012a2`
+**This package verified baseline:** `develop @ 0362cf349eb0c9e8c26244f5b1dd663eff246c7f`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -354,8 +355,8 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute one checksum-bound profile bootstrap and one new-end item; review its
-redacted report and independent SQLite integrity before continuing.
+Execute the same-end 100-item continuation; review its redacted report and
+independent SQLite integrity before continuing.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

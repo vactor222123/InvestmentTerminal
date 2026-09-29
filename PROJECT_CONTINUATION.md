@@ -1,6 +1,19 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — private weekly profile and one item
+## Current handoff — first weekly continuation
+
+Fresh clean GitHub `develop` matched
+`0362cf349eb0c9e8c26244f5b1dd663eff246c7f`. The returned redacted
+one-item weekly report records one success, 11 downloaded, five inserted,
+six duplicates, zero failures, and 11,891 remaining; the user separately
+reported SQLite integrity `ok`. This OPERATIONAL package changes no
+application code and does not write private runtime data. Execute the
+same-end, 100-new-item handoff in
+`docs/PHASE_7_WEEKLY_RUN_100_ITEM_HANDOFF.md` before applying its ZIP; return
+only the new redacted report, hash, and integrity result. Do not auto-rerun,
+broaden, or schedule before review.
+
+## Historical handoff — private weekly profile and one item
 
 Fresh clean GitHub `develop` matched
 `f817a22c6ce2b5f82e8609c3d947426d276012a2`. This OPERATIONAL package
@@ -255,10 +268,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `f817a22c6ce2b5f82e8609c3d947426d276012a2`
-**Current local package:** Private Weekly Profile and One-Item Handoff
+**Current GitHub baseline:** `0362cf349eb0c9e8c26244f5b1dd663eff246c7f`
+**Current local package:** First Weekly Continuation Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Execute one private weekly item and review its redacted report
+**Current next action:** Execute one private same-end 100-item slice and review its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
