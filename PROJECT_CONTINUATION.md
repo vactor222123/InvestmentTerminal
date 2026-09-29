@@ -1,6 +1,19 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — private observed-history cohort scan
+## Current handoff — stale-success and gap audit
+
+Fresh clean `develop` matched `25c6a31cdd7b9e4a164c35632b1a63d8f0cb32bf`.
+The returned redacted cohort report reconciles all 11,892 selected series;
+all 214 weekly failures lack the end proxy, while 31 `SUCCESS` series also
+lack it and 36 `SUCCESS` series have gaps over seven calendar days. The user
+reported SQLite integrity `ok`. Code inspection confirms that weekly
+`SUCCESS` requires a nonempty valid response, not a newly inserted or fresh
+end candle. This AUDIT package makes no application or runtime change. Next:
+one read-only, versioned diagnostic limited to the union of those 31 and 36
+cohorts; do not retry, backfill, or schedule from the aggregate result. See
+`docs/PHASE_7_WEEKLY_STALE_SUCCESS_AND_GAP_AUDIT.md`.
+
+## Historical handoff — private observed-history cohort scan
 
 Fresh clean `develop` matched caller baseline
 `bc90efe5976138a6d4690c004713f86064ab0f77`. This OPERATIONAL package
@@ -170,10 +183,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `bc90efe5976138a6d4690c004713f86064ab0f77`
-**Current local package:** Observed-History Cohort Operational Handoff
+**Current GitHub baseline:** `25c6a31cdd7b9e4a164c35632b1a63d8f0cb32bf`
+**Current local package:** Stale-Success and Gap Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run the private cohort handoff and review its redacted report
+**Current next action:** Implement a read-only stale-success and gap diagnostic
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

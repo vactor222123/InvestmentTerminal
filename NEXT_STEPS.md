@@ -1,6 +1,18 @@
 # Investment Terminal — Next Steps
 
-## Current gate — execute one private cohort scan
+## Current gate — diagnose successful-but-stale and long-gap series
+
+The returned cohort report reconciles 11,892 series and the user reports
+SQLite integrity `ok`. All 214 weekly failures lack the end proxy. Another
+31 weekly `SUCCESS` series lack it, and 36 `SUCCESS` series have an interior
+gap over seven calendar days; their overlap is unknown. The current refresh
+code calls a nonempty valid provider response `SUCCESS` even without a new
+or fresh end candle. Implement a separate read-only, privacy-safe diagnostic
+for the union of these at-most-67 series, then inspect its redacted result
+before any retry, gap repair, status-policy change, or unattended scheduling.
+See `docs/PHASE_7_WEEKLY_STALE_SUCCESS_AND_GAP_AUDIT.md`.
+
+## Historical gate — execute one private cohort scan
 
 Run the exact-baseline ASCII-only PowerShell block in
 `docs/PHASE_7_TEN_YEAR_COHORT_HANDOFF.md` before applying its ZIP. Return only
@@ -116,7 +128,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ bc90efe5976138a6d4690c004713f86064ab0f77`
+**This package verified baseline:** `develop @ 25c6a31cdd7b9e4a164c35632b1a63d8f0cb32bf`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -332,9 +344,10 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Run one exact-baseline private read-only cohort report, then review its
-redacted aggregate result and separate SQLite integrity. Do not claim
-full-universe session completeness or schedule updates before that evidence.
+Implement one read-only, versioned diagnostic of the successful-but-stale
+and long-gap cohorts, then review its private redacted result and SQLite
+integrity. Do not claim full-universe session completeness or schedule
+updates before that evidence.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

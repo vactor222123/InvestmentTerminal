@@ -1,5 +1,13 @@
 # Investment Terminal — Product Roadmap
 
+The completed ten-year cohort measurement isolates 31 weekly `SUCCESS`
+series lacking the end proxy and 36 weekly `SUCCESS` series with a long
+calendar gap; all 214 weekly failures also lack the end proxy. A bounded
+read-only diagnostic of the at-most-67-series union is the next quality
+gate. Nonempty transfer status does not imply fresh or complete history;
+provider revalidation, calendar-specific quality, and unattended scheduling
+remain deferred. See `docs/PHASE_7_WEEKLY_STALE_SUCCESS_AND_GAP_AUDIT.md`.
+
 The measured ten-year span has 17,242,630 in-window rows over 11,892 series,
 but only 4,410 meet both endpoint proxies. A separate read-only cohort report
 is now implemented to partition observed start age, endpoints, interior gaps,
