@@ -1,5 +1,12 @@
 # Investment Terminal — Software Architecture
 
+`weekly_stale_gap_diagnostic` is a separate read-only operations/CLI boundary
+over the existing validated stored-coverage scan and one SQLite snapshot. It
+selects only weekly `SUCCESS` series that lack the end proxy or have an
+interior calendar gap over seven days, and emits redacted aggregate disjoint
+groups. It changes neither refresh status semantics nor candle/checkpoint
+persistence and has no provider or scheduling authority.
+
 The separate `weekly_stored_cohorts` operation reuses the validated,
 read-only stored-coverage scan in one SQLite snapshot. Its versioned redacted
 report groups observed first-candle offsets, endpoint proxies, maximum

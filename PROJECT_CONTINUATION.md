@@ -1,6 +1,18 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — stale-success and gap audit
+## Current handoff — stale-success/gap diagnostic implemented
+
+Fresh clean `develop` matched `36c39f1603f434d64772332f2c0221dc32728618`.
+A separate read-only, redacted diagnostic now measures the union and overlap
+of weekly `SUCCESS` series lacking the end proxy or having a gap over seven
+calendar days, with duration bins and aggregate transfer counts. It reuses
+the validated SQLite snapshot and preserves all existing JSON/checkpoint
+contracts. No private runtime action occurred. Next: prepare one
+exact-baseline private operational handoff and review only its redacted
+report and independent SQLite integrity. See
+`docs/PHASE_7_WEEKLY_STALE_GAP_DIAGNOSTIC.md`.
+
+## Historical handoff — stale-success and gap audit
 
 Fresh clean `develop` matched `25c6a31cdd7b9e4a164c35632b1a63d8f0cb32bf`.
 The returned redacted cohort report reconciles all 11,892 selected series;
@@ -183,10 +195,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `25c6a31cdd7b9e4a164c35632b1a63d8f0cb32bf`
-**Current local package:** Stale-Success and Gap Audit
+**Current GitHub baseline:** `36c39f1603f434d64772332f2c0221dc32728618`
+**Current local package:** Stale-Success and Gap Diagnostic
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement a read-only stale-success and gap diagnostic
+**Current next action:** Prepare one private read-only diagnostic handoff
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

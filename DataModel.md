@@ -1,5 +1,13 @@
 # Investment Terminal — Data Model
 
+`WEEKLY_STALE_GAP_DIAGNOSTIC` schema version 1 is a separate aggregate report
+bound by manifest/selection checksums and explicit start/exclusive end. It
+contains stale/long-gap/intersection/union counts, duration bins, and
+`STALE_ONLY`, `GAP_ONLY`, `BOTH` disjoint groups with aggregate weekly
+checkpoint transfer counters. It contains no instrument identity, per-series
+time or price, path, or provider text. Existing weekly checkpoint and
+stored-coverage/cohort JSON schemas are unchanged.
+
 `WEEKLY_STORED_COHORTS` schema version 1 is a separate redacted report bound
 to manifest/selection checksums and an explicit half-open history window. It
 contains mutually exclusive first-observation-age, endpoint-proxy, and

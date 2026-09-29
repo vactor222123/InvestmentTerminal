@@ -1,5 +1,12 @@
 # Investment Terminal — Product Roadmap
 
+The read-only successful-stale/long-gap diagnostic is implemented. One
+private run must measure the overlap and transfer evidence for the previously
+observed 31 stale-success and 36 long-gap-success series before selecting
+targeted provider or calendar checks. Mass collection, automatic retries,
+stored-candle replacement, and unattended scheduling remain deferred. See
+`docs/PHASE_7_WEEKLY_STALE_GAP_DIAGNOSTIC.md`.
+
 The completed ten-year cohort measurement isolates 31 weekly `SUCCESS`
 series lacking the end proxy and 36 weekly `SUCCESS` series with a long
 calendar gap; all 214 weekly failures also lack the end proxy. A bounded
