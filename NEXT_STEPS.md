@@ -1,15 +1,13 @@
 # Investment Terminal — Next Steps
 
-## Current gate — qualify the stale-success/gap diagnostic privately
+## Current gate — run one private stale-success/gap diagnostic
 
-The separate read-only `weekly_stale_gap_diagnostic` CLI is implemented and
-preserves existing report/checkpoint contracts. Prepare one exact-baseline,
-user-executed PowerShell handoff for the complete private manifest, source
-checkpoints, weekly checkpoint, SQLite database, and explicit 2016–2026
-window. Review only its redacted aggregate union/intersection, staleness,
-gap, and transfer evidence plus independent SQLite integrity. Do not retry
-Yahoo, backfill, change weekly `SUCCESS`, or schedule updates yet. See
-`docs/PHASE_7_WEEKLY_STALE_GAP_DIAGNOSTIC.md`.
+Run the exact-baseline ASCII-only PowerShell block in
+`docs/PHASE_7_WEEKLY_STALE_GAP_HANDOFF.md` on the Desktop repository before
+applying its ZIP. Return only the redacted aggregate report and independent
+`SQLite integrity: ok` line. Review union/intersection, duration bins, and
+transfer evidence before any targeted repair decision. Do not retry Yahoo,
+backfill, change weekly `SUCCESS`, or schedule updates yet.
 
 ## Historical gate — diagnose successful-but-stale and long-gap series
 
@@ -139,7 +137,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 36c39f1603f434d64772332f2c0221dc32728618`
+**This package verified baseline:** `develop @ 1deeefa785a85b845650a6ca94d68a58e67edcc8`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -355,8 +353,8 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Prepare one exact-baseline read-only diagnostic handoff, then review its
-private redacted result and independent SQLite integrity. Do not claim
+Run one exact-baseline read-only diagnostic, then review its private redacted
+result and independent SQLite integrity. Do not claim
 full-universe session completeness or schedule updates before that evidence.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,

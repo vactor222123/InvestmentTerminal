@@ -1,6 +1,17 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — stale-success/gap diagnostic implemented
+## Current handoff — private stale-success/gap diagnostic
+
+Fresh clean `develop` matched `1deeefa785a85b845650a6ca94d68a58e67edcc8`.
+This OPERATIONAL package prepares one ASCII-only, read-only PowerShell
+handoff for the complete private manifest, 601 source checkpoints, weekly
+checkpoint, and SQLite database. It does not access or change private runtime
+data. Run the block in `docs/PHASE_7_WEEKLY_STALE_GAP_HANDOFF.md` before
+applying the ZIP; return only its redacted aggregate report and independent
+SQLite integrity. No Yahoo request, retry, backfill, status-policy change,
+or scheduler is authorized.
+
+## Historical handoff — stale-success/gap diagnostic implemented
 
 Fresh clean `develop` matched `36c39f1603f434d64772332f2c0221dc32728618`.
 A separate read-only, redacted diagnostic now measures the union and overlap
@@ -195,10 +206,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `36c39f1603f434d64772332f2c0221dc32728618`
-**Current local package:** Stale-Success and Gap Diagnostic
+**Current GitHub baseline:** `1deeefa785a85b845650a6ca94d68a58e67edcc8`
+**Current local package:** Stale-Success and Gap Operational Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Prepare one private read-only diagnostic handoff
+**Current next action:** Run one private read-only diagnostic and review its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
