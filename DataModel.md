@@ -1,5 +1,17 @@
 # Investment Terminal — Data Model
 
+`LATEST_RAW_INDICATOR_PROJECTION` schema version 1 is private and contains
+selected per-series symbol/currency, weekly status, latest timestamp/raw
+close, sample count capped at 200, raw-close SMA50/SMA200, recency proxy,
+and one availability category. Its separate
+`LATEST_RAW_INDICATOR_PROJECTION_REPORT` schema version 1 contains only
+manifest/selection/end/price-basis bindings, selection/budget counts,
+availability bins, SMA availability counts, a recency-proxy count, and a
+generic failure state. Neither changes the candle or weekly checkpoint
+schemas. `STORED_CLOSE_NO_EXPLICIT_ADJUSTMENT` means Terminal applied no
+corporate-action adjustment; it does not establish the provider's historical
+split handling, session completeness, or return validity.
+
 `WEEKLY_RUN_PROFILE` schema version 1 is a private, path-bearing runtime
 configuration with exact fields for the manifest and checksum, complete
 source checkpoint directory, existing candle database, cache, and separate

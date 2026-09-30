@@ -1,6 +1,20 @@
 # Investment Terminal — Next Steps
 
-## Current gate — project objective latest indicators
+## Current gate — qualify bounded raw-close indicators
+
+The versioned private latest-indicator projection is implemented for a
+deterministic bounded prefix of the manifest-bound daily selection. It reads
+SQLite and the complete weekly checkpoint without Yahoo or candle writes,
+computes stored-close SMA50/SMA200 only when 50/200 samples exist, and emits a
+separate redacted aggregate report. The Yahoo ingestion path uses
+`auto_adjust=False`; Terminal applies no explicit corporate-action adjustment
+and provider historical split handling is unverified. Prepare
+one exact-baseline private operational handoff with `--max-items 1`, then
+review its redacted report and independent SQLite integrity before a broad
+projection or scheduling. See
+`docs/PHASE_7_LATEST_RAW_INDICATOR_PROJECTION.md`.
+
+## Historical gate — project objective latest indicators
 
 The completed same-window cohort report reconciles all 11,892 selected
 series: 7,189 first appear more than a year after the ten-year start; 28
@@ -149,7 +163,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 2e9419617cf83fd9c58b5b73e0c7a3e5fcc486de`
+**This package verified baseline:** `develop @ 26f2831251175f7b221e09393d2fa209800d1684`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -365,8 +379,8 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement one bounded private latest-indicator projection after auditing its
-persistence and adjusted-price boundaries; do not yet enable unattended weekly updates.
+Prepare one exact-baseline private one-series raw-indicator qualification;
+review only its redacted report and independent SQLite integrity.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

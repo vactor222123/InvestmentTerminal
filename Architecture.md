@@ -1,5 +1,16 @@
 # Investment Terminal — Software Architecture
 
+The `latest_raw_indicator_projection` operation reads a complete manifest-
+bound weekly selection and existing daily SQLite candles under one read-only
+snapshot. It computes objective SMA50/SMA200 on at most 200 stored closes
+per selected series, writes one private atomic value document and a separate
+redacted aggregate report, and leaves candle and checkpoint persistence
+unchanged. The price basis records no explicit Terminal-side adjustment:
+the Yahoo adapter uses `auto_adjust=False` and the candle table has no
+adjusted-close or corporate-action fields. Upstream historical split
+handling is not inferred. No trend classification, trading decision, Yahoo request, or
+scheduler authority flows from this projection.
+
 The profile-backed `weekly_run` CLI is an outer composition root over the
 existing weekly refresh CLI/service. It validates private static paths and
 manifest/source binding, derives separate per-end private checkpoints and

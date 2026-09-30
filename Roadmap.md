@@ -1,5 +1,13 @@
 # Investment Terminal — Product Roadmap
 
+The bounded latest stored-close SMA50/SMA200 projection is implemented as a
+private, versioned value document plus a redacted aggregate report. Terminal
+applies no explicit corporate-action adjustment; it is not yet a verified
+analysis export. Next qualify one selected series against the private
+complete weekly checkpoint and SQLite store, then review the report and
+integrity before a full projection. Unattended weekly scheduling remains
+deferred. See `docs/PHASE_7_LATEST_RAW_INDICATOR_PROJECTION.md`.
+
 The read-only successful-stale/long-gap diagnostic is implemented. One
 private run must measure the overlap and transfer evidence for the previously
 observed 31 stale-success and 36 long-gap-success series before selecting

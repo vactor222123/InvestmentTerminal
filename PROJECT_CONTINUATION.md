@@ -1,6 +1,22 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — cohorts reviewed, project latest indicators
+## Current handoff — bounded raw-close indicators implemented
+
+Fresh clean GitHub `develop` matched
+`26f2831251175f7b221e09393d2fa209800d1684`. This IMPLEMENTATION
+package adds a read-only, manifest/checkpoint-bound latest SMA50/SMA200
+projection with a private per-series atomic JSON and separate redacted
+aggregate report. Yahoo ingestion uses `auto_adjust=False` and stores `Close`;
+Terminal applies no explicit corporate-action adjustment, so the output is
+`STORED_CLOSE_NO_EXPLICIT_ADJUSTMENT`, not an adjusted-price validity claim.
+Existing candle and weekly JSON
+contracts are unchanged. No private runtime data was accessed or modified.
+Next prepare one exact-baseline `--max-items 1` private qualification and
+review only its redacted report plus independent SQLite integrity before
+full-universe projection or scheduling. See
+`docs/PHASE_7_LATEST_RAW_INDICATOR_PROJECTION.md`.
+
+## Historical handoff — cohorts reviewed, project latest indicators
 
 Fresh clean GitHub `develop` matched
 `2e9419617cf83fd9c58b5b73e0c7a3e5fcc486de`. The returned redacted
@@ -328,10 +344,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `2e9419617cf83fd9c58b5b73e0c7a3e5fcc486de`
-**Current local package:** Weekly Cohort Result and Indicator Boundary Audit
+**Current GitHub baseline:** `26f2831251175f7b221e09393d2fa209800d1684`
+**Current local package:** Bounded Latest Raw Indicator Projection
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement a private latest-indicator projection after auditing persistence and adjusted-price semantics
+**Current next action:** Prepare one exact-baseline private one-series raw-indicator qualification
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
