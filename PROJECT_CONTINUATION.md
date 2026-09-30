@@ -1,6 +1,21 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — full remaining weekly collection
+## Current handoff — completed collection, measure stored quality
+
+Fresh clean GitHub `develop` matched
+`9fb52e3942df0e068ec081c089b2d28b9cce075f`. The returned redacted
+slice-003 report proves all 11,892 selected series have outcomes for the
+2026-09-29 exclusive end: 11,805 successes, 87 isolated failures, zero
+remaining; the user separately reported SQLite integrity `ok`. This does
+not establish fresh, session-complete, or indicator-ready history. This
+OPERATIONAL package changes no application code or private runtime data.
+Execute the read-only explicit-ten-year stored-coverage handoff in
+`docs/PHASE_7_WEEKLY_FULL_COLLECTION_RESULT_AND_COVERAGE_HANDOFF.md` before
+applying its ZIP; return only the redacted report, hash, and independent
+integrity. Do not retry the 87 failures or enable unattended refresh before
+reviewing stored quality.
+
+## Historical handoff — full remaining weekly collection
 
 Fresh clean GitHub `develop` matched
 `7c2ca38d44cfe24c0e0a612c7aa2e85e6867b930`; remote `develop` still
@@ -282,10 +297,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `7c2ca38d44cfe24c0e0a612c7aa2e85e6867b930`
-**Current local package:** Full Remaining Weekly Collection Handoff
+**Current GitHub baseline:** `9fb52e3942df0e068ec081c089b2d28b9cce075f`
+**Current local package:** Completed Weekly Collection and Stored-Coverage Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Execute one private same-end full-remaining run and review its redacted report
+**Current next action:** Execute one private read-only ten-year stored-coverage scan and review its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

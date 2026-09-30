@@ -1,17 +1,16 @@
 # Investment Terminal — Next Steps
 
-## Current gate — execute one full-remaining weekly collection run
+## Current gate — measure stored quality after full collection
 
-Slice 002 completed 100 new attempts: 90 successes, three `NO_PRICE_DATA`,
-seven `STORED_CANDLE_DRIFT`, no systemic halt, and 11,791 remaining. SQLite
-integrity was separately reported `ok`. The user selected one full-remaining
-run rather than the unapplied 1000-item draft. Run the exact-baseline
-ASCII-only PowerShell block in
-`docs/PHASE_7_WEEKLY_RUN_REMAINING_HANDOFF.md` before applying this ZIP. It
-verifies the prior report and private checkpoint, attempts at most the
-11,791 unattempted series, validates its redacted report, and checks SQLite
-integrity. Review the result before any retry, scheduler, or indicator-quality
-claim. Do not rerun automatically after partial progress or a halt.
+The complete 2026-09-29 weekly pass reached all 11,892 selected series:
+11,805 successes and 87 isolated failures, with zero remaining. SQLite
+integrity was separately reported `ok`. Run the exact-baseline ASCII-only
+PowerShell block in
+`docs/PHASE_7_WEEKLY_FULL_COLLECTION_RESULT_AND_COVERAGE_HANDOFF.md` before
+applying its ZIP. It performs one read-only, explicit-ten-year stored scan
+against the complete private checkpoint and returns only aggregate quality
+evidence. Review the result before retrying failures, asserting indicator
+readiness, or enabling an unattended schedule.
 
 ## Historical gate — diagnose successful-but-stale and long-gap series
 
@@ -141,7 +140,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 7c2ca38d44cfe24c0e0a612c7aa2e85e6867b930`
+**This package verified baseline:** `develop @ 9fb52e3942df0e068ec081c089b2d28b9cce075f`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -357,7 +356,7 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute one same-end full-remaining run; review its redacted report and
+Execute one read-only explicit-ten-year stored-coverage scan; review its redacted report and
 independent SQLite integrity before continuing.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
