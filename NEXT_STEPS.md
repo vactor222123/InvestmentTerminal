@@ -1,16 +1,17 @@
 # Investment Terminal — Next Steps
 
-## Current gate — measure stored quality after full collection
+## Current gate — measure observed-history cohorts
 
-The complete 2026-09-29 weekly pass reached all 11,892 selected series:
-11,805 successes and 87 isolated failures, with zero remaining. SQLite
-integrity was separately reported `ok`. Run the exact-baseline ASCII-only
-PowerShell block in
-`docs/PHASE_7_WEEKLY_FULL_COLLECTION_RESULT_AND_COVERAGE_HANDOFF.md` before
-applying its ZIP. It performs one read-only, explicit-ten-year stored scan
-against the complete private checkpoint and returns only aggregate quality
-evidence. Review the result before retrying failures, asserting indicator
-readiness, or enabling an unattended schedule.
+The completed explicit-ten-year stored-coverage scan measured 17,274,367
+in-window rows across all 11,892 selected series: 10,239 have at least 200
+rows, 11,787 have the seven-day end proxy, 4,449 have both endpoint proxies,
+and 41 have an observed gap over seven days. SQLite integrity was separately
+reported `ok`. Run the exact-baseline ASCII-only PowerShell block in
+`docs/PHASE_7_WEEKLY_COVERAGE_RESULT_AND_COHORT_HANDOFF.md` before applying
+its ZIP. It measures observed-age, endpoint, gap, and weekly-outcome
+intersections without Yahoo or database/checkpoint writes. Review the
+redacted result before retrying failures, asserting indicator readiness, or
+enabling an unattended schedule.
 
 ## Historical gate — diagnose successful-but-stale and long-gap series
 
@@ -140,7 +141,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 9fb52e3942df0e068ec081c089b2d28b9cce075f`
+**This package verified baseline:** `develop @ b46a96982993322c04d64dba5979599b432d052d`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -356,7 +357,7 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute one read-only explicit-ten-year stored-coverage scan; review its redacted report and
+Execute one read-only same-window observed-history cohort scan; review its redacted report and
 independent SQLite integrity before continuing.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,

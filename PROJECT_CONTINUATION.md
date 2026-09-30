@@ -1,6 +1,22 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — completed collection, measure stored quality
+## Current handoff — stored coverage reviewed, measure cohorts
+
+Fresh clean GitHub `develop` matched
+`b46a96982993322c04d64dba5979599b432d052d`. The returned redacted
+schema-2 ten-year stored-coverage report records 17,274,367 in-window rows,
+zero empty series, 10,239 series with at least 200 rows, 11,787 with the
+end proxy, 4,449 with both endpoint proxies, and 41 with an observed gap
+over seven calendar days. The 87 weekly failures remain unchanged and the
+user separately reported SQLite integrity `ok`. These are observations,
+not analysis-readiness or exchange-session completeness. This OPERATIONAL
+package changes no application code or private runtime data. Run the
+read-only same-window cohort handoff in
+`docs/PHASE_7_WEEKLY_COVERAGE_RESULT_AND_COHORT_HANDOFF.md` before applying
+its ZIP; return only the redacted report, hash, and integrity result. Do not
+retry failures or schedule updates before reviewing cohort intersections.
+
+## Historical handoff — completed collection, measure stored quality
 
 Fresh clean GitHub `develop` matched
 `9fb52e3942df0e068ec081c089b2d28b9cce075f`. The returned redacted
@@ -297,10 +313,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `9fb52e3942df0e068ec081c089b2d28b9cce075f`
-**Current local package:** Completed Weekly Collection and Stored-Coverage Handoff
+**Current GitHub baseline:** `b46a96982993322c04d64dba5979599b432d052d`
+**Current local package:** Stored-Coverage Result and Cohort Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Execute one private read-only ten-year stored-coverage scan and review its redacted report
+**Current next action:** Execute one private read-only same-window cohort scan and review its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
