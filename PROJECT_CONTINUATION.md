@@ -1,6 +1,20 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — first weekly continuation
+## Current handoff — full remaining weekly collection
+
+Fresh clean GitHub `develop` matched
+`7c2ca38d44cfe24c0e0a612c7aa2e85e6867b930`; remote `develop` still
+has that SHA. The reviewed slice-002 report records 101 completed, 91
+successes, 10 isolated failures, and 11,791 remaining; the user reported
+SQLite integrity `ok`. At the user's request, this OPERATIONAL package
+supersedes the unapplied 1000-item draft with one same-end, full-remaining
+handoff in `docs/PHASE_7_WEEKLY_RUN_REMAINING_HANDOFF.md`. It changes no
+application code or private runtime data. Execute the block before applying
+the ZIP; return only the redacted report, hash, and integrity result. A
+complete pass is expected to report `COMPLETE_WITH_FAILURES` because prior
+failures are not retried. Do not auto-rerun or schedule before review.
+
+## Historical handoff — first weekly continuation
 
 Fresh clean GitHub `develop` matched
 `0362cf349eb0c9e8c26244f5b1dd663eff246c7f`. The returned redacted
@@ -268,10 +282,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `0362cf349eb0c9e8c26244f5b1dd663eff246c7f`
-**Current local package:** First Weekly Continuation Handoff
+**Current GitHub baseline:** `7c2ca38d44cfe24c0e0a612c7aa2e85e6867b930`
+**Current local package:** Full Remaining Weekly Collection Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Execute one private same-end 100-item slice and review its redacted report
+**Current next action:** Execute one private same-end full-remaining run and review its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
