@@ -1,6 +1,21 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — stored coverage reviewed, measure cohorts
+## Current handoff — cohorts reviewed, project latest indicators
+
+Fresh clean GitHub `develop` matched
+`2e9419617cf83fd9c58b5b73e0c7a3e5fcc486de`. The returned redacted
+same-window cohort report reconciles all 11,892 series: 7,189 first appear
+more than a year after the ten-year start, 4,449 have both endpoint proxies,
+28 weekly successes lack the end proxy, and 33 weekly successes have a gap
+over seven calendar days. The user separately reported SQLite integrity
+`ok`. These are observations, not missing-session or indicator-readiness
+verdicts. This AUDIT package changes no application or private runtime data.
+Next implement a bounded, private, versioned latest-indicator projection,
+starting with objective SMA50/SMA200 availability and explicit evidence
+bindings; audit persistence and adjusted-price semantics first. See
+`docs/PHASE_7_WEEKLY_COHORT_RESULT_AND_INDICATOR_BOUNDARY_AUDIT.md`.
+
+## Historical handoff — stored coverage reviewed, measure cohorts
 
 Fresh clean GitHub `develop` matched
 `b46a96982993322c04d64dba5979599b432d052d`. The returned redacted
@@ -313,10 +328,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `b46a96982993322c04d64dba5979599b432d052d`
-**Current local package:** Stored-Coverage Result and Cohort Handoff
+**Current GitHub baseline:** `2e9419617cf83fd9c58b5b73e0c7a3e5fcc486de`
+**Current local package:** Weekly Cohort Result and Indicator Boundary Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Execute one private read-only same-window cohort scan and review its redacted report
+**Current next action:** Implement a private latest-indicator projection after auditing persistence and adjusted-price semantics
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

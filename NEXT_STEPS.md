@@ -1,17 +1,25 @@
 # Investment Terminal — Next Steps
 
-## Current gate — measure observed-history cohorts
+## Current gate — project objective latest indicators
 
-The completed explicit-ten-year stored-coverage scan measured 17,274,367
-in-window rows across all 11,892 selected series: 10,239 have at least 200
-rows, 11,787 have the seven-day end proxy, 4,449 have both endpoint proxies,
-and 41 have an observed gap over seven days. SQLite integrity was separately
-reported `ok`. Run the exact-baseline ASCII-only PowerShell block in
-`docs/PHASE_7_WEEKLY_COVERAGE_RESULT_AND_COHORT_HANDOFF.md` before applying
-its ZIP. It measures observed-age, endpoint, gap, and weekly-outcome
-intersections without Yahoo or database/checkpoint writes. Review the
-redacted result before retrying failures, asserting indicator readiness, or
-enabling an unattended schedule.
+The completed same-window cohort report reconciles all 11,892 selected
+series: 7,189 first appear more than a year after the ten-year start; 28
+weekly successes lack the seven-day end proxy and 33 have an observed gap
+over seven days. The user separately reported SQLite integrity `ok`. These
+observations do not establish missing sessions or indicator readiness.
+Implement a bounded, private, versioned latest-indicator projection with
+objective SMA50/SMA200 availability and explicit evidence bindings after
+auditing persistence ownership and adjusted-price semantics. Do not repeat
+the broad collection, retry failures, or enable unattended scheduling based
+on aggregate row counts. See
+`docs/PHASE_7_WEEKLY_COHORT_RESULT_AND_INDICATOR_BOUNDARY_AUDIT.md`.
+
+## Historical gate — measure observed-history cohorts
+
+The previous package prepared one read-only, same-window cohort scan. Its
+redacted result has now been reviewed; the run instruction in
+`docs/PHASE_7_WEEKLY_COVERAGE_RESULT_AND_COHORT_HANDOFF.md` is historical,
+not the current action.
 
 ## Historical gate — diagnose successful-but-stale and long-gap series
 
@@ -141,7 +149,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ b46a96982993322c04d64dba5979599b432d052d`
+**This package verified baseline:** `develop @ 2e9419617cf83fd9c58b5b73e0c7a3e5fcc486de`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -357,8 +365,8 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute one read-only same-window observed-history cohort scan; review its redacted report and
-independent SQLite integrity before continuing.
+Implement one bounded private latest-indicator projection after auditing its
+persistence and adjusted-price boundaries; do not yet enable unattended weekly updates.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
