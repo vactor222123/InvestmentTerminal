@@ -1,5 +1,17 @@
 # Investment Terminal — Data Model
 
+`INSTRUMENT_RESEARCH_EXPORT` schema version 1 is private: one selected
+symbol/currency, its existing projected indicator item, an ordered bounded
+array of stored daily OHLCV rows, manifest/selection/projection/window/price-
+basis bindings, and a deterministic exported-candle-array SHA-256. The
+separate `INSTRUMENT_RESEARCH_EXPORT_REPORT` schema version 1 exposes only
+the bindings, source and exported-candle checksums, window, row/sample
+counts, availability and recency proxy, and a generic failure state. It
+excludes symbol, currency, per-candle values, SMA values, paths, and error
+text. Neither contract changes the existing candle store, weekly checkpoint,
+or latest raw-indicator projection schemas; the export has no corporate-
+action adjustment or exchange-session-completeness claim.
+
 `LATEST_RAW_INDICATOR_PROJECTION` schema version 1 is private and contains
 selected per-series symbol/currency, weekly status, latest timestamp/raw
 close, sample count capped at 200, raw-close SMA50/SMA200, recency proxy,

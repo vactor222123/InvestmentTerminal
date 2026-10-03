@@ -1,6 +1,19 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — full indicator result and export boundary
+## Current handoff — one-instrument research export qualification
+
+Fresh clean GitHub `develop` matched
+`bebffba256af5fb11bd907a9ec00b20d4131afc2`. This IMPLEMENTATION
+package adds a bounded, read-only, private single-instrument candle/indicator
+export with exact projection checksum and latest-sample parity, plus a
+separate redacted report. Focused failure paths guard selection, binding,
+stored rows, output alias/overwrite, and atomic write cleanup. No private
+runtime data was accessed or modified. Next prepare one exact-baseline
+private qualification and review only its redacted report and SQLite
+integrity; do not share values with ChatGPT automatically or schedule
+weekly execution. See `docs/PHASE_7_INSTRUMENT_RESEARCH_EXPORT.md`.
+
+## Historical handoff — full indicator result and export boundary
 
 Fresh clean GitHub `develop` matched
 `f7177ba009e45a22848871ac275ff4776bb453bb`. The redacted full
@@ -384,10 +397,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `f7177ba009e45a22848871ac275ff4776bb453bb`
-**Current local package:** Full Indicator Result and Research-Export Audit
+**Current GitHub baseline:** `bebffba256af5fb11bd907a9ec00b20d4131afc2`
+**Current local package:** Bounded Single-Instrument Research Export
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Implement one bounded private read-only instrument research export and a separate redacted report
+**Current next action:** Qualify one selected instrument through the private export and review only its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

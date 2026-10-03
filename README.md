@@ -177,6 +177,18 @@ depend on developer-local personal portfolio files.
 
 ## Operational CLIs
 
+Read-only single-instrument research export:
+
+```text
+python -m investment_terminal.cli.instrument_research_export
+```
+
+It validates a private full raw-indicator projection against the selected
+manifest and weekly checkpoint, exports one bounded private candle/indicator
+artifact, and writes a separate redacted report. It does not share values
+with ChatGPT or update SQLite; see
+`docs/PHASE_7_INSTRUMENT_RESEARCH_EXPORT.md`.
+
 Bounded profile-backed weekly candle slice:
 
 ```text

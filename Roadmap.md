@@ -1,5 +1,13 @@
 # Investment Terminal — Product Roadmap
 
+The bounded private single-instrument research export is implemented and
+locally tested. It combines one validated latest raw-close indicator item
+with up to ten years of current stored daily candles under read-only and
+checksum-bound evidence. One private operational qualification and redacted
+report review are next. Automatic ChatGPT sharing, adjusted-price claims,
+multi-instrument export, and unattended weekly updates remain deferred.
+See `docs/PHASE_7_INSTRUMENT_RESEARCH_EXPORT.md`.
+
 The full read-only stored-close indicator projection has now completed for
 all 11,892 selected series: 11,597 have SMA50 and 10,239 have SMA200.
 The separate recency proxy holds for 11,787, but its intersection with

@@ -1,6 +1,18 @@
 # Investment Terminal — Next Steps
 
-## Current gate — bounded private research export
+## Current gate — qualify one private instrument research export
+
+The new read-only single-instrument export CLI and private/redacted schema-1
+contracts are implemented. Prepare one exact-baseline ASCII-only operational
+handoff for a selected instrument in the existing private full projection.
+Verify source projection bytes, manifest/weekly bindings, redacted output,
+and independent SQLite integrity. Return only the redacted report and its
+SHA-256; the per-instrument candles and indicator values remain private.
+Do not automatically send the private artifact to ChatGPT, run a bulk
+export, or enable weekly scheduling. See
+`docs/PHASE_7_INSTRUMENT_RESEARCH_EXPORT.md`.
+
+## Historical gate — bounded private research export
 
 The full stored-close projection completed for 11,892 selected series: 10,239
 have both SMA50 and SMA200, 1,358 have SMA50 only, and 295 have fewer than
@@ -203,7 +215,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ f7177ba009e45a22848871ac275ff4776bb453bb`
+**This package verified baseline:** `develop @ bebffba256af5fb11bd907a9ec00b20d4131afc2`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -419,9 +431,8 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Implement one bounded private read-only instrument research export and
-separate redacted report; review its focused failure-path tests before
-operational use.
+Prepare one exact-baseline private one-instrument research-export
+qualification; review only its redacted report and SQLite integrity.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

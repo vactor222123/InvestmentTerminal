@@ -1,5 +1,15 @@
 # Investment Terminal — Software Architecture
 
+The `instrument_research_export` operation is a separate, read-only
+single-instrument boundary over the validated manifest/weekly selection,
+exact-byte private SMA projection, and current SQLite candle snapshot. It
+verifies selected latest-200 projection parity, bounds a historical query,
+and writes a private factual artifact plus a redacted aggregate report.
+It neither adjusts prices nor grants provider, scheduler, ChatGPT-sharing,
+recommendation, candle-write, or checkpoint-write authority. Older exported
+rows are bound to the export's candle-array checksum, not retroactively to
+the earlier SMA projection's SQLite snapshot.
+
 The `latest_raw_indicator_projection` operation reads a complete manifest-
 bound weekly selection and existing daily SQLite candles under one read-only
 snapshot. It computes objective SMA50/SMA200 on at most 200 stored closes
