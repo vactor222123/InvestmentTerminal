@@ -1,11 +1,18 @@
 # Investment Terminal — Product Roadmap
 
-The bounded latest stored-close SMA50/SMA200 projection is implemented as a
-private, versioned value document plus a redacted aggregate report. Terminal
-applies no explicit corporate-action adjustment; it is not yet a verified
-analysis export. Next qualify one selected series against the private
-complete weekly checkpoint and SQLite store, then review the report and
-integrity before a full projection. Unattended weekly scheduling remains
+The full read-only stored-close indicator projection has now completed for
+all 11,892 selected series: 11,597 have SMA50 and 10,239 have SMA200.
+The separate recency proxy holds for 11,787, but its intersection with
+indicator availability is unmeasured. The next bounded product step is a
+private, read-only, single-instrument factual research export plus redacted
+operational report, not automatic ChatGPT sharing or a weekly scheduler.
+See `docs/PHASE_7_FULL_RAW_INDICATOR_RESULT_AND_EXPORT_AUDIT.md`.
+
+The earlier bounded latest stored-close SMA50/SMA200 projection was
+implemented as a private, versioned value document plus a redacted aggregate
+report. Its one-series and full-selection operational qualifications are now
+complete. Terminal applies no explicit corporate-action adjustment; this is
+still not a verified analysis export. Unattended weekly scheduling remains
 deferred. See `docs/PHASE_7_LATEST_RAW_INDICATOR_PROJECTION.md`.
 
 The read-only successful-stale/long-gap diagnostic is implemented. One

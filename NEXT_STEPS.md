@@ -1,6 +1,20 @@
 # Investment Terminal — Next Steps
 
-## Current gate — complete stored-close SMA projection
+## Current gate — bounded private research export
+
+The full stored-close projection completed for 11,892 selected series: 10,239
+have both SMA50 and SMA200, 1,358 have SMA50 only, and 295 have fewer than
+50 sampled closes. The seven-day latest-candle proxy holds for 11,787; the
+SMA/recency intersection is unreported. SQLite integrity was separately
+reported `ok`. Next implement a read-only, checksum-bound, single-instrument
+research export from the existing private projection and SQLite candles,
+with a private factual artifact and a separate redacted operational report.
+Preserve existing JSON contracts, test invalid/mismatched inputs and write
+failures, and do not automatically share private values with ChatGPT or
+enable unattended weekly updates. See
+`docs/PHASE_7_FULL_RAW_INDICATOR_RESULT_AND_EXPORT_AUDIT.md`.
+
+## Historical gate — complete stored-close SMA projection
 
 The exact-baseline one-item run completed: that single selected series has
 SMA50, SMA200, and the seven-calendar-day recency proxy; SQLite integrity
@@ -189,7 +203,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 776f80dc60e9b71e7d0a57a64392b754ebf56b0a`
+**This package verified baseline:** `develop @ f7177ba009e45a22848871ac275ff4776bb453bb`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -405,8 +419,9 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute one exact-baseline private complete-selection stored-close SMA
-projection; review only its redacted report and independent SQLite integrity.
+Implement one bounded private read-only instrument research export and
+separate redacted report; review its focused failure-path tests before
+operational use.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest

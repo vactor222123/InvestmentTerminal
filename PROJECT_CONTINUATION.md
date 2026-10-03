@@ -1,6 +1,20 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — complete stored-close SMA projection
+## Current handoff — full indicator result and export boundary
+
+Fresh clean GitHub `develop` matched
+`f7177ba009e45a22848871ac275ff4776bb453bb`. The redacted full
+projection report is `COMPLETE` for all 11,892 selected series: 11,597 have
+SMA50, 10,239 have SMA200, and 11,787 meet the seven-day recency proxy;
+the user reported SQLite integrity `ok`. These aggregates do not establish
+their intersections, exchange-session completeness, or adjusted-price
+validity. This AUDIT package changes no application code or private runtime
+data. Next implement one bounded, private, read-only instrument research
+export with a separate redacted report; no automatic ChatGPT sharing or
+weekly schedule. See
+`docs/PHASE_7_FULL_RAW_INDICATOR_RESULT_AND_EXPORT_AUDIT.md`.
+
+## Historical handoff — complete stored-close SMA projection
 
 Fresh clean GitHub `develop` matched
 `776f80dc60e9b71e7d0a57a64392b754ebf56b0a`. The returned redacted
@@ -370,10 +384,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `776f80dc60e9b71e7d0a57a64392b754ebf56b0a`
-**Current local package:** Complete Stored-Close SMA Projection Handoff
+**Current GitHub baseline:** `f7177ba009e45a22848871ac275ff4776bb453bb`
+**Current local package:** Full Indicator Result and Research-Export Audit
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one exact-baseline private complete-selection SMA projection and review its redacted report
+**Current next action:** Implement one bounded private read-only instrument research export and a separate redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds
