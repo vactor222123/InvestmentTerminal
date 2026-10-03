@@ -1,6 +1,22 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — generic profile-backed research run
+## Current handoff — qualify MCD through the generic research command
+
+Fresh clean GitHub `develop` matched
+`70c8d51dd7963d08a725594e601f782a46dc1c28`. This OPERATIONAL
+documentation package prepares one user-executed, read-only qualification
+of the already implemented generic `instrument_research_run` for the user's
+selected MCD symbol. The exact-baseline ASCII-only block validates the
+previously reported private projection checksum, requires unused outputs,
+checks the redacted report contract and source immutability, and independently
+checks SQLite integrity. No private runtime file or application code was
+accessed or changed here. Run the block in
+`docs/PHASE_7_PROFILE_RESEARCH_MCD_HANDOFF.md` before applying this ZIP;
+return only its validated redacted report, SHA-256, and integrity line.
+MCD absence or stale evidence must fail closed; do not rerun automatically,
+share private candles, broaden export, or enable scheduling.
+
+## Historical handoff — generic profile-backed research run
 
 Fresh clean GitHub `develop` matched
 `b647aa773bf2f2850cf4f1b86f4fb1e9ddccfcf4`. This IMPLEMENTATION package

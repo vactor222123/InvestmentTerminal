@@ -1,6 +1,18 @@
 # Investment Terminal — Next Steps
 
-## Current gate — qualify the generic profile-backed research command
+## Current gate — execute one MCD qualification and review redacted evidence
+
+Run the exact-baseline ASCII-only block in
+`docs/PHASE_7_PROFILE_RESEARCH_MCD_HANDOFF.md` **before applying this
+documentation ZIP**. It tests the generic read-only research command for
+the user's selected MCD input using the previously reported private full
+projection and weekly checkpoint. Return only the validated redacted report,
+its SHA-256, and `SQLite integrity: ok`. A missing MCD selection or stale
+evidence is a blocker, not permission to choose another symbol or retry.
+Do not send the private export, infer adjusted returns or session completeness,
+bulk-export the universe, or start a scheduler.
+
+## Historical gate — generic profile-backed command implemented
 
 The new `instrument_research_run` CLI reduces repeated operator arguments for
 any selected manifest instrument. It reuses the existing read-only export and

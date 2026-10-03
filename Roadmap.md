@@ -1,5 +1,11 @@
 # Investment Terminal — Product Roadmap
 
+The immediate operational gate is one user-executed MCD qualification of the
+generic profile-backed research command. MCD is a selected input, not a
+special-case product rule. Review only the redacted report and independent
+SQLite integrity before any private sharing, wider research export, or weekly
+scheduler decision. See `docs/PHASE_7_PROFILE_RESEARCH_MCD_HANDOFF.md`.
+
 The next operational gate is one private qualification of the generic
 profile-backed `instrument_research_run` CLI for an explicitly selected
 manifest instrument. It reuses the existing one-instrument read-only export
