@@ -1,5 +1,18 @@
 # Investment Terminal — Next Steps
 
+## Current gate — choose a user-directed research handoff
+
+The one-instrument export qualification completed with 2,512 stored rows,
+SMA50/SMA200 availability, a recent-candle proxy, and user-reported SQLite
+integrity `ok`. The redacted result is not a price or return dataset and
+does not reveal which automatically chosen instrument was exported. Ask the
+user which symbol they want to analyze and whether they explicitly authorize
+sharing a bounded private export with ChatGPT. The existing CLI accepts a
+selected symbol; no manual market-data entry is required. Define and verify
+the handoff for that symbol before any upload. Do not infer adjusted-price
+returns, ten-year session completeness, or scheduler readiness. See
+`docs/PHASE_7_INSTRUMENT_RESEARCH_EXPORT_RESULT_AUDIT.md`.
+
 ## Current gate — execute one private instrument export
 
 Run the exact-baseline, ASCII-only PowerShell block in

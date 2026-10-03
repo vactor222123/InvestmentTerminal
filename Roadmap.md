@@ -1,5 +1,14 @@
 # Investment Terminal — Product Roadmap
 
+The first private instrument research export completed: its redacted report
+records 2,512 stored daily rows and current SMA50/SMA200 availability for
+one automatically selected, unidentified instrument. This validates a
+bounded factual export path, not analysis-ready adjusted performance or
+ten-year session continuity. The next gate is a user-selected symbol and
+explicit decision about sharing its checksum-verified private export with
+ChatGPT; bulk export and unattended weekly scheduling remain separate.
+See `docs/PHASE_7_INSTRUMENT_RESEARCH_EXPORT_RESULT_AUDIT.md`.
+
 One exact-baseline private instrument research-export qualification is now
 prepared for user execution; see
 `docs/PHASE_7_ONE_INSTRUMENT_RESEARCH_EXPORT_HANDOFF.md`. Its redacted

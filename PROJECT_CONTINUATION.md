@@ -1,5 +1,21 @@
 # InvestmentTerminal — Project Continuation
 
+## Current handoff — one-instrument export result reviewed
+
+Fresh clean GitHub `develop` matched
+`f39a7566a0f67027fd29436f9cad3f79b4a71a6f`. The returned redacted
+export report is `COMPLETE`: 2,512 stored daily-labeled rows in the explicit
+ten-year window, 200 latest samples with SMA50/SMA200 available, and a true
+seven-day recency proxy. Its verified SHA-256 is
+`43cf520503abd2582d003a4575e5d51f7504ec75a571999a43654d9b7e9c7701`;
+the user reported SQLite integrity `ok`. This AUDIT package changes no
+application code or private runtime data. The report does not identify the
+instrument, prove session completeness, or validate adjusted returns. Next
+obtain the user's intended instrument and explicit sharing preference before
+a bounded ChatGPT research handoff; do not upload private data or broaden
+the export automatically. See
+`docs/PHASE_7_INSTRUMENT_RESEARCH_EXPORT_RESULT_AUDIT.md`.
+
 ## Current handoff — execute one private research export
 
 Fresh clean GitHub `develop` matched
