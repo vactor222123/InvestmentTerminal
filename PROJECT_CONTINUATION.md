@@ -1,6 +1,19 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — bounded raw-close indicators implemented
+## Current handoff — one-item stored-close SMA qualification
+
+Fresh clean GitHub `develop` matched
+`5ce869688cbd61e1a9ae0621bdac6d6b760058c4`. This OPERATIONAL
+package changes no application code or private runtime data. Run the
+exact-baseline ASCII-only, `--max-items 1` PowerShell handoff in
+`docs/PHASE_7_ONE_ITEM_RAW_INDICATOR_HANDOFF.md` before applying its ZIP.
+It verifies the complete manifest-bound private checkpoint, reads SQLite
+without modification, writes one private stored-close SMA value document,
+and returns only a redacted aggregate report. Send the report, its SHA-256,
+and independent SQLite integrity; do not send the private document. Do not
+run the full projection or enable scheduling before reviewing this result.
+
+## Historical handoff — bounded raw-close indicators implemented
 
 Fresh clean GitHub `develop` matched
 `26f2831251175f7b221e09393d2fa209800d1684`. This IMPLEMENTATION
@@ -344,10 +357,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `26f2831251175f7b221e09393d2fa209800d1684`
-**Current local package:** Bounded Latest Raw Indicator Projection
+**Current GitHub baseline:** `5ce869688cbd61e1a9ae0621bdac6d6b760058c4`
+**Current local package:** One-Item Stored-Close SMA Qualification Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Prepare one exact-baseline private one-series raw-indicator qualification
+**Current next action:** Run one exact-baseline private one-series SMA qualification and review its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

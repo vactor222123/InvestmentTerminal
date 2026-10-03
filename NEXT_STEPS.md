@@ -1,6 +1,18 @@
 # Investment Terminal — Next Steps
 
-## Current gate — qualify bounded raw-close indicators
+## Current gate — execute one-item stored-close SMA qualification
+
+Run the exact-baseline ASCII-only PowerShell block in
+`docs/PHASE_7_ONE_ITEM_RAW_INDICATOR_HANDOFF.md` **before applying this
+package's ZIP**. It verifies the complete private weekly checkpoint and
+prior cohort report, projects only the first selected series with
+`--max-items 1`, and checks the redacted result and SQLite integrity.
+Return only the redacted report, its SHA-256, and the integrity result;
+the per-series value document under `C:\runtime\data` remains private.
+No Yahoo request, full-universe projection, adjusted-price inference, or
+unattended schedule is authorized yet.
+
+## Historical gate — qualify bounded raw-close indicators
 
 The versioned private latest-indicator projection is implemented for a
 deterministic bounded prefix of the manifest-bound daily selection. It reads
@@ -163,7 +175,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 26f2831251175f7b221e09393d2fa209800d1684`
+**This package verified baseline:** `develop @ 5ce869688cbd61e1a9ae0621bdac6d6b760058c4`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -379,7 +391,7 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Prepare one exact-baseline private one-series raw-indicator qualification;
+Execute one exact-baseline private one-series stored-close SMA qualification;
 review only its redacted report and independent SQLite integrity.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
