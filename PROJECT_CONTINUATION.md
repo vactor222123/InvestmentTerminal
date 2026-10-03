@@ -1,6 +1,19 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — one-item stored-close SMA qualification
+## Current handoff — complete stored-close SMA projection
+
+Fresh clean GitHub `develop` matched
+`776f80dc60e9b71e7d0a57a64392b754ebf56b0a`. The returned redacted
+one-item report is `COMPLETE`: one of 11,892 selected series had SMA50,
+SMA200, and the seven-calendar-day recency proxy; the user reported SQLite
+integrity `ok`. This does not establish full-selection readiness. This
+OPERATIONAL package changes no application code or private runtime data.
+Run the exact-baseline, read-only, complete-selection handoff in
+`docs/PHASE_7_ONE_ITEM_SMA_RESULT_AND_FULL_PROJECTION_HANDOFF.md` before
+applying its ZIP. Return only the redacted full report, its SHA-256, and
+independent SQLite integrity. Do not schedule or claim adjusted prices.
+
+## Historical handoff — one-item stored-close SMA qualification
 
 Fresh clean GitHub `develop` matched
 `5ce869688cbd61e1a9ae0621bdac6d6b760058c4`. This OPERATIONAL
@@ -357,10 +370,10 @@ retry, and terminalization remain excluded.
 
 **Current repository:** `vactor222123/InvestmentTerminal`
 **Current branch:** `develop`
-**Current GitHub baseline:** `5ce869688cbd61e1a9ae0621bdac6d6b760058c4`
-**Current local package:** One-Item Stored-Close SMA Qualification Handoff
+**Current GitHub baseline:** `776f80dc60e9b71e7d0a57a64392b754ebf56b0a`
+**Current local package:** Complete Stored-Close SMA Projection Handoff
 **Current phase:** Phase 7 — Operational Data and First Real Use — OPEN
-**Current next action:** Run one exact-baseline private one-series SMA qualification and review its redacted report
+**Current next action:** Run one exact-baseline private complete-selection SMA projection and review its redacted report
 
 Package 61 live evidence contains 13,184 source rows and 12,424 unique accepted
 members: 5,653 ETFs and 6,771 non-ETFs, with zero collisions. Package 62 finds

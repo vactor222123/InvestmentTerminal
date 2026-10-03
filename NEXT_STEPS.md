@@ -1,6 +1,20 @@
 # Investment Terminal — Next Steps
 
-## Current gate — execute one-item stored-close SMA qualification
+## Current gate — complete stored-close SMA projection
+
+The exact-baseline one-item run completed: that single selected series has
+SMA50, SMA200, and the seven-calendar-day recency proxy; SQLite integrity
+was separately reported `ok`. Run the read-only full-selection PowerShell
+block in `docs/PHASE_7_ONE_ITEM_SMA_RESULT_AND_FULL_PROJECTION_HANDOFF.md`
+**before applying this package's ZIP**. It validates the existing evidence,
+projects all 11,892 selected series into a private file, validates its
+aggregate against a separate redacted report, and checks checkpoint
+immutability plus SQLite integrity. Return only the redacted report, its
+SHA-256, and the integrity result. A failed report is diagnostic; do not
+retry automatically or relax stored-candle validation. No provider request,
+candle write, adjusted-price claim, or unattended schedule is authorized.
+
+## Historical gate — execute one-item stored-close SMA qualification
 
 Run the exact-baseline ASCII-only PowerShell block in
 `docs/PHASE_7_ONE_ITEM_RAW_INDICATOR_HANDOFF.md` **before applying this
@@ -175,7 +189,7 @@ Package 178 previously instructed a one-time residual inventory handoff. Its
 result has since been reviewed; this paragraph is historical, not an active
 instruction. The private manifest and checkpoint set remain private.
 
-**This package verified baseline:** `develop @ 5ce869688cbd61e1a9ae0621bdac6d6b760058c4`
+**This package verified baseline:** `develop @ 776f80dc60e9b71e7d0a57a64392b754ebf56b0a`
 **Sprint 32:** CLOSED
 **Sprint 33:** CLOSED
 **Post-Sprint-33 audit:** COMPLETE
@@ -391,8 +405,8 @@ Sprint 33 — Integrated Current-State Market Intelligence completed the current
 
 ## Next Action
 
-Execute one exact-baseline private one-series stored-close SMA qualification;
-review only its redacted report and independent SQLite integrity.
+Execute one exact-baseline private complete-selection stored-close SMA
+projection; review only its redacted report and independent SQLite integrity.
 
 Use `docs/AI_ASSISTED_DELIVERY_WORKFLOW.md` for fresh-clone baseline checks,
 package classification, private/runtime handoff labels, repository-local pytest
