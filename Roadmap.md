@@ -1,5 +1,13 @@
 # Investment Terminal — Product Roadmap
 
+One exact-baseline private instrument research-export qualification is now
+prepared for user execution; see
+`docs/PHASE_7_ONE_INSTRUMENT_RESEARCH_EXPORT_HANDOFF.md`. Its redacted
+result and independent SQLite integrity must be reviewed before any broader
+export interface, explicit ChatGPT-sharing workflow, or unattended weekly
+schedule. The handoff does not change candle data or establish adjusted
+performance or exchange-session completeness.
+
 The bounded private single-instrument research export is implemented and
 locally tested. It combines one validated latest raw-close indicator item
 with up to ten years of current stored daily candles under read-only and

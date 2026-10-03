@@ -1,5 +1,16 @@
 # Investment Terminal — Next Steps
 
+## Current gate — execute one private instrument export
+
+Run the exact-baseline, ASCII-only PowerShell block in
+`docs/PHASE_7_ONE_INSTRUMENT_RESEARCH_EXPORT_HANDOFF.md` **before applying
+this package's ZIP**. It selects one qualifying instrument from the private
+projection without manual market-data entry, produces a private bounded
+historical export and separate redacted report, and independently checks
+SQLite integrity. Return only that report, its SHA-256, and the integrity
+line. No automatic rerun, bulk export, private-value sharing, adjusted-price
+claim, or unattended weekly schedule is authorized pending review.
+
 ## Current gate — qualify one private instrument research export
 
 The new read-only single-instrument export CLI and private/redacted schema-1

@@ -1,5 +1,19 @@
 # InvestmentTerminal — Project Continuation
 
+## Current handoff — execute one private research export
+
+Fresh clean GitHub `develop` matched
+`a1bc935877266c94861e0ed00b7dcb7350cf6feb`. This OPERATIONAL
+documentation package changes no application code or private runtime data.
+Run the exact-baseline, ASCII-only, one-instrument PowerShell block in
+`docs/PHASE_7_ONE_INSTRUMENT_RESEARCH_EXPORT_HANDOFF.md` before applying
+its ZIP. It derives one recent/SMA200-ready identity locally from the private
+full projection, exports only that series read-only, and checks the separate
+redacted report, source immutability, and SQLite integrity. Return only the
+redacted report, its SHA-256, and `SQLite integrity: ok`; do not send private
+candles or automatically rerun/schedule. Review the measured result before
+any wider export or ChatGPT-sharing decision.
+
 ## Current handoff — one-instrument research export qualification
 
 Fresh clean GitHub `develop` matched
