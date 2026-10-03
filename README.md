@@ -177,6 +177,18 @@ depend on developer-local personal portfolio files.
 
 ## Operational CLIs
 
+Profile-backed selected-instrument research export:
+
+```text
+python -m investment_terminal.cli.instrument_research_run
+```
+
+It reuses the private weekly profile and the existing read-only export,
+reducing manually repeated evidence paths without changing export contracts.
+The selected symbol, explicit window, projection SHA-256, and private/redacted
+destinations remain caller-owned. See
+`docs/PHASE_7_PROFILE_BACKED_RESEARCH_RUN.md`.
+
 Read-only single-instrument research export:
 
 ```text

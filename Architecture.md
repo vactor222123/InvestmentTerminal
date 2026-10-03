@@ -1,5 +1,12 @@
 # Investment Terminal — Software Architecture
 
+The `instrument_research_run` CLI is a profile-backed composition over the
+existing read-only export CLI. It derives static manifest/source/database paths
+and the exact-date weekly checkpoint from the validated private weekly profile,
+while retaining an explicit selected symbol, UTC window, projection checksum,
+and separate private/report destinations. It adds no new data authority, JSON
+contract, provider access, persistence path, interpretation, or scheduler.
+
 The `instrument_research_export` operation is a separate, read-only
 single-instrument boundary over the validated manifest/weekly selection,
 exact-byte private SMA projection, and current SQLite candle snapshot. It

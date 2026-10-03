@@ -1,5 +1,17 @@
 # Investment Terminal — Next Steps
 
+## Current gate — qualify the generic profile-backed research command
+
+The new `instrument_research_run` CLI reduces repeated operator arguments for
+any selected manifest instrument. It reuses the existing read-only export and
+schema-1 private/redacted outputs; it does not acquire candles or interpret an
+investment. Prepare one exact-baseline, user-executed private qualification
+with a verified selected symbol, matching complete weekly checkpoint and full
+projection, explicit UTC window, and unused outputs. Review only the redacted
+report, its SHA-256, and independent SQLite integrity. No automatic private
+sharing, bulk export, or unattended scheduling is authorized. See
+`docs/PHASE_7_PROFILE_BACKED_RESEARCH_RUN.md`.
+
 ## Current gate — choose a user-directed research handoff
 
 The one-instrument export qualification completed with 2,512 stored rows,

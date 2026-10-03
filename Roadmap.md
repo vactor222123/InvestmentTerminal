@@ -1,5 +1,12 @@
 # Investment Terminal — Product Roadmap
 
+The next operational gate is one private qualification of the generic
+profile-backed `instrument_research_run` CLI for an explicitly selected
+manifest instrument. It reuses the existing one-instrument read-only export
+and schema-1 artifacts; it does not update candles, expand to bulk research,
+share private values with ChatGPT, or prove weekly scheduler readiness. See
+`docs/PHASE_7_PROFILE_BACKED_RESEARCH_RUN.md`.
+
 The first private instrument research export completed: its redacted report
 records 2,512 stored daily rows and current SMA50/SMA200 availability for
 one automatically selected, unidentified instrument. This validates a

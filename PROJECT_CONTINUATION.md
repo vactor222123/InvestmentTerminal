@@ -1,5 +1,20 @@
 # InvestmentTerminal — Project Continuation
 
+## Current handoff — generic profile-backed research run
+
+Fresh clean GitHub `develop` matched
+`b647aa773bf2f2850cf4f1b86f4fb1e9ddccfcf4`. This IMPLEMENTATION package
+adds a short CLI for any explicitly selected manifest instrument. It uses the
+existing validated private weekly profile to derive static paths and the
+matching weekly checkpoint, then delegates to the unchanged read-only
+instrument export. Profile, path, UTC-end, checksum-shape, projection-byte,
+and overwrite failure paths are locally tested. No private runtime files,
+provider, candle database, JSON contracts, or ChatGPT-sharing authority were
+changed. Next prepare one exact-baseline private qualification for a selected
+instrument and review only its redacted report plus independent SQLite
+integrity; do not enable bulk export or weekly scheduling. See
+`docs/PHASE_7_PROFILE_BACKED_RESEARCH_RUN.md`.
+
 ## Current handoff — one-instrument export result reviewed
 
 Fresh clean GitHub `develop` matched
