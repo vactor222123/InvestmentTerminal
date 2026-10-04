@@ -1,6 +1,19 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — research price-basis boundary audited
+## Current handoff — generic Yahoo price-basis field qualification
+
+Fresh clean GitHub `develop` matched
+`dd8c32a83eaa8ba7c341d2cf766a510942393b94`. A separate read-only,
+one-instrument Yahoo field-shape qualifier now reports redacted aggregate
+presence and validity for candidate adjusted-close, dividend, and split
+fields. It leaves stored raw `Close`, SQLite, ingestion, and existing research
+JSON contracts untouched. Next run exactly one user-selected live instrument
+and review only the new redacted report, then audit provider semantics before
+any adjusted-price storage or return calculation. Do not bulk-run, share the
+private MCD export, or schedule updates from field presence alone. See
+`docs/PHASE_7_YAHOO_PRICE_BASIS_FIELD_QUALIFICATION.md`.
+
+## Historical handoff — research price-basis boundary audited
 
 Fresh clean GitHub `develop` matched
 `ef67204bbae7eea0ea77d5f9e582138219397f29`. The user permitted an

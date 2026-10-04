@@ -1,6 +1,16 @@
 # Investment Terminal — Next Steps
 
-## Current gate — qualify adjustment-field availability generically
+## Current gate — measure one Yahoo price-basis field shape
+
+The separate generic field-shape command is implemented without changing
+stored candles or existing JSON contracts. Run exactly one explicit live
+instrument with a bounded UTC window using
+`docs/PHASE_7_YAHOO_PRICE_BASIS_FIELD_QUALIFICATION.md`; review only its
+redacted report. Field presence is not adjustment-methodology proof. Audit
+provider semantics and storage provenance after measurement, before adjusted
+returns. Keep the private MCD export local; do not bulk-run or schedule.
+
+## Historical gate — qualify adjustment-field availability generically
 
 The user allowed sharing the private MCD export if it would materially help,
 but its current raw-close-only basis does not support reliable long-horizon

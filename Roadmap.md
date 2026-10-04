@@ -1,6 +1,13 @@
 # Investment Terminal — Product Roadmap
 
-The next generic data-readiness increment is a read-only, one-instrument
+The generic one-instrument Yahoo price-basis field-shape qualification is
+implemented and locally tested. Next measure one live selected instrument
+with its redacted report, then separately audit provider adjustment semantics
+and storage provenance. Candidate fields alone do not authorize adjusted
+returns, schema migration, private upload, bulk requests, or scheduling. See
+`docs/PHASE_7_YAHOO_PRICE_BASIS_FIELD_QUALIFICATION.md`.
+
+The preceding audit selected a read-only, one-instrument
 qualification of candidate adjusted-close and corporate-action fields from
 the existing Yahoo provider boundary. No adjusted-price storage, return
 calculation, private upload, or candle-schema migration is justified before
