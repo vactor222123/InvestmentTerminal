@@ -1,5 +1,12 @@
 # Investment Terminal — Product Roadmap
 
+The normalized Yahoo field-shape result is now semantically audited. In
+yfinance 1.6.0, candidate columns can be synthesized, so the next bounded
+increment is a schema-2 report that explicitly names the yfinance frame
+layer and marks raw-source provenance unknown. Adjusted-price persistence,
+return calculation, bulk expansion, and scheduling remain gated on stronger
+evidence. See `docs/PHASE_7_YAHOO_PRICE_BASIS_SEMANTICS_AUDIT.md`.
+
 One bounded live MCD Yahoo field-shape check succeeded with `Adj Close`,
 `Dividends`, and `Stock Splits` columns present and finite. This is only
 provider-shape evidence. Next audit adjustment semantics and design explicit

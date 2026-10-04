@@ -1,6 +1,17 @@
 # Investment Terminal — Next Steps
 
-## Current gate — audit adjusted-price semantics and provenance
+## Current gate — make normalized-frame provenance explicit
+
+The pinned yfinance source can synthesize `Adj Close` from `Close` and zero
+action columns, so the prior `QUALIFIED` report is not raw Yahoo source
+provenance. Implement a separate schema-2 redacted one-instrument report
+identifying `YFINANCE_HISTORY_FRAME`, pinned library version, and raw-source
+presence/completeness as `UNKNOWN`; retain schema 1 and existing candle/JSON
+contracts. See `docs/PHASE_7_YAHOO_PRICE_BASIS_SEMANTICS_AUDIT.md`. Do not
+store adjusted prices or compute returns, run bulk requests, or schedule
+updates from normalized-frame evidence alone.
+
+## Historical gate — audit adjusted-price semantics and provenance
 
 The single public MCD Yahoo field-shape check succeeded with all candidate
 columns present; see `docs/PHASE_7_YAHOO_PRICE_BASIS_FIELD_RESULT.md`.

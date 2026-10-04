@@ -1,6 +1,18 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — one live Yahoo price-basis field shape measured
+## Current handoff — Yahoo normalized-frame semantics audited
+
+Fresh clean GitHub `develop` matched
+`b25f437c0009bca1dcade99b269650716b30e4c3`. The pinned yfinance 1.6.0
+source shows that `Adj Close` may fall back to `Close` and empty action
+columns may be synthesized with zeros. Thus the prior MCD `QUALIFIED` result
+proves only normalized-frame shape, not raw Yahoo field presence, complete
+actions, or adjusted-return correctness. No provider or private runtime work
+occurred. Next add a separate schema-2 redacted report that names this layer
+and marks raw-source provenance `UNKNOWN`; preserve schema 1 and stored
+candles. See `docs/PHASE_7_YAHOO_PRICE_BASIS_SEMANTICS_AUDIT.md`.
+
+## Historical handoff — one live Yahoo price-basis field shape measured
 
 Fresh clean GitHub `develop` matched
 `b168b2fed4f3f333719325dfbe55c77a8e087ce8`. With the user's renewed
