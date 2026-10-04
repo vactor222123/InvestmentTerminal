@@ -1,5 +1,12 @@
 # Investment Terminal — Product Roadmap
 
+The returned redacted selected-instrument research report is complete, but
+its privacy contract excludes identity and values. Before ChatGPT consumes
+any private research artifact, add one generic local-only verifier for the
+existing private/report pair and an explicitly selected symbol; keep sharing
+user-authorized and manual. See
+`docs/PHASE_7_MCD_PROFILE_RESEARCH_RESULT_AUDIT.md`.
+
 The immediate operational gate is one user-executed MCD qualification of the
 generic profile-backed research command. MCD is a selected input, not a
 special-case product rule. Review only the redacted report and independent

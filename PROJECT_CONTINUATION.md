@@ -1,6 +1,23 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — qualify MCD through the generic research command
+## Current handoff — redacted profile-backed research result reviewed
+
+Fresh clean GitHub `develop` matched
+`4d22fd509c0ea9b5c3204afb307acf56e592c72c`. This AUDIT package read
+only the returned redacted research report. Its verified SHA-256 is
+`f67727f3f09ef6b7b82a0f80102323b56ecdd67786e6177f600bd409cc0ea3ed`;
+it reports `COMPLETE`, 2,512 stored daily rows, 200 latest closes with
+SMA50/SMA200 available, and a true seven-day proxy relative to the
+2026-09-29 exclusive end. The user separately reported SQLite integrity
+`ok`. The report excludes symbol and values, so it does not independently
+attest MCD identity, adjusted returns, session completeness, or private
+artifact parity. No private input or application code was touched. Next
+implement one generic local-only verifier of an explicitly selected private
+export against this redacted report before any user-authorized sharing;
+no automatic upload, bulk export, or scheduler. See
+`docs/PHASE_7_MCD_PROFILE_RESEARCH_RESULT_AUDIT.md`.
+
+## Historical handoff — qualify MCD through the generic research command
 
 Fresh clean GitHub `develop` matched
 `70c8d51dd7963d08a725594e601f782a46dc1c28`. This OPERATIONAL

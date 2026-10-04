@@ -1,6 +1,21 @@
 # Investment Terminal — Next Steps
 
-## Current gate — execute one MCD qualification and review redacted evidence
+## Current gate — verify a selected private research export locally
+
+The returned redacted MCD-named report is `COMPLETE`, with 2,512 stored
+daily rows and latest-200 SMA50/SMA200 availability; its exact-byte SHA-256
+and the user's independent SQLite integrity result have been recorded.
+Because the report deliberately excludes symbol and prices, it cannot alone
+prove that the private export is MCD or that the two artifacts match. Audit
+and implement the smallest generic, read-only local verifier for any
+caller-selected symbol and the existing schema-1 private/report pair.
+Test identity, binding, candle-array checksum, and failure paths without
+changing JSON contracts or reading the user's private runtime here. Do not
+upload private values, infer adjusted returns or session completeness, or
+enable bulk export/scheduling from this report. See
+`docs/PHASE_7_MCD_PROFILE_RESEARCH_RESULT_AUDIT.md`.
+
+## Historical gate — execute one MCD qualification and review redacted evidence
 
 Run the exact-baseline ASCII-only block in
 `docs/PHASE_7_PROFILE_RESEARCH_MCD_HANDOFF.md` **before applying this
