@@ -1,6 +1,15 @@
 # Investment Terminal — Next Steps
 
-## Current gate — measure one Yahoo price-basis field shape
+## Current gate — live price-basis qualification deferred
+
+The user deferred the live Yahoo check. Do not call Yahoo or request a private
+runtime report until the user chooses to resume. The isolated qualifier now
+correctly treats rows without columns as `MALFORMED`, not `EMPTY`; see
+`docs/PHASE_7_PRICE_BASIS_EMPTY_FRAME_GUARD.md`. Field-shape evidence and a
+separate methodology/provenance audit are still required before adjusted
+prices, returns, or storage changes.
+
+## Deferred gate — measure one Yahoo price-basis field shape
 
 The separate generic field-shape command is implemented without changing
 stored candles or existing JSON contracts. Run exactly one explicit live

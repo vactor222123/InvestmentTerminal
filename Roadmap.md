@@ -1,5 +1,12 @@
 # Investment Terminal — Product Roadmap
 
+The live one-instrument Yahoo price-basis field qualification is deferred at
+the user's request. A local-only failure-path guard now distinguishes truly
+empty history from a malformed row-bearing frame without columns. Resume the
+bounded live measurement only when requested; adjusted-price semantics and
+storage provenance remain later gates. See
+`docs/PHASE_7_PRICE_BASIS_EMPTY_FRAME_GUARD.md`.
+
 The generic one-instrument Yahoo price-basis field-shape qualification is
 implemented and locally tested. Next measure one live selected instrument
 with its redacted report, then separately audit provider adjustment semantics

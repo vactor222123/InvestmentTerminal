@@ -121,6 +121,15 @@ def test_empty_and_nonframe_are_distinct():
     assert invalid["failure_category"] == "FRAME_TYPE"
 
 
+def test_rows_without_columns_are_malformed_not_empty():
+    value = pd.DataFrame(index=pd.DatetimeIndex([START]))
+    result = PriceBasisQualification(FakeClient(value)).qualify(request())
+    assert result["status"] == "MALFORMED"
+    assert result["row_count"] == 1
+    assert result["failure_category"] == "CLOSE_MISSING"
+    assert all(item["valid_count"] is None for item in result["fields"].values())
+
+
 def test_cli_writes_only_report_and_refuses_overwrite(tmp_path):
     path = tmp_path / "report.json"
     client = FakeClient(frame())

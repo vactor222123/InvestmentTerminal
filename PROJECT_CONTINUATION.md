@@ -1,6 +1,17 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — generic Yahoo price-basis field qualification
+## Current handoff — price-basis empty-frame guard; live run deferred
+
+Fresh clean GitHub `develop` matched
+`d438e357863bbbeb48be77888257efdf0d1c3220`. Static review found that
+the isolated Yahoo qualifier treated a row-bearing frame with zero columns as
+`EMPTY`; it now reports `MALFORMED` / `CLOSE_MISSING`. Focused fake-provider
+tests cover this failure path. No Yahoo request or private runtime access was
+made. The user explicitly deferred the live one-instrument qualification;
+do not run it until requested. See
+`docs/PHASE_7_PRICE_BASIS_EMPTY_FRAME_GUARD.md`.
+
+## Historical handoff — generic Yahoo price-basis field qualification
 
 Fresh clean GitHub `develop` matched
 `dd8c32a83eaa8ba7c341d2cf766a510942393b94`. A separate read-only,

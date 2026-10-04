@@ -81,7 +81,9 @@ class PriceBasisQualification:
             return base
         if not isinstance(frame, pd.DataFrame):
             return self._malformed(base, "FRAME_TYPE")
-        if frame.empty:
+        # DataFrame.empty is also true for row-bearing frames with zero
+        # columns. Those are malformed responses, not absent price history.
+        if len(frame.index) == 0:
             base["status"] = "EMPTY"
             base["row_count"] = 0
             return base
