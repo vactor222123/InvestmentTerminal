@@ -1,6 +1,19 @@
 # Investment Terminal — Next Steps
 
-## Current gate — choose the exact private-artifact sharing boundary
+## Current gate — qualify adjustment-field availability generically
+
+The user allowed sharing the private MCD export if it would materially help,
+but its current raw-close-only basis does not support reliable long-horizon
+return comparison. Keep the artifact local for now. Implement the separate
+read-only one-instrument Yahoo field-shape qualification selected in
+`docs/PHASE_7_RESEARCH_PRICE_BASIS_AUDIT.md`: inspect candidate adjusted-close
+and corporate-action availability with fake-provider failure-path tests,
+redacted output, no candle/SQLite writes, and no change to existing JSON
+contracts. A later measured provider result and explicit semantics audit must
+precede any adjusted-return storage or calculation. Exchange-session quality
+and weekly scheduling remain separate.
+
+## Historical gate — choose the exact private-artifact sharing boundary
 
 The user returned `VERIFIED` from the local MCD pair check, and the redacted
 report's pinned exact-byte SHA-256 was independently confirmed. The private

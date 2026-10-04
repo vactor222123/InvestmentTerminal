@@ -1,6 +1,20 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — local MCD research-pair verification reviewed
+## Current handoff — research price-basis boundary audited
+
+Fresh clean GitHub `develop` matched
+`ef67204bbae7eea0ea77d5f9e582138219397f29`. The user permitted an
+exact private MCD research handoff if useful; this AUDIT package did not use
+or upload that artifact. Code inspection shows ingestion requests
+`auto_adjust=False` and `actions=False`, then stores only OHLCV `Close` without
+adjusted-price/action provenance. The verified research pair therefore
+supports raw-price description, not reliable total-return analysis or
+ten-year session-completeness claims. Next implement one generic read-only,
+one-instrument Yahoo price-basis field qualification with redacted evidence;
+do not modify existing candles or automatically share private data. See
+`docs/PHASE_7_RESEARCH_PRICE_BASIS_AUDIT.md`.
+
+## Historical handoff — local MCD research-pair verification reviewed
 
 Fresh clean GitHub `develop` matched
 `dd7fb5f02d84478bbc9dab06ed6f7e675064a17d`. The returned redacted

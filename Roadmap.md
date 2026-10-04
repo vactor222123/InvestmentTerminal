@@ -1,5 +1,13 @@
 # Investment Terminal — Product Roadmap
 
+The next generic data-readiness increment is a read-only, one-instrument
+qualification of candidate adjusted-close and corporate-action fields from
+the existing Yahoo provider boundary. No adjusted-price storage, return
+calculation, private upload, or candle-schema migration is justified before
+that field-shape evidence and a separate semantics audit. The previously
+verified MCD export remains a raw-price factual artifact. See
+`docs/PHASE_7_RESEARCH_PRICE_BASIS_AUDIT.md`.
+
 The generic local read-only verifier is implemented. The user reported a
 successful MCD pair check, and the redacted report's pinned checksum was
 independently reconfirmed. The next gate is a separate explicit decision to
