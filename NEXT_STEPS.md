@@ -1,6 +1,18 @@
 # Investment Terminal — Next Steps
 
-## Current gate — qualify the generic verifier on the private MCD pair
+## Current gate — run the local MCD pair verification
+
+Run the exact-baseline ASCII-only block in
+`docs/PHASE_7_MCD_RESEARCH_VERIFIER_HANDOFF.md` **before applying this
+documentation ZIP**. It verifies only the already-created private MCD-named
+export and the previously reviewed redacted report, without new data
+acquisition, SQLite access, file writes, or upload. Send only the generic
+verifier lines and redacted report path; never send the private export unless
+you separately approve those exact bytes after reviewing the result. A
+successful parity check does not prove adjusted returns, exchange sessions,
+current freshness, or investment suitability.
+
+## Historical gate — prepare the private MCD verifier handoff
 
 The read-only `instrument_research_verify` CLI is implemented with no new
 JSON contract. Prepare one exact-baseline, ASCII-only user-executed handoff

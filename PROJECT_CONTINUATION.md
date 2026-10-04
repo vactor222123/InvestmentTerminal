@@ -1,5 +1,18 @@
 # InvestmentTerminal — Project Continuation
 
+## Current handoff — qualify the existing MCD research pair locally
+
+Fresh clean GitHub `develop` matched
+`1769859eb3dca2407c1c82ada23a40499768548f`. This OPERATIONAL
+documentation package prepares one exact-baseline, ASCII-only, user-executed
+read-only verification of the existing MCD-named private export against the
+previously reviewed redacted report and pinned report SHA-256. No private
+runtime file, SQLite, provider, JSON contract, or application code was touched.
+Run the block in `docs/PHASE_7_MCD_RESEARCH_VERIFIER_HANDOFF.md` before
+applying this ZIP. Return only its safe verifier lines and the redacted report
+path; do not send private candles. Review the result before any separate
+per-artifact sharing decision.
+
 ## Current handoff — generic local research verifier implemented
 
 Fresh clean GitHub `develop` matched
