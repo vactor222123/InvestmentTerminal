@@ -1,6 +1,19 @@
 # Investment Terminal — Next Steps
 
-## Current gate — run the local MCD pair verification
+## Current gate — choose the exact private-artifact sharing boundary
+
+The user returned `VERIFIED` from the local MCD pair check, and the redacted
+report's pinned exact-byte SHA-256 was independently confirmed. The private
+export was not accessed here. Ask whether the user explicitly approves
+sharing that exact private market-data artifact with ChatGPT for MCD research.
+Approval is per artifact; neither a prior general analysis request nor a
+checksum alone authorizes upload. If not approved, select a separate bounded
+local-only analytical projection and review its redacted output. Do not infer
+adjusted returns, exchange-session completeness, current freshness, or
+investment suitability from pair integrity. See
+`docs/PHASE_7_MCD_RESEARCH_VERIFIER_RESULT_AUDIT.md`.
+
+## Historical gate — run the local MCD pair verification
 
 Run the exact-baseline ASCII-only block in
 `docs/PHASE_7_MCD_RESEARCH_VERIFIER_HANDOFF.md` **before applying this

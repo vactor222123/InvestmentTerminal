@@ -1,10 +1,11 @@
 # Investment Terminal — Product Roadmap
 
-The generic local read-only verifier is implemented for a selected private
-research export and its exact-byte-pinned redacted report. Next qualify it
-on the existing MCD-named pair before a separate user-controlled sharing
-decision; parity is not adjusted-return or trading-session completeness.
-See `docs/PHASE_7_INSTRUMENT_RESEARCH_VERIFIER.md`.
+The generic local read-only verifier is implemented. The user reported a
+successful MCD pair check, and the redacted report's pinned checksum was
+independently reconfirmed. The next gate is a separate explicit decision to
+share the exact private export or keep value-level analysis local; pair parity
+is not adjusted-return or trading-session completeness. See
+`docs/PHASE_7_MCD_RESEARCH_VERIFIER_RESULT_AUDIT.md`.
 
 The returned redacted selected-instrument research report is complete, but
 its privacy contract excludes identity and values. Before ChatGPT consumes

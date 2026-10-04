@@ -1,6 +1,19 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — qualify the existing MCD research pair locally
+## Current handoff — local MCD research-pair verification reviewed
+
+Fresh clean GitHub `develop` matched
+`dd7fb5f02d84478bbc9dab06ed6f7e675064a17d`. The returned redacted
+report independently matches its pinned SHA-256 and still records 2,512
+stored rows with latest-200 raw-close SMA availability. The user reported
+`VERIFIED` and both report/private hashes from the local pair check; the
+private bytes were not accessed here, and their hash is not committed.
+This AUDIT package changes no application code or runtime data. Next obtain
+an explicit decision about sharing the exact private MCD export before any
+ChatGPT value-level analysis, or keep the analysis local. See
+`docs/PHASE_7_MCD_RESEARCH_VERIFIER_RESULT_AUDIT.md`.
+
+## Historical handoff — qualify the existing MCD research pair locally
 
 Fresh clean GitHub `develop` matched
 `1769859eb3dca2407c1c82ada23a40499768548f`. This OPERATIONAL
