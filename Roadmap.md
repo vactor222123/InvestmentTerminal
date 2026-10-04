@@ -1,17 +1,23 @@
 # Investment Terminal — Product Roadmap
 
-The live one-instrument Yahoo price-basis field qualification is deferred at
-the user's request. A local-only failure-path guard now distinguishes truly
-empty history from a malformed row-bearing frame without columns. Resume the
-bounded live measurement only when requested; adjusted-price semantics and
-storage provenance remain later gates. See
+One bounded live MCD Yahoo field-shape check succeeded with `Adj Close`,
+`Dividends`, and `Stock Splits` columns present and finite. This is only
+provider-shape evidence. Next audit adjustment semantics and design explicit
+versioned price/action provenance before storage or return analysis; do not
+expand to bulk qualification or weekly scheduling yet. See
+`docs/PHASE_7_YAHOO_PRICE_BASIS_FIELD_RESULT.md`.
+
+The previously deferred one-instrument Yahoo price-basis qualification was
+later resumed at the user's request. At that earlier point, a local-only
+failure-path guard distinguished truly empty history from a malformed
+row-bearing frame without columns. See
 `docs/PHASE_7_PRICE_BASIS_EMPTY_FRAME_GUARD.md`.
 
 The generic one-instrument Yahoo price-basis field-shape qualification is
-implemented and locally tested. Next measure one live selected instrument
-with its redacted report, then separately audit provider adjustment semantics
-and storage provenance. Candidate fields alone do not authorize adjusted
-returns, schema migration, private upload, bulk requests, or scheduling. See
+implemented and locally tested. Its earlier next gate was one live selected
+instrument; that measurement is recorded above. Candidate fields alone do
+not authorize adjusted returns, schema migration, private upload, bulk
+requests, or scheduling. See
 `docs/PHASE_7_YAHOO_PRICE_BASIS_FIELD_QUALIFICATION.md`.
 
 The preceding audit selected a read-only, one-instrument

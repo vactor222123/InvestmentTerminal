@@ -1,6 +1,18 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — price-basis empty-frame guard; live run deferred
+## Current handoff — one live Yahoo price-basis field shape measured
+
+Fresh clean GitHub `develop` matched
+`b168b2fed4f3f333719325dfbe55c77a8e087ce8`. With the user's renewed
+permission, one bounded MCD Yahoo request returned a redacted schema-1
+`QUALIFIED` report: 251 daily rows, all three candidate columns present and
+valid, four nonzero dividend entries, and zero nonzero split entries. No
+private runtime data or SQLite was touched. Field shape is not adjustment
+methodology or return proof. Next audit provider semantics and a versioned
+price/action provenance contract before storage changes; no bulk run or
+scheduling. See `docs/PHASE_7_YAHOO_PRICE_BASIS_FIELD_RESULT.md`.
+
+## Historical handoff — price-basis empty-frame guard; live run deferred
 
 Fresh clean GitHub `develop` matched
 `d438e357863bbbeb48be77888257efdf0d1c3220`. Static review found that

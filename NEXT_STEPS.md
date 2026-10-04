@@ -1,6 +1,16 @@
 # Investment Terminal — Next Steps
 
-## Current gate — live price-basis qualification deferred
+## Current gate — audit adjusted-price semantics and provenance
+
+The single public MCD Yahoo field-shape check succeeded with all candidate
+columns present; see `docs/PHASE_7_YAHOO_PRICE_BASIS_FIELD_RESULT.md`.
+Do not treat column presence as proof of correct dividends, splits, adjusted
+prices, or returns. Audit provider semantics and specify a separate versioned
+price/action provenance and storage boundary before any adjusted-price
+persistence or calculation. Keep stored raw `Close` and existing contracts
+unchanged meanwhile. No bulk run or weekly scheduler follows from this result.
+
+## Historical gate — live price-basis qualification deferred
 
 The user deferred the live Yahoo check. Do not call Yahoo or request a private
 runtime report until the user chooses to resume. The isolated qualifier now
