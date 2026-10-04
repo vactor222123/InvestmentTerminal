@@ -1,5 +1,13 @@
 # Investment Terminal — Software Architecture
 
+The `instrument_research_verify` operation and CLI form a read-only local
+handoff boundary over an already-created private research export and its
+redacted report. They check a caller-pinned report checksum, exact existing
+schema and evidence parity, canonical exported-candle checksum, and available
+latest-sample indicator values for one explicitly expected symbol. They do
+not reopen SQLite/source evidence, create a new JSON contract, contact a
+provider, upload private values, or interpret an investment.
+
 The `instrument_research_run` CLI is a profile-backed composition over the
 existing read-only export CLI. It derives static manifest/source/database paths
 and the exact-date weekly checkpoint from the validated private weekly profile,

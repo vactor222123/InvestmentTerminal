@@ -1,6 +1,18 @@
 # Investment Terminal — Next Steps
 
-## Current gate — verify a selected private research export locally
+## Current gate — qualify the generic verifier on the private MCD pair
+
+The read-only `instrument_research_verify` CLI is implemented with no new
+JSON contract. Prepare one exact-baseline, ASCII-only user-executed handoff
+for the existing private MCD-named export and redacted report, pinned to the
+report SHA-256 recorded in
+`docs/PHASE_7_MCD_PROFILE_RESEARCH_RESULT_AUDIT.md`. Review only the
+verifier's generic result and exact-byte hashes; do not access private
+runtime files here, upload the export automatically, or infer adjusted
+returns/session completeness from successful parity. See
+`docs/PHASE_7_INSTRUMENT_RESEARCH_VERIFIER.md`.
+
+## Historical gate — implement a local verifier
 
 The returned redacted MCD-named report is `COMPLETE`, with 2,512 stored
 daily rows and latest-200 SMA50/SMA200 availability; its exact-byte SHA-256

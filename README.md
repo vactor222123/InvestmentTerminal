@@ -177,6 +177,16 @@ depend on developer-local personal portfolio files.
 
 ## Operational CLIs
 
+Local selected-instrument research handoff verification:
+
+```text
+python -m investment_terminal.cli.instrument_research_verify
+```
+
+It verifies an existing private export against an exact-byte-pinned redacted
+report and a caller-selected symbol, without writing or uploading data. See
+`docs/PHASE_7_INSTRUMENT_RESEARCH_VERIFIER.md`.
+
 Profile-backed selected-instrument research export:
 
 ```text

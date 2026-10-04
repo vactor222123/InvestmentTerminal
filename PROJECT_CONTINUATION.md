@@ -1,6 +1,21 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — redacted profile-backed research result reviewed
+## Current handoff — generic local research verifier implemented
+
+Fresh clean GitHub `develop` matched
+`ed5baf3cffacf93a16309ff15c604d6aa59bfbc5`. This IMPLEMENTATION package
+adds a read-only local verifier for any explicitly selected symbol and the
+existing private/export-report schema-1 pair. It pins exact report bytes,
+checks private/report identity and bindings, recomputes the exported candle
+checksum and available latest raw-close indicator values, and fails closed
+on mismatches without exposing private values or writing data. No private
+runtime file, provider, SQLite, existing JSON contract, or automatic sharing
+path was changed. Next prepare one exact-baseline private qualification of
+the previously returned MCD-named pair; inspect only the verifier's safe
+result and hashes before any separate per-artifact sharing decision. See
+`docs/PHASE_7_INSTRUMENT_RESEARCH_VERIFIER.md`.
+
+## Historical handoff — redacted profile-backed research result reviewed
 
 Fresh clean GitHub `develop` matched
 `4d22fd509c0ea9b5c3204afb307acf56e592c72c`. This AUDIT package read
