@@ -12,6 +12,9 @@ from investment_terminal.operations.yahoo_price_basis_qualification import (
     PriceBasisQualification,
     PriceBasisRequest,
 )
+from investment_terminal.operations.yahoo_price_basis_provenance_report import (
+    to_schema2_report,
+)
 
 
 START = datetime(2026, 9, 1, tzinfo=timezone.utc)
@@ -161,3 +164,82 @@ def test_cli_failure_writes_only_redacted_report(tmp_path, capsys):
     assert "MCD" not in report + capsys.readouterr().out
     assert "secret" not in report
     assert sorted(item.name for item in tmp_path.iterdir()) == ["failed.json"]
+
+
+def test_schema2_labels_normalized_layer_without_new_provider_call(tmp_path, capsys):
+    path = tmp_path / "schema2.json"
+    client = FakeClient(frame())
+    main([
+        "--symbol", "MCD", "--start", "2026-09-01", "--end", "2026-09-04",
+        "--output", str(path), "--schema-version", "2",
+    ], client=client)
+    report = json.loads(path.read_text())
+    assert report["schema_version"] == 2
+    assert report["observed_layer"] == "YFINANCE_HISTORY_FRAME"
+    assert report["qualification_scope"] == "NORMALIZED_FRAME_SHAPE_ONLY"
+    assert report["adapter"]["name"] == "YFINANCE"
+    assert report["adapter"]["version"] == "1.6.0"
+    assert report["normalized_frame_fields"]["Dividends"]["nonzero_count"] == 1
+    assert set(report["raw_source_evidence"].values()) == {"UNKNOWN"}
+    assert "fields" not in report
+    assert len(client.calls) == 1
+    rendered = path.read_text() + capsys.readouterr().out
+    for secret in ("MCD", "101.0", "99.0", "0.5", "C:\\runtime"):
+        assert secret not in rendered
+    assert sorted(item.name for item in tmp_path.iterdir()) == ["schema2.json"]
+
+
+def test_schema2_provider_failure_stays_redacted(tmp_path, capsys):
+    path = tmp_path / "failed.json"
+    client = FakeClient(error=RuntimeError("private MCD 123.45"))
+    with pytest.raises(SystemExit) as exited:
+        main([
+            "--symbol", "MCD", "--start", "2026-09-01", "--end", "2026-09-04",
+            "--output", str(path), "--schema-version", "2",
+        ], client=client)
+    report = json.loads(path.read_text())
+    assert exited.value.code == 1
+    assert report["status"] == "PROVIDER_FAILURE"
+    assert report["failure_category"] == "PROVIDER_REQUEST"
+    assert set(report["raw_source_evidence"].values()) == {"UNKNOWN"}
+    assert "private" not in path.read_text() + capsys.readouterr().out
+    assert len(client.calls) == 1
+
+
+def test_schema1_default_remains_byte_identical_to_explicit_choice(tmp_path, capsys):
+    client = FakeClient(frame())
+    base = ["--symbol", "MCD", "--start", "2026-09-01", "--end", "2026-09-04"]
+    default_path = tmp_path / "default.json"
+    explicit_path = tmp_path / "explicit.json"
+    main([*base, "--output", str(default_path)], client=client)
+    main([*base, "--schema-version", "1", "--output", str(explicit_path)], client=client)
+    assert default_path.read_bytes() == explicit_path.read_bytes()
+    assert json.loads(default_path.read_text())["schema_version"] == 1
+    assert "observed_layer" not in json.loads(default_path.read_text())
+    assert len(client.calls) == 2
+    capsys.readouterr()
+
+
+def test_schema2_rejects_untrusted_adapter_version_and_wrong_source_schema():
+    source = PriceBasisQualification(FakeClient(frame())).qualify(request())
+    with pytest.raises(ValueError, match="yfinance_version"):
+        to_schema2_report(source, yfinance_version="private C:\\runtime")
+    assert source["schema_version"] == 1
+    with pytest.raises(ValueError, match="schema-1"):
+        to_schema2_report({"schema_version": 2}, yfinance_version="1.6.0")
+
+
+def test_schema2_invalid_adapter_version_stops_before_provider(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        "investment_terminal.cli.yahoo_price_basis_qualification.yf.__version__",
+        "private C:\\runtime",
+    )
+    client = FakeClient(frame())
+    path = tmp_path / "unsafe.json"
+    with pytest.raises(SystemExit):
+        main([
+            "--symbol", "MCD", "--start", "2026-09-01", "--end", "2026-09-04",
+            "--output", str(path), "--schema-version", "2",
+        ], client=client)
+    assert not client.calls
+    assert not path.exists()

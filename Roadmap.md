@@ -1,5 +1,12 @@
 # Investment Terminal — Product Roadmap
 
+The one-instrument field qualifier now has an explicit schema-2 redacted
+report identifying yfinance-normalized shape and unknown raw Yahoo field
+provenance. Schema 1 remains unchanged. Next measure one selected public
+instrument with schema 2 before designing adjusted-price/action storage;
+bulk expansion, return calculation, and scheduling remain gated. See
+`docs/PHASE_7_YAHOO_PRICE_BASIS_SCHEMA2.md`.
+
 The normalized Yahoo field-shape result is now semantically audited. In
 yfinance 1.6.0, candidate columns can be synthesized, so the next bounded
 increment is a schema-2 report that explicitly names the yfinance frame

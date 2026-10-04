@@ -1,6 +1,16 @@
 # Investment Terminal — Next Steps
 
-## Current gate — make normalized-frame provenance explicit
+## Current gate — one live schema-2 provenance qualification
+
+The one-instrument qualifier now offers explicit `--schema-version 2` with
+normalized-frame scope and raw-source `UNKNOWN` labels; schema 1 remains the
+unchanged default. Prepare one bounded live run for a selected public symbol,
+then review only its redacted report and exact output checksum. Do not infer
+raw Yahoo field presence, complete actions, adjusted returns, or session
+coverage from a schema-2 `QUALIFIED` status. See
+`docs/PHASE_7_YAHOO_PRICE_BASIS_SCHEMA2.md`. No bulk run or storage change.
+
+## Historical gate — make normalized-frame provenance explicit
 
 The pinned yfinance source can synthesize `Adj Close` from `Close` and zero
 action columns, so the prior `QUALIFIED` report is not raw Yahoo source

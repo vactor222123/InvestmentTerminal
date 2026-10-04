@@ -1,6 +1,18 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — Yahoo normalized-frame semantics audited
+## Current handoff — schema-2 normalized-frame provenance report
+
+Fresh clean GitHub `develop` matched
+`5c3ca361c1ff57b39193fdc56813865e11b8dbf7`. The existing one-symbol
+qualifier now offers explicit `--schema-version 2` while schema 1 remains
+the byte-identical default. Schema 2 identifies `YFINANCE_HISTORY_FRAME`,
+records the installed library version, and marks raw Yahoo field presence
+and action completeness `UNKNOWN`; no extra provider call or candle/SQLite
+change was made. Next qualify one selected public instrument and review only
+its redacted schema-2 report. See
+`docs/PHASE_7_YAHOO_PRICE_BASIS_SCHEMA2.md`.
+
+## Historical handoff — Yahoo normalized-frame semantics audited
 
 Fresh clean GitHub `develop` matched
 `b25f437c0009bca1dcade99b269650716b30e4c3`. The pinned yfinance 1.6.0
