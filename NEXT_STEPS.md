@@ -1,5 +1,18 @@
 # Investment Terminal — Next Steps
 
+## Current gate — one public EODHD demo qualification
+
+The official-source comparison identifies EODHD as a candidate for private
+local storage, not a selected production provider or permission for ChatGPT
+raw-data upload. Build one read-only, one-public-ETF `VTI.US` `demo`
+qualification with aggregate/redacted output, exact request/window and
+response checksum, and absent/malformed/HTTP failure-path tests. Preserve
+Yahoo candle/indicator contracts and SQLite; do not buy a subscription,
+bulk-import, calculate adjusted returns, or send source values to ChatGPT.
+Before production integration, resolve subscription, retention, instrument
+coverage and third-party AI handoff rights. See
+`docs/PHASE_7_AUTHORIZED_PRICE_SOURCE_COMPARISON.md`.
+
 ## Current gate — qualify an authorized price/action source
 
 The combined source-evidence and access audit found no raw Yahoo response

@@ -1,5 +1,18 @@
 # InvestmentTerminal — Project Continuation
 
+## Current handoff — documented price/action sources compared
+
+Fresh clean GitHub `develop` matched
+`4bedf380a605bafbb6216890fdf4463b12e5c6aa`. This AUDIT package
+compares official EODHD and Twelve Data API/terms against the Terminal's
+ten-year local-data and separate ChatGPT-analysis needs. EODHD is a bounded
+local-only evaluation candidate: its personal terms allow qualifying private
+storage, but prohibit third-party retransmission of the information. No
+subscription, provider request, private runtime, SQLite, or JSON contract
+was changed. Next qualify one public `VTI.US` EODHD `demo` response read-only
+with redacted evidence and failure-path tests; do not infer production rights
+or upload series. See `docs/PHASE_7_AUTHORIZED_PRICE_SOURCE_COMPARISON.md`.
+
 ## Current handoff — source evidence and access boundary audited
 
 Fresh clean GitHub `develop` matched

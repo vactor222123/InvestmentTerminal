@@ -1,5 +1,15 @@
 # Investment Terminal — Product Roadmap
 
+Official EODHD and Twelve Data source/terms comparison is complete. EODHD
+is a candidate for one public, read-only ETF demo qualification because its
+published personal terms permit qualifying private storage, while the same
+terms prohibit third-party retransmission of source information. The demo
+does not establish full-universe coverage, paid entitlement, retention after
+cancellation, or permission to upload values for ChatGPT analysis. Preserve
+the raw-close product path and existing contracts; only after a bounded
+qualification and explicit rights decision consider a separate adjusted
+source. See `docs/PHASE_7_AUTHORIZED_PRICE_SOURCE_COMPARISON.md`.
+
 The combined price-source audit closes the present provenance/terms review:
 schema-2 MCD evidence remains normalized-frame-only, and a new direct raw
 Yahoo capture/archive lacks established access and retention authority.
