@@ -6,7 +6,9 @@ from pathlib import Path
 import re
 import sys
 
-from investment_terminal.cli.instrument_research_export import main as export_main
+from investment_terminal.cli.instrument_research_export import (
+    action_arguments, add_action_arguments, main as export_main,
+)
 from investment_terminal.cli.weekly_run import _profile
 
 
@@ -20,9 +22,14 @@ def main(argv=None):
     parser.add_argument("--end", required=True)
     parser.add_argument("--private-output", required=True, type=Path)
     parser.add_argument("--report-output", required=True, type=Path)
+    add_action_arguments(parser)
     options = parser.parse_args(argv)
     try:
+        action_args = action_arguments(options)
         profile, paths = _profile(options.profile)
+        if (options.actions_snapshot is not None
+                and options.actions_snapshot.resolve().is_relative_to(paths["report_directory"])):
+            raise ValueError("Action snapshot must remain private")
         end = datetime.fromisoformat(options.end)
         if (end.utcoffset() != timedelta(0)
                 or end.hour != 0 or end.minute != 0
@@ -56,6 +63,7 @@ def main(argv=None):
             "--end", options.end,
             "--private-output", str(private),
             "--report-output", str(report),
+            *action_args,
         ])
     except (Exception, SystemExit):
         print("Research run preflight failed; inspect private inputs locally",

@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-## Current next step — consume the Yahoo action snapshot
+## Current next step — qualify one schema-2 research export
 
 EODHD evaluation is paused by user decision. Keep Yahoo and the existing candle
 database; no subscription or provider migration is selected. Generic normalized
@@ -8,12 +8,16 @@ dividend/split collection, separate durable snapshots and offline reuse are now
 implemented and bounded-live-tested on AAPL (40 dividends, one split, 2,512 rows).
 See `docs/PHASE_7_YAHOO_CORPORATE_ACTION_COLLECTION.md`.
 
-Apply the package and commit it. The next development increment is to attach a
-validated snapshot to the generic research export with explicit missing/stale
-evidence and provider-normalization labels. Do not silently add dividends to
-adjusted returns, apply splits again to stored candles, or mutate the portfolio
-ledger. Full-universe action refresh and return accounting are not claimed done.
-No private runtime execution is needed to repeat the workspace qualification.
+The generic export and profile-backed command now support explicit schema 2 with
+`AVAILABLE`, `STALE` or `MISSING` corporate-action context. The local verifier
+checks both schemas; schema 1 remains unchanged. Apply/commit the package, then
+run one selected-symbol schema-2 export using confirmed private inputs, a matching
+snapshot/file checksum and an explicit UTC freshness policy. Verify the resulting
+pair locally; return only its redacted report. An absent snapshot may be omitted
+and reported `MISSING`; an explicitly supplied corrupt/mismatched input must fail.
+Do not silently add dividends to returns, apply splits again to stored candles,
+or mutate portfolio cash. Full-universe action refresh and return accounting are
+not claimed done. See `docs/PHASE_7_RESEARCH_CORPORATE_ACTION_CONTEXT.md`.
 
 All prior gates below are historical and superseded by this section. In
 particular, do not resume the EODHD experiment as a prerequisite for progress.

@@ -223,6 +223,13 @@ The selected symbol, explicit window, projection SHA-256, and private/redacted
 destinations remain caller-owned. See
 `docs/PHASE_7_PROFILE_BACKED_RESEARCH_RUN.md`.
 
+Both research export commands now offer explicit `--schema-version 2` to add
+corporate-action context. Supply `--actions-as-of` and
+`--actions-maximum-age-days`; optionally supply a matching `--actions-snapshot`
+and `--actions-sha256`. Missing/stale evidence is labeled, not filled with zeros.
+The local verifier accepts both versions. Default schema 1 and raw-price/SMA
+semantics are unchanged. See `docs/PHASE_7_RESEARCH_CORPORATE_ACTION_CONTEXT.md`.
+
 Read-only single-instrument research export:
 
 ```text

@@ -9,10 +9,14 @@ versioned snapshots, exact offline reuse and redacted evidence. A workspace-only
 AAPL ten-year qualification measured 40 dividend observations and one split;
 local success/failure tests and the full suite passed. This completes that
 bounded collection capability, not action completeness or total-return math.
-Next consume these facts in generic research exports. Price adjustment, broker
+Generic research exports now consume these facts through optional schema 2,
+with explicitly evaluated evidence freshness, checksum-bound embedded snapshots
+and offline verification. Schema 1 stays the default; prices and SMA are unchanged.
+One private selected-symbol operational qualification is next. Price adjustment, broker
 cash accounting and broad weekly action orchestration remain separate explicit
 work; no data re-download or paid-provider migration is required.
 See `docs/PHASE_7_YAHOO_CORPORATE_ACTION_COLLECTION.md`.
+Research integration: `docs/PHASE_7_RESEARCH_CORPORATE_ACTION_CONTEXT.md`.
 
 ## Historical checkpoints (superseded next-action instructions)
 

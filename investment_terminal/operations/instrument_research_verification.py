@@ -6,6 +6,8 @@ import json
 from math import fsum, isfinite
 from numbers import Real
 
+from investment_terminal.operations.research_corporate_actions import verified_schema1_pair
+
 
 _COMMON_KEYS = frozenset({
     "schema_version", "manifest_checksum", "selection_checksum",
@@ -43,6 +45,8 @@ _REPORT_LIMITATIONS = [
 
 def verify_instrument_research_export(private, report, *, expected_symbol):
     """Fail closed on identity, shape, binding, or exported-candle mismatch."""
+    if isinstance(private, dict) and private.get("schema_version") == 2:
+        private, report = verified_schema1_pair(private, report)
     if (not isinstance(expected_symbol, str) or not expected_symbol
             or expected_symbol != expected_symbol.strip().upper()):
         raise ValueError("Expected symbol is invalid")

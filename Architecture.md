@@ -1,5 +1,15 @@
 # Investment Terminal — Software Architecture
 
+Optional research schema 2 attaches corporate-action context to the existing
+schema-1 factual export. The operations layer owns deterministic identity/window/
+currency binding, caller-specified UTC freshness policy and detached context
+projection; CLI composition alone loads the checksum-pinned snapshot. The same
+projector is reused by the local verifier, avoiding duplicated freshness/count
+rules. The legacy verifier still owns candle/indicator checks. Profile-backed
+composition forwards the opt-in fields without a second data pipeline. This is
+offline read-only context assembly, not a provider call, candle adjustment or
+broker/portfolio mutation. Default schema 1 remains unchanged.
+
 The Yahoo corporate-action path is separate from candle ingestion and portfolio
 accounting. A client retrieves a bounded yfinance history frame and public
 history metadata; operations validate normalized action observations into

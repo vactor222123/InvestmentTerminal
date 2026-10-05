@@ -1,5 +1,26 @@
 # Investment Terminal — Data Model
 
+`INSTRUMENT_RESEARCH_EXPORT` and its redacted report optionally use schema 2.
+Every schema-1 field retains its meaning; the only additions are version 2 and
+`corporate_actions`. This context has its own schema 1 and records explicit
+`as_of_utc`, integer `maximum_age_days` (1 through 365), `FACTUAL_CONTEXT_ONLY`,
+and `AVAILABLE`, `STALE` or `MISSING` availability. An available snapshot has
+matching symbol, quote currency and exact requested window; age equal to the
+limit is still available. Future-dated or mismatched snapshots fail, while stale
+snapshots are retained with their explicit label. Availability is not an action
+completeness or return-readiness statement.
+
+Private context embeds the complete validated action snapshot. Its report
+counterpart omits that snapshot and exposes only the exact source-file SHA-256,
+canonical full-snapshot SHA-256 (including fetch time), normalized-content hash,
+aggregate event counts, capital-gains presence, policy, availability and fixed
+limitations. Missing context has null snapshot/checksums/counts/presence, never
+fabricated zeros. Both retain `UNKNOWN` action completeness. Source bytes are
+checked before database access; the local pair verifier recomputes the embedded
+document/content hashes, aggregates and freshness, then applies existing
+schema-1 candle/indicator checks. A schema-2 failed report uses null context.
+Schema 1, raw price basis, candles, weekly checkpoints and portfolios are unchanged.
+
 `YAHOO_CORPORATE_ACTION_SNAPSHOT` schema 1 is a separate private, immutable
 normalized observation document. It contains provider symbol, half-open UTC
 window, fetch time, library version, explicit history flags, case-preserved quote

@@ -1,30 +1,33 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — Yahoo corporate-action collection delivered
+## Current handoff — corporate actions integrated into research schema 2
 
 Verified fresh, clean `develop` baseline:
-`58905a9c0e1fe97cd972f55c2f6c926eaef62b80`.
-Classification: `IMPLEMENTATION`. The user paused EODHD evaluation and selected
-completion of the Yahoo dividend/split collection path. No paid-source migration
-or re-download of the candle database is planned.
+`0b440ccb1571ba501137afd246b78d9124c7abe8`.
+Classification: `IMPLEMENTATION`. EODHD remains paused; Yahoo and existing candle
+history are retained. Both `instrument_research_export` and the profile-backed
+`instrument_research_run` now support explicit schema 2, attaching a validated
+normalized action snapshot with a pinned exact-file checksum. Schema 1 remains
+the byte-identical default. Explicit UTC evaluation time and maximum age produce
+`AVAILABLE`, `STALE` or `MISSING` action context, without altering raw prices or
+indicators. `instrument_research_verify` now validates both schemas, including
+embedded event content, snapshot time, checksums, counts, identity and policy.
 
-The generic `yahoo_corporate_actions` CLI now automatically collects a bounded
-normalized action snapshot, validates it, writes it separately from candles and
-portfolio transactions, and emits a redacted checksum-bound report. Exact reuse
-is offline; new acquisitions use new snapshot paths and retain older evidence.
-One workspace-only AAPL ten-year run stored 40 dividend observations and one
-split across 2,512 history rows. An offline repeat preserved exact bytes.
-Focused tests: 111 passed. Full tests: 3,423 passed, 4 skipped, one existing
-Starlette warning. No private runtime or SQLite was accessed or changed.
+Focused checks: 197 passed. Full suite: 3473 passed, 4 skipped, one existing
+Starlette deprecation warning. `git diff --check`: clean.
+No provider request, private runtime input or
+operational SQLite access occurred; local E2E used synthetic fixtures. Collection
+live evidence (AAPL: 40 dividends, one split) remains in
+`docs/PHASE_7_YAHOO_CORPORATE_ACTION_COLLECTION.md`, not rerun here.
 
-Collection/storage/reuse is implemented and live-measured for this request.
-This is NOT closure of adjusted-return accounting: normalized cash units and
-raw-source completeness remain unverified. Never apply split ratios again to
-stored Yahoo prices or manufacture broker DIVIDEND transactions. Next integrate
-the validated action snapshot as explicitly labeled factual context in the
-generic research export; keep return calculation and candle refresh separate.
-See `docs/PHASE_7_YAHOO_CORPORATE_ACTION_COLLECTION.md` for contracts, measured
-evidence, recovery and the exact completion boundary.
+Next operational step: apply/commit the package, then qualify one selected-symbol
+schema-2 profile export against the user's local matching action snapshot and
+existing candle/projection evidence, followed by the same local verifier. Return
+only the redacted report. Do not silently choose another symbol or infer input
+paths. Missing/stale action context is explicit, not a total-return verdict.
+No source completeness, cash-currency certification, split adjustment, portfolio
+ledger mutation or automatic private upload is introduced. See
+`docs/PHASE_7_RESEARCH_CORPORATE_ACTION_CONTEXT.md`.
 
 All older handoffs and next-action statements below are historical. This section
 supersedes the EODHD and source-selection gates; their technical observations and
