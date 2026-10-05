@@ -1,5 +1,17 @@
 # Investment Terminal — Next Steps
 
+## Current gate — qualify an authorized price/action source
+
+The combined source-evidence and access audit found no raw Yahoo response
+provenance in the current yfinance frame and no established permission for a
+new direct chart-response capture/archive. Compare documented provider
+licences and technical capabilities for ten-year daily prices, corporate
+actions, currency/session identity, local persistence, derived analytics,
+and private ChatGPT handoff. Do not build a raw Yahoo collector, adjusted
+store, or total-return logic until that boundary is evidenced. Continue
+raw-close indicator work only under its existing explicit price-basis label.
+See `docs/PHASE_7_PRICE_SOURCE_EVIDENCE_AND_TERMS_AUDIT.md`.
+
 ## Current gate — audit source-provenance evidence boundary
 
 The one-symbol schema-2 live check completed with 251 normalized daily rows

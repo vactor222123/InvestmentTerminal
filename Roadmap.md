@@ -1,5 +1,14 @@
 # Investment Terminal — Product Roadmap
 
+The combined price-source audit closes the present provenance/terms review:
+schema-2 MCD evidence remains normalized-frame-only, and a new direct raw
+Yahoo capture/archive lacks established access and retention authority.
+Next evaluate a documented, authorized source against ten-year price/action
+and local-analysis requirements before implementing a source-provenance
+qualifier or adjusted-price store. Existing explicitly raw-close indicators
+remain separate. See
+`docs/PHASE_7_PRICE_SOURCE_EVIDENCE_AND_TERMS_AUDIT.md`.
+
 The live one-instrument schema-2 check qualified 251 yfinance-normalized
 daily rows while explicitly retaining `UNKNOWN` for raw Yahoo field and
 action provenance. The next bounded product gate is a source-evidence and

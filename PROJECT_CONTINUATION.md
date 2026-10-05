@@ -1,5 +1,19 @@
 # InvestmentTerminal — Project Continuation
 
+## Current handoff — source evidence and access boundary audited
+
+Fresh clean GitHub `develop` matched
+`6226425f466986a0c79567611b70baa8e14707c7`. One AUDIT package combined
+the normalized-frame technical boundary, published Yahoo/yfinance access
+terms, and the next safe source decision. The current qualifier cannot prove
+raw `adjclose`/action presence, and the repository does not establish
+permission for a new direct chart-response capture or archive. No provider,
+private runtime, SQLite, or JSON contract was touched. Next compare a
+documented, authorized source/contract against ten-year price/action and
+local-analysis needs before any new provenance collector or adjusted-return
+store. Existing raw-close work remains separate. See
+`docs/PHASE_7_PRICE_SOURCE_EVIDENCE_AND_TERMS_AUDIT.md`.
+
 ## Current handoff — live schema-2 price-basis shape measured
 
 Fresh clean GitHub `develop` matched
