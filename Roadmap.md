@@ -1,5 +1,12 @@
 # Investment Terminal — Product Roadmap
 
+The live one-instrument schema-2 check qualified 251 yfinance-normalized
+daily rows while explicitly retaining `UNKNOWN` for raw Yahoo field and
+action provenance. The next bounded product gate is a source-evidence and
+provider-terms audit before adjusted-price/action storage. Do not mistake
+this shape result for total-return readiness or a bulk/scheduler gate. See
+`docs/PHASE_7_YAHOO_PRICE_BASIS_SCHEMA2_RESULT.md`.
+
 The one-instrument field qualifier now has an explicit schema-2 redacted
 report identifying yfinance-normalized shape and unknown raw Yahoo field
 provenance. Schema 1 remains unchanged. Next measure one selected public

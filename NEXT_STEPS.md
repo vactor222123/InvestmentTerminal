@@ -1,6 +1,16 @@
 # Investment Terminal — Next Steps
 
-## Current gate — one live schema-2 provenance qualification
+## Current gate — audit source-provenance evidence boundary
+
+The one-symbol schema-2 live check completed with 251 normalized daily rows
+and explicitly unknown raw-source field/action evidence; see
+`docs/PHASE_7_YAHOO_PRICE_BASIS_SCHEMA2_RESULT.md`. Audit how to capture
+supportable source/version, raw-versus-synthesized field, currency, exchange
+session, action-unit, and checksum evidence before selecting any new
+adjusted-price/action store. Do not infer adjusted returns, broaden requests,
+or schedule refreshes from this shape result.
+
+## Historical gate — one live schema-2 provenance qualification
 
 The one-instrument qualifier now offers explicit `--schema-version 2` with
 normalized-frame scope and raw-source `UNKNOWN` labels; schema 1 remains the

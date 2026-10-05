@@ -1,6 +1,17 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — schema-2 normalized-frame provenance report
+## Current handoff — live schema-2 price-basis shape measured
+
+Fresh clean GitHub `develop` matched
+`a03fe14d6891d89c9d75287d714e31c1fb6b59b7`. One public MCD schema-2
+request returned `QUALIFIED` for 251 yfinance-normalized daily rows, with
+four nonzero dividend entries and zero split entries. All raw-source evidence
+fields correctly remain `UNKNOWN`; no private runtime or SQLite access
+occurred. Next audit a supportable source-provenance boundary before
+adjusted-price/action storage or return calculation. See
+`docs/PHASE_7_YAHOO_PRICE_BASIS_SCHEMA2_RESULT.md`.
+
+## Historical handoff — schema-2 normalized-frame provenance report
 
 Fresh clean GitHub `develop` matched
 `5c3ca361c1ff57b39193fdc56813865e11b8dbf7`. The existing one-symbol
