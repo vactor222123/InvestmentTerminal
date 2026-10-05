@@ -177,6 +177,17 @@ depend on developer-local personal portfolio files.
 
 ## Operational CLIs
 
+Public EODHD one-ETF demo price-shape qualification:
+
+```text
+python -m investment_terminal.cli.eodhd_demo_price_qualification
+```
+
+It uses only `VTI.US` and the public `demo` token, makes one read-only bounded
+request, and writes a redacted aggregate report rather than prices or candles.
+It does not qualify corporate actions or authorize bulk acquisition; see
+`docs/PHASE_7_EODHD_PUBLIC_DEMO_PRICE_QUALIFICATION.md`.
+
 Local selected-instrument research handoff verification:
 
 ```text

@@ -1,5 +1,17 @@
 # Investment Terminal — Next Steps
 
+## Current gate — public ETF corporate-action shape
+
+The bounded EODHD `VTI.US` demo price response has 2,512 structurally valid
+rows over the selected ten-year window; its raw response checksum and
+redacted aggregate are recorded in
+`docs/PHASE_7_EODHD_PUBLIC_DEMO_PRICE_QUALIFICATION.md`. The final stricter
+parser has local fake-provider coverage, not a second live request. Next
+qualify one public ETF dividend/split response with redacted counts, source
+checksum, currency/unit validation and failure-path tests. Do not infer
+dividend completeness or total return, persist an adjusted series, run bulk
+requests, buy a plan or send provider values to ChatGPT.
+
 ## Current gate — one public EODHD demo qualification
 
 The official-source comparison identifies EODHD as a candidate for private

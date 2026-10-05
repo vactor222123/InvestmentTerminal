@@ -1,5 +1,14 @@
 # Investment Terminal — Product Roadmap
 
+The isolated EODHD public ETF demo price-shape qualifier is implemented.
+One VTI.US ten-year response measured 2,512 structurally valid daily rows,
+with no source-value storage or change to existing Yahoo candles. This is
+field-shape evidence, not proof of adjustment/action quality, paid coverage,
+source rights for third-party AI, or total-return readiness. Next qualify
+one public dividend/split action response before deciding whether a separate
+source-provenance store is warranted. See
+`docs/PHASE_7_EODHD_PUBLIC_DEMO_PRICE_QUALIFICATION.md`.
+
 Official EODHD and Twelve Data source/terms comparison is complete. EODHD
 is a candidate for one public, read-only ETF demo qualification because its
 published personal terms permit qualifying private storage, while the same

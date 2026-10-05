@@ -1,5 +1,18 @@
 # InvestmentTerminal — Project Continuation
 
+## Current handoff — one public EODHD ETF price shape qualified
+
+Fresh clean GitHub `develop` matched
+`d02a65c3f8026b98e5a230f2c4b1361ec688b5db`. A separate one-request,
+read-only EODHD `VTI.US` demo qualifier now emits only a redacted source-byte
+checksum, dates, counts and stable failures. One public ten-year request
+returned 2,512 structurally qualified daily rows; strict JSON/volume guards
+were added and fake-tested afterward without another provider call. No source
+values, private runtime, SQLite, existing candle or JSON contract were
+changed. Next qualify one public ETF dividend/split action response and its
+units/currency; do not infer total return, buy access or upload source values.
+See `docs/PHASE_7_EODHD_PUBLIC_DEMO_PRICE_QUALIFICATION.md`.
+
 ## Current handoff — documented price/action sources compared
 
 Fresh clean GitHub `develop` matched
