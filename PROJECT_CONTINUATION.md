@@ -1,6 +1,36 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — one public EODHD ETF price shape qualified
+## Current handoff — Yahoo corporate-action collection delivered
+
+Verified fresh, clean `develop` baseline:
+`58905a9c0e1fe97cd972f55c2f6c926eaef62b80`.
+Classification: `IMPLEMENTATION`. The user paused EODHD evaluation and selected
+completion of the Yahoo dividend/split collection path. No paid-source migration
+or re-download of the candle database is planned.
+
+The generic `yahoo_corporate_actions` CLI now automatically collects a bounded
+normalized action snapshot, validates it, writes it separately from candles and
+portfolio transactions, and emits a redacted checksum-bound report. Exact reuse
+is offline; new acquisitions use new snapshot paths and retain older evidence.
+One workspace-only AAPL ten-year run stored 40 dividend observations and one
+split across 2,512 history rows. An offline repeat preserved exact bytes.
+Focused tests: 111 passed. Full tests: 3,423 passed, 4 skipped, one existing
+Starlette warning. No private runtime or SQLite was accessed or changed.
+
+Collection/storage/reuse is implemented and live-measured for this request.
+This is NOT closure of adjusted-return accounting: normalized cash units and
+raw-source completeness remain unverified. Never apply split ratios again to
+stored Yahoo prices or manufacture broker DIVIDEND transactions. Next integrate
+the validated action snapshot as explicitly labeled factual context in the
+generic research export; keep return calculation and candle refresh separate.
+See `docs/PHASE_7_YAHOO_CORPORATE_ACTION_COLLECTION.md` for contracts, measured
+evidence, recovery and the exact completion boundary.
+
+All older handoffs and next-action statements below are historical. This section
+supersedes the EODHD and source-selection gates; their technical observations and
+limitations remain evidence, not instructions to resume that work.
+
+## Historical handoff — one public EODHD ETF price shape qualified
 
 Fresh clean GitHub `develop` matched
 `d02a65c3f8026b98e5a230f2c4b1361ec688b5db`. A separate one-request,

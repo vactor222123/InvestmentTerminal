@@ -1,5 +1,26 @@
 # Investment Terminal — Data Model
 
+`YAHOO_CORPORATE_ACTION_SNAPSHOT` schema 1 is a separate private, immutable
+normalized observation document. It contains provider symbol, half-open UTC
+window, fetch time, library version, explicit history flags, case-preserved quote
+currency, instrument type, exchange timezone, observed row bounds/count, capital
+gains field availability, and ordered nonzero `DIVIDEND`, `SPLIT`, `CAPITAL_GAIN`
+events. Each event retains UTC time and exchange-local date. Split values mean
+new shares per old share; cash values are normalized per-share observations with
+unverified currency and historical adjustment basis. Currency is null on events;
+quote currency must not be substituted. Missing action fields are not zeros.
+Raw field presence and completeness remain `UNKNOWN`.
+
+The content SHA-256 covers canonical strict JSON of `content` (not acquisition
+time); a separate exact-file SHA-256 binds the redacted schema-1
+`YAHOO_CORPORATE_ACTION_COLLECTION` report. Its status is `STORED` or `FAILED`,
+with optional aggregate row/event counts, capital-gain availability, reuse flag,
+snapshot-persisted/file-presence flag and fixed failure category. After a failed
+write or invalid existing file the presence flag may be true: only `STORED`
+attests successful snapshot validation. Reports omit symbol, currency, event
+dates/values, paths and provider exception text. Existing candle, research,
+weekly and transaction JSON contracts remain unchanged.
+
 `INSTRUMENT_RESEARCH_EXPORT` schema version 1 is private: one selected
 symbol/currency, its existing projected indicator item, an ordered bounded
 array of stored daily OHLCV rows, manifest/selection/projection/window/price-

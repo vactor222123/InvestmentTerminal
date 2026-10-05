@@ -1,5 +1,21 @@
 # Investment Terminal — Product Roadmap
 
+## Active product direction — Yahoo corporate actions
+
+The user paused EODHD investigation: retain Yahoo and existing candle history.
+The normalized action acquisition/storage boundary is now implemented for a
+generic selected symbol with automatic metadata, bounded history, separate
+versioned snapshots, exact offline reuse and redacted evidence. A workspace-only
+AAPL ten-year qualification measured 40 dividend observations and one split;
+local success/failure tests and the full suite passed. This completes that
+bounded collection capability, not action completeness or total-return math.
+Next consume these facts in generic research exports. Price adjustment, broker
+cash accounting and broad weekly action orchestration remain separate explicit
+work; no data re-download or paid-provider migration is required.
+See `docs/PHASE_7_YAHOO_CORPORATE_ACTION_COLLECTION.md`.
+
+## Historical checkpoints (superseded next-action instructions)
+
 The isolated EODHD public ETF demo price-shape qualifier is implemented.
 One VTI.US ten-year response measured 2,512 structurally valid daily rows,
 with no source-value storage or change to existing Yahoo candles. This is

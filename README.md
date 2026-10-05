@@ -177,7 +177,20 @@ depend on developer-local personal portfolio files.
 
 ## Operational CLIs
 
-Public EODHD one-ETF demo price-shape qualification:
+Yahoo normalized dividends, splits and available capital-gain observations:
+
+```text
+python -m investment_terminal.cli.yahoo_corporate_actions --help
+```
+
+It collects one explicit bounded symbol/window into a private validated snapshot
+and a separate redacted report. Existing matching snapshots are reused offline;
+new snapshot paths request a fresh full window without rewriting older evidence.
+No manual action entry, candle rewrite or portfolio transaction is involved.
+It does not establish cash-action currency or calculate total return. See
+`docs/PHASE_7_YAHOO_CORPORATE_ACTION_COLLECTION.md`.
+
+Paused experiment: public EODHD one-ETF demo price-shape qualification:
 
 ```text
 python -m investment_terminal.cli.eodhd_demo_price_qualification

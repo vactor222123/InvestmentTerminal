@@ -1,6 +1,24 @@
 # Investment Terminal — Next Steps
 
-## Current gate — public ETF corporate-action shape
+## Current next step — consume the Yahoo action snapshot
+
+EODHD evaluation is paused by user decision. Keep Yahoo and the existing candle
+database; no subscription or provider migration is selected. Generic normalized
+dividend/split collection, separate durable snapshots and offline reuse are now
+implemented and bounded-live-tested on AAPL (40 dividends, one split, 2,512 rows).
+See `docs/PHASE_7_YAHOO_CORPORATE_ACTION_COLLECTION.md`.
+
+Apply the package and commit it. The next development increment is to attach a
+validated snapshot to the generic research export with explicit missing/stale
+evidence and provider-normalization labels. Do not silently add dividends to
+adjusted returns, apply splits again to stored candles, or mutate the portfolio
+ledger. Full-universe action refresh and return accounting are not claimed done.
+No private runtime execution is needed to repeat the workspace qualification.
+
+All prior gates below are historical and superseded by this section. In
+particular, do not resume the EODHD experiment as a prerequisite for progress.
+
+## Historical gate — public ETF corporate-action shape
 
 The bounded EODHD `VTI.US` demo price response has 2,512 structurally valid
 rows over the selected ten-year window; its raw response checksum and

@@ -1,5 +1,16 @@
 # Investment Terminal — Software Architecture
 
+The Yahoo corporate-action path is separate from candle ingestion and portfolio
+accounting. A client retrieves a bounded yfinance history frame and public
+history metadata; operations validate normalized action observations into
+immutable Market-domain models. The CLI owns explicit private snapshot and
+redacted report paths, cooperative exclusive locks, atomic writes, readback
+verification and offline reuse. Refresh creates a new full-window snapshot,
+never a tail merge or rewrite of older evidence. The adapter may issue auxiliary
+metadata requests through yfinance; no direct chart collector is introduced.
+There is no SQLite, broker-ledger, return-calculation or scheduler dependency.
+EODHD remains an inactive experiment, not the selected production source.
+
 The `instrument_research_verify` operation and CLI form a read-only local
 handoff boundary over an already-created private research export and its
 redacted report. They check a caller-pinned report checksum, exact existing
