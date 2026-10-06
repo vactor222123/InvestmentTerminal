@@ -1,33 +1,33 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — corporate actions integrated into research schema 2
+## Current handoff — one-command corporate-action research
 
 Verified fresh, clean `develop` baseline:
-`0b440ccb1571ba501137afd246b78d9124c7abe8`.
-Classification: `IMPLEMENTATION`. EODHD remains paused; Yahoo and existing candle
-history are retained. Both `instrument_research_export` and the profile-backed
-`instrument_research_run` now support explicit schema 2, attaching a validated
-normalized action snapshot with a pinned exact-file checksum. Schema 1 remains
-the byte-identical default. Explicit UTC evaluation time and maximum age produce
-`AVAILABLE`, `STALE` or `MISSING` action context, without altering raw prices or
-indicators. `instrument_research_verify` now validates both schemas, including
-embedded event content, snapshot time, checksums, counts, identity and policy.
+`8232d583a46480dd7f21ed3982077a59aee77893`.
+Classification: `IMPLEMENTATION`. The user-returned MCD schema-2 qualification
+reports agree on 2,512 candles, 40 dividend observations and `AVAILABLE` action
+context; SQLite integrity was separately reported `ok`. Report hashes and limits
+are recorded in `docs/PHASE_7_CORPORATE_ACTION_RESEARCH_RUN.md`.
 
-Focused checks: 197 passed. Full suite: 3473 passed, 4 skipped, one existing
-Starlette deprecation warning. `git diff --check`: clean.
-No provider request, private runtime input or
-operational SQLite access occurred; local E2E used synthetic fixtures. Collection
-live evidence (AAPL: 40 dividends, one split) remains in
-`docs/PHASE_7_YAHOO_CORPORATE_ACTION_COLLECTION.md`, not rerun here.
+`instrument_research_collect` now composes existing collection/reuse, schema-2
+profile export, persisted-pair verification and read-only SQLite integrity in one
+generic command. It derives outputs from an explicit run ID, checks export
+readiness before provider work, pins evidence, coordinates cooperative locks and
+stops on failure while retaining acquired snapshots. Explicit offline reuse
+requires a pinned, matching, fresh snapshot; no silent fallback or overwrite.
+Existing JSON contracts, candles, SMA and standalone commands remain unchanged.
 
-Next operational step: apply/commit the package, then qualify one selected-symbol
-schema-2 profile export against the user's local matching action snapshot and
-existing candle/projection evidence, followed by the same local verifier. Return
-only the redacted report. Do not silently choose another symbol or infer input
-paths. Missing/stale action context is explicit, not a total-return verdict.
-No source completeness, cash-currency certification, split adjustment, portfolio
-ledger mutation or automatic private upload is introduced. See
-`docs/PHASE_7_RESEARCH_CORPORATE_ACTION_CONTEXT.md`.
+Focused: 244 passed. Full suite: 3520 passed, 4 skipped, one existing Starlette
+deprecation warning. `git diff --check`: clean. No live provider call or private
+runtime access during implementation; E2E tests use synthetic fixtures.
+
+Next: apply/commit, then qualify one composed MCD run using the existing snapshot
+offline, a new run ID, the same 2016-09-29/2026-09-29 window and a seven-day
+action-age policy while still fresh. Bind the short handoff to the applied SHA;
+confirmed paths and checksums are in the owning document. Return only both
+redacted reports, final completion and SQLite integrity lines. Do not rerun Yahoo
+or read/share private values here. EODHD remains paused; total return, broad
+action refresh, portfolio cash accounting and scheduling are separate work.
 
 All older handoffs and next-action statements below are historical. This section
 supersedes the EODHD and source-selection gates; their technical observations and

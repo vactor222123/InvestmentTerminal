@@ -12,7 +12,12 @@ bounded collection capability, not action completeness or total-return math.
 Generic research exports now consume these facts through optional schema 2,
 with explicitly evaluated evidence freshness, checksum-bound embedded snapshots
 and offline verification. Schema 1 stays the default; prices and SMA are unchanged.
-One private selected-symbol operational qualification is next. Price adjustment, broker
+The returned MCD schema-2 qualification succeeded with 2,512 candles and 40
+dividend observations; the user reported SQLite integrity `ok`. A generic
+one-command collection/export/verification/integrity composition is now
+implemented. Qualify it once by explicitly reusing the existing MCD snapshot
+offline, then review its redacted stage evidence. See
+`docs/PHASE_7_CORPORATE_ACTION_RESEARCH_RUN.md`. Price adjustment, broker
 cash accounting and broad weekly action orchestration remain separate explicit
 work; no data re-download or paid-provider migration is required.
 See `docs/PHASE_7_YAHOO_CORPORATE_ACTION_COLLECTION.md`.

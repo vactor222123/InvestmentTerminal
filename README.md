@@ -177,6 +177,19 @@ depend on developer-local personal portfolio files.
 
 ## Operational CLIs
 
+One-command corporate actions plus verified research export:
+
+```text
+python -m investment_terminal.cli.instrument_research_collect --help
+```
+
+Supply the existing weekly profile, pinned projection, selected symbol/window,
+new run ID and action-age policy. The command derives output paths, collects
+actions (or explicitly reuses a pinned snapshot offline), exports schema 2,
+verifies the persisted pair and checks SQLite integrity. Existing files are not
+overwritten and stored candles are not updated. See
+`docs/PHASE_7_CORPORATE_ACTION_RESEARCH_RUN.md` for failure/recovery and privacy.
+
 Yahoo normalized dividends, splits and available capital-gain observations:
 
 ```text

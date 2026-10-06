@@ -1,5 +1,13 @@
 # Investment Terminal — Data Model
 
+The combined `instrument_research_collect` command preserves all existing action,
+profile and research schemas. Its derived artifacts are separate stage evidence:
+collection `STORED` and export `COMPLETE` do not certify a later SQLite check.
+Overall success is an exit-code/console result, not a new durable JSON status.
+Its UTC evaluation time is measured after collection, with caller-selected maximum
+age; only matching `AVAILABLE` context proceeds. Standalone export semantics stay
+unchanged, including explicit `STALE` and `MISSING` support.
+
 `INSTRUMENT_RESEARCH_EXPORT` and its redacted report optionally use schema 2.
 Every schema-1 field retains its meaning; the only additions are version 2 and
 `corporate_actions`. This context has its own schema 1 and records explicit

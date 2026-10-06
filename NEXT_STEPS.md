@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-## Current next step — qualify one schema-2 research export
+## Current next step — qualify the composed research command offline
 
 EODHD evaluation is paused by user decision. Keep Yahoo and the existing candle
 database; no subscription or provider migration is selected. Generic normalized
@@ -8,16 +8,19 @@ dividend/split collection, separate durable snapshots and offline reuse are now
 implemented and bounded-live-tested on AAPL (40 dividends, one split, 2,512 rows).
 See `docs/PHASE_7_YAHOO_CORPORATE_ACTION_COLLECTION.md`.
 
-The generic export and profile-backed command now support explicit schema 2 with
-`AVAILABLE`, `STALE` or `MISSING` corporate-action context. The local verifier
-checks both schemas; schema 1 remains unchanged. Apply/commit the package, then
-run one selected-symbol schema-2 export using confirmed private inputs, a matching
-snapshot/file checksum and an explicit UTC freshness policy. Verify the resulting
-pair locally; return only its redacted report. An absent snapshot may be omitted
-and reported `MISSING`; an explicitly supplied corrupt/mismatched input must fail.
-Do not silently add dividends to returns, apply splits again to stored candles,
-or mutate portfolio cash. Full-universe action refresh and return accounting are
-not claimed done. See `docs/PHASE_7_RESEARCH_CORPORATE_ACTION_CONTEXT.md`.
+The returned MCD schema-2 reports agree on 40 dividend observations, zero observed
+splits, 2,512 candles and available action context; SQLite integrity was reported
+`ok`. The generic `instrument_research_collect` command now composes collection,
+schema-2 export, persisted-pair verification and read-only SQLite integrity with
+profile-derived outputs and safe failure stops. Apply/commit this package, then
+run it once with a new run ID and the existing matching MCD snapshot/checksum
+in explicit offline reuse mode; do not download MCD again for this check.
+Use the same 2016-09-29 to exclusive 2026-09-29 window and a seven-day action-age
+policy while the snapshot remains fresh. Return only the two redacted reports,
+final completion and integrity lines. If stale, stop instead of silently refetching.
+See `docs/PHASE_7_CORPORATE_ACTION_RESEARCH_RUN.md` for evidence pins and paths.
+Do not infer complete actions, adjusted returns or current candle freshness;
+full-universe action refresh, portfolio cash accounting and scheduling are separate.
 
 All prior gates below are historical and superseded by this section. In
 particular, do not resume the EODHD experiment as a prerequisite for progress.

@@ -1,5 +1,14 @@
 # Investment Terminal — Software Architecture
 
+`instrument_research_collect` is a single-symbol CLI composition over the existing
+action collector, profile-backed schema-2 export and local verifier. The export's
+read-only `prepare_export` loader is reused for readiness before provider access.
+The CLI derives private/report paths from explicit run ID and profile, checks
+input/output bindings across stages, coordinates cooperative locks with weekly
+refresh, and checks SQLite integrity read-only before overall success. It owns
+no new downloader, schema, candle write, return calculation or scheduler. Failed
+later stages preserve acquired action evidence; offline recovery is explicit.
+
 Optional research schema 2 attaches corporate-action context to the existing
 schema-1 factual export. The operations layer owns deterministic identity/window/
 currency binding, caller-specified UTC freshness policy and detached context

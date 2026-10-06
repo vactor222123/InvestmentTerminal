@@ -52,6 +52,35 @@ def action_arguments(options):
     return result
 
 
+def prepare_export(options):
+    """Build without writes/provider work; shared by the collecting composition."""
+    projection_bytes = options.projection.read_bytes()
+    projection_sha256 = sha256(projection_bytes).hexdigest()
+    if projection_sha256 != options.projection_sha256:
+        raise ValueError("Private projection checksum mismatch")
+    projection = json.loads(projection_bytes)
+    manifest = json.loads(options.manifest.read_text(encoding="utf-8"))
+    checkpoint = json.loads(options.weekly_checkpoint.read_text(encoding="utf-8"))
+
+    def source_checkpoint(index):
+        path = options.source_checkpoint_directory / f"batch_{index:04d}.json"
+        return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
+
+    plan = WeeklyCandleRefreshPlan.from_manifest(
+        manifest, options.manifest_checksum, source_checkpoint,
+        end=datetime.fromisoformat(options.end),
+    )
+    uri = options.database.resolve().as_uri() + "?mode=ro"
+    with closing(sqlite3.connect(uri, uri=True)) as connection:
+        connection.execute("PRAGMA query_only = ON")
+        connection.execute("BEGIN")
+        return build_instrument_research_export(
+            plan, checkpoint, projection, projection_sha256, connection,
+            symbol=options.symbol,
+            history_start=datetime.fromisoformat(options.history_start),
+        )
+
+
 def main(argv=None, *, writer=write_json_atomic):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", required=True, type=Path)
@@ -96,31 +125,7 @@ def main(argv=None, *, writer=write_json_atomic):
             snapshot, action_hash = load_snapshot(options.actions_snapshot)
             if action_hash != options.actions_sha256:
                 raise ValueError("Action snapshot checksum mismatch")
-        projection_bytes = options.projection.read_bytes()
-        projection_sha256 = sha256(projection_bytes).hexdigest()
-        if projection_sha256 != options.projection_sha256:
-            raise ValueError("Private projection checksum mismatch")
-        projection = json.loads(projection_bytes)
-        manifest = json.loads(options.manifest.read_text(encoding="utf-8"))
-        checkpoint = json.loads(options.weekly_checkpoint.read_text(encoding="utf-8"))
-
-        def source_checkpoint(index):
-            path = options.source_checkpoint_directory / f"batch_{index:04d}.json"
-            return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
-
-        plan = WeeklyCandleRefreshPlan.from_manifest(
-            manifest, options.manifest_checksum, source_checkpoint,
-            end=datetime.fromisoformat(options.end),
-        )
-        uri = options.database.resolve().as_uri() + "?mode=ro"
-        with closing(sqlite3.connect(uri, uri=True)) as connection:
-            connection.execute("PRAGMA query_only = ON")
-            connection.execute("BEGIN")
-            private, report = build_instrument_research_export(
-                plan, checkpoint, projection, projection_sha256, connection,
-                symbol=options.symbol,
-                history_start=datetime.fromisoformat(options.history_start),
-            )
+        private, report = prepare_export(options)
         if options.schema_version == 2:
             private, report = attach_action_context(
                 private, report,
