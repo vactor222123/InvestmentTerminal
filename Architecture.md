@@ -1,5 +1,15 @@
 # Investment Terminal — Software Architecture
 
+`portfolio_split_collect` is CLI-only composition over the canonical CSV parser,
+ledger validation and existing Yahoo action collector. It discovers one local
+input, plans deterministic bounded candidate requests and preserves immutable
+per-request snapshots. It adds no provider adapter or accounting algorithm.
+Source checksums, cooperative collection/report locks, atomic private/redacted
+outputs and stage readbacks protect handoff; the first collection failure stops
+provider work. Existing snapshots are validated and reused, never overwritten or
+silently refreshed. Identity matching is candidate evidence, not ISIN/listing
+verification. No domain imports CLI and no SQLite/legacy valuation path changes.
+
 The split-adjustment boundary is a detached projection, not a source-store
 migration. Market owns immutable `SplitPlan`/`SplitPriceSeries` and pure split-only
 OHLC arithmetic. Portfolio replays original trades in a common end-date share

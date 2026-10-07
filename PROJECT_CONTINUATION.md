@@ -1,6 +1,34 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — explicit split projections implemented, qualification pending
+## Current handoff — bounded portfolio action collection implemented
+
+Fresh clean `develop`: `3507c2c6eb98b453675983bf61cbc3f394db9f66`.
+Classification: `IMPLEMENTATION`. The user returned discovery counts: zero
+split-positive snapshots, one valid CSV, zero identity candidates and two
+oversized files skipped. This is incomplete discovery, not proof of no splits;
+the earlier AAPL acquisition was workspace-only, not delivered runtime evidence.
+
+`portfolio_split_collect` now discovers exactly one canonical CSV locally,
+derives bounded candidate requests from its original trades, and composes the
+existing collector. Snapshots are durable and reused offline; provider failure
+stops further requests. New private selection/redacted report distinguish
+observed zero splits, blocked identity/age/window, failed and unattempted items.
+No guessed aliases, broker balances, price/quantity adjustments or SQLite writes.
+Provider-symbol mapping and action completeness remain explicitly unverified.
+See `docs/PHASE_7_PORTFOLIO_SPLIT_COLLECTION.md`.
+
+Focused: 183 passed (31 new cases). Full: 3,604 passed, 4 skipped, one existing
+Starlette deprecation warning. `git diff --check`: clean. Test temporary roots
+and private artifacts are excluded from commit and ZIP.
+
+Next: apply/commit and return the applied SHA, then execute one bounded runtime
+collection with automatic CSV discovery and send only its redacted report.
+Runtime inputs were not accessed here; tests use fake providers and synthetic
+CSVs. Qualification of original trade basis and compatible price/quantity basis
+still precedes production adjustment. Do not claim the split stage is closed.
+Older next-action statements below are historical.
+
+## Historical handoff — explicit split projections implemented, qualification pending
 
 Caller-confirmed fresh `develop` baseline:
 `860ad718030414bfcca4ca5b45c2a056bedf5f0d`. Classification: `IMPLEMENTATION`.

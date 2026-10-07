@@ -1,5 +1,19 @@
 # Investment Terminal — Data Model
 
+`PORTFOLIO_SPLIT_CANDIDATES` schema 1 is a private collection index: CSV path/hash,
+exclusive end, ordered instrument identities/windows, snapshot paths/hashes,
+nullable observed split counts and fixed statuses/categories. It contains no
+derived broker quantities or replacement transactions. Its separate schema-1
+`PORTFOLIO_SPLIT_COLLECTION_REPORT` omits identities, paths, dates and values;
+it binds the CSV/private-index hashes and exposes counts by status/category,
+invalid CSV count and maximum-age policy. Overall status is `COLLECTED`,
+`COMPLETE_WITH_BLOCKERS` or `STOPPED`. Per-item statuses are `BLOCKED`, `FAILED`,
+`PENDING`, `SPLITS_OBSERVED`, `NO_SPLITS_OBSERVED`. Unknown/unattempted split counts
+are null, never zero. Both retain `UNVERIFIED_PROVIDER_MAPPING` and
+`adjustment_performed=false`; the report retains `UNKNOWN` action completeness.
+An exit/result check is required in addition to a report: late verification
+failure can leave complete stage artifacts. Existing schemas remain unchanged.
+
 Split projection adds two independent schema-1 operation identities:
 `SPLIT_PORTFOLIO_PROJECTION` (private) and
 `SPLIT_PORTFOLIO_PROJECTION_REPORT` (redacted). Neither is an existing ledger or

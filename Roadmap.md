@@ -2,6 +2,13 @@
 
 ## Active product direction — Yahoo corporate actions
 
+Latest delivery: bounded automatic portfolio action collection from one locally
+discovered canonical CSV. New `portfolio_split_collect` reuses existing collector
+and snapshots, distinguishes missing/blocked/failed/observed-zero results and
+produces a redacted aggregate. Next run it on the user's runtime after package
+application. No live result or broker mapping/adjustment closure is claimed.
+See `docs/PHASE_7_PORTFOLIO_SPLIT_COLLECTION.md`.
+
 Current user priority: split-only price/share adjustment. The generic projection
 core and offline original-CSV position CLI are implemented and tested; the
 current handoff is `docs/PHASE_7_SPLIT_ADJUSTMENT.md`. Preserve original trades,

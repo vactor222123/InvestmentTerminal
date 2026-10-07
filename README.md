@@ -21,6 +21,11 @@ The system prioritizes:
 
 ## Continuing Development
 
+`python -m investment_terminal.cli.portfolio_split_collect --help` describes
+bounded action collection with automatic canonical-CSV discovery, private
+snapshot reuse and a redacted report. It collects candidate events, not adjusted
+broker holdings. See [portfolio split collection](docs/PHASE_7_PORTFOLIO_SPLIT_COLLECTION.md).
+
 Split handling now has an explicit, non-destructive projection core and an
 offline position command (`python -m investment_terminal.cli.split_positions
 --help`). It uses original broker trades and existing pinned action snapshots;

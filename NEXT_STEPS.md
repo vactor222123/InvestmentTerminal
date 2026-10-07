@@ -1,6 +1,27 @@
 # Investment Terminal — Next Steps
 
-## Current next step — qualify the generic split projection
+## Current next step — run automatic bounded portfolio action collection
+
+Apply this implementation package and return the resulting SHA. Then run
+`portfolio_split_collect` with the existing private data directory, a dedicated
+snapshot/cache directory, a new report path, explicit exclusive UTC end and
+instrument budget (default 10, maximum 50). CSV filenames, instruments and split
+values are discovered/collected automatically; no manual market-data entry.
+The next handoff will pin the applied SHA and use the standard runtime roots.
+
+Send only `PORTFOLIO_SPLIT_COLLECTION_REPORT` plus exit/result evidence. A
+`STOPPED` report retains failed/unattempted counts; do not blindly retry. Reuse
+successful snapshots with a new report path, preserving the prior outputs.
+`NO_SPLITS_OBSERVED` is not a failure or proof of complete absence.
+`SPLITS_OBSERVED` identifies candidates, not verified broker mappings or adjusted
+holdings. The next decision depends on returned counts/categories, not invented
+instruments. See `docs/PHASE_7_PORTFOLIO_SPLIT_COLLECTION.md`.
+
+No live collection or private runtime access occurred during package preparation.
+Known price basis, trade-history completeness and broker split-day execution
+remain separate gates. Previous instructions below are historical.
+
+## Historical next step — qualify the generic split projection
 
 The user explicitly prioritized split price/share adjustment. The implementation
 at baseline `860ad718030414bfcca4ca5b45c2a056bedf5f0d` adds separate immutable
