@@ -1,6 +1,39 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — composed research qualification complete
+## Current handoff — explicit split projections implemented, qualification pending
+
+Caller-confirmed fresh `develop` baseline:
+`860ad718030414bfcca4ca5b45c2a056bedf5f0d`. Classification: `IMPLEMENTATION`.
+The user selected split price/share adjustment ahead of weekly composition.
+Generic immutable split-only OHLC projection and detached average-cost position
+replay now support forward/reverse/multiple splits, fractional entitlements and
+sales between events. The offline `split_positions` CLI consumes original CSV
+and checksum-pinned existing action evidence, writing a private projection and
+a redacted schema-1 report. No source CSV, candle, SQLite, legacy valuation or
+existing JSON schema is changed. No private runtime files or provider were used.
+
+Price projection requires explicitly known `AS_TRADED` input; stored Yahoo
+`STORED_CLOSE_NO_EXPLICIT_ADJUSTMENT` is not that evidence. Unknown basis stops
+rather than applying a split twice. Quantity results remain conditional on
+complete original trades and observed actions, whose completeness is `UNKNOWN`.
+Split-day trade ordering, broker rounding/cash-in-lieu and unmapped listings
+fail or remain explicitly outside scope. This is not full operational closure.
+See `docs/PHASE_7_SPLIT_ADJUSTMENT.md` for contracts, audit and qualification gates.
+
+Focused: 233 passed, including 53 new tests. Full: 3,573 passed, 4 skipped,
+one existing Starlette deprecation warning. `git diff --check`: clean.
+Architecture/dependency guards are included.
+Next operational step: apply this package and return the applied SHA. Then use
+read-only local discovery to identify one already-collected split-positive
+snapshot and matching complete original transactions; return only redacted
+evidence. Do not rerun MCD as a positive split test (its qualified snapshot has
+zero splits), invent inputs, read private files into the chat, rewrite SQLite,
+or label existing raw indicators split-adjusted. A known-price-basis adapter and
+legacy valuation integration remain separate gates before end-to-end closure.
+EODHD remains paused; dividends/total return and broad action refresh are not
+part of this implementation. Older next-action statements below are historical.
+
+## Historical handoff — composed research qualification complete
 
 Verified fresh, clean `develop` baseline:
 `ae87d4436ff18aa1a892779cefd4340e0976dd92`.

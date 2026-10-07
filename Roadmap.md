@@ -2,6 +2,16 @@
 
 ## Active product direction — Yahoo corporate actions
 
+Current user priority: split-only price/share adjustment. The generic projection
+core and offline original-CSV position CLI are implemented and tested; the
+current handoff is `docs/PHASE_7_SPLIT_ADJUSTMENT.md`. Preserve original trades,
+cost and stored candles. Forward/reverse/multiple splits and fractional
+entitlements are supported conditionally on observed events. This does NOT
+close production adjustment: a split-positive operational run, trustworthy
+price basis/cutoff, and compatible legacy valuation integration remain gates.
+Existing Yahoo candles must not be blindly adjusted again. Weekly composition
+below is deferred by this newer user request; EODHD remains paused.
+
 The user paused EODHD investigation: retain Yahoo and existing candle history.
 The normalized action acquisition/storage boundary is now implemented for a
 generic selected symbol with automatic metadata, bounded history, separate

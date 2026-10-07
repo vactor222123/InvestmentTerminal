@@ -1,6 +1,33 @@
 # Investment Terminal — Next Steps
 
-## Current next step — simplify the generic weekly workflow
+## Current next step — qualify the generic split projection
+
+The user explicitly prioritized split price/share adjustment. The implementation
+at baseline `860ad718030414bfcca4ca5b45c2a056bedf5f0d` adds separate immutable
+price/position projections and an offline one-instrument `split_positions` CLI.
+It does not rewrite existing candles or change legacy portfolio valuation.
+See `docs/PHASE_7_SPLIT_ADJUSTMENT.md`.
+
+1. Apply the package and return the applied SHA. No runtime mutation was run.
+2. Discover existing private action snapshots and original transaction inputs
+   locally with read-only checks. Select an exact identity with an observed split
+   and complete original trade history inside the action window. No manual market
+   data entry, new guessed filenames or private-value upload is required.
+3. Qualify one detached projection using the existing snapshot, explicit age
+   policy and source checksums. Check readback/source preservation and send only
+   its redacted report plus final exit/completion evidence. Do not use MCD's
+   zero-split snapshot to claim real split arithmetic qualification.
+4. Before enabling price adjustment or wiring legacy valuation, establish and
+   persist source price basis/cutoff and compatible quote/quantity basis. Existing
+   `auto_adjust=False`/stored-close labels cannot establish this. Unknown basis
+   must stay blocked, not be filled by a user guess or inferred from a price jump.
+
+The mathematical core is tested; production integration is not complete. Broker
+split-day ordering, fractional cash settlement, dividends/total return and broad
+weekly action orchestration remain explicit separate work. Weekly composition
+is deferred, not silently resumed. All older gates below are historical.
+
+## Historical next step — simplify the generic weekly workflow
 
 EODHD evaluation is paused by user decision. Keep Yahoo and the existing candle
 database; no subscription or provider migration is selected. Generic normalized

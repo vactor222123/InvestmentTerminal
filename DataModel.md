@@ -1,5 +1,30 @@
 # Investment Terminal — Data Model
 
+Split projection adds two independent schema-1 operation identities:
+`SPLIT_PORTFOLIO_PROJECTION` (private) and
+`SPLIT_PORTFOLIO_PROJECTION_REPORT` (redacted). Neither is an existing ledger or
+valuation schema migration. Private output records source-ledger/CSV hashes,
+selected instrument key, original `AS_TRADED` trade basis, derived end-date
+share basis, trade counts, optional reconstructed position, gross average-cost
+realized gain/loss and settlement currency. It assumes complete original trades;
+transfers/opening balances, cash-in-lieu, fees, dividends and taxes are not inferred.
+Report status is `PROJECTED_WITH_LIMITATIONS`; it omits identities and all
+quantities/prices/profits, retaining counts, exact private-output/CSV hashes,
+split-plan evidence and `NOT_PERFORMED_UNVERIFIED_STORED_BASIS` for market prices.
+The plan binds exact snapshot bytes and canonical document hash, exclusive end,
+UTC evaluation/maximum age (1..365 days), observed split count and `UNKNOWN`
+action completeness. A report is stage evidence: later verification failure can
+leave it behind, so overall success also requires exit 0/final completion.
+
+In-memory `SplitPriceSeries` contains bounded ordered daily OHLC (no volume),
+source identity/currency/hash and explicit basis. `AS_TRADED` prohibits adjusted
+cutoff/evidence; `SPLIT_ADJUSTED` requires both. Adjustment produces the latter
+bound to the snapshot end/content hash. Exact repeated adjustment is a no-op;
+different evidence/cutoff is rejected. Source hashes are lineage, not proof that
+a caller-declared price basis is true. Legacy stored-close labels are rejected.
+There is no persisted adjusted-candle schema or automatic SMA/valuation change.
+See `docs/PHASE_7_SPLIT_ADJUSTMENT.md` for effective-date and failure semantics.
+
 The combined `instrument_research_collect` command preserves all existing action,
 profile and research schemas. Its derived artifacts are separate stage evidence:
 collection `STORED` and export `COMPLETE` do not certify a later SQLite check.

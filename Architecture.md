@@ -1,5 +1,19 @@
 # Investment Terminal — Software Architecture
 
+The split-adjustment boundary is a detached projection, not a source-store
+migration. Market owns immutable `SplitPlan`/`SplitPriceSeries` and pure split-only
+OHLC arithmetic. Portfolio replays original trades in a common end-date share
+basis, preserving gross acquisition/disposal amounts with exact rational
+arithmetic. It returns a typed projection, never a replacement transaction ledger.
+CLI composition alone reads the existing CSV/action snapshot and writes separate
+private/redacted artifacts with cooperative locks, checksums and atomic readback.
+No domain imports CLI or persistence. Legacy valuation, raw indicators, SQLite
+and weekly flows are untouched. Unknown source price basis and split-day trade
+ordering are rejected; no provider download or broker cash inference is added.
+This deliberately additive boundary avoids silently changing existing accounting
+contracts; integration requires confirmed source/quote basis and operational
+qualification. See `docs/PHASE_7_SPLIT_ADJUSTMENT.md`.
+
 `instrument_research_collect` is a single-symbol CLI composition over the existing
 action collector, profile-backed schema-2 export and local verifier. The export's
 read-only `prepare_export` loader is reused for readiness before provider access.

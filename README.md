@@ -21,6 +21,13 @@ The system prioritizes:
 
 ## Continuing Development
 
+Split handling now has an explicit, non-destructive projection core and an
+offline position command (`python -m investment_terminal.cli.split_positions
+--help`). It uses original broker trades and existing pinned action snapshots;
+it does not rewrite stored Yahoo prices or change legacy portfolio valuation.
+Operational qualification and known source-price basis remain required before
+production integration. See [split adjustment](docs/PHASE_7_SPLIT_ADJUSTMENT.md).
+
 The durable execution/handoff checkpoint is:
 
 ```text
