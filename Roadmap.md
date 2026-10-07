@@ -2,6 +2,11 @@
 
 ## Active product direction — Yahoo corporate actions
 
+Current operational gate: diagnose the returned generic collection preflight
+failure with the new read-only `--preflight-only` mode. Specific categories and
+safe counts are implemented; the user's actual cause is not yet measured. Keep
+collection paused and preserve the budget/evidence until that result is reviewed.
+
 Latest delivery: bounded automatic portfolio action collection from one locally
 discovered canonical CSV. New `portfolio_split_collect` reuses existing collector
 and snapshots, distinguishes missing/blocked/failed/observed-zero results and

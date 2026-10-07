@@ -21,6 +21,11 @@ The system prioritizes:
 
 ## Continuing Development
 
+For collection startup diagnosis, add `--preflight-only` to
+`python -B -m investment_terminal.cli.portfolio_split_collect` with the usual
+arguments. It prints a safe diagnosis without provider requests or runtime writes;
+send only `PREFLIGHT_RESULT` and the exit code. It does not prove live readiness.
+
 `python -m investment_terminal.cli.portfolio_split_collect --help` describes
 bounded action collection with automatic canonical-CSV discovery, private
 snapshot reuse and a redacted report. It collects candidate events, not adjusted

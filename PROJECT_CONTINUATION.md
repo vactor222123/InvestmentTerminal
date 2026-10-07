@@ -1,6 +1,32 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — bounded portfolio action collection implemented
+## Current handoff — read-only collection preflight diagnostics
+
+Fresh clean `develop`: `c3864d552a166fbdb024a12fe1853cee4eb3f587`.
+Classification: `IMPLEMENTATION`. The user-run collection returned generic
+`PREFLIGHT`, no aggregate report and exit 1. This proves no collector invocation,
+not the specific cause. No private runtime input was inspected here; do not
+assert the instrument budget, CSV or paths were the actual cause.
+
+`portfolio_split_collect --preflight-only` now runs shared input/path/date/plan
+checks and emits a privacy-safe `PREFLIGHT_RESULT` line without provider calls,
+output writes, directory creation or locks. Normal collection emits the same
+fixed failure categories/counts for known preflight errors. Existing persisted
+JSON contracts, budgets, selection and collection behavior remain unchanged.
+See `docs/PHASE_7_PORTFOLIO_SPLIT_COLLECTION.md` for categories and limits.
+
+Focused: 123 passed, including 49 new cases. Full: 3,653 passed, 4 skipped,
+one existing Starlette deprecation warning. `git diff --check`: clean.
+No private runtime access, provider work or source-value changes were performed.
+
+Next: apply/commit and return the applied SHA, then run only `python -B ...
+--preflight-only` with the same runtime roots, end policy and budget 10. Return
+the `PREFLIGHT_RESULT` line and exit code; no JSON file is expected. Do not
+increase the budget, delete files, fix CSV values or resume collection until
+the actual category is known. Passing preflight is not operational qualification
+or proof of filesystem write access/provider readiness. Older gates are historical.
+
+## Historical handoff — bounded portfolio action collection implemented
 
 Fresh clean `develop`: `3507c2c6eb98b453675983bf61cbc3f394db9f66`.
 Classification: `IMPLEMENTATION`. The user returned discovery counts: zero

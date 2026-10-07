@@ -1,6 +1,23 @@
 # Investment Terminal — Next Steps
 
-## Current next step — run automatic bounded portfolio action collection
+## Current next step — diagnose the collection preflight, offline
+
+The user's first runtime attempt stopped at `PREFLIGHT` with exit 1 and no
+aggregate report. The concrete cause remains unknown. Apply the diagnostic
+package and return the applied SHA. Then use `portfolio_split_collect` with
+`--preflight-only`, the original runtime roots, maximum 10 instruments and the
+same end-date policy. Use `python -B` to suppress interpreter bytecode writes.
+This mode only reads local inputs and prints a redacted `PREFLIGHT_RESULT`;
+it creates no runtime artifacts and invokes no provider.
+
+Send that console line and exit code, not the private CSV or snapshot files.
+Known failures identify the exact guard and safe counts (for example required
+instrument count versus budget); do not choose a repair based on speculation.
+Keep all prior outputs and existing limits. Collection remains paused until
+the result is reviewed. Successful preflight does not certify write permissions,
+snapshot reuse validity, broker mapping or split adjustment readiness.
+
+## Historical next step — run automatic bounded portfolio action collection
 
 Apply this implementation package and return the resulting SHA. Then run
 `portfolio_split_collect` with the existing private data directory, a dedicated

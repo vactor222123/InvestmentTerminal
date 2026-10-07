@@ -1,5 +1,70 @@
 # Phase 7 — bounded portfolio split candidate collection
 
+## Current diagnostic follow-up
+
+Fresh baseline `c3864d552a166fbdb024a12fe1853cee4eb3f587`; classification
+`IMPLEMENTATION`. The user returned `Portfolio action collection failed at
+PREFLIGHT`, no aggregate report and exit 1. The collector is invoked only after
+the stage changes to `COLLECTION`, so no provider work occurred in that attempt.
+The old catch-all hid the cause. It is not evidence that the CSV, date, paths or
+instrument count were specifically at fault. No runtime files were accessed by
+the agent to guess which condition failed.
+
+The optional `--preflight-only` flag now stops before locks, directory creation,
+collector calls or writes. It shares the normal path's guards, reads/parses the
+CSV, builds the bounded plan, verifies source bytes and prints one console-only
+schema-1 `PORTFOLIO_SPLIT_PREFLIGHT` diagnostic prefixed `PREFLIGHT_RESULT: `.
+Invoke using `python -B` to suppress Python interpreter bytecode writes as well.
+All usual options remain required; `--report-output` is checked but never written
+in this mode. Existing report/private-index files and locks remain protected.
+
+`READY` and `READY_WITH_BLOCKERS` return 0 with safe instrument/CSV/plan counts.
+`FAILED` returns 1 with a fixed category and applicable numeric counts. Normal
+collection also emits this diagnosis for a known preflight failure. The result
+contains no source hashes, paths, identities, trade IDs, quantities or prices.
+No new persisted schema or migration is introduced. Normal successful collection
+output stays unchanged; later-stage failures keep the existing behavior.
+
+Categories distinguish:
+
+- `CSV_NOT_FOUND` / `CSV_AMBIGUOUS`: seen, valid and invalid CSV counts;
+- `CSV_FILE_LIMIT` / `CSV_SIZE_LIMIT`: the existing bounds, without truncation;
+- `CSV_SYMLINK`, `CSV_READ_ERROR`, `CSV_CHANGED`: unsafe/unreadable/changing input;
+- `DUPLICATE_TRANSACTION_IDS`: duplicate count, never private IDs;
+- `LEDGER_INVALID`, `NO_TRADE_INSTRUMENTS`, `INSTRUMENT_BUDGET`: validation or
+  required instrument count versus the unchanged requested maximum;
+- `PATH_NOT_ABSOLUTE_OR_SYMLINK`, `INPUT_DIRECTORY_MISSING`,
+  `REPORT_EXISTS`, `PRIVATE_SELECTION_EXISTS`, `OUTPUT_DIRECTORY_INVALID`,
+  `OUTPUT_LOCK_EXISTS`, `SNAPSHOT_INPUT_OVERLAP`, `REPORT_PRIVATE_OVERLAP`,
+  `CACHE_SNAPSHOT_OVERLAP`: specific path/ownership guards;
+- `INVALID_INSTRUMENT_LIMIT`, `INVALID_AGE_LIMIT`, `INVALID_CLOCK`,
+  `INVALID_END_DATE`, `FUTURE_END_DATE`: invalid explicit policy or time;
+- `PREFLIGHT_UNEXPECTED`: sanitized fallback, not a guessed specific cause.
+
+The diagnostic stops at the first failed guard. `INPUT_DIRECTORY_MISSING` means
+the supplied path did not identify a directory. Argument parsing remains argparse
+and is outside the structured diagnostic. Read-only checks cannot prove future
+write permissions, prevent later races, validate existing snapshot contents,
+establish provider-symbol mapping or certify CSV completeness. The underlying
+CSV discovery scope is unchanged. Preflight is not a positive split qualification.
+
+Next operational step: after applying and returning the SHA, run only preflight
+with the same runtime roots/end policy and budget 10. Send its console line and
+exit code. Do not raise limits, delete evidence, edit private values or resume
+network collection until the actual category is measured. No private report file
+needs to be sent or created for this step.
+
+Verification: 49 new diagnostic cases; combined development run 80 passed;
+focused CSV/ledger/collection/architecture/dependency selection 123 passed;
+full pytest 3,653 passed, 4 skipped, one existing Starlette warning.
+`git diff --check` clean. Tests assert both normal and dry-run categories,
+exact budget/duplicate/CSV counts, no provider/writer invocation, no new runtime
+paths and unchanged bytes, existing lock/output preservation, injected read
+errors/source changes and private-exception redaction. Temporary pytest roots
+are excluded from the commit and ZIP. No live diagnosis was performed here.
+
+## Original collection implementation
+
 Classification: `IMPLEMENTATION`. Fresh clean `develop` baseline:
 `3507c2c6eb98b453675983bf61cbc3f394db9f66`.
 

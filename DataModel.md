@@ -1,5 +1,16 @@
 # Investment Terminal — Data Model
 
+`PORTFOLIO_SPLIT_PREFLIGHT` schema 1 is console-only diagnostic output on the
+`PREFLIGHT_RESULT: ` line; it is not a persisted collection report. Fields are
+`status` (`FAILED`, `READY`, `READY_WITH_BLOCKERS`), nullable fixed
+`failure_category`, numeric aggregate `counts` and `collection_started=false`.
+Known failures expose only the guard category and relevant counts, not filenames,
+transaction IDs, identities, monetary values or exception messages. Unexpected
+preflight exceptions use `PREFLIGHT_UNEXPECTED`. Passing the read-only path does
+not certify write access or existing snapshot contents. Argument-parser errors
+remain the existing argparse boundary and do not produce this diagnostic.
+Persisted collection/index schemas are unchanged.
+
 `PORTFOLIO_SPLIT_CANDIDATES` schema 1 is a private collection index: CSV path/hash,
 exclusive end, ordered instrument identities/windows, snapshot paths/hashes,
 nullable observed split counts and fixed statuses/categories. It contains no

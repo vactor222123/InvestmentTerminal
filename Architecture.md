@@ -1,5 +1,12 @@
 # Investment Terminal — Software Architecture
 
+Portfolio action collection has a shared read-only preflight seam selected by
+`--preflight-only`. It stops before directory creation, cooperative lock creation,
+collector invocation and output writers. Fixed typed preflight errors are
+rendered with aggregate counts, never parser/provider exception text. The normal
+collection path uses the same guards; known failures are diagnosable without
+duplicating validation in PowerShell. No domain/dependency direction changes.
+
 `portfolio_split_collect` is CLI-only composition over the canonical CSV parser,
 ledger validation and existing Yahoo action collector. It discovers one local
 input, plans deterministic bounded candidate requests and preserves immutable

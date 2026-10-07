@@ -22,6 +22,23 @@ from investment_terminal.utils.atomic_write import write_json_atomic
 from investment_terminal.utils.validation import validate_aware_datetime
 
 
+class PreflightError(ValueError):
+    """Fixed local diagnosis; never includes file names or parser messages."""
+
+    def __init__(self, category, **counts):
+        super().__init__(category)
+        self.category = category
+        self.counts = counts
+
+
+def print_preflight(status, category=None, **counts):
+    print("PREFLIGHT_RESULT: " + json.dumps({
+        "schema_version": 1, "operation_identity": "PORTFOLIO_SPLIT_PREFLIGHT",
+        "status": status, "failure_category": category, "counts": counts,
+        "collection_started": False,
+    }, sort_keys=True, allow_nan=False))
+
+
 def discover_transactions(directory, now):
     """Never pick a CSV by filename, modification time or first match."""
     candidates = []
@@ -29,23 +46,42 @@ def discover_transactions(directory, now):
     invalid = 0
     for path in sorted(directory.rglob("*.csv")):
         seen += 1
-        if seen > 100 or path.is_symlink() or path.stat().st_size > 4_000_000:
-            raise ValueError("CSV discovery bound or unsafe input")
-        data = path.read_bytes()
+        if seen > 100:
+            raise PreflightError("CSV_FILE_LIMIT", csv_seen_count=seen, maximum_csv_count=100)
+        if path.is_symlink():
+            raise PreflightError("CSV_SYMLINK")
+        try:
+            if path.stat().st_size > 4_000_000:
+                raise PreflightError("CSV_SIZE_LIMIT", maximum_bytes=4_000_000)
+            data = path.read_bytes()
+        except OSError:
+            raise PreflightError("CSV_READ_ERROR") from None
         try:
             batch = PortfolioTransactionCsvParser.load(path, imported_at=now)
         except (ValueError, TypeError, UnicodeError):
             invalid += 1
             continue
-        if path.read_bytes() != data:
-            raise ValueError("CSV changed while parsing")
-        ledger = PortfolioTransactionLedger(
-            "action-candidates", "Private action candidates", "USD",
-            tuple(sorted(batch.transactions, key=lambda t: (t.occurred_at, t.transaction_id))),
-        )
+        except OSError:
+            raise PreflightError("CSV_READ_ERROR") from None
+        try:
+            if path.read_bytes() != data:
+                raise PreflightError("CSV_CHANGED")
+        except OSError:
+            raise PreflightError("CSV_READ_ERROR") from None
+        ids = [t.transaction_id for t in batch.transactions]
+        if len(set(ids)) != len(ids):
+            raise PreflightError("DUPLICATE_TRANSACTION_IDS", duplicate_id_count=len(ids) - len(set(ids)))
+        try:
+            ledger = PortfolioTransactionLedger(
+                "action-candidates", "Private action candidates", "USD",
+                tuple(sorted(batch.transactions, key=lambda t: (t.occurred_at, t.transaction_id))),
+            )
+        except (TypeError, ValueError):
+            raise PreflightError("LEDGER_INVALID") from None
         candidates.append((path, sha256(data).hexdigest(), ledger))
     if len(candidates) != 1:
-        raise ValueError("Exactly one canonical transaction CSV required")
+        raise PreflightError("CSV_NOT_FOUND" if not candidates else "CSV_AMBIGUOUS",
+                             csv_seen_count=seen, valid_csv_count=len(candidates), invalid_csv_count=invalid)
     return (*candidates[0], invalid)
 
 
@@ -54,8 +90,10 @@ def plan_candidates(ledger, end, limit):
     for trade in ledger.transactions:
         if trade.transaction_type in ("BUY", "SELL"):
             groups.setdefault(trade.instrument.instrument_key, []).append(trade)
-    if not groups or len(groups) > limit:
-        raise ValueError("Instrument budget exceeded or no trades")
+    if not groups:
+        raise PreflightError("NO_TRADE_INSTRUMENTS", instrument_count=0)
+    if len(groups) > limit:
+        raise PreflightError("INSTRUMENT_BUDGET", instrument_count=len(groups), maximum_instruments=limit)
     items = []
     for key, trades in sorted(groups.items()):
         instrument = trades[0].instrument
@@ -88,34 +126,63 @@ def main(argv=None, *, collector=collect_actions, clock=None, writer=write_json_
     parser.add_argument("--end", required=True, help="Exclusive UTC YYYY-MM-DD")
     parser.add_argument("--max-instruments", type=int, default=10)
     parser.add_argument("--maximum-age-days", type=int, default=7)
+    parser.add_argument("--preflight-only", action="store_true",
+                        help="Read-only checks; no collector, locks, directories or output writes")
     options = parser.parse_args(argv)
     stage = "PREFLIGHT"
     try:
         raw = (options.transactions_directory, options.snapshot_directory,
                options.report_output, options.cache_directory)
         if any(not p.is_absolute() or p.is_symlink() for p in raw):
-            raise ValueError("Absolute non-symlink paths required")
+            raise PreflightError("PATH_NOT_ABSOLUTE_OR_SYMLINK")
         root, directory, report, cache = (p.resolve() for p in raw)
-        if (not root.is_dir() or report.exists() or directory == root
-                or not 1 <= options.max_instruments <= 50
-                or not 1 <= options.maximum_age_days <= 365):
-            raise ValueError("Invalid paths or budget")
+        if not root.is_dir():
+            raise PreflightError("INPUT_DIRECTORY_MISSING")
+        if report.exists():
+            raise PreflightError("REPORT_EXISTS")
+        if directory == root:
+            raise PreflightError("SNAPSHOT_INPUT_OVERLAP")
+        if not 1 <= options.max_instruments <= 50:
+            raise PreflightError("INVALID_INSTRUMENT_LIMIT")
+        if not 1 <= options.maximum_age_days <= 365:
+            raise PreflightError("INVALID_AGE_LIMIT")
+        if any(p.exists() and not p.is_dir() for p in (directory, cache, report.parent)):
+            raise PreflightError("OUTPUT_DIRECTORY_INVALID")
         for value in (root, directory, cache):
             if value.is_relative_to(report.parent) or report.parent.is_relative_to(value):
-                raise ValueError("Report must be separate from private directories")
+                raise PreflightError("REPORT_PRIVATE_OVERLAP")
         if directory.is_relative_to(cache) or cache.is_relative_to(directory):
-            raise ValueError("Cache overlaps snapshots")
-        now = validate_aware_datetime(clock() if clock else datetime.now(timezone.utc),
-                                      field_name="clock").astimezone(timezone.utc)
-        end = datetime.strptime(options.end, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            raise PreflightError("CACHE_SNAPSHOT_OVERLAP")
+        try:
+            now = validate_aware_datetime(clock() if clock else datetime.now(timezone.utc),
+                                          field_name="clock").astimezone(timezone.utc)
+        except (TypeError, ValueError):
+            raise PreflightError("INVALID_CLOCK") from None
+        try:
+            end = datetime.strptime(options.end, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        except ValueError:
+            raise PreflightError("INVALID_END_DATE") from None
         if end > now.replace(hour=0, minute=0, second=0, microsecond=0):
-            raise ValueError("Future end")
+            raise PreflightError("FUTURE_END_DATE")
         source, source_hash, ledger, invalid_csv = discover_transactions(root, now)
         items = plan_candidates(ledger, end, options.max_instruments)
         token = sha256(str(report).encode("utf-8")).hexdigest()[:24]
         private = directory / (token + "-selection.json")
         if private.exists():
-            raise ValueError("Private selection already exists")
+            raise PreflightError("PRIVATE_SELECTION_EXISTS")
+        lock_paths = (directory / ".portfolio-actions.lock", report.with_name(report.name + ".lock"))
+        if any(path.exists() or path.is_symlink() for path in lock_paths):
+            raise PreflightError("OUTPUT_LOCK_EXISTS")
+
+        if options.preflight_only:
+            if sha256(source.read_bytes()).hexdigest() != source_hash:
+                raise PreflightError("CSV_CHANGED")
+            blocked = sum(item["status"] == "BLOCKED" for item in items)
+            print_preflight("READY_WITH_BLOCKERS" if blocked else "READY",
+                            valid_csv_count=1, invalid_csv_count=invalid_csv,
+                            instrument_count=len(items), maximum_instruments=options.max_instruments,
+                            blocked_instrument_count=blocked, pending_instrument_count=len(items) - blocked)
+            return 0
 
         def verify_source():
             if sha256(source.read_bytes()).hexdigest() != source_hash:
@@ -124,7 +191,7 @@ def main(argv=None, *, collector=collect_actions, clock=None, writer=write_json_
         with ExitStack() as locks:
             directory.mkdir(parents=True, exist_ok=True)
             report.parent.mkdir(parents=True, exist_ok=True)
-            for lock in sorted((directory / ".portfolio-actions.lock", report.with_name(report.name + ".lock"))):
+            for lock in sorted(lock_paths):
                 with lock.open("x", encoding="ascii"):
                     pass
                 locks.callback(lock.unlink)
@@ -213,7 +280,12 @@ def main(argv=None, *, collector=collect_actions, clock=None, writer=write_json_
         print("SEND: " + str(report))
         print("REPORT_SHA256: " + sha256(report.read_bytes()).hexdigest())
         return 1 if stopped else 0
+    except PreflightError as exc:
+        print_preflight("FAILED", exc.category, **exc.counts)
+        return 1
     except Exception:
+        if stage == "PREFLIGHT":
+            print_preflight("FAILED", "PREFLIGHT_UNEXPECTED")
         print("Portfolio action collection failed at " + stage + "; preserve outputs", file=sys.stderr)
         return 1
     finally:
