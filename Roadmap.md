@@ -15,10 +15,15 @@ and offline verification. Schema 1 stays the default; prices and SMA are unchang
 The returned MCD schema-2 qualification succeeded with 2,512 candles and 40
 dividend observations; the user reported SQLite integrity `ok`. A generic
 one-command collection/export/verification/integrity composition is now
-implemented. Qualify it once by explicitly reusing the existing MCD snapshot
-offline, then review its redacted stage evidence. See
-`docs/PHASE_7_CORPORATE_ACTION_RESEARCH_RUN.md`. Price adjustment, broker
-cash accounting and broad weekly action orchestration remain separate explicit
+implemented and operationally qualified by the composed offline MCD run. The
+returned reports agree on the existing snapshot, 2,512 candles and 40 dividend
+observations; the user reported overall completion and SQLite integrity `ok`.
+This closes the bounded collection/storage/research-context slice, not Phase 7
+or total-return accounting. See `docs/PHASE_7_COMPOSED_RESEARCH_RESULT_AUDIT.md`.
+Next audit a generic short weekly refresh/quality/indicator workflow over existing
+boundaries; no new live run or unattended schedule is authorized yet.
+Implementation details: `docs/PHASE_7_CORPORATE_ACTION_RESEARCH_RUN.md`.
+Price adjustment, broker cash accounting and broad weekly action orchestration remain separate explicit
 work; no data re-download or paid-provider migration is required.
 See `docs/PHASE_7_YAHOO_CORPORATE_ACTION_COLLECTION.md`.
 Research integration: `docs/PHASE_7_RESEARCH_CORPORATE_ACTION_CONTEXT.md`.

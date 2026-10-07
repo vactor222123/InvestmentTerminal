@@ -1,6 +1,6 @@
 # Investment Terminal — Next Steps
 
-## Current next step — qualify the composed research command offline
+## Current next step — simplify the generic weekly workflow
 
 EODHD evaluation is paused by user decision. Keep Yahoo and the existing candle
 database; no subscription or provider migration is selected. Generic normalized
@@ -8,19 +8,24 @@ dividend/split collection, separate durable snapshots and offline reuse are now
 implemented and bounded-live-tested on AAPL (40 dividends, one split, 2,512 rows).
 See `docs/PHASE_7_YAHOO_CORPORATE_ACTION_COLLECTION.md`.
 
-The returned MCD schema-2 reports agree on 40 dividend observations, zero observed
-splits, 2,512 candles and available action context; SQLite integrity was reported
-`ok`. The generic `instrument_research_collect` command now composes collection,
-schema-2 export, persisted-pair verification and read-only SQLite integrity with
-profile-derived outputs and safe failure stops. Apply/commit this package, then
-run it once with a new run ID and the existing matching MCD snapshot/checksum
-in explicit offline reuse mode; do not download MCD again for this check.
-Use the same 2016-09-29 to exclusive 2026-09-29 window and a seven-day action-age
-policy while the snapshot remains fresh. Return only the two redacted reports,
-final completion and integrity lines. If stale, stop instead of silently refetching.
-See `docs/PHASE_7_CORPORATE_ACTION_RESEARCH_RUN.md` for evidence pins and paths.
-Do not infer complete actions, adjusted returns or current candle freshness;
-full-universe action refresh, portfolio cash accounting and scheduling are separate.
+The composed MCD run is now qualified: collection `STORED` with explicit offline
+reuse, research schema 2 `COMPLETE`, 2,512 candles, 40 dividend observations and
+`AVAILABLE` context at its recorded evaluation time. Both report bindings agree;
+the user returned overall completion and SQLite integrity `ok`. The bounded
+dividend/split collection, storage and research-context slice is complete, not
+total-return accounting or all-instrument coverage. Preserve the existing files;
+do not repeat this run or download MCD again to reconfirm it.
+See `docs/PHASE_7_COMPOSED_RESEARCH_RESULT_AUDIT.md`.
+
+Apply/commit this documentation package and return the new SHA. Next development
+is a focused audit of a short, generic weekly workflow using existing refresh,
+stored-quality and raw-indicator boundaries. Check checkpoint resume, explicit
+end/budget, isolated failures, rate-limit stops, output retention, SQLite integrity
+and quality/indicator evidence bindings before choosing the smallest implementation.
+This audit selection does not authorize live refresh, automatic retries, a new
+schema or scheduler. Keep missing/stale data visible instead of requiring manual
+market-data entry. EODHD, adjusted returns, broad action refresh, portfolio cash
+accounting and private sharing remain outside this next package.
 
 All prior gates below are historical and superseded by this section. In
 particular, do not resume the EODHD experiment as a prerequisite for progress.

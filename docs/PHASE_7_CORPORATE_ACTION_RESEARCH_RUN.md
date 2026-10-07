@@ -110,7 +110,12 @@ process is interrupted, inspect retained artifacts rather than deleting them or
 assuming overall success. There is no automatic retry or transactional claim
 across the snapshot, two reports and private export.
 
-## Verification and next step
+## Verification and historical qualification handoff
+
+The composed offline qualification below has since completed. Its returned
+reports and user-reported overall completion/integrity are recorded in
+`PHASE_7_COMPOSED_RESEARCH_RESULT_AUDIT.md`. Do not repeat that completed run;
+the original implementation evidence and handoff are preserved below.
 
 Focused tests cover generic-symbol online/offline success, source immutability,
 invalid policy/window/path/checksum, stale/corrupt reuse without network fallback,

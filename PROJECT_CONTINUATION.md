@@ -1,33 +1,35 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — one-command corporate-action research
+## Current handoff — composed research qualification complete
 
 Verified fresh, clean `develop` baseline:
-`8232d583a46480dd7f21ed3982077a59aee77893`.
-Classification: `IMPLEMENTATION`. The user-returned MCD schema-2 qualification
-reports agree on 2,512 candles, 40 dividend observations and `AVAILABLE` action
-context; SQLite integrity was separately reported `ok`. Report hashes and limits
-are recorded in `docs/PHASE_7_CORPORATE_ACTION_RESEARCH_RUN.md`.
+`ae87d4436ff18aa1a892779cefd4340e0976dd92`.
+Classification: `AUDIT`. Both returned composed-run reports agree on the pinned
+snapshot/content hashes and 40 dividend observations. Research schema 2 reports
+`COMPLETE`, 2,512 candles and `BOTH_AVAILABLE`; collection reports `STORED` and
+`reused_snapshot=true`. The user returned the final overall completion and
+`SQLite integrity: ok` lines. Exact report hashes, evidence limits and closure
+scope are recorded in `docs/PHASE_7_COMPOSED_RESEARCH_RESULT_AUDIT.md`.
 
-`instrument_research_collect` now composes existing collection/reuse, schema-2
-profile export, persisted-pair verification and read-only SQLite integrity in one
-generic command. It derives outputs from an explicit run ID, checks export
-readiness before provider work, pins evidence, coordinates cooperative locks and
-stops on failure while retaining acquired snapshots. Explicit offline reuse
-requires a pinned, matching, fresh snapshot; no silent fallback or overwrite.
-Existing JSON contracts, candles, SMA and standalone commands remain unchanged.
+The generic collection/storage/context/verified-export slice is operationally
+qualified at this bounded scope. MCD is a caller-selected example, not a special
+product rule. No new provider request, private input access, SQLite operation,
+code change or JSON-contract change was performed in this audit. Private-pair
+verification and SQLite integrity are user-run evidence, not independently
+repeated checks. Action completeness and cash currency/basis remain unverified.
 
 Focused: 244 passed. Full suite: 3520 passed, 4 skipped, one existing Starlette
-deprecation warning. `git diff --check`: clean. No live provider call or private
-runtime access during implementation; E2E tests use synthetic fixtures.
+deprecation warning. `git diff --check`: clean. Existing success/failure-path
+tests were rerun; no behavior change calls for new synthetic fixtures.
 
-Next: apply/commit, then qualify one composed MCD run using the existing snapshot
-offline, a new run ID, the same 2016-09-29/2026-09-29 window and a seven-day
-action-age policy while still fresh. Bind the short handoff to the applied SHA;
-confirmed paths and checksums are in the owning document. Return only both
-redacted reports, final completion and SQLite integrity lines. Do not rerun Yahoo
-or read/share private values here. EODHD remains paused; total return, broad
-action refresh, portfolio cash accounting and scheduling are separate work.
+Next operational step: apply/commit this documentation package and return the
+applied SHA; do not repeat the completed MCD run. Next development: audit the
+smallest generic composition of existing weekly refresh, stored-quality checks
+and raw-indicator projection, so the operator need not chain long scripts.
+Retain explicit end/budget, checkpoint resume, failure isolation and evidence
+bindings. No weekly execution or scheduler is enabled by this result. Phase 7
+remains open; EODHD stays paused. Total return, broad action refresh, portfolio
+cash accounting and private-value sharing remain separate decisions.
 
 All older handoffs and next-action statements below are historical. This section
 supersedes the EODHD and source-selection gates; their technical observations and
