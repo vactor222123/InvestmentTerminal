@@ -1,5 +1,14 @@
 # Investment Terminal — Software Architecture
 
+`portfolio_split_diagnose` is a separate CLI composition over the existing
+portfolio planner and action collector. It verifies a stopped report, its
+checksum-bound private selection and original CSV before selecting one failed
+provider request. A one-invocation probe uses a client-layer typed error
+classifier; no message matching, provider retry loop or new downloader is added.
+Collection continues to own snapshot validation/storage. The diagnostic owns
+only new report/asset names and coordinates with the portfolio directory lock.
+No domain imports CLI and no batch checkpoint, ledger or SQLite mutation occurs.
+
 Portfolio action collection has a shared read-only preflight seam selected by
 `--preflight-only`. It stops before directory creation, cooperative lock creation,
 collector invocation and output writers. Fixed typed preflight errors are

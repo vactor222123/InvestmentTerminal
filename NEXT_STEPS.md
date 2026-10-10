@@ -1,6 +1,26 @@
 # Investment Terminal — Next Steps
 
-## Current next step — diagnose the collection preflight, offline
+## Current next step — one checksum-bound provider diagnostic
+
+Preflight is resolved: the measured instrument count was 12, and budget 12
+returned READY. Do not repeat the budget diagnosis. Collection then stopped on
+one `PROVIDER_REQUEST`, leaving 11 pending and no successful observations.
+The exact original request failure remains unknown because its exception was
+not persisted. The new single-request diagnostic is implemented.
+
+After package application, return the applied SHA. Run `portfolio_split_diagnose`
+against `portfolio_split_collection_20261007_163405_454b8eb5.json`, pinned to
+`52fc890cf9c6264dcea9e742f2573354e1ee2026ec8b4f0caae868feadde46f5`.
+The private selection and unchanged CSV are discovered through this existing
+report's bindings, not by guessing a ticker or rerunning all instruments.
+Use a new diagnostic output name and preserve every previous artifact.
+Send only the new redacted report and exit code, even if FAILED.
+
+No live diagnostic has been run here. Its outcome will select the next remedy;
+do not infer delisting, raise budgets, tune retries, or resume the batch now.
+See `docs/PHASE_7_SPLIT_PROVIDER_DIAGNOSTIC.md`.
+
+## Historical next step — diagnose the collection preflight, offline
 
 The user's first runtime attempt stopped at `PREFLIGHT` with exit 1 and no
 aggregate report. The concrete cause remains unknown. Apply the diagnostic

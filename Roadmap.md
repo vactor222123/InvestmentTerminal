@@ -2,6 +2,12 @@
 
 ## Active product direction — Yahoo corporate actions
 
+Latest gate: preflight passed with the measured budget 12, but collection stopped
+on the first provider request. A separate checksum-bound, one-invocation provider
+diagnostic is implemented; the next operational run measures this failure without
+resuming the other 11 items. Source/broker mapping and production split closure
+remain unverified. See `docs/PHASE_7_SPLIT_PROVIDER_DIAGNOSTIC.md`.
+
 Current operational gate: diagnose the returned generic collection preflight
 failure with the new read-only `--preflight-only` mode. Specific categories and
 safe counts are implemented; the user's actual cause is not yet measured. Keep

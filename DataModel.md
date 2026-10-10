@@ -1,5 +1,18 @@
 # Investment Terminal — Data Model
 
+`PORTFOLIO_SPLIT_PROVIDER_DIAGNOSTIC` schema 1 is a new redacted report, not a
+migration of collection schemas. It binds the original collection report,
+private selection and CSV hashes, new private stage-report/snapshot hashes,
+one provider invocation count, status (`COLLECTED` or `FAILED`), nullable fixed
+failure category/phase, limitations and `adjustment_performed=false`.
+It omits identity, values, paths and exception messages. Categories identify
+typed rate limit, timeout, missing price/timezone, TLS/connection/HTTP/transport
+errors or unknown provider error. Phase distinguishes client setup from combined
+history/metadata; validation/storage failures are separately labelled.
+A null snapshot hash does not prove no partial file exists. New observations
+do not retrospectively establish the cause of the original failure. Existing
+collection and private-index schemas are unchanged.
+
 `PORTFOLIO_SPLIT_PREFLIGHT` schema 1 is console-only diagnostic output on the
 `PREFLIGHT_RESULT: ` line; it is not a persisted collection report. Fields are
 `status` (`FAILED`, `READY`, `READY_WITH_BLOCKERS`), nullable fixed

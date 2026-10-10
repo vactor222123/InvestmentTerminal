@@ -21,6 +21,11 @@ The system prioritizes:
 
 ## Continuing Development
 
+`python -B -m investment_terminal.cli.portfolio_split_diagnose --help` describes
+one checksum-bound diagnostic replay of a failed action request. It retains new
+evidence without resuming the batch or changing holdings; send only its redacted
+report. See [provider diagnostic](docs/PHASE_7_SPLIT_PROVIDER_DIAGNOSTIC.md).
+
 For collection startup diagnosis, add `--preflight-only` to
 `python -B -m investment_terminal.cli.portfolio_split_collect` with the usual
 arguments. It prints a safe diagnosis without provider requests or runtime writes;

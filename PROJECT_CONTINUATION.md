@@ -1,6 +1,34 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — read-only collection preflight diagnostics
+## Current handoff — one bound provider diagnostic implemented
+
+Fresh clean `develop`: `311b1e3b64350e40ea115472b8bb08ff56dc8476`.
+Classification: `IMPLEMENTATION`. User preflight measured 12 instruments against
+budget 10; budget 12 then returned `READY`, one valid CSV and no blocked items.
+The subsequent collection report returned `STOPPED`, one `PROVIDER_REQUEST`,
+11 pending, zero successful observations and exit 1. Its exact SHA-256 is
+`52fc890cf9c6264dcea9e742f2573354e1ee2026ec8b4f0caae868feadde46f5`.
+The original typed exception was not retained; do not infer its cause.
+
+New `portfolio_split_diagnose` pins that report, its private selection and CSV,
+rebuilds the original request plan and selects exactly the failed provider item.
+It performs at most one application history/metadata invocation, classifies only
+known exception types/status codes, and retains successful evidence in a new
+private snapshot. Existing batch/index/report contracts and all old files stay
+unchanged. No live request or private runtime read was performed by the agent.
+See `docs/PHASE_7_SPLIT_PROVIDER_DIAGNOSTIC.md`.
+
+Focused: 202 passed (32 new cases), one pytest cache-access warning. Full:
+3,685 passed, 4 skipped; existing Starlette and pytest cache-access warnings.
+No test failures. `git diff --check`: clean. Test roots/caches are excluded.
+
+Next: apply/commit and return the applied SHA. Then execute one checksum-bound
+diagnostic against the returned report, not the 12-item batch. Send only the new
+redacted diagnostic report and exit code. A new success/failure is a new
+observation, not proof of the earlier cause, verified broker mapping or split
+stage closure. Automatic batch resume remains disabled. Older gates are historical.
+
+## Historical handoff — read-only collection preflight diagnostics
 
 Fresh clean `develop`: `c3864d552a166fbdb024a12fe1853cee4eb3f587`.
 Classification: `IMPLEMENTATION`. The user-run collection returned generic
