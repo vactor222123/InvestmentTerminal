@@ -1,5 +1,14 @@
 # Investment Terminal — Product Roadmap
 
+## Latest operational gate — bound symbol resolution
+
+The returned diagnostic observed TIMEZONE_MISSING. A generic one-item ISIN search
+and exact existing-ticker resolution composition is implemented; live qualification
+is next. It preserves evidence and does not resume the portfolio batch or certify
+broker mapping. Production split adjustment remains open, including source price
+basis and operational qualification. Older gates below are historical.
+See `docs/PHASE_7_SPLIT_SYMBOL_RESOLUTION.md`.
+
 ## Active product direction — Yahoo corporate actions
 
 Latest gate: preflight passed with the measured budget 12, but collection stopped

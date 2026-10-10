@@ -1,6 +1,26 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — one bound provider diagnostic implemented
+## Current handoff — bound ISIN/ticker candidate resolution
+
+Fresh clean develop baseline: `0fa9e6d72adc8fd1fba2943896cfb415f0bd2b16`.
+Classification: IMPLEMENTATION. The returned single-item diagnostic observed
+TIMEZONE_MISSING in HISTORY_OR_METADATA, with one invocation and no snapshot.
+This does not prove delisting or establish the original failure's cause.
+
+New `portfolio_split_resolve` reuses existing ISIN search and exact ticker matching,
+bound to that diagnostic, original stopped report, private selection and unchanged
+CSV. At most one search and one conditional action invocation; no guessed listing,
+batch resume, trade edit or SQLite write. Successful evidence remains a separate
+UNVERIFIED_BROKER_MAPPING candidate. See `docs/PHASE_7_SPLIT_SYMBOL_RESOLUTION.md`.
+
+Next: apply this package, return the applied SHA, then run the bounded resolver.
+Send only its redacted report and exit code, including a blocked/failed result.
+No live request or private runtime input inspection occurred during implementation.
+Verification: focused 217 passed; full 3713 passed, 4 skipped, one existing
+Starlette deprecation warning. git diff --check clean; 28 new failure/success tests.
+Earlier current-gate text below is historical.
+
+## Historical handoff — one bound provider diagnostic implemented
 
 Fresh clean `develop`: `311b1e3b64350e40ea115472b8bb08ff56dc8476`.
 Classification: `IMPLEMENTATION`. User preflight measured 12 instruments against

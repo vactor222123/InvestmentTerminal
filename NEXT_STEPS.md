@@ -1,6 +1,23 @@
 # Investment Terminal — Next Steps
 
-## Current next step — one checksum-bound provider diagnostic
+## Current next step — resolve the same failed candidate
+
+The returned diagnostic measured TIMEZONE_MISSING, not a confirmed delisting.
+After applying this package, return the applied SHA. Run
+`portfolio_split_resolve` with the original collection report and private snapshot
+directory, the returned diagnostic and its exact SHA-256:
+`df4510f3ac6636746903e01c6c1877c9c60e9e3d24c67c845625c34100332363`.
+Use a fresh report output and separate explicit cache directory.
+
+The resolver discovers the original CSV through existing checksum bindings.
+It searches its ISIN once, requires a unique exact existing exchange ticker, and
+conditionally collects actions once. Missing or ambiguous identity is a blocker,
+not permission to guess a ticker or manually invent market data.
+Send only the redacted report and exit code. Do not resume all 12 instruments,
+promote the candidate, or adjust holdings yet.
+See `docs/PHASE_7_SPLIT_SYMBOL_RESOLUTION.md`.
+
+## Historical next step — one checksum-bound provider diagnostic
 
 Preflight is resolved: the measured instrument count was 12, and budget 12
 returned READY. Do not repeat the budget diagnosis. Collection then stopped on

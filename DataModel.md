@@ -1,5 +1,17 @@
 # Investment Terminal — Data Model
 
+Two additive schema-1 operations support bound symbol resolution:
+`PORTFOLIO_SPLIT_SYMBOL_RESOLUTION` (private) and
+`PORTFOLIO_SPLIT_SYMBOL_RESOLUTION_REPORT` (redacted). Status is
+RESOLVED_CANDIDATE, BLOCKED or FAILED. Private evidence retains original instrument,
+request, search candidates, exact match and optional separate action snapshot.
+The report binds diagnostic/collection/selection/CSV/private/stage/snapshot hashes;
+records nullable fixed failure category, search failure category, invocation counts,
+candidate/exact-match counts and nullable provider_symbol_changed; retains
+UNVERIFIED_BROKER_MAPPING and adjustment_performed=false.
+Unknown counts/hashes remain null. Exit/result checks are required because a late
+verification failure can leave artifacts. Existing contracts remain unchanged.
+
 `PORTFOLIO_SPLIT_PROVIDER_DIAGNOSTIC` schema 1 is a new redacted report, not a
 migration of collection schemas. It binds the original collection report,
 private selection and CSV hashes, new private stage-report/snapshot hashes,

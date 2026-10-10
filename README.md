@@ -21,6 +21,11 @@ The system prioritizes:
 
 ## Continuing Development
 
+`python -B -m investment_terminal.cli.portfolio_split_resolve --help` describes
+one bound ISIN search and conditional action collection using an exact existing
+ticker. It does not change holdings or resume the batch. See
+[symbol resolution](docs/PHASE_7_SPLIT_SYMBOL_RESOLUTION.md).
+
 `python -B -m investment_terminal.cli.portfolio_split_diagnose --help` describes
 one checksum-bound diagnostic replay of a failed action request. It retains new
 evidence without resuming the batch or changing holdings; send only its redacted

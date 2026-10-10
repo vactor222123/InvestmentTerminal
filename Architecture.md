@@ -1,5 +1,12 @@
 # Investment Terminal — Software Architecture
 
+`portfolio_split_resolve` is an additive CLI composition, reusing the bound
+diagnostic planner, existing ISIN search/exact ticker services and action collector.
+It permits one search plus at most one history/metadata invocation, preserving the
+original request window. Cooperative locks, input checksum rechecks and atomic
+output readbacks protect evidence handoff. No new downloader, fuzzy identity
+authority, domain dependency, SQLite mutation or automatic batch promotion.
+
 `portfolio_split_diagnose` is a separate CLI composition over the existing
 portfolio planner and action collector. It verifies a stopped report, its
 checksum-bound private selection and original CSV before selecting one failed
