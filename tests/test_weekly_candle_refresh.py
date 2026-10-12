@@ -314,6 +314,8 @@ def test_cli_writes_private_checkpoint_and_redacted_report(tmp_path):
     assert set(json.loads(checkpoint_path.read_text(encoding="utf-8"))["outcomes"]) == {
         symbol for symbol, _ in plan.items
     }
+    # Each invocation needs a fresh report; the checkpoint is still resumable.
+    args[args.index(str(report_path))] = str(tmp_path / "repeat-report.json")
     assert main(args, client=client, clock=lambda: END) == 0
     assert len(client.calls) == 2
 

@@ -1,5 +1,13 @@
 # InvestmentTerminal: аудит 2026-10-12
 
+## Follow-up status
+
+A01/A04/A05: implemented after this audit, from baseline
+`52a9430e6d35e7b350d72d6969337dbf4b9bd987`; see `CANDLE_WRITE_SAFETY.md`.
+Local regression evidence only, not verification or repair of private runtime data.
+The original findings below remain the historical baseline evidence; other items
+remain open, including A02/A03. The old characterization script is baseline-specific.
+
 ## Висновок і межі доказів
 
 Baseline: `53fd2be0153d4842023a16d2286b41b83c971fa7`, fresh clone `develop`.

@@ -21,7 +21,8 @@ the exclusive end. A gap over 90 days is reported as `WINDOW_TOO_LARGE`, not
 silently skipped. Returned candles must match symbol, resolution, currency,
 and time window; overlap value drift is reported as `STORED_CANDLE_DRIFT`
 without overwriting SQLite. Valid new rows use existing atomic
-`CandleRepository.save_many` insert-or-ignore persistence. The private
+`CandleRepository.save_many` conflict-aware persistence: only exact payload
+repeats are duplicates, and any write/commit failure rolls back the batch. The private
 checkpoint is atomically replaced after each series. A failed write is surfaced;
 if a process dies after SQLite commit but before checkpoint write, rerun is
 idempotent on existing rows. A Yahoo rate limit halts; other per-series failures
@@ -41,3 +42,8 @@ checkpoints, and SQLite path on the user's machine; do not invent them. Run a
 one-item qualification, inspect the redacted report and SQLite integrity,
 then run a bounded full drain and repeat-idempotency check. Compare real
 session coverage separately before claiming a complete analytical universe.
+
+Safety update: each direct CLI invocation now requires a fresh report path,
+including repeats using the same checkpoint. Unsafe paths return a fixed stderr
+error without writing a failure report. See `CANDLE_WRITE_SAFETY.md` for guards,
+transaction ownership and the remaining concurrency boundary.

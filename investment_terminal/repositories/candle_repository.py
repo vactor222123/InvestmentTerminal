@@ -2,6 +2,7 @@
 SQLite repository for historical market candles.
 """
 
+from contextlib import contextmanager
 from datetime import datetime
 from math import isfinite
 from numbers import Real
@@ -12,6 +13,10 @@ from investment_terminal.models.candle import Candle
 from investment_terminal.repositories.base_repository import (
     BaseRepository,
 )
+
+
+class CandleConflictError(sqlite3.IntegrityError):
+    """An existing candle key has a different persisted payload."""
 
 
 class CandleRepository(BaseRepository):
@@ -32,41 +37,14 @@ class CandleRepository(BaseRepository):
         """
         Save one candle and return its database ID.
 
-        If the candle already exists, return the existing ID.
+        Exact repeats return the existing ID; changed payloads fail closed.
         """
         self._validate_candle(model)
 
-        try:
-            cursor = self.database.connection.execute(
-                """
-                INSERT INTO candles (
-                    symbol,
-                    resolution,
-                    timestamp,
-                    open_price,
-                    high_price,
-                    low_price,
-                    close_price,
-                    volume,
-                    currency
-                )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                self._candle_values(model),
-            )
-            self.database.connection.commit()
-
-            return int(cursor.lastrowid)
-
-        except sqlite3.IntegrityError:
-            existing_id = self._get_existing_id(
-                model
-            )
-
-            if existing_id is None:
-                raise
-
-            return existing_id
+        values = self._candle_values(model)
+        with self._write_transaction():
+            candle_id, _ = self._save_values(values)
+        return candle_id
 
     def save_many(
         self,
@@ -75,7 +53,7 @@ class CandleRepository(BaseRepository):
         """
         Save multiple candles in one transaction.
 
-        Existing duplicate candles are ignored.
+        Only exact duplicates are ignored; conflicts roll back the entire batch.
 
         Returns the number of newly inserted rows.
         """
@@ -90,30 +68,50 @@ class CandleRepository(BaseRepository):
         for candle in candles:
             self._validate_candle(candle)
 
-        cursor = self.database.connection.executemany(
+        values = [self._candle_values(candle) for candle in candles]
+        inserted = 0
+        with self._write_transaction():
+            for value in values:
+                _, was_inserted = self._save_values(value)
+                inserted += was_inserted
+        return inserted
+
+    @contextmanager
+    def _write_transaction(self):
+        """Own one transaction; never commit or roll back a caller's work."""
+        connection = self.database.connection
+        if connection.in_transaction:
+            raise RuntimeError("Candle writes require an idle connection")
+        with connection:
+            # Serialize conflict checks with writes, including exact replays.
+            connection.execute("BEGIN IMMEDIATE")
+            yield
+
+    def _save_values(self, values: tuple[object, ...]) -> tuple[int, int]:
+        cursor = self.database.connection.execute(
             """
-            INSERT OR IGNORE INTO candles (
-                symbol,
-                resolution,
-                timestamp,
-                open_price,
-                high_price,
-                low_price,
-                close_price,
-                volume,
-                currency
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO candles (
+                symbol, resolution, timestamp, open_price, high_price,
+                low_price, close_price, volume, currency
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(symbol, resolution, timestamp) DO NOTHING
             """,
-            [
-                self._candle_values(candle)
-                for candle in candles
-            ],
+            values,
         )
-
-        self.database.connection.commit()
-
-        return cursor.rowcount
+        if cursor.rowcount == 1:
+            return int(cursor.lastrowid), 1
+        row = self.database.connection.execute(
+            """
+            SELECT id, open_price, high_price, low_price, close_price, volume, currency
+            FROM candles WHERE symbol = ? AND resolution = ? AND timestamp = ?
+            """,
+            values[:3],
+        ).fetchone()
+        if row is None:
+            raise sqlite3.IntegrityError("Candle insert did not persist a row")
+        if tuple(row)[1:] != values[3:]:
+            raise CandleConflictError("Existing candle payload conflicts with input")
+        return int(row["id"]), 0
 
     def get(
         self,
@@ -390,30 +388,6 @@ class CandleRepository(BaseRepository):
         return int(
             row["candle_count"]
         )
-
-    def _get_existing_id(
-        self,
-        candle: Candle,
-    ) -> int | None:
-        row = self.database.connection.execute(
-            """
-            SELECT id
-            FROM candles
-            WHERE symbol = ?
-              AND resolution = ?
-              AND timestamp = ?
-            """,
-            (
-                candle.symbol.strip().upper(),
-                candle.resolution.strip().upper(),
-                candle.timestamp.isoformat(),
-            ),
-        ).fetchone()
-
-        if row is None:
-            return None
-
-        return int(row["id"])
 
     @staticmethod
     def _candle_values(

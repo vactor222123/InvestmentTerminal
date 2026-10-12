@@ -1,6 +1,19 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — repository-wide audit, 2026-10-12
+## Current handoff — candle write safety
+
+IMPLEMENTATION from exact fresh clean develop
+`52a9430e6d35e7b350d72d6969337dbf4b9bd987`.
+Audit A01/A04/A05 are repaired at the tested code boundary: exact-only duplicates,
+atomic failed writes/commits, caller transaction ownership and guarded weekly
+failure-report outputs. Each direct invocation needs a fresh report path.
+See `docs/CANDLE_WRITE_SAFETY.md`. Focused 118 passed; full 3764 passed, 4 skipped,
+one existing warning; diff-check clean. 51 new regression cases.
+No private data/provider work or schema migration. Other audit findings remain open.
+Next: apply and return SHA, then address A02/A03 UTC/unit contracts and migration
+implications. No live collection is needed now. Older gates below are historical.
+
+## Historical handoff — repository-wide audit, 2026-10-12
 
 Classification: AUDIT. Exact fresh-clone baseline:
 `53fd2be0153d4842023a16d2286b41b83c971fa7`.

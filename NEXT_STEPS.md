@@ -1,6 +1,15 @@
 # Investment Terminal — Next Steps
 
-## Current next step — audit-led data safety
+## Current next step — UTC and unit safety contract
+
+A01/A04/A05 implementation is complete with local synthetic regression evidence;
+see `docs/CANDLE_WRITE_SAFETY.md`. Apply the package and return the applied SHA.
+Next inspect A02/A03 consumers and existing storage-format compatibility before
+changing timestamp or unit normalization. Do not migrate private rows, launch
+provider collection, or claim full audit closure. The existing complete-read,
+exact-baseline, one-commit and no-push rules remain unchanged.
+
+## Historical next step — audit-led data safety
 
 Audit baseline: `53fd2be0153d4842023a16d2286b41b83c971fa7`.
 Read `docs/INVESTMENT_TERMINAL_AUDIT_2026_10_12.md` and

@@ -1,5 +1,15 @@
 # Investment Terminal — Software Architecture
 
+## Candle write safety boundary
+
+`CandleRepository.save` / nonempty `save_many` own an explicit transaction on an
+idle Database connection; caller-owned transactions are rejected without mutation.
+Only equal persisted payloads are idempotent duplicates. Conflicts and write/commit
+failures roll back the operation. CLI path guards apply before all weekly writers,
+including failure reports. No domain-to-CLI dependency or schema change is added.
+See `docs/CANDLE_WRITE_SAFETY.md`; UTC/unit migration and shared runtime locks remain
+separate work.
+
 `portfolio_split_resolve` is an additive CLI composition, reusing the bound
 diagnostic planner, existing ISIN search/exact ticker services and action collector.
 It permits one search plus at most one history/metadata invocation, preserving the

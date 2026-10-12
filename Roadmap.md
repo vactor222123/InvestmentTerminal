@@ -1,6 +1,14 @@
 # Investment Terminal — Product Roadmap
 
-## Latest gate — repository audit and data safety
+## Latest gate — A01/A04/A05 write safety implemented
+
+Exact-only duplicate handling, atomic repository writes and safe weekly output
+paths are implemented and locally regression-tested; no live data qualification
+or migration is claimed. See `docs/CANDLE_WRITE_SAFETY.md`.
+Next: A02/A03 UTC/unit contracts and compatibility, followed by the remaining
+audit priorities. The full 24-point audit and process-efficiency plan remain active.
+
+## Historical gate — repository audit and data safety
 
 2026-10-12 AUDIT at `53fd2be0153d4842023a16d2286b41b83c971fa7`:
 five synthetic defects and 24 prioritized findings documented in

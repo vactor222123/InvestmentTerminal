@@ -4,6 +4,7 @@ import argparse
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+import sys
 
 from investment_terminal.clients.yahoo_finance_client import YahooFinanceClient
 from investment_terminal.database.database import Database
@@ -13,6 +14,38 @@ from investment_terminal.operations.weekly_candle_refresh import (
 )
 from investment_terminal.repositories.candle_repository import CandleRepository
 from investment_terminal.utils.atomic_write import write_json_atomic
+
+
+def _validate_output_paths(options):
+    """Fail before every write if a destination can replace input evidence."""
+    files = [options.manifest, options.weekly_checkpoint, options.database,
+             options.report_output]
+    sidecars = [Path(str(options.database.resolve()) + suffix)
+                for suffix in ("-wal", "-shm", "-journal")]
+    protected = files + sidecars
+    for index, first in enumerate(protected):
+        for second in protected[index + 1:]:
+            if first.resolve() == second.resolve() or (
+                first.exists() and second.exists() and first.samefile(second)
+            ):
+                raise ValueError("Input and output paths must be distinct")
+    source = options.source_checkpoint_directory.resolve()
+    cache = options.cache_directory.resolve()
+    if source.is_relative_to(cache) or cache.is_relative_to(source):
+        raise ValueError("Cache must be separate from source checkpoints")
+    for directory in (options.source_checkpoint_directory, options.cache_directory):
+        if directory.exists() and not directory.is_dir():
+            raise ValueError("Directory path must not identify a file")
+    for path in files:
+        if path.resolve().is_relative_to(cache):
+            raise ValueError("Cache must be separate from input and output files")
+    for output in (options.weekly_checkpoint, options.report_output):
+        if output.resolve().is_relative_to(source):
+            raise ValueError("Weekly outputs must not overwrite source checkpoints")
+        if output.is_symlink() or (output.exists() and not output.is_file()):
+            raise ValueError("Output must be a regular file path")
+    if options.report_output.exists():
+        raise FileExistsError("Report destination already exists")
 
 
 def main(argv=None, *, client=None, clock=None, writer=write_json_atomic) -> int:
@@ -29,22 +62,20 @@ def main(argv=None, *, client=None, clock=None, writer=write_json_atomic) -> int
     parser.add_argument("--retry-rate-limited", action="store_true")
     parser.add_argument("--json", action="store_true")
     options = parser.parse_args(argv)
+    try:
+        _validate_output_paths(options)
+    except Exception:
+        print("Unsafe weekly paths; no report written; preserve inputs", file=sys.stderr)
+        return 1
+
+    def guarded_writer(path, payload):
+        _validate_output_paths(options)
+        return writer(path, payload)
+
     runtime_clock = clock or (lambda: datetime.now(timezone.utc))
     database = None
     plan = None
     try:
-        paths = [
-            options.manifest, options.weekly_checkpoint, options.database,
-            options.report_output,
-        ]
-        if len({path.resolve() for path in paths}) != len(paths):
-            raise ValueError("Input and output paths must be distinct")
-        source_directory = options.source_checkpoint_directory.resolve()
-        if any(
-            output.resolve().is_relative_to(source_directory)
-            for output in (options.weekly_checkpoint, options.report_output)
-        ):
-            raise ValueError("Weekly outputs must not overwrite source checkpoints")
         if not options.database.is_file():
             raise ValueError("Existing candle database is required")
         manifest = json.loads(options.manifest.read_text(encoding="utf-8"))
@@ -65,7 +96,7 @@ def main(argv=None, *, client=None, clock=None, writer=write_json_atomic) -> int
         service = WeeklyCandleRefreshService(
             client=client or YahooFinanceClient(cache_directory=options.cache_directory),
             repository=CandleRepository(database),
-            checkpoint_writer=lambda payload: writer(options.weekly_checkpoint, payload),
+            checkpoint_writer=lambda payload: guarded_writer(options.weekly_checkpoint, payload),
             clock=runtime_clock,
         )
         payload = service.run(
@@ -99,7 +130,12 @@ def main(argv=None, *, client=None, clock=None, writer=write_json_atomic) -> int
     finally:
         if database is not None:
             database.close()
-    writer(options.report_output, payload)
+    try:
+        guarded_writer(options.report_output, payload)
+    except Exception:
+        print("Weekly report write failed; preserve outputs; do not rerun blindly",
+              file=sys.stderr)
+        return 1
     if options.json:
         print(json.dumps(payload, indent=2, allow_nan=False))
     return 0 if payload["status"] in {"COMPLETE", "BUDGET_EXHAUSTED"} else 1

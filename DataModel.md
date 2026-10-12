@@ -1,5 +1,15 @@
 # Investment Terminal — Data Model
 
+## Candle duplicate contract
+
+The current `(symbol, resolution, timestamp)` storage key and JSON schemas remain
+unchanged. Duplicate success requires equal persisted open/high/low/close/volume
+and currency; differing payloads raise `CandleConflictError` and roll back all new
+rows in that save operation. No replacement/revision is implicit. Existing
+timestamp/currency normalization is unchanged pending audit A02/A03 work.
+Direct weekly runs require a new report destination; unsafe destinations emit no
+JSON file. See `docs/CANDLE_WRITE_SAFETY.md` for the scope and failure semantics.
+
 Two additive schema-1 operations support bound symbol resolution:
 `PORTFOLIO_SPLIT_SYMBOL_RESOLUTION` (private) and
 `PORTFOLIO_SPLIT_SYMBOL_RESOLUTION_REPORT` (redacted). Status is
