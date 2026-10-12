@@ -1,6 +1,16 @@
 # Investment Terminal — Product Roadmap
 
-## Latest operational gate — bound symbol resolution
+## Latest gate — repository audit and data safety
+
+2026-10-12 AUDIT at `53fd2be0153d4842023a16d2286b41b83c971fa7`:
+five synthetic defects and 24 prioritized findings documented in
+`docs/INVESTMENT_TERMINAL_AUDIT_2026_10_12.md`.
+Prioritize safe outputs/atomic conflict-aware storage, then time/unit/provenance,
+backup and end-to-end weekly workflow, then identity/split-aware valuation.
+No production repair or operational qualification is claimed by this audit.
+Process simplification proposal: `docs/DEVELOPMENT_EFFICIENCY_PLAN.md`.
+
+## Historical operational gate — bound symbol resolution
 
 The returned diagnostic observed TIMEZONE_MISSING. A generic one-item ISIN search
 and exact existing-ticker resolution composition is implemented; live qualification

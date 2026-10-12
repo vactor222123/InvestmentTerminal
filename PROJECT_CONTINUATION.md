@@ -1,6 +1,21 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — bound ISIN/ticker candidate resolution
+## Current handoff — repository-wide audit, 2026-10-12
+
+Classification: AUDIT. Exact fresh-clone baseline:
+`53fd2be0153d4842023a16d2286b41b83c971fa7`.
+See `docs/INVESTMENT_TERMINAL_AUDIT_2026_10_12.md` for 24 prioritized findings
+and `docs/DEVELOPMENT_EFFICIENCY_PLAN.md` for the proposed delivery changes.
+Five synthetic defects reproduced: silent candle conflict, noncanonical timestamp,
+minor-unit loss, failed-batch transaction leakage and unsafe failure-report output.
+Focused: 222 passed. Full: 3713 passed, 4 skipped, one existing warning.
+No production code, private inputs, provider requests or live database changed.
+The resolver remains blocked; an unfinished draft in another clone is not delivered.
+Next: apply the audit, then prioritize A05/A01/A04 with regression tests; do not
+resume provider collection merely to bypass the identity blocker. Existing full-read
+and one-commit/no-push rules remain in force. All older current gates are historical.
+
+## Historical handoff — bound ISIN/ticker candidate resolution
 
 Fresh clean develop baseline: `0fa9e6d72adc8fd1fba2943896cfb415f0bd2b16`.
 Classification: IMPLEMENTATION. The returned single-item diagnostic observed

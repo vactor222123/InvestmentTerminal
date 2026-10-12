@@ -1,6 +1,19 @@
 # Investment Terminal — Next Steps
 
-## Current next step — resolve the same failed candidate
+## Current next step — audit-led data safety
+
+Audit baseline: `53fd2be0153d4842023a16d2286b41b83c971fa7`.
+Read `docs/INVESTMENT_TERMINAL_AUDIT_2026_10_12.md` and
+`docs/DEVELOPMENT_EFFICIENCY_PLAN.md`.
+After applying this documentation package, return the applied SHA. The next
+implementation should address A05 (safe failure-report output) and A01/A04
+(conflict-aware atomic persistence), bounded by focused failure tests and full pytest.
+Do not launch a live run or modify private data for this audit. Identity resolution
+and split-aware valuation remain unfinished, not certified by green unit tests.
+Token-saving routing changes are proposals; existing mandatory reads still apply.
+All earlier next-step gates below are historical.
+
+## Historical next step — resolve the same failed candidate
 
 The returned diagnostic measured TIMEZONE_MISSING, not a confirmed delisting.
 After applying this package, return the applied SHA. Run
