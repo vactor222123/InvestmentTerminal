@@ -1,5 +1,13 @@
 # Investment Terminal — Data Model
 
+## Open timestamp/unit compatibility findings
+
+Current candle TEXT timestamps are not guaranteed canonical UTC and currency
+labels do not retain source-unit conversion evidence. Equivalent offset request
+dates also remain distinct checksum inputs. Do not reinterpret old rows or
+rewrite manifests. `docs/CANDLE_TIME_UNIT_COMPATIBILITY.md` records the audit;
+its proposed UTC/unit contracts are not yet implemented or schema migrations.
+
 ## Candle duplicate contract
 
 The current `(symbol, resolution, timestamp)` storage key and JSON schemas remain

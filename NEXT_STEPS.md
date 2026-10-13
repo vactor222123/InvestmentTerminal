@@ -1,6 +1,17 @@
 # Investment Terminal — Next Steps
 
-## Current next step — UTC and unit safety contract
+## Current next step — implement UTC safety with legacy-storage guard
+
+The A02/A03 compatibility audit is complete, not the fixes. Read
+`docs/CANDLE_TIME_UNIT_COMPATIBILITY.md` and its executable probes.
+After applying and returning SHA, implement aware UTC candle keys/query bounds
+and naive-source rejection with fail-closed handling of incompatible old rows.
+Preserve request/checkpoint checksums; test offset replays, conflicts, rollback,
+fractional seconds and legacy data. Do not auto-migrate or inspect private data.
+A03 follows at the source-unit boundary, including old successful metadata
+checkpoints; no guessed scaling or manual price entry. No operational run now.
+
+## Historical next step — UTC and unit safety contract
 
 A01/A04/A05 implementation is complete with local synthetic regression evidence;
 see `docs/CANDLE_WRITE_SAFETY.md`. Apply the package and return the applied SHA.

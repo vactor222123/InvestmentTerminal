@@ -1,5 +1,13 @@
 # Investment Terminal — Software Architecture
 
+## UTC/unit compatibility boundary (audit, not implemented)
+
+Storage/query normalization must not rewrite checksum-bound operational requests.
+Unit validation must precede metadata uppercasing, not only repository insertion.
+Existing data requires an explicit compatibility gate before canonical writes;
+no implicit migration or guessed price rescaling. See
+`docs/CANDLE_TIME_UNIT_COMPATIBILITY.md` for evidence and the implementation gate.
+
 ## Candle write safety boundary
 
 `CandleRepository.save` / nonempty `save_many` own an explicit transaction on an

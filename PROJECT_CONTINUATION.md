@@ -1,6 +1,21 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — candle write safety
+## Current handoff — A02/A03 compatibility audit
+
+AUDIT at fresh clean develop `67362b6e1cd790858403a28d794f8a4955899835`.
+See `docs/CANDLE_TIME_UNIT_COMPATIBILITY.md`: offset keys bypass duplicate/conflict
+checks, text queries misorder time, naive source time is assumed UTC, and source
+unit spelling is lost upstream. Existing request checksums preserve offsets.
+Eight strict expected-failure probes expose OPEN defects; five controls pass.
+Focused: 74 passed, 8 xfailed (3.84 s). Full: 3769 passed, 4 skipped,
+8 xfailed (48.82 s), one existing Starlette warning. Explicit --runxfail:
+8 intended failures, 5 controls passed; causes inspected. Diff-check clean.
+No production fix, schema change, private inspection, provider call or migration.
+Next: apply and return SHA, then implement A02 storage/query UTC safety together
+with a fail-closed legacy-storage gate. A03 needs upstream unit evidence and old
+checkpoint handling; never infer or rescale old GBP prices. No live run now.
+
+## Historical handoff — candle write safety
 
 IMPLEMENTATION from exact fresh clean develop
 `52a9430e6d35e7b350d72d6969337dbf4b9bd987`.

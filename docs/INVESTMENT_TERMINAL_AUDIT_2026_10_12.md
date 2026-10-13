@@ -2,6 +2,11 @@
 
 ## Follow-up status
 
+A02/A03: compatibility audit completed at
+`67362b6e1cd790858403a28d794f8a4955899835`; see
+`CANDLE_TIME_UNIT_COMPATIBILITY.md`. Eight strict expected-failure acceptance
+probes expose still-open defects. No production fix or data migration yet.
+
 A01/A04/A05: implemented after this audit, from baseline
 `52a9430e6d35e7b350d72d6969337dbf4b9bd987`; see `CANDLE_WRITE_SAFETY.md`.
 Local regression evidence only, not verification or repair of private runtime data.

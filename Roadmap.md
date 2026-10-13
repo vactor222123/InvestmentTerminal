@@ -1,6 +1,14 @@
 # Investment Terminal — Product Roadmap
 
-## Latest gate — A01/A04/A05 write safety implemented
+## Latest gate — A02/A03 compatibility audit complete; fixes open
+
+Synthetic probes and consumer/checksum review are recorded in
+`docs/CANDLE_TIME_UNIT_COMPATIBILITY.md`. Next implement UTC storage/query safety
+with a legacy-storage gate; then preserve source-unit evidence upstream.
+No migration, provider work or live-data correctness claim. Eight strict xfails
+explicitly track known defects, not completed functionality.
+
+## Historical gate — A01/A04/A05 write safety implemented
 
 Exact-only duplicate handling, atomic repository writes and safe weekly output
 paths are implemented and locally regression-tested; no live data qualification
