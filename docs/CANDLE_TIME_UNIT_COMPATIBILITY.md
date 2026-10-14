@@ -1,5 +1,9 @@
 # Candle timestamp and unit compatibility audit
 
+Follow-up: A02 repository/provider implementation is recorded in
+`CANDLE_UTC_SAFETY.md`. Six probes below are now ordinary regression tests;
+the two A03 xfails remain open. This document preserves the audit baseline.
+
 Classification: AUDIT. Fresh clean `develop` baseline:
 `67362b6e1cd790858403a28d794f8a4955899835`.
 No production code, SQLite schema, JSON contract, private file or provider changed.

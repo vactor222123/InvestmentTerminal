@@ -40,7 +40,6 @@ def candle(timestamp=INSTANT, currency="USD", close=100):
                   close_price=close, volume=10, currency=currency)
 
 
-@pytest.mark.xfail(strict=True, reason="A02: equivalent instants use different TEXT keys")
 def test_same_instant_replay_has_one_id(repository):
     first = repository.save(candle())
     offset = INSTANT.astimezone(timezone(timedelta(hours=1)))
@@ -48,7 +47,6 @@ def test_same_instant_replay_has_one_id(repository):
     assert repository.count("SYNTH", "D") == 1
 
 
-@pytest.mark.xfail(strict=True, reason="A02: offset spelling bypasses payload conflict")
 def test_same_instant_changed_payload_rolls_back_batch(repository):
     repository.save(candle())
     offset = INSTANT.astimezone(timezone(timedelta(hours=1)))
@@ -57,21 +55,18 @@ def test_same_instant_changed_payload_rolls_back_batch(repository):
     assert repository.count("SYNTH", "D") == 1
 
 
-@pytest.mark.xfail(strict=True, reason="A02: naive persisted timestamp accepted")
 def test_naive_batch_rejected_without_partial_write(repository):
     with pytest.raises(ValueError):
         repository.save_many([candle(), candle(INSTANT.replace(tzinfo=None))])
     assert repository.count("SYNTH", "D") == 0
 
 
-@pytest.mark.xfail(strict=True, reason="A02: range bounds compare ISO text, not instants")
 def test_equivalent_offset_range_includes_utc_row(repository):
     repository.save(candle())
     bound = INSTANT.astimezone(timezone(timedelta(hours=1)))
     assert len(repository.get_range("SYNTH", "D", bound, bound)) == 1
 
 
-@pytest.mark.xfail(strict=True, reason="A02: mixed offset storage sorts lexically")
 def test_latest_uses_chronological_order(repository):
     earlier = (INSTANT - timedelta(minutes=30)).astimezone(timezone(timedelta(hours=2)))
     repository.save_many([candle(earlier), candle()])
@@ -79,7 +74,6 @@ def test_latest_uses_chronological_order(repository):
     assert repository.get_earliest("SYNTH", "D").timestamp == earlier
 
 
-@pytest.mark.xfail(strict=True, reason="A02: Yahoo assigns UTC to timezone-less source")
 def test_yahoo_naive_source_is_not_assumed_utc():
     frame = pd.DataFrame({"Open": [100], "High": [102], "Low": [98],
                           "Close": [100], "Volume": [10]},

@@ -25,6 +25,7 @@ from yfinance.exceptions import (
 
 from investment_terminal.models.candle import Candle
 from investment_terminal.utils.exceptions import APIError
+from investment_terminal.utils.validation import validate_aware_datetime
 
 
 class YahooCandleFailureCategory(str, Enum):
@@ -638,23 +639,19 @@ class YahooFinanceClient:
         """
         Convert pandas index values to UTC datetime.
         """
-        if isinstance(value, pd.Timestamp):
-            timestamp = value.to_pydatetime()
-        elif isinstance(value, datetime):
-            timestamp = value
-        else:
+        try:
+            if isinstance(value, pd.Timestamp):
+                if value.nanosecond:
+                    raise ValueError("Unsupported timestamp precision")
+                timestamp = value.to_pydatetime()
+            else:
+                timestamp = value
+            validate_aware_datetime(timestamp, field_name="candle timestamp")
+            return timestamp.astimezone(timezone.utc)
+        except (TypeError, ValueError, OverflowError):
             raise YahooCandleInvalidResponseError(
                 YahooCandleFailureCategory.RESPONSE_TIMESTAMP
-            )
-
-        if timestamp.tzinfo is None:
-            return timestamp.replace(
-                tzinfo=timezone.utc
-            )
-
-        return timestamp.astimezone(
-            timezone.utc
-        )
+            ) from None
 
     @staticmethod
     def _require_positive_number(

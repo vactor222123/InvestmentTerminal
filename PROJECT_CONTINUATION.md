@@ -1,6 +1,23 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — A02/A03 compatibility audit
+## Current handoff — UTC repository and provider safety implemented
+
+IMPLEMENTATION at fresh clean develop `f473834faa609db55aedf534881989f13afa5a92`.
+Aware input instants and query bounds now use canonical UTC. Equivalent-offset
+replays/conflicts share one key. Each affected stored series is validated before
+write/read; incompatible old timestamps stop without rewriting history. Reads
+share a SQLite snapshot with validation; writes retain atomic transaction ownership.
+Yahoo no longer guesses UTC for naive source timestamps or truncates nanoseconds.
+See `docs/CANDLE_UTC_SAFETY.md`. Six A02 probes now pass normally; A03 remains open.
+Focused: 253 passed, 2 xfailed (6.91 s). Final full: 3875 passed, 4 skipped,
+2 xfailed (39.23 s), one existing Starlette warning. Diff-check clean.
+100 new cases; the initial full run exposed one obsolete invalid-save fixture,
+now replaced by independent injected-consumer and raw legacy-storage checks.
+No private data/provider work, migration, JSON or request-checksum change.
+Next: apply and return SHA, then implement source-unit safety and legacy currency
+checkpoint handling. No live collection or automatic historical repair now.
+
+## Historical handoff — A02/A03 compatibility audit
 
 AUDIT at fresh clean develop `67362b6e1cd790858403a28d794f8a4955899835`.
 See `docs/CANDLE_TIME_UNIT_COMPATIBILITY.md`: offset keys bypass duplicate/conflict

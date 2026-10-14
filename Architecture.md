@@ -1,6 +1,15 @@
 # Investment Terminal — Software Architecture
 
-## UTC/unit compatibility boundary (audit, not implemented)
+## UTC repository boundary
+
+CandleRepository canonicalizes aware input instants and query bounds to UTC.
+Affected-series timestamp validation precedes writes inside BEGIN IMMEDIATE and
+shares a read snapshot with get/range/boundary queries. Incompatible legacy
+storage raises a sqlite-compatible typed error, never an implicit migration.
+Yahoo source timestamps must be aware and losslessly microsecond-representable.
+See `docs/CANDLE_UTC_SAFETY.md` for transaction and linear-scan costs.
+
+## UTC/unit compatibility boundary (audit history; units still open)
 
 Storage/query normalization must not rewrite checksum-bound operational requests.
 Unit validation must precede metadata uppercasing, not only repository insertion.

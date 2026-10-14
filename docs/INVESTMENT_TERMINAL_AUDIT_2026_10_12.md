@@ -2,6 +2,12 @@
 
 ## Follow-up status
 
+A02: repository/provider UTC safety implemented from
+`f473834faa609db55aedf534881989f13afa5a92`; see `CANDLE_UTC_SAFETY.md`.
+Six audit probes promoted to regressions. Incompatible legacy series fail closed;
+private corpus inspection/migration and direct-SQL consumer certification are not
+claimed. A03 and its two expected-failure probes remain open.
+
 A02/A03: compatibility audit completed at
 `67362b6e1cd790858403a28d794f8a4955899835`; see
 `CANDLE_TIME_UNIT_COMPATIBILITY.md`. Eight strict expected-failure acceptance

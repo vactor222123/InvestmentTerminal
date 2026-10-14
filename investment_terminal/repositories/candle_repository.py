@@ -3,7 +3,7 @@ SQLite repository for historical market candles.
 """
 
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from math import isfinite
 from numbers import Real
 import sqlite3
@@ -13,10 +13,15 @@ from investment_terminal.models.candle import Candle
 from investment_terminal.repositories.base_repository import (
     BaseRepository,
 )
+from investment_terminal.utils.validation import validate_aware_datetime
 
 
 class CandleConflictError(sqlite3.IntegrityError):
     """An existing candle key has a different persisted payload."""
+
+
+class CandleTimestampCompatibilityError(sqlite3.DatabaseError):
+    """Stored series requires explicit timestamp review; never auto-migrate."""
 
 
 class CandleRepository(BaseRepository):
@@ -43,6 +48,7 @@ class CandleRepository(BaseRepository):
 
         values = self._candle_values(model)
         with self._write_transaction():
+            self._validate_stored_timestamps(*values[:2])
             candle_id, _ = self._save_values(values)
         return candle_id
 
@@ -71,6 +77,9 @@ class CandleRepository(BaseRepository):
         values = [self._candle_values(candle) for candle in candles]
         inserted = 0
         with self._write_transaction():
+            # Scan each affected series once, not once per incoming candle.
+            for identity in sorted({value[:2] for value in values}):
+                self._validate_stored_timestamps(*identity)
             for value in values:
                 _, was_inserted = self._save_values(value)
                 inserted += was_inserted
@@ -86,6 +95,62 @@ class CandleRepository(BaseRepository):
             # Serialize conflict checks with writes, including exact replays.
             connection.execute("BEGIN IMMEDIATE")
             yield
+
+    @contextmanager
+    def _read_snapshot(self):
+        """Keep validation and selection consistent without owning caller work."""
+        connection = self.database.connection
+        if connection.in_transaction:
+            yield
+        else:
+            with connection:
+                connection.execute("BEGIN")
+                yield
+
+    def _validate_stored_timestamps(self, symbol: str, resolution: str) -> None:
+        """Stream the indexed series; incompatible history blocks this operation."""
+        cursor = self.database.connection.execute(
+            "SELECT timestamp FROM candles WHERE symbol = ? AND resolution = ?",
+            (symbol, resolution),
+        )
+        try:
+            for row in cursor:
+                raw = row["timestamp"]
+                try:
+                    canonical = self._utc_timestamp(datetime.fromisoformat(raw))
+                except (TypeError, ValueError, OverflowError):
+                    raise CandleTimestampCompatibilityError(
+                        "Stored candle timestamps require explicit compatibility review"
+                    ) from None
+                if raw != canonical:
+                    raise CandleTimestampCompatibilityError(
+                        "Stored candle timestamps require explicit compatibility review"
+                    )
+        finally:
+            cursor.close()
+
+    def _read_rows(self, query, parameters, *, identity=None):
+        with self._read_snapshot():
+            if identity is not None:
+                self._validate_stored_timestamps(*identity)
+            rows = self.database.connection.execute(query, parameters).fetchall()
+            if identity is None and rows:
+                # ID lookup must not certify a row in an incompatible series.
+                self._validate_stored_timestamps(rows[0]["symbol"], rows[0]["resolution"])
+            return rows
+
+    @staticmethod
+    def _utc_timestamp(value: datetime) -> str:
+        aware = validate_aware_datetime(value, field_name="timestamp")
+        try:
+            utc = aware.astimezone(timezone.utc)
+            parsed = datetime.fromisoformat(utc.isoformat())
+            if parsed != utc:
+                raise ValueError("Timestamp precision exceeds microseconds")
+            # stdlib auto precision preserves legacy UTC second/microsecond keys.
+            return parsed.isoformat()
+        except (ValueError, OverflowError):
+            raise ValueError("Timestamp cannot be represented as UTC microseconds") from None
 
     def _save_values(self, values: tuple[object, ...]) -> tuple[int, int]:
         cursor = self.database.connection.execute(
@@ -122,7 +187,7 @@ class CandleRepository(BaseRepository):
         """
         self._validate_id(candle_id)
 
-        row = self.database.connection.execute(
+        rows = self._read_rows(
             """
             SELECT
                 symbol,
@@ -138,12 +203,12 @@ class CandleRepository(BaseRepository):
             WHERE id = ?
             """,
             (candle_id,),
-        ).fetchone()
+        )
 
-        if row is None:
+        if not rows:
             return None
 
-        return self._row_to_candle(row)
+        return self._row_to_candle(rows[0])
 
     def get_latest(
         self,
@@ -165,7 +230,7 @@ class CandleRepository(BaseRepository):
             field_name="resolution",
         )
 
-        row = self.database.connection.execute(
+        rows = self._read_rows(
             """
             SELECT
                 symbol,
@@ -187,12 +252,13 @@ class CandleRepository(BaseRepository):
                 normalized_symbol,
                 normalized_resolution,
             ),
-        ).fetchone()
+            identity=(normalized_symbol, normalized_resolution),
+        )
 
-        if row is None:
+        if not rows:
             return None
 
-        return self._row_to_candle(row)
+        return self._row_to_candle(rows[0])
 
     def get_earliest(
         self,
@@ -209,7 +275,7 @@ class CandleRepository(BaseRepository):
             field_name="resolution",
         )
 
-        row = self.database.connection.execute(
+        rows = self._read_rows(
             """
             SELECT
                 symbol,
@@ -231,12 +297,13 @@ class CandleRepository(BaseRepository):
                 normalized_symbol,
                 normalized_resolution,
             ),
-        ).fetchone()
+            identity=(normalized_symbol, normalized_resolution),
+        )
 
-        if row is None:
+        if not rows:
             return None
 
-        return self._row_to_candle(row)
+        return self._row_to_candle(rows[0])
 
     def get_range(
         self,
@@ -281,11 +348,9 @@ class CandleRepository(BaseRepository):
                 "end must be a datetime or None"
             )
 
-        if (
-            start is not None
-            and end is not None
-            and start > end
-        ):
+        start_key = self._utc_timestamp(start) if start is not None else None
+        end_key = self._utc_timestamp(end) if end is not None else None
+        if start_key is not None and end_key is not None and start_key > end_key:
             raise ValueError(
                 "start must not be later than end"
             )
@@ -314,21 +379,22 @@ class CandleRepository(BaseRepository):
         if start is not None:
             query += " AND timestamp >= ?"
             parameters.append(
-                start.isoformat()
+                start_key
             )
 
         if end is not None:
             query += " AND timestamp <= ?"
             parameters.append(
-                end.isoformat()
+                end_key
             )
 
         query += " ORDER BY timestamp ASC"
 
-        rows = self.database.connection.execute(
+        rows = self._read_rows(
             query,
             parameters,
-        ).fetchall()
+            identity=(normalized_symbol, normalized_resolution),
+        )
 
         return [
             self._row_to_candle(row)
@@ -389,14 +455,15 @@ class CandleRepository(BaseRepository):
             row["candle_count"]
         )
 
-    @staticmethod
+    @classmethod
     def _candle_values(
+        cls,
         candle: Candle,
     ) -> tuple[object, ...]:
         return (
             candle.symbol.strip().upper(),
             candle.resolution.strip().upper(),
-            candle.timestamp.isoformat(),
+            cls._utc_timestamp(candle.timestamp),
             float(candle.open_price),
             float(candle.high_price),
             float(candle.low_price),
@@ -456,6 +523,7 @@ class CandleRepository(BaseRepository):
             raise ValueError(
                 "candle timestamp must be a datetime"
             )
+        cls._utc_timestamp(candle.timestamp)
 
         numeric_fields = {
             "open_price": candle.open_price,

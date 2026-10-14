@@ -1,6 +1,16 @@
 # Investment Terminal — Data Model
 
-## Open timestamp/unit compatibility findings
+## UTC candle key contract
+
+New candle keys and query bounds use stdlib UTC isoformat: +00:00 with either
+seconds or six fractional digits when microseconds are nonzero. Equivalent instants are one key;
+exact OHLCV/currency equality is required for duplicate success. All stored keys
+in an affected series must already round-trip to this form before repository
+read/write. Other spellings fail closed without migration. Schema, historical
+bytes and request/checkpoint checksums are unchanged. A03 unit evidence is still
+open. See `docs/CANDLE_UTC_SAFETY.md` for the precise boundary and limitations.
+
+## Historical timestamp/unit compatibility findings
 
 Current candle TEXT timestamps are not guaranteed canonical UTC and currency
 labels do not retain source-unit conversion evidence. Equivalent offset request
@@ -13,8 +23,9 @@ its proposed UTC/unit contracts are not yet implemented or schema migrations.
 The current `(symbol, resolution, timestamp)` storage key and JSON schemas remain
 unchanged. Duplicate success requires equal persisted open/high/low/close/volume
 and currency; differing payloads raise `CandleConflictError` and roll back all new
-rows in that save operation. No replacement/revision is implicit. Existing
-timestamp/currency normalization is unchanged pending audit A02/A03 work.
+rows in that save operation. No replacement/revision is implicit. Timestamp
+keys now follow the UTC compatibility gate above; currency normalization remains
+unchanged pending A03 source-unit work.
 Direct weekly runs require a new report destination; unsafe destinations emit no
 JSON file. See `docs/CANDLE_WRITE_SAFETY.md` for the scope and failure semantics.
 

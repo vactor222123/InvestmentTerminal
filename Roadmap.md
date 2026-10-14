@@ -1,6 +1,14 @@
 # Investment Terminal — Product Roadmap
 
-## Latest gate — A02/A03 compatibility audit complete; fixes open
+## Latest gate — A02 UTC safety implemented; A03 units next
+
+Canonical UTC keys/bounds, fail-closed affected-series legacy validation, atomic
+write and snapshot-read consistency, and naive provider timestamp rejection are
+implemented. Six A02 probes become regression tests. Private data correctness,
+migration and full-universe overhead remain unmeasured. Next address source units
+and old currency checkpoint evidence; see `docs/CANDLE_UTC_SAFETY.md`.
+
+## Historical gate — A02/A03 compatibility audit complete; fixes open
 
 Synthetic probes and consumer/checksum review are recorded in
 `docs/CANDLE_TIME_UNIT_COMPATIBILITY.md`. Next implement UTC storage/query safety

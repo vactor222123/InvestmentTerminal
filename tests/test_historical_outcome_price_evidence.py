@@ -15,6 +15,7 @@ from investment_terminal.history.historical_outcome_price_evidence import (
 from investment_terminal.models.candle import Candle
 from investment_terminal.repositories.candle_repository import (
     CandleRepository,
+    CandleTimestampCompatibilityError,
 )
 
 
@@ -206,7 +207,7 @@ def test_provider_rejects_naive_requested_timestamp(
         database.close()
 
 
-def test_provider_rejects_naive_stored_candle_timestamp(
+def test_provider_rejects_naive_candle_returned_by_repository(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -215,16 +216,11 @@ def test_provider_rejects_naive_stored_candle_timestamp(
         monkeypatch,
     )
     try:
-        repository.save(
-            candle(
-                timestamp=datetime(
-                    2026,
-                    8,
-                    3,
-                    20,
-                    0,
-                ),
-            )
+        # Persistence now rejects this input. Preserve the independent
+        # consumer-defense test with an explicitly injected malformed result.
+        monkeypatch.setattr(
+            repository, "get_range",
+            lambda *args: [candle(timestamp=TARGET.replace(tzinfo=None))],
         )
 
         with pytest.raises(
@@ -238,6 +234,24 @@ def test_provider_rejects_naive_stored_candle_timestamp(
                 resolution="D",
                 observed_at=TARGET,
             )
+    finally:
+        database.close()
+
+
+def test_provider_propagates_legacy_storage_gate(tmp_path, monkeypatch):
+    database, repository = prepare_repository(tmp_path, monkeypatch)
+    try:
+        database.connection.execute(
+            "INSERT INTO candles (symbol,resolution,timestamp,open_price,high_price,"
+            "low_price,close_price,volume,currency) "
+            "VALUES ('IWDA','D','2026-08-03T20:00:00',100,106,99,105,1000,'EUR')"
+        )
+        database.connection.commit()
+        with pytest.raises(CandleTimestampCompatibilityError):
+            HistoricalOutcomePriceEvidenceProvider(repository).get_exact(
+                instrument_key="IWDA", resolution="D", observed_at=TARGET)
+        assert repository.count("IWDA", "D") == 1
+        assert not database.connection.in_transaction
     finally:
         database.close()
 

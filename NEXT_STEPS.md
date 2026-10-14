@@ -1,6 +1,17 @@
 # Investment Terminal — Next Steps
 
-## Current next step — implement UTC safety with legacy-storage guard
+## Current next step — source-unit safety upstream of normalization
+
+A02 repository/provider safety is implemented; see `docs/CANDLE_UTC_SAFETY.md`.
+After applying and returning SHA, implement A03 at the raw metadata/unit boundary
+before uppercasing. Preserve existing JSON/checksum contracts or explicitly
+design versioned changes; account for old successful currency checkpoints and
+derived manifests. Reject ambiguous unit evidence rather than guess or rescale
+stored GBP prices. No manual price entry, live collection or private migration.
+If the UTC compatibility gate stops an operation, preserve its database/checkpoint
+for a separately authorized inventory/recovery decision, not a blind retry.
+
+## Historical next step — implement UTC safety with legacy-storage guard
 
 The A02/A03 compatibility audit is complete, not the fixes. Read
 `docs/CANDLE_TIME_UNIT_COMPATIBILITY.md` and its executable probes.
