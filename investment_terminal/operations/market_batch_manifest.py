@@ -4,6 +4,8 @@ from datetime import datetime
 from hashlib import sha256
 import json
 
+from investment_terminal.market.candle_currency import require_yahoo_candle_currency
+
 from investment_terminal.operations.resumable_market_batch import MarketBatchRequest
 from investment_terminal.operations.symbol_currency_qualification import (
     SymbolCurrencyQualificationService,
@@ -78,11 +80,7 @@ class MarketBatchManifestService:
                 )
                 excluded_categories[category] = excluded_categories.get(category, 0) + 1
                 continue
-            currency = normalize_required_text(
-                outcome.get("currency"), field_name="currency", uppercase=True
-            )
-            if len(currency) != 3 or not currency.isalpha():
-                raise ValueError("Successful currency must be a three-letter code")
+            currency = require_yahoo_candle_currency(outcome.get("currency"))
             items.append({"symbol": symbol, "currency": currency})
         if not items:
             raise ValueError("Market batch manifest requires at least one successful item")

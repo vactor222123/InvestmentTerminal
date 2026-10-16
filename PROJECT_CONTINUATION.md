@@ -1,6 +1,22 @@
 # InvestmentTerminal — Project Continuation
 
-## Current handoff — UTC repository and provider safety implemented
+## Current handoff — bounded source-unit rejection implemented
+
+IMPLEMENTATION at fresh clean develop `95b5265b95fa7ced963d5723814fb196325db5ad`.
+User delegated compatibility choice. Selected rejection instead of a speculative
+schema migration: preserve historical evidence, JSON and request checksums;
+reject mixed-case labels before folding and block the reproduced legacy Yahoo
+GBP collision at metadata, checkpoint resume, request and execution boundaries.
+Repository writes reject ambiguous labels atomically; canonical generic GBP
+does not certify provider units. No private data, live provider or migration.
+See `docs/CANDLE_UNIT_SAFETY.md` for restrictions and remaining provenance work.
+Focused: 329 passed (6.91 s). Full: 3928 passed, 4 skipped (43.91 s),
+one existing Starlette warning; diff-check clean. 51 new synthetic cases;
+the two A03 expected-failure probes now pass normally.
+Next: apply and return SHA, then A06 consistent market-runtime backup/restore.
+No operational run or historical price conversion is authorized by this result.
+
+## Historical handoff — UTC repository and provider safety implemented
 
 IMPLEMENTATION at fresh clean develop `f473834faa609db55aedf534881989f13afa5a92`.
 Aware input instants and query bounds now use canonical UTC. Equivalent-offset

@@ -1,5 +1,10 @@
 # Candle timestamp and unit compatibility audit
 
+Latest follow-up: `CANDLE_UNIT_SAFETY.md` implements bounded A03 rejection and
+legacy GBP checkpoint/request gating. Both unit probes are now ordinary tests;
+source-unit conversion and historical certification remain deferred. The text
+below preserves the original audit and its prior follow-up status.
+
 Follow-up: A02 repository/provider implementation is recorded in
 `CANDLE_UTC_SAFETY.md`. Six probes below are now ordinary regression tests;
 the two A03 xfails remain open. This document preserves the audit baseline.

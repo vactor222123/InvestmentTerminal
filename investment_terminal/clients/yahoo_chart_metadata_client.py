@@ -3,6 +3,7 @@
 import yfinance as yf
 
 from investment_terminal.utils.validation import normalize_required_text
+from investment_terminal.market.candle_currency import require_yahoo_candle_currency
 
 
 class YahooChartMetadataClient:
@@ -22,7 +23,4 @@ class YahooChartMetadataClient:
         currency = metadata.get("currency")
         if not isinstance(currency, str):
             raise ValueError("Yahoo chart metadata currency is missing")
-        normalized_currency = currency.strip().upper()
-        if len(normalized_currency) != 3 or not normalized_currency.isalpha():
-            raise ValueError("Yahoo chart metadata currency is invalid")
-        return normalized_currency
+        return require_yahoo_candle_currency(currency)

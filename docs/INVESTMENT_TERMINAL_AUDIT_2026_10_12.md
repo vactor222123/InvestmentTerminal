@@ -2,6 +2,13 @@
 
 ## Follow-up status
 
+A03: bounded prevention implemented from
+`95b5265b95fa7ced963d5723814fb196325db5ad`; see `CANDLE_UNIT_SAFETY.md`.
+Raw mixed-case labels are rejected and legacy Yahoo GBP successes/requests are
+blocked before execution. Both probes are regressions now. Full source-unit
+catalog, historical certification, conversion and A07 remain open; no private
+data defect or repair is claimed. Earlier status paragraphs are historical.
+
 A02: repository/provider UTC safety implemented from
 `f473834faa609db55aedf534881989f13afa5a92`; see `CANDLE_UTC_SAFETY.md`.
 Six audit probes promoted to regressions. Incompatible legacy series fail closed;

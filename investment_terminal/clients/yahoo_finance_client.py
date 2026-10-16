@@ -24,6 +24,7 @@ from yfinance.exceptions import (
 )
 
 from investment_terminal.models.candle import Candle
+from investment_terminal.market.candle_currency import require_yahoo_candle_currency
 from investment_terminal.utils.exceptions import APIError
 from investment_terminal.utils.validation import validate_aware_datetime
 
@@ -317,10 +318,7 @@ class YahooFinanceClient:
             resolution,
             field_name="resolution",
         )
-        normalized_currency = self._normalize_text(
-            currency,
-            field_name="currency",
-        )
+        normalized_currency = require_yahoo_candle_currency(currency)
 
         if not isinstance(start, datetime):
             raise TypeError("start must be a datetime")
@@ -370,7 +368,7 @@ class YahooFinanceClient:
         normalized_resolution = self._normalize_text(
             resolution, field_name="resolution"
         )
-        normalized_currency = self._normalize_text(currency, field_name="currency")
+        normalized_currency = require_yahoo_candle_currency(currency)
         if not isinstance(start, datetime):
             raise TypeError("start must be a datetime")
         if not isinstance(end, datetime):
@@ -429,7 +427,7 @@ class YahooFinanceClient:
             frame,
             symbol=cls._normalize_text(symbol, field_name="symbol"),
             resolution=cls._normalize_text(resolution, field_name="resolution"),
-            currency=cls._normalize_text(currency, field_name="currency"),
+            currency=require_yahoo_candle_currency(currency),
             allow_trailing_incomplete=False,
         )
 

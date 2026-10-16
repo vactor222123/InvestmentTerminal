@@ -10,6 +10,7 @@ import sqlite3
 
 from investment_terminal.database.database import Database
 from investment_terminal.models.candle import Candle
+from investment_terminal.market.candle_currency import normalize_candle_currency
 from investment_terminal.repositories.base_repository import (
     BaseRepository,
 )
@@ -469,7 +470,7 @@ class CandleRepository(BaseRepository):
             float(candle.low_price),
             float(candle.close_price),
             float(candle.volume),
-            candle.currency.strip().upper(),
+            normalize_candle_currency(candle.currency),
         )
 
     @staticmethod
@@ -511,10 +512,7 @@ class CandleRepository(BaseRepository):
             candle.resolution,
             field_name="resolution",
         )
-        cls._normalize_text(
-            candle.currency,
-            field_name="currency",
-        )
+        normalize_candle_currency(candle.currency)
 
         if not isinstance(
             candle.timestamp,

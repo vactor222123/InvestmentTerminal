@@ -7,6 +7,8 @@ from hashlib import sha256
 import json
 import sqlite3
 
+from investment_terminal.market.candle_currency import require_yahoo_candle_currency
+
 from investment_terminal.clients.yahoo_finance_client import (
     YahooCandleFailureCategory,
     project_yahoo_candle_failure,
@@ -143,6 +145,8 @@ class WeeklyCandleRefreshService:
     def run(self, plan, checkpoint=None, *, max_items, retry_rate_limited=False):
         if not isinstance(plan, WeeklyCandleRefreshPlan):
             raise TypeError("plan must be a WeeklyCandleRefreshPlan")
+        for _, currency in plan.items:
+            require_yahoo_candle_currency(currency)
         if isinstance(max_items, bool) or not isinstance(max_items, int) or not (
             1 <= max_items <= len(plan.items)
         ):

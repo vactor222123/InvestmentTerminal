@@ -1,5 +1,15 @@
 # Investment Terminal — Data Model
 
+## Candle unit compatibility gate
+
+Existing JSON schemas and request checksum serialization are unchanged. Candle
+writes reject mixed-case/non-ASCII/non-three-letter labels before normalization.
+The current Yahoo string-only contract refuses the reproduced GBP collision
+family, including legacy successful currency evidence and derived requests.
+No old currency is promoted to verified source-unit evidence. Generic canonical
+GBP storage remains possible but cannot certify Yahoo provenance. No price or
+volume is converted. See `docs/CANDLE_UNIT_SAFETY.md` for exact scope and limits.
+
 ## UTC candle key contract
 
 New candle keys and query bounds use stdlib UTC isoformat: +00:00 with either

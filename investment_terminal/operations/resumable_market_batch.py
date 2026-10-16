@@ -6,6 +6,8 @@ from datetime import datetime
 from hashlib import sha256
 import json
 
+from investment_terminal.market.candle_currency import require_yahoo_candle_currency
+
 from investment_terminal.clients.yahoo_finance_client import (
     YahooCandleFailureCategory,
     project_yahoo_candle_failure,
@@ -58,7 +60,7 @@ class MarketBatchRequest:
             raise ValueError("items must contain between 1 and 20 objects")
         items = tuple(sorted(MarketBatchItem(
             normalize_required_text(row.get("symbol"), field_name="symbol", uppercase=True),
-            normalize_required_text(row.get("currency"), field_name="currency", uppercase=True),
+            require_yahoo_candle_currency(row.get("currency")),
         ) for row in rows))
         if len({item.symbol for item in items}) != len(items):
             raise ValueError("items must contain unique symbols")
@@ -91,6 +93,8 @@ class ResumableMarketBatchService:
     ) -> dict[str, object]:
         if not isinstance(request, MarketBatchRequest):
             raise TypeError("request must be a MarketBatchRequest")
+        for item in request.items:
+            require_yahoo_candle_currency(item.currency)
         if not isinstance(retry_failed, bool):
             raise TypeError("retry_failed must be a boolean")
         if continue_after_failure is not None and not callable(

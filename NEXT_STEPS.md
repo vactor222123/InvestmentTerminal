@@ -1,6 +1,16 @@
 # Investment Terminal — Next Steps
 
-## Current next step — source-unit safety upstream of normalization
+## Current next step — consistent market-runtime backup/restore (A06)
+
+Bounded A03 rejection is implemented; see `docs/CANDLE_UNIT_SAFETY.md`.
+Apply this package and return the applied SHA. No runtime command is needed now.
+Next audit existing backup/restore ownership and implement the smallest coherent
+market-data recovery slice with synthetic failure tests. Keep unit support and
+historical repair separate: a GBP compatibility stop preserves evidence and is
+not permission to relabel prices, rewrite manifests or re-download everything.
+Existing complete-read, exact-baseline, one-commit and no-push rules remain.
+
+## Historical next step — source-unit safety upstream of normalization
 
 A02 repository/provider safety is implemented; see `docs/CANDLE_UTC_SAFETY.md`.
 After applying and returning SHA, implement A03 at the raw metadata/unit boundary

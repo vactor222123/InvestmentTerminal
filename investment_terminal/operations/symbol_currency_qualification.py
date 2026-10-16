@@ -4,6 +4,8 @@ from datetime import datetime
 from hashlib import sha256
 import json
 
+from investment_terminal.market.candle_currency import require_yahoo_candle_currency
+
 from investment_terminal.clients.yahoo_finance_client import (
     YahooCandleFailureCategory,
     classify_yahoo_candle_failure,
@@ -53,7 +55,7 @@ class SymbolCurrencyQualificationService:
             previous = outcomes.get(symbol, {})
             attempts = int(previous.get("attempt_count", 0)) + 1
             try:
-                currency = self.client.get_currency(symbol)
+                currency = require_yahoo_candle_currency(self.client.get_currency(symbol))
                 outcome = {"status": "SUCCESS", "attempt_count": attempts,
                            "currency": currency, "failure_category": None}
             except Exception as exc:
@@ -152,6 +154,11 @@ class SymbolCurrencyQualificationService:
             raise ValueError("Checkpoint outcomes are invalid")
         migrated = value["schema_version"] == 1 and migrate
         copied = {key: dict(item) for key, item in outcomes.items()}
+        # Validate before migration writes or terminal-success/provider bypass.
+        # This applies to schema 1 and 2 and to the complete-drain consumer.
+        for item in copied.values():
+            if item.get("status") == "SUCCESS":
+                require_yahoo_candle_currency(item.get("currency"))
         if migrated:
             for item in copied.values():
                 if (item.get("status") == "FINAL_FAILED"

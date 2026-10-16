@@ -1,5 +1,14 @@
 # Investment Terminal — Software Architecture
 
+## Candle unit rejection boundary
+
+Market-owned label validation is shared by provider, operation and repository
+write boundaries. Mixed-case units are rejected before case folding; the legacy
+Yahoo string-only path also blocks GBP before successful-checkpoint resume or
+manifest execution. No conversion or evidence migration is implicit. Generic
+repository GBP is not provider certification. See `docs/CANDLE_UNIT_SAFETY.md`
+for the deliberately bounded compatibility policy and remaining provenance gaps.
+
 ## UTC repository boundary
 
 CandleRepository canonicalizes aware input instants and query bounds to UTC.

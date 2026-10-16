@@ -83,7 +83,6 @@ def test_yahoo_naive_source_is_not_assumed_utc():
             frame, symbol="SYNTH", resolution="D", currency="USD")
 
 
-@pytest.mark.xfail(strict=True, reason="A03: metadata case lost before unit qualification")
 def test_metadata_does_not_silently_relabel_case_sensitive_unit():
     client = YahooChartMetadataClient(ticker_factory=lambda _: SimpleNamespace(
         get_history_metadata=lambda: {"currency": "GBp"}))
@@ -93,7 +92,6 @@ def test_metadata_does_not_silently_relabel_case_sensitive_unit():
         client.get_currency("SYNTH")
 
 
-@pytest.mark.xfail(strict=True, reason="A03: repository silently relabels GBp as GBP")
 def test_unqualified_unit_rejected_before_storage(repository):
     with pytest.raises(ValueError):
         repository.save(candle(currency="GBp"))

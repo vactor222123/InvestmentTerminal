@@ -1,6 +1,15 @@
 # Investment Terminal — Product Roadmap
 
-## Latest gate — A02 UTC safety implemented; A03 units next
+## Latest gate — bounded A03 rejection implemented
+
+Raw mixed-case unit labels now fail before normalization. Legacy Yahoo GBP
+successes/requests cannot bypass the compatibility gate through resume. Existing
+JSON/checksums and historical prices stay unchanged. Full source-unit support and
+private historical qualification are not claimed. See `docs/CANDLE_UNIT_SAFETY.md`.
+Next prioritize A06 consistent market-runtime backup/restore before repair;
+no live refresh, metadata rerun or automatic migration follows from this package.
+
+## Historical gate — A02 UTC safety implemented; A03 units next
 
 Canonical UTC keys/bounds, fail-closed affected-series legacy validation, atomic
 write and snapshot-read consistency, and naive provider timestamp rejection are
